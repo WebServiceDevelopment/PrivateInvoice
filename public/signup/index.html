@@ -1,0 +1,179 @@
+<!--
+/**
+
+ Apache-2.0 License
+ Copyright 2020 - 2022 Web Service Development Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ Author: Ogawa Kousei (kogawa@wsd.co.jp)
+
+**/
+-->
+<!doctype html>
+<html>
+
+	<head>
+
+		<title>Private Invoice | Signup</title>
+		<meta charset="utf-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<link rel="shortcut icon" type="image/png" href="img/favicon_wsd.png"/>
+		<link rel="stylesheet" type="text/css" href="css/layout.css"/>
+		<link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet"> 
+
+	</head>
+
+	<body>
+		
+		<main>
+
+			<h1>
+				<img src="img/logo_full.png"/> <span><b>Private</b> Invoice</span>
+			</h1>
+
+			<article>
+				
+				<h2>Get Started with Private Invoice</h2>
+
+				<!-- END ACCOUNT INFORMATION -->
+
+				<h3>Company Information</h3>
+
+				<!-- START COMPANY INFORMATION -->
+
+				<div class="row">
+
+					<div class="main">
+
+						<div class="field">
+							<label class="placeholder required">Company Name</label>
+							<input type="text" id="SignupForm.company.name" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+						<div class="field">
+							<label class="placeholder required">Company Postcode</label>
+							<input type="text" id="SignupForm.company.postcode" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+						<div class="field">
+							<label class="placeholder required">Company Address</label>
+							<input type="text" id="SignupForm.company.address" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+						<div class="field">
+							<label class="placeholder required">Company Building</label>
+							<input type="text" id="SignupForm.company.building" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+						<div class="field">
+							<label class="placeholder required">Company Department</label>
+							<input type="text" id="SignupForm.company.department" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+					</div>
+
+					<div class="aside">
+
+						<p>
+						Upload Company Logo
+						</p>
+						
+						<li>Company Logo</li>
+
+					</div>
+
+				</div>
+
+				<!-- END COMPANY INFORMATION -->
+				
+				<h3>Account Information</h3>
+
+				<!-- START ACCOUNT INFORMATION -->
+
+				<div class="row">
+
+					<div class="main">
+
+						<div class="field">
+							<label class="placeholder required">Username</label>
+							<input type="text" id="SignupForm.account.username" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+						<div class="field">
+							<label class="placeholder required">Contact Email</label>
+							<input type="text" id="SignupForm.account.work_email" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+						<div class="field">
+							<label class="placeholder required">Password</label>
+							<input type="password" id="SignupForm.account.password" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+						<div class="field">
+							<label class="placeholder required">Confirm Password</label>
+							<input type="password" id="SignupForm.account.confirm_password" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+					</div>
+
+					<div class="aside">
+
+						<p>
+						Profile Image
+						</p>
+						
+						<li>Upload Profile Image</li>
+
+					</div>
+
+				</div>
+
+				<div class="footer">
+					
+					<div class="agree">
+					<label>
+						<input type="checkbox"/> I have read and agree to the
+						<a href="#">Privacy Policy</a> and <a href="#">Terms of Service</a>
+					</label>
+					</div>
+
+					<button id="SignupForm.submit" disabled="disabled">
+						Get Started
+					</button>
+
+				</div>
+
+			</article>
+
+			<div class="copyright">
+				Already have an account? <a href="/login/">Login</a><br>
+				Copyright &copy 2016 - 2021 Web Service Development
+			</div>
+
+		</main>
+
+		<script type="text/javascript" src="js/SignupForm.js"></script>
+
+	</body>
+
+
+</html>

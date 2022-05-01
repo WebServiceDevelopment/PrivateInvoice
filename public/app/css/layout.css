@@ -1,0 +1,8252 @@
+html {
+
+	padding: 0;
+	margin: 0;
+	height: 100%;
+
+}
+
+body {
+
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	background-color: #f2f2f2;
+
+}
+
+
+
+main.app {
+
+	width: 100%;
+	height: 100%;
+
+	--header-height: 42px;
+	--folder-width: 240px;
+	--tray-width: 390px;
+	--chat-width: 360px;
+
+	--stamp-width: 120px;
+	--input-placeholder-color: #bababa;
+}
+
+main.app header {
+
+	position: fixed;
+	left: 0;
+	top: 0;
+	height: var(--header-height);
+	width: 100%;
+	background-color: #124088;
+	z-index: 100;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
+
+aside {
+
+	position: fixed;
+	z-index: 200;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.25);
+	/*
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	*/
+
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 200ms;
+
+}
+
+aside.open {
+
+	opacity: 1;
+	pointer-events: all;
+
+}
+
+aside div.modal {
+
+	width: 500px;
+	background-color: #fff;
+	border-radius: 5px;
+	border: 1px solid rgba(0,0,0,.2);
+	display: block;
+	margin: auto;
+	font-family: 'Montserrat', sans-serif;
+	transition: transform 200ms;
+
+}
+
+aside.open div.modal {
+
+	transform: translateY(180px);
+
+}
+
+aside div.modal div.header {
+
+	height: 38px;
+	border-bottom: 1px solid rgba(0,0,0,0.2);
+	padding: 8px;
+	position: relative;
+
+}
+
+aside div.modal div.footer {
+
+	height: 38px;
+	border-top: 1px solid rgba(0,0,0,0.2);
+	padding: 8px;
+	position: relative;
+
+}
+
+aside div.modal div.footer table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+aside div.modal div.footer table button.close {
+
+	width: 120px;
+	padding: 5px 0;
+	background-color: #6c757d;
+	border: 1px solid #6c757d;
+	color: #fff;
+	border-radius: 5px;
+	display: block;
+	margin: auto;
+
+}
+
+aside div.modal div.footer table button.close:hover {
+
+	cursor: pointer;
+
+}
+
+aside div.modal div.footer table button.submit {
+
+	width: 120px;
+	padding: 5px 0;
+	background-color: #007bff;
+	border: 1px solid #007bff;
+	color: #fff;
+	border-radius: 5px;
+	display: block;
+	margin: auto;
+
+}
+
+
+aside div.modal div.footer table button.submit:hover {
+
+	cursor: pointer;
+
+}
+
+aside div.modal div.header h3 {
+
+	padding: 0;
+	margin: 0;
+	font-size: 19px;
+	font-weight: 400;
+	line-height: 38px;
+	text-indent: 20px;
+
+}
+
+aside div.modal div.header div.close {
+
+	width: 38px;
+	height: 38px;
+	padding: 8px;
+	background-image: url(../img/close.png);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 30%;
+	position: absolute;
+	right: 0;
+	top: 0;
+
+}
+
+aside div.modal div.header div.close:hover {
+
+	cursor: pointer;
+
+}
+
+aside div.modal div.body {
+
+	padding: 16px;
+	width: 86%;
+	display : block;
+	margin: auto;
+
+}
+
+aside div.modal div.body table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+aside div.modal div.body li {
+
+	list-style: none;
+
+}
+
+aside div.modal div.body li.request {
+
+	padding-bottom: 5px;
+
+}
+
+aside div.modal div.body li.label {
+
+	font-weight: bold;
+	font-size: 14px;
+	padding-bottom: 5px;
+
+}
+
+aside div.modal div.body .balance {
+
+	font-size: 20px;
+	color: #26173a;
+	text-align: right;
+	padding-bottom: 6px;
+
+}
+
+aside div.modal div.body div.line {
+
+	height: 1px;
+	background-color: #ddd;
+	margin: 10px 0;
+
+}
+
+main.app header table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app header table td.search {
+
+	width: var(--tray-width);
+
+}
+
+main.app header table td.search div.search-widget {
+
+	width: calc(100% - 10px);
+	min-height: 20px;
+	display: block;
+	position: relative;
+	top: -1px;
+
+	display: none;
+}
+
+main.app header table td.search div.search-widget i.hint {
+
+	position: absolute;
+	right: 14px;
+	top: 7px;
+	font-size: 15px;
+	color: #222;
+
+}
+
+main.app header table td.search div.search-widget input {
+
+	width: 100%;
+	border: none;
+	outline: none;
+	background-color: rgba(255, 255, 255, 0.7);
+	font-size: 15px;
+	font-family: 'Montserrat', sans-serif;
+	text-indent: 14px;
+	padding: 5px 0;
+	border-radius: 13px;
+
+}
+
+main.app header table td.toggle {
+
+	width: 90px;
+
+}
+
+main.app header table td.toggle div.span {
+
+	width: 84px;
+	display: block;
+	margin: auto;
+	background-color: rgba(255, 255, 255, 0.1);
+	border-radius: 10px;
+	color: #fff;
+	font-family: 'Muli', sans-serif;
+	font-size: 14px;
+	padding: 5px 0;
+	text-align: center;
+
+}
+
+main.app header table td.toggle div.span.open {
+
+	background-color: rgba(255, 255, 255, 0.4);
+
+}
+
+main.app header table td.toggle div.span:hover {
+	
+	cursor: pointer;
+	background-color: rgba(255, 255, 255, 0.4);
+
+}
+
+main.app header table td.icon {
+
+	width: 40px;
+
+}
+
+main.app header table td.title {
+
+	width: 200px;
+	text-indent: 4px;
+
+}
+
+main.app header table td.icon img {
+
+	max-width: 90%;
+	display: block;
+	margin: auto;
+	padding-top: 1px;
+	padding-left: 4px;
+
+}
+
+main.app header table td.title h1 {
+
+	padding: 0;
+	margin: 0;
+	font-size: 20px;
+	color: #fff;
+	font-weight: 500;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+main.app header table td.email {
+
+	padding-right: 10px;
+	font-size: 15px;
+	color: #fff;
+	font-family: 'Muli', sans-serif;
+	text-align: right;
+
+}
+
+main.app header table td.menu {
+
+	width: 40px;
+
+}
+
+main.app header table td.menu div.btn {
+
+	width: 36px;
+	height: 36px;
+	border-radius: 4px;
+	display: block;
+	margin: auto;
+	font-size: 18px;
+	color: #fff;
+	line-height: 39px;
+	text-align: center;
+
+}
+
+#TabWidget\.tab\.bell{
+    display : none;
+}
+
+main.app header table td.menu div.btn.open,
+main.app header table td.menu div.btn:hover {
+
+	cursor: pointer;
+	background-color: rgba(255, 255, 255, 0.4);
+
+}
+
+main.app section {
+
+	position: fixed;
+	left: 0;
+	top: var(--header-height);
+	width: 100%;
+	height: calc(100% - var(--header-height));
+	x-index: 0;
+	
+}
+
+main.app section article.send {
+
+	background-color: #ececec;
+
+}
+
+main.app section article {
+
+	width: 100%;
+	height: 100%;
+	background-color: #fff;
+	position: relative;
+	display: none;
+
+}
+
+main.app section article.open {
+
+	display: block;
+
+}
+
+main.app section article div.folders {
+
+	width: calc(var(--folder-width) - 1px);
+	border-right: 1px solid #dddddd;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	background-color: #f5f5f5;
+
+}
+
+main.app section article div.folders div.select-widget {
+	
+	width: calc(100% - 10px);
+	margin: auto;
+	position: absolute;
+	left: 4px;
+	bottom: 4px;
+
+}
+
+main.app section article div.folders div.select-widget div.contain {
+
+	border: 1px solid #ccc;
+	border-radius: 8px;
+	overflow: hidden;
+
+}
+
+main.app section article div.folders div.select-widget div.contain table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.folders div.select-widget div.contain table td {
+
+	border-right: 1px solid #ccc;
+	text-align: center;
+	font-size: 15px;
+	font-family: 'Montserrat', sans-serif;
+	padding-top: 4px;
+	padding-bottom: 4px;
+
+}
+
+main.app section article div.folders div.select-widget div.contain table td.disabled {
+
+	background-color: #e2e2e2;
+	pointer-events: none;
+
+}
+
+main.app section article div.folders div.select-widget div.contain table td.active {
+
+	color: #fff;
+	background-color: #1d65a8 !important;
+	font-weight: bold;
+
+}
+
+main.app section article div.folders div.select-widget div.contain table td:hover {
+
+	cursor: pointer;
+	background-color: #ebf8ff;
+
+}
+
+main.app section article div.folders div.select-widget div.contain table td:last-child {
+
+	border-right: none;
+
+}
+
+main.app section article div.folders div.direction-widget {
+
+	width: calc(100% - 10px);
+	position: absolute;
+	left: 4px;
+	bottom: 12px;
+
+}
+
+main.app section article div.folders div.direction-widget label {
+
+	display: block;
+	margin-top: 8px;
+	font-family: 'Montserrat', sans-serif;
+	color: #444;
+	font-size: 15px;
+	letter-spacing: 1px;
+
+}
+
+main.app section article div.folders div.toggle-widget {
+
+	width: calc(100% - 8px);
+	border: 1px solid #cecece;
+	margin: 10px auto;
+	border-radius: 24px;
+	display: flex;
+	overflow: hidden;
+
+}
+
+main.app section article div.folders div.toggle-widget label {
+
+	position: relative;
+	width: 50%;
+	display: block;
+	padding: 5px 0;
+	padding-bottom: 7px;
+	text-indent: 0px;
+	z-index: 1;
+
+}
+
+main.app section article div.folders div.toggle-widget label:hover {
+
+	background-color: pink;
+	cursor: pointer;
+
+}
+
+main.app section article div.folders div.toggle-widget input[type="radio"] {
+
+	appearance: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	pointer-events: none;
+
+}
+
+main.app section article div.folders div.toggle-widget input[type="radio"]:before {
+
+	content: "";
+	display: block;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	background-color: #f2f2f2;
+	position: absolute;
+	z-index: -1;
+
+}
+
+main.app section article div.folders div.toggle-widget input[type="radio"]:after {
+
+	content: attr(data-label);
+	font-family: 'Montserrat', sans-serif;
+	font-size: 14px;
+	color: #444;
+	display: block;
+	text-indent: 5px;
+
+}
+
+main.app section article div.folders div.toggle-widget input[type="radio"]:checked:after {
+
+	color: #fff;
+
+}
+
+main.app section article div.folders div.toggle-widget input[type="radio"]:checked:before {
+
+	background-color: #2879b7;
+
+}
+
+main.app section article div.folders div.compose {
+
+	padding-top: 10px;
+
+}
+
+main.app section article div.folders ul {
+
+	padding: 5px 0;
+	margin: 0;
+	width: 100%;
+
+}
+
+main.app section article div.folders ul li {
+
+	list-style: none;
+	width: calc(100% - 8px);
+	display: block;
+	margin: auto;
+	margin-bottom: 2px;
+	padding: 5px 0;
+	border-radius: 5px;
+
+}
+
+/*
+main.app section article div.folders ul li:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.1);
+
+}
+*/
+
+main.app section article div.folders ul li.sub {
+
+	width: calc(100% - 28px);
+	margin-left: 26px;
+
+}
+
+main.app section article div.folders ul li table {
+
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.folders ul li table td.label {
+
+	text-indent: 4px;
+
+}
+
+main.app section article div.folders ul li table td.icon {
+
+	width: 30px;
+	text-align: center;
+	color: #333;
+
+}
+
+main.app section article div.folders ul li table td.count {
+
+	width: 40px;
+	padding-right: 5px;
+	text-align: right;
+
+}
+
+main.app section article div.folders ul li:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.06);
+
+}
+
+main.app section article div.folders ul li.active {
+
+	color: #1e6399;
+	background-color: rgba(30, 99, 153, 0.09) !important;
+
+}
+
+main.app section article div.folders ul li.active td.icon {
+	
+	color: #1e6399;
+
+}
+
+main.app section article div.folders ul li.active td.icon i:before {
+
+	content: "\f07c";
+
+}
+
+main.app section article div.folders div.search {
+
+	padding-top: 10px;
+	padding-bottom: 10px;
+
+}
+
+main.app section article div.folders div.search div.input {
+
+	width: calc(100% - 8px);
+	display: block;
+	margin: auto;
+	border-radius: 4px;
+	background-color: rgba(0,0,0,0.07);
+	position: relative;
+
+}
+
+main.app section article div.folders div.search div.input input {
+
+	background-color: transparent;
+	border: none;
+	outline: none;
+	width: 100%;
+	padding: 7px 0;
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+	text-indent: 10px;
+
+}
+
+main.app section article div.folders div.search i {
+
+	position: absolute;
+	right: 12px;
+	top: 8px;
+	color: #9a9a9a;
+
+}
+
+main.app section article div.folders div.search i.fa-search {
+
+	pointer-events: none;
+
+}
+
+main.app section article div.folders div.compose div.button {
+
+	height: 34px;
+	width: calc(100% - 8px);
+	border-radius: 5px;
+	display: block;
+	margin: auto;
+	font-size: 15px;
+	overflow: hidden;
+	background-color: #2879b7;
+	margin-bottom: 10px;
+	transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+
+}
+
+main.app section article div.folders div.compose div.button table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	height: 100%;
+	color: #fff;
+
+}
+
+main.app section article div.folders div.compose div.button table td {
+
+	padding-top: 4px;
+	padding-bottom: 4px;
+
+}
+
+main.app section article div.folders div.compose div.button table td.icon {
+
+	width: 40px;
+	text-align: center;
+	background-color: #1e6399;
+
+}
+
+main.app section article div.folders div.compose div.button table td.text {
+
+	text-align: center;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 17px;
+
+}
+
+main.app section article div.folders div.compose div.button:hover {
+
+	box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+	cursor: pointer;
+
+}
+
+main.app section article div.tray {
+
+	position: absolute;
+	left: var(--folder-width);
+	top: 0;
+	height: 100%;
+	width: calc(var(--tray-width) - 1px);
+	border-right: 1px solid #dddddd;
+	background-color: #fff;
+	overflow: hidden;
+	--batch-height: 39px;
+	z-index: 20;
+
+}
+
+main.app section article div.tray div.batch {
+
+	height: calc(var(--batch-height) - 1px);
+	border-bottom: 1px solid #dddddd;
+
+}
+
+main.app section article div.tray div.batch table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.tray div.batch table td.dropdown {
+
+	width: 54px;
+	color: #222;
+	font-family: 'Montserrat', sans-serif;
+	text-indent: 8px;
+
+}
+
+main.app section article div.tray div.batch table td.check {
+
+	width: 40px;
+
+}
+
+main.app section article div.tray div.batch table td.actions {
+
+	width: 90px;
+	text-align: right;
+	padding-right: 8px;
+	font-size: 14px;
+	color: #222;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+main.app section article div.tray div.batch table td.total {
+
+	font-size: 14px;
+	padding-right: 4px;
+
+}
+
+main.app section article div.tray div.batch table td.total span {
+
+	padding-left: 4px;
+
+}
+
+main.app section article div.tray div.batch table td.dropdown span {
+
+	padding-left: 4px;
+
+}
+
+main.app section article div.tray div.batch table td.dropdown i.fa-sort-down {
+
+	font-size: 18px;
+	position: relative;
+	top: -1px;
+
+}
+
+main.app section article div.chat div.header table td.adjust,
+main.app section article div.tray div.batch table td.adjust {
+
+	width: 34px;
+	text-align: center;
+	color: #222;
+	font-size: 14px;
+
+}
+
+main.app section article div.chat div.header table td.adjust i,
+main.app section article div.tray div.batch table td.adjust i {
+
+	position: relative;
+
+}
+
+main.app section article div.chat div.header table td.adjust i:after,
+main.app section article div.tray div.batch table td.adjust i:after {
+	
+	content: "";
+	display: block;
+	position: absolute;
+	width: 27px;
+	height: 27px;
+	background-color: rgba(0,0,0,0.07);
+	border-radius: 100%;
+	left: -7px;
+	top: -7px;
+	transform: scale(0,0);
+	transition: transform 200ms;
+
+}
+
+main.app section article div.tray div.batch table td.adjust i.fa-ellipsis-v:after {
+
+	left: -11px;
+
+}
+
+main.app section article div.chat div.header table td.adjust:hover,
+main.app section article div.tray div.batch table td.adjust:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.chat div.header table td.adjust:hover i:after,
+main.app section article div.tray div.batch table td.adjust:hover i:after {
+
+	transform: scale(1,1);
+
+}
+
+
+main.app section article div.tray div.list {
+
+	height: calc(100% - var(--batch-height) - 50px);
+	overflow-y: auto;
+
+}
+
+main.app section article div.tray div.list li {
+
+	width: calc(100% - 1px);
+	margin-left: 1px;
+	list-style: none;
+	border-bottom: 1px solid #cecece;
+	background-color: #fcfcfc;
+	padding: 8px 0;
+	position: relative;
+
+}
+
+main.app section article div.tray div.list li:before {
+
+	content: "";
+	display: block;
+	width: calc(100% - 2px);
+	height: calc(100% - 1px);
+	position: absolute;
+	left: 0;
+	top: 0;
+	border: 1px solid #009cde;
+	pointer-events: none;
+	display: none;
+	border-radius: 2px;
+
+}
+
+main.app section article div.tray div.list li.active {
+
+	background-color: #e9f8ff !important;
+
+}
+
+main.app section article div.tray div.list li.active:before {
+
+	display: block;
+
+}
+
+main.app section article div.tray div.list li:hover {
+
+	background-color: rgba(0,0,0,0.06);
+
+}
+
+main.app section article div.tray div.list label {
+
+	padding: 5px 0;
+
+}
+
+main.app section article div.tray div.list label:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.tray div.list li div.fixed {
+
+	height: 70px;
+	width: calc(100% - 8px);
+	padding-left: 4px;
+	padding-right: 4px;
+	position: relative;
+
+}
+
+main.app section article div.tray div.list.select li div.fixed {
+
+	width: calc(100% - 24px);
+	padding-left: 20px;
+
+}
+
+main.app section article div.tray div.list li div.fixed div.hold {
+
+	width: calc(100% - 2px);
+	padding-left: 2px;
+	height: 100%;
+
+}
+
+main.app section article div.tray div.list li div.fixed div.label {
+
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	display: flex;
+	width: 0px;
+	overflow: hidden;
+
+}
+
+main.app section article div.tray div.list.select li div.fixed div.label {
+
+	width: 18px;
+	overflow: visible;
+
+}
+
+main.app section article div.tray div.list li div.fixed div.label table td {
+
+	text-indent: -2px;
+
+}
+
+main.app section article div.tray div.list li div.fixed div.row {
+
+	height: calc(100% / 3);
+
+}
+
+main.app section article div.tray div.list li div.fixed table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.tray div.list li div.fixed table td {
+
+	font-size: 13px;
+	font-family: 'Muli', sans-serif;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+}
+
+main.app section article div.tray div.list li div.fixed table td.unset {
+
+	color: #bbb;
+
+}
+
+main.app section article div.tray div.list li div.fixed table td.num {
+
+	text-align: right;
+	width: 84px;
+
+}
+
+main.app section article div.tray div.list li div.fixed table td.sum {
+
+	text-align: right;
+
+}
+
+
+main.app section article div.tray div.pages {
+
+	height: 50px;
+	border-top: 1px solid #dddddd;
+
+}
+
+main.app section article div.tray div.pages div.row {
+
+	height: 50%;
+
+}
+
+main.app section article div.tray div.pages div.row table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.tray div.pages div.row table td.show {
+
+	width: 58%;
+	text-indent: 4px;
+
+}
+
+main.app section article div.tray div.pages div.row table td.label {
+
+	width: 32px;
+
+}
+
+main.app section article div.tray div.pages div.row table td.numbers {
+
+	text-align: right;
+	padding-right: 4px;
+
+}
+
+main.app section article div.tray div.pages div.row table td.angle {
+
+	width: 60px;
+	text-align: center;
+
+}
+
+main.app section article div.tray div.pages div.row table td.angle i {
+
+	position: relative;
+
+}
+
+main.app section article div.tray div.pages div.row table td.angle i:after {
+	
+	content: "";
+	display: block;
+	position: absolute;
+	width: 27px;
+	height: 27px;
+	background-color: rgba(0,0,0,0.07);
+	border-radius: 100%;
+	left: -7px;
+	top: -7px;
+	transform: scale(0,0);
+	transition: transform 200ms;
+
+}
+
+main.app section article div.tray div.pages div.row table td.angle i.fa-angle-right:after,
+main.app section article div.tray div.pages div.row table td.angle i.fa-angle-left:after {
+
+	left: -11px;
+
+}
+
+main.app section article div.tray div.pages div.row table td.angle:hover i:after {
+
+	transform: scale(1,1);
+
+}
+
+main.app section article div.tray div.pages div.row table td.angle:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.tray div.pages div.row table td.page {
+
+	text-align: center;
+
+}
+
+main.app section article div.chat {
+	
+	position: absolute;
+	width: calc(var(--chat-width) - 1px);
+	height: 100%;
+	right: 0;
+	top: 0;
+	background-color: #fff;
+	overflow: hidden;
+	border-left: 1px solid #dddddd;
+
+}
+
+main.app section article div.chat div.header {
+
+	height: 40px;
+	border-bottom: 1px solid #dddddd;
+
+}
+
+main.app section article div.chat div.header table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.chat div.header table td.active span {
+
+	color: #222;
+	border-color: #0005a5 !important;
+
+}
+
+main.app section article div.chat div.header table td:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.chat div.header table td:hover span {
+
+	border-color: #466ec6;
+
+}
+
+main.app section article div.chat div.header table td span {
+
+	display: block;
+	width: 80%;
+	padding: 4px 0;
+	color: #444;
+	font-size: 15px;
+	font-family: 'Montserrat', sans-serif;
+	text-align: center;
+	border-bottom: 2px solid transparent;
+	margin: auto;
+
+
+}
+
+main.app section article div.chat div.widget {
+
+	height: calc(100% - 41px);
+	position: absolute;
+	left: 0;
+	top: 41px;
+	width: 100%;
+	opacity: 0;
+	pointer-events: none;
+	overflow-y: auto;
+
+}
+
+main.app section article div.chat div.widget div.point {
+
+	position: relative;
+	width: calc(100% - 10px);
+	height: 80px;
+	display: block;
+	margin: auto;
+
+	--radius: 20px;
+	--border-width: 2px;
+
+}
+
+main.app section article div.chat div.widget div.point div.circle {
+
+	position: absolute;
+	width: calc(var(--radius) - var(--border-radius) * 2);
+	background-color: #fff;
+	width: var(--radius);
+	height: var(--radius);
+	border-radius: 100%;
+	border: var(--border-width) solid #000;
+	left: 0;
+	top: calc(50% - (var(--radius) + var(--border-width)) / 2);
+	z-index: 1;
+
+}
+
+main.app section article div.chat div.widget div.point div.bottom {
+
+	width: var(--border-width);
+	background-color: #000;
+	position: absolute;
+	height: 50%;
+	top: 50%;
+	left: calc(var(--radius) / 2);
+
+}
+
+main.app section article div.chat div.widget div.point div.top {
+
+	width: var(--border-width);
+	background-color: #000;
+	position: absolute;
+	height: 50%;
+	top: 0;
+	left: calc(var(--radius) / 2);
+
+}
+
+main.app section article div.chat div.widget div.point div.bubble {
+
+	border: 1px solid #000;
+	height: calc(100% - 10px);
+	top: 4px;
+	width:calc(100% - 45px);
+	left: 40px;
+	position: absolute;
+	border-radius: 5px;
+
+}
+
+main.app section article div.chat div.widget div.point div.bubble:before {
+
+	content: "";
+	display: block;
+	position: absolute;
+
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 7px 14px 7px 0;
+	border-color: transparent #000103 transparent transparent;
+
+	right: 100%;
+	top: calc(50% - 7px);
+	
+}
+
+main.app section article div.chat div.widget div.point div.bubble:after {
+
+	content: "";
+	display: block;
+	position: absolute;
+
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 7px 14px 7px 0;
+	border-color: transparent #fff transparent transparent;
+
+	right: calc(100% - 1px);
+	top: calc(50% - 7px);
+	
+}
+
+main.app section article div.chat div.widget div.point div.bubble div.profile {
+
+	width: 40px;
+	height: 40px;
+	background-color: pink;
+	border-radius: 100%;
+	position: absolute;
+	top: 14px;
+	left: 8px;
+
+}
+
+main.app section article div.chat div.widget div.point div.bubble div.date {
+
+	color: #888;
+	font-size: 14px;
+	font-family: 'Montserrat', sans-serif;
+	position: absolute;
+	top: 16px;
+	left: 60px;
+
+}
+
+main.app section article div.chat div.widget div.point div.bubble div.action {
+
+	color: #222;
+	font-size: 14px;
+	font-family: 'Montserrat', sans-serif;
+	position: absolute;
+	top: 36px;
+	left: 60px;
+
+}
+
+main.app section article div.chat div.widget.open {
+
+	opacity: 1;
+	pointer-events: all;
+
+}
+
+main.app section article div.chat div.log {
+
+	height: calc(100% - 134px);
+	overflow-y: auto;
+
+}
+
+main.app section article div.chat div.message {
+
+	height: 84px;
+	background-color: #fff;
+	width: calc(100% - 2px);
+	margin: auto;
+
+}
+
+main.app section article div.chat div.message textarea {
+
+	width: calc(100% - 16px);
+	height: calc(100% - 4px);
+	padding: 2px 4px;
+	border: 1px solid #b0b0b0;
+	border-radius: 4px;
+	outline: none;
+	background-color: transparent;
+	font-size: 14px;
+	font-family: 'Montserrat', sans-serif;
+	resize: none;
+	display: block;
+	margin: auto;
+
+}
+
+main.app section article div.chat div.buttons {
+
+	position: absolute;
+	bottom: 6px;
+	width: 100%;
+	left: 0;
+
+}
+
+main.app section article div.chat div.buttons button.submit-btn {
+
+	width: calc(100% - 10px);
+	font-family: 'Montserrat', sans-serif;
+	display: block;
+	margin: auto;
+	margin-top: 12px;
+	padding: 8px 0;
+	border: 1px solid #035ee8;
+	color: #fff;
+	background-color: #035ee8;
+	border-radius: 8px;
+
+}
+
+main.app section article div.chat div.buttons table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.chat div.buttons table td.text {
+	
+	text-indent: 4px;
+	font-size: 13px;
+	color: #444;
+
+}
+
+main.app section article div.chat div.buttons table td.icon {
+
+	width: 32px;
+	text-align: center;
+	font-size: 15px;
+	color: #222;
+
+}
+
+main.app section article div.chat div.buttons table td.icon i {
+
+	position: relative;
+
+}
+
+main.app section article div.chat div.buttons table td.icon i:after {
+	
+	content: "";
+	display: block;
+	position: absolute;
+	width: 27px;
+	height: 27px;
+	background-color: rgba(0,0,0,0.07);
+	border-radius: 100%;
+	left: -6px;
+	top: -7px;
+	transform: scale(0,0);
+	transition: transform 200ms;
+
+}
+
+main.app section article div.chat div.buttons table td.icon:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.chat div.buttons table td.icon:hover i:after {
+
+	transform: scale(1,1);
+
+}
+
+main.app section article div.chat div.buttons table td.submit {
+
+	width: 60px;
+	text-indent: 8px;
+	font-size: 15px;
+	font-weight: 600;
+	color: #2b90d9;
+	position: relative;
+
+}
+
+main.app section article div.chat div.buttons table td.submit:before {
+
+	content: "";
+	display: block;
+	width: 90%;
+	height: 15px;
+	padding: 4px;
+	background-color: rgba(0,0,0,0.08);
+	border-radius: 8px;
+	left: -4px;
+	top: 6px;
+	position: absolute;
+	transform: scale(0,0);
+	transition: transform 200ms;
+
+}
+
+main.app section article div.chat div.buttons table td.submit:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.chat div.buttons table td.submit:hover:before {
+
+	transform: scale(1,1);
+
+}
+
+main.app section article div.toolset {
+
+	width: calc(100% - var(--folder-width) - var(--tray-width));
+	height: 38px;
+	border-bottom: 1px solid #dddddd;
+	right: 0;
+	top: 0;
+	position: absolute;
+	background-color: #fff;
+	z-index: 20;
+}
+
+main.app section article div.toolset table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+/*
+main.app section article div.toolset span {
+
+	font-size: 15px;
+	font-family: 'Montserrat', sans-serif;
+	color: #124088;
+	position: relative;
+
+}
+
+main.app section article div.toolset td.icon span {
+
+	display: block;
+	width: 30px;
+	text-align: center;
+	margin: auto;
+
+}
+
+main.app section article div.toolset td.icon span:before {
+
+	content: attr(data-text);
+	position: absolute;
+	left: calc(50% - 35px);
+	position: absolute;
+	width: 70px;
+	top: calc(100% + 10px);
+	color: #fff;
+	font-size: 14px;
+	background-color: rgba(0,0,0,0.5);
+	display: block;
+	border-radius: 5px;
+	padding: 5px 0;
+	pointer-events: none;
+	transform: translateY(-10px);
+	opacity: 0;
+	transition: all 200ms;
+
+}
+
+main.app section article div.toolset td.icon span:after {
+	
+	content: "";
+	display: block;
+	position: absolute;
+	top: 100%;
+	left: calc(50% - 10px);
+	width: 0; 
+	height: 0; 
+	border-left: 10px solid transparent;
+	border-right: 10px solid transparent;
+	border-bottom: 10px solid rgba(0,0,0,0.5);
+	pointer-events: none;
+	transform: translateY(-10px);
+	opacity: 0;
+	transition: all 200ms;
+
+}
+
+main.app section article div.toolset td.icon span:hover:before,
+main.app section article div.toolset td.icon span:hover:after {
+
+	transform: translateY(0px);
+	opacity: 1;
+
+}
+
+
+main.app section article div.toolset span:hover {
+
+	cursor: pointer;
+	opacity: 0.8;
+
+}
+
+main.app section article div.toolset table td.icon {
+
+	width: 34px;
+	text-align: center;
+	font-size: 16px;
+
+}
+
+main.app section article div.toolset table td.create {
+
+	width: 120px;
+	padding-left: 10px;
+	text-transform: uppercase;
+
+}
+*/
+
+main.app section article div.toolset table td.dl {
+
+	width: 180px;
+	text-align: right;
+	padding-right: 10px;
+
+}
+
+main.app section article div.document {
+
+	width: calc(100% - var(--folder-width) - var(--tray-width));
+	// height: calc(100% - 39px);
+	height: 100%;
+	right: 0;
+	// top: 39px;
+	top: 0px;
+	position: absolute;
+	overflow-y: scroll;
+	background-color: #e2e2e2;
+	--hdr-height: 40px;
+	
+}
+
+main.app section article div.document input::placeholder ,
+main.app section article div.document textarea::placeholder {
+
+	color : var(--input-placeholder-color);
+
+}
+
+main.app section article div.document div.header {
+
+	height: var(--hdr-height);
+	border-bottom: 1px solid #dddddd;
+
+}
+
+main.app section article div.document div.body {
+
+	height: 1200px;
+	position: relative;
+
+}
+
+/*
+main.app section article div.document::before {
+
+	content: "";
+	display: block;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-width: 0 55px 50px 0;
+	border-color: transparent #d5d5d5 transparent transparent;
+	position: absolute;
+	right: 0;
+	top: 0;
+
+}
+*/
+
+main.app section article div.document div.footer {
+
+	width: 100%;
+	position: absolute;
+	left: 0;
+	bottom: 5px;
+	z-index: 10;
+	height: 38px;
+	display: none;
+
+}
+
+main.app section article div.document div.footer div.panel {
+
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	display: none;
+
+}
+
+main.app section article div.document div.footer div.panel.open {
+
+	display: block;
+
+}
+
+main.app section article div.document div.footer table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.footer table button {
+
+	width: calc(100% - 15px);
+	font-family: 'Montserrat', sans-serif;
+	display: block;
+	margin: auto;
+	padding: 8px 0;
+	border: 1px solid #035ee8;
+	color: #fff;
+	background-color: #035ee8;
+	border-radius: 8px;
+
+}
+
+main.app section article div.document div.footer table button:hover {
+
+	cursor: pointer;
+	background-color: #3f86bd;
+
+}
+
+main.app section article div.document div.footer table button.cancel {
+
+	background-color: #e2e2e2;
+	color: #333;
+	border-color: #9a9a9a;
+
+}
+
+main.app section article div.document div.footer table button.cancel:hover {
+
+	background-color: #d5d5d5;
+
+}
+
+main.app section article div.document div.header table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.document div.header table td.prefix {
+
+	width: 24px;
+	text-align: right;
+	padding-right: 4px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.document div.header table td.doctype {
+
+	width: 120px;
+	padding-left: 20px;
+	font-size: 16px;
+	letter-spacing: 1px;
+	color: #555;
+	padding-right: 10px;
+	text-align: right;
+
+}
+
+main.app section article div.document div.header table td.btn {
+
+	width: 42px;
+	text-align: center;
+	font-size: 15px;
+
+}
+
+main.app section article div.document div.header table td.btn a {
+
+	color: #9a9a9a;
+
+}
+
+main.app section article div.document div.header table td.btn:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.document div.header table td.btn:hover a {
+
+	color: #4a4a4a;
+
+}
+
+main.app section article div.document div.header table td.contact {
+	
+	width: 50%;
+	padding-left: 4px;
+
+}
+
+main.app section article div.document div.header table td.contact input[type="text"] {
+
+	border: none;
+	border-bottom: 2px solid #1e6399;
+	padding: 2px 0;
+	width: 100%;
+	text-indent: 4px;
+	font-family: 'Muli', sans-serif;
+	background-color: transparent;
+
+}
+
+main.app section article div.document div.body h3.doc-type {
+
+	padding: 0;
+	margin: 0;
+	top: 0px;
+	font-size: 22px;
+	color: #7a7a7a;
+	font-weight: 600;
+	letter-spacing: 1px;
+	position: absolute;
+	text-align: right;
+	left: 10px;
+
+	
+}
+
+main.app section article div.document div.body div.subject-widget {
+
+	border: 1px solid #ccc;
+	width: calc(100% - 22px);
+	border-radius: 5px;
+	position: absolute;
+	left: 10px;
+	top: 216px;
+	height: 28px;
+	padding: 3px 0;
+
+}
+
+main.app section article div.document div.body div.subject-widget table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-family: 'Muli', sans-serif;
+	font-size: 14px;
+
+}
+
+main.app section article div.document div.body div.subject-widget table td.label {
+
+	text-indent: 8px;
+	width: 65px;
+
+}
+
+main.app section article div.document div.body div.subject-widget table td.btn {
+
+	width: 60px;
+
+}
+
+main.app section article div.document div.body div.subject-widget table td.btn button {
+
+	color: #2879b7;
+	display: block;
+	text-align: center;
+	border: none;
+	background-color: transparent;
+	margin: auto;
+
+}
+
+main.app section article div.document div.body div.subject-widget table td.input.b {
+
+	width: 160px;
+
+}
+
+main.app section article div.document div.body div.subject-widget table td.input  {
+
+	border-right: 1px solid #ccc;
+
+}
+
+main.app section article div.document div.body div.subject-widget table td.input input {
+
+	width: calc(100% - 10px);
+	border: none;
+	border-bottom: 1px solid #2879b7;
+	background-color: transparent;
+	padding: 2px 0;
+	text-indent: 8px;
+
+}
+
+main.app section article div.document div.body div.contact-line {
+
+	position: absolute;
+	left: 8px;
+	width: calc(45% - 10px);
+	min-width: 300px;
+	max-width: calc(100% - 350px);
+	background-color: #e9f8ff;
+	border-radius: 5px;
+	top: 124px;
+	font-size: 14px;
+	font-family: 'Montserrat', sans-serif;
+	border: 1px solid #009cde;
+
+}
+
+main.app section article div.document div.body div.contact-line.open {
+
+	border-bottom: none;
+	border-bottom-right-radius: 0;
+	border-bottom-left-radius: 0;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow {
+
+	position: absolute;
+	left: 0px;
+	top: calc(100% - 1px);
+	width: calc(100% - 18px);
+	height: 0px;
+	z-index: 10;
+	overflow: hidden;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.input.open div.overflow {
+
+	overflow: visible;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow:before {
+
+	content: "";
+	width: 92%;
+	height: 1px;
+	background-color: #009cde;
+	margin: auto;
+	position: absolute;
+	top: 0;
+	left: 4%;
+	display: none;
+
+}
+
+main.app section article div.document div.body div.contact-line.open div.overflow:before {
+
+	display: block;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul {
+
+	padding: 0;
+	margin: 0;
+	max-height: 250px;
+	background-color: #e9f8ff;
+	border: 1px solid #009cde;
+	border-top: none;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	overflow : hidden;
+
+
+}
+
+main.app section article div.document div.body div.contact-line.open div.overflow ul {
+
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li {
+
+	list-style: none;
+	height: 50px;
+	display: block;
+	padding: 8px 0;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 12px;
+	font-family: 'Montserrat', sans-serif;
+
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li table td.profile {
+
+	width: 70px;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li table td.username {
+
+	font-size: 10px;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li table td.company {
+
+	font-size: 13px;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li table td.profile div.profile {
+
+	width: 45px;
+	height: 45px;
+	border: 1px solid #ccc;
+	border-radius: 100%;
+	display: block;
+	margin: auto;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.1);
+
+}
+
+
+main.app section article div.document div.body div.contact-line input[type="text"] {
+
+	width: 100%;
+	/*
+	border: 1px solid #009cde;
+	*/
+	border: none;
+	background-color: transparent;
+	text-indent: 8px;
+	padding: 6px 0;
+	border-radius: 5px;
+	
+}
+
+main.app section article div.document div.body div.document-meta {
+
+	position: absolute;
+	right: 8px;
+	top: 4px;
+	font-size: 13px;
+	color: #333;
+	width: 210px;
+	font-family: 'Montserrat', sans-serif;
+
+
+}
+
+main.app section article div.document div.body div.document-meta table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.body div.document-meta table td {
+
+	padding-top: 4px;
+
+}
+
+main.app section article div.document div.body div.document-meta table td.char {
+
+	width: 10px;
+	text-align: center;
+
+}
+
+main.app section article div.document div.body div.document-meta table td.label {
+
+	width: 94px;
+
+}
+
+
+main.app section article div.document div.body div.document-meta table td.value {
+
+	text-align: right;
+
+}
+
+main.app section article div.document div.body div.document-meta table td.value input {
+
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	border: none;
+	background-color: transparent;
+	text-align: right;
+	font-family: 'Montserrat', sans-serif;
+	color: #333;
+	font-size: 13px;
+
+}
+
+main.app section article div.document div.body div.invoice-data {
+
+	position: absolute;
+	left: 4px;
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 4px;
+	top: 170px;
+	min-width: 320px;
+	width: 40%;
+	padding: 10px 0;
+
+}
+
+main.app section article div.document div.body div.invoice-data table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 14px;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+main.app section article div.document div.body div.invoice-data table td.label {
+
+	width: 80px;
+	padding-left: 10px;
+	text-align: right;
+	vertical-align: top;
+	padding-right: 5px;
+
+}
+
+main.app section article div.document div.body div.invoice-data table td {
+
+	padding-bottom: 4px;
+
+}
+
+main.app section article div.document div.body div.invoice-data table input.subject {
+
+	width: calc(100% - 10px);
+	border: none;
+	background-color: transparent;
+	border-bottom: 1px solid #124088;
+	text-indent: 8px;
+
+}
+
+main.app section article div.document div.body div.invoice-data table input.date {
+
+	width: 120px;
+	border: none;
+	background-color: transparent;
+	border-bottom: 1px solid #124088;
+	text-indent: 8px;
+
+}
+
+main.app section article div.document div.body div.invoice-data table input.amount {
+
+	width: 120px;
+	border: none;
+	background-color: transparent;
+	border-bottom: 1px solid #124088;
+	text-indent: 8px;
+
+}
+
+main.app section article div.document div.body div.their-company:before,
+main.app section article div.document div.body div.my-company:before {
+
+	color: #fff;
+	text-indent: 10px;
+	font-size: 12px;
+	content: attr(data-text);
+	display: block;
+	position: absolute;
+	bottom: calc(100% + 8px);
+	width: 100%;
+	background-color: #0a6f99;
+	font-family: 'Montserrat', sans-serif;
+	padding: 2px 0;
+	border-radius: 3px;
+
+}
+
+
+main.app section article div.document div.body div.my-company,
+main.app section article div.document div.body div.their-company {
+
+	top: 194px;
+	min-width: 300px;
+	width: calc(50% - 12px);
+	border-radius: 4px;
+	position: absolute;
+
+}
+
+
+main.app section article div.document div.body div.my-company {
+
+	right: 8px;
+
+}
+
+main.app section article div.document div.body div.their-company {
+
+	left: 8px;
+
+}
+
+main.app section article div.document div.body div.their-company input[type="text"],
+main.app section article div.document div.body div.my-company input[type="text"] {
+
+	padding: 2px 0;
+	margin: 0;
+	width: 100%;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 14px;
+	border: 0;
+	background-color: transparent;
+
+}
+
+main.app section article div.document div.body div.their-company input[type="text"].top,
+main.app section article div.document div.body div.my-company input[type="text"].top {
+
+	font-size: 16px;
+
+}
+
+main.app section article div.document div.paper {
+
+	width: 1200px;
+	display: block;
+	margin: auto;
+	min-height: 400px;
+	margin: 20px auto;
+	max-width: calc(100% - 40px);
+	background-color: #fff;
+	border-radius: 5px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
+
+main.app section article div.document div.paper div.content {
+
+	padding: 20px;
+	min-height: 200px;
+
+}
+
+main.app section article div.document div.paper div.content div.pmeta {
+
+	position: relative;
+
+}
+
+main.app section article div.document div.paper div.content div.pmeta div.plogo {
+
+	width: calc(100% - 400px);
+	height: calc(100% - 20px);
+	position: absolute;
+	left: 0;
+	top: 10px;
+	background-image: url('../img/placeholder_logo.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+
+}
+
+main.app section article div.document div.paper div.content div.pmeta div.pdata {
+
+	width: 260px;
+	height: 100%;
+	padding-left: calc(100% - 260px);
+
+}
+
+main.app section article div.document div.paper div.content div.paddr {
+
+	padding-top: 20px;
+	height: 120px;
+
+}
+
+main.app section article div.document div.paper div.content div.paddr ul {
+
+	padding: 0;
+	margin: 0;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 15px;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable {
+
+	width: calc(100% - 2px);
+	border: 1px solid #444;
+	min-height: 80px;
+	margin-top: 40px;
+	border-radius: 4px;
+	overflow: hidden;
+	border-bottom-right-radius: 0;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.thead {
+
+	height: 30px;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.thead table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	background-color: #0a6f99;
+	color: #fff;
+	font-size: 14px;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.thead table td {
+
+	border-right: 1px solid #444;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.thead table td:last-child {
+
+	border-right: none;
+
+}
+
+main.app section article div.document div.paper div.content div.paddr ul li {
+
+	list-style: none;
+	padding: 4px 0;
+
+}
+
+
+main.app section article div.document div.paper div.content div.ptable div.tbody li {
+
+	border-top: 1px solid #444;
+	list-style: none;
+	background-color: #fff;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.tbody li:nth-child(even) {
+
+	background-color: #f2f2f2;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.tbody li td {
+
+	border-right: 1px solid #444;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.tbody li td:last-child {
+
+	border-right: none;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable td.px,
+main.app section article div.document div.paper div.content div.ptable td.no {
+
+	width: 40px;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable td.date {
+
+	width: 100px;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable td.tax {
+
+	width: 50px;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable td.tax input {
+
+	width: calc(100% - 20px) !important;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable td.price {
+
+	width: 90px;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable td.quan {
+
+	width: 90px;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable td.unit {
+
+	width: 90px;
+
+}
+
+main.app section article div.document div.paper div.content div.pdue {
+
+	width: 270px;
+	height: 70px;
+	margin-top: 20px;
+	border: 1px solid #8a8a8a;
+	border-radius: 8px;
+	margin-left: calc(100% - 272px);
+	background-color: #f2f2f2;
+	position: relative;
+
+}
+
+main.app section article div.document div.paper div.content div.pdue span.label {
+
+	font-size: 15px;
+	position: absolute;
+	left: 4px;
+	top: 4px;
+	font-family: 'Montserrat', sans-serif;
+	color: #222;
+
+}
+
+main.app section article div.document div.paper div.content div.pdue span.value {
+
+	font-size: 24px;
+	position: absolute;
+	right: 14px;
+	top: 24px;
+	font-family: 'Montserrat', sans-serif;
+	color: #222;
+	text-align: right;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable td.tax input,
+main.app section article div.document div.paper div.content div.ptable td.price input,
+main.app section article div.document div.paper div.content div.ptable td.quan input,
+main.app section article div.document div.paper div.content div.ptable td.unit input,
+main.app section article div.document div.paper div.content div.ptable td.subtotal input,
+main.app section article div.document div.paper div.content div.ptable td.sub input {
+
+	text-align: right;
+
+}
+
+
+main.app section article div.document div.paper div.content div.ptable td.sub,
+main.app section article div.document div.paper div.content div.ptable td.subtotal {
+
+	width: 110px;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.tbody li table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 14px;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.tbody li table  div.percent:after {
+
+	content: "%";
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.tbody li table  td {
+	
+	padding-top: 4px;
+	vertical-align: top;
+	text-align: center;
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.tbody li table  td input {
+
+	border: 0;
+	background-color: transparent;
+	width: calc(100% - 10px);
+
+}
+
+main.app section article div.document div.paper div.content div.ptable div.tbody li table  td textarea {
+
+	width: calc(100% - 2px);
+	resize: none;
+	border: none;
+	height: 30px;
+	background-color: transparent;
+
+}
+
+main.app section article div.document div.paper div.content div.paddr ul li.label {
+
+	background-color: #0a6f99;
+	color: #fff;
+	text-indent: 12px;
+	border-radius: 3px;
+
+}
+
+main.app section article div.document div.paper div.content div.ptotals {
+
+	width: 391px;
+	background-color: #fff;
+	margin-left: calc(100% - 393px);
+	border-left: 1px solid #444;
+	border-right: 1px solid #444;
+	border-bottom: 1px solid #444;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	overflow: hidden;
+
+}
+
+main.app section article div.document div.paper div.content div.rel {
+
+	position: relative;
+	min-height: 220px;
+
+}
+
+main.app section article div.document div.paper div.content div.rel div.pnotes {
+
+	width: calc(100% - 440px);
+	height: 120px;
+	border: 1px solid #444;
+	position: absolute;
+	left: 0;
+	top: 80px;
+	border-radius: 4px;
+
+}
+
+main.app section article div.document div.paper div.content div.rel div.pnotes:before {
+
+	content: "Notes:";
+	position: absolute;
+	bottom: calc(100% + 10px);
+	font-size: 16px;
+	left: 0;
+	display: block;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+main.app section article div.document div.paper div.content div.rel div.pnotes textarea {
+
+	width: calc(100% - 10px);
+	height: calc(100% - 10px);
+	padding: 5px;
+	border: none;
+	resize: none;
+	background-color: transparent;
+
+}
+
+main.app section article div.document div.paper div.content div.ptotals table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.paper div.content div.ptotals table td.label {
+
+	width: 185px;
+	text-indent: 10px;
+	border-right: 1px solid #444;
+
+}
+
+main.app section article div.document div.paper div.content div.ptotals table td.value {
+
+	padding-right: 10px;
+	text-align: right;
+
+}
+
+main.app section article div.document div.paper div.content div.ptotals table td {
+	
+	padding: 8px 0;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 15px;
+	border-bottom :1px solid #444;
+
+}
+
+main.app section article div.document div.paper div.content div.ptotals table tr:last-child td {
+
+	background-color: #f2f2f2;
+	font-weight: bold;
+	border-bottom: none;
+
+}
+
+main.app section article div.document div.paper div.content div.paddr ul li.text {
+
+	text-indent: 8px;
+
+}
+
+main.app section article div.document div.paper div.content div.paddr ul li.text input {
+
+	border: none;
+	background-color: transparent;
+	width: calc(100% - 10px);
+
+}
+
+main.app section article div.document div.paper div.content div.paddr table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.paper div.content div.paddr table td.text {
+
+	vertical-align: top;
+
+}
+
+main.app section article div.document div.paper div.content div.paddr table td.stamp {
+
+	width: var(--stamp-width);
+
+}
+
+main.app section article div.document div.paper div.content div.paddr table td.stamp div.box {
+
+	border: 1px solid #444;
+	border-radius: 5px;
+	width: 100px;
+	height: 100px;
+	display: block;
+	margin: auto;
+	display : none;
+
+}
+
+main.app section article div.document div.paper div.content div.pmeta div.pdata h3 {
+
+	padding: 0;
+	margin: 0;
+	font-size: 32px;
+	font-family: 'Montserrat', sans-serif;
+	text-transform: uppercase;
+	font-weight: 400;
+	letter-spacing: 3px;
+	text-align: right;
+
+}
+
+main.app section article div.document div.paper div.content div.pmeta div.pdata li {
+
+	margin-top: 4px;
+	list-style: none;
+
+}
+
+main.app section article div.document div.paper div.content div.pmeta div.pdata li table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 14px;
+	color: #222;
+
+
+}
+
+main.app section article div.document div.paper div.content div.pmeta div.pdata li table td.label {
+
+	width: 110px;
+
+}
+
+main.app section article div.document div.paper div.content div.pmeta div.pdata li table td.char {
+
+	width: 20px;
+	text-align: center;
+
+}
+
+main.app section article div.document div.paper div.content div.pmeta div.pdata li table td.value {
+
+	text-align: right;
+
+}
+
+main.app section article div.document div.paper div.content div.pmeta div.pdata li table td.value input {
+
+	padding: 0;
+	margin: 0;
+	text-align: right;
+	background-color: transparent;
+	border: none;
+	width: 100%;
+	font-size: 14px;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+main.app section article div.document div.paper div.pfooter {
+
+	padding: 20px;
+	width: calc(100% - 40px);
+	border-top: 1px solid #dddddd;
+	min-height: 38px;
+
+}
+
+main.app section article div.document div.paper div.pfooter table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.paper div.pfooter table button {
+
+	width: calc(100% - 15px);
+	font-family: 'Montserrat', sans-serif;
+	display: block;
+	margin: auto;
+	padding: 8px 0;
+	border: 1px solid #035ee8;
+	color: #fff;
+	background-color: #035ee8;
+	border-radius: 8px;
+
+}
+
+main.app section article div.document div.paper div.pfooter table button.nonactive {
+	opacity:  0.33;
+}
+
+main.app section article div.document div.paper div.pfooter table button.cancel {
+
+	background-color: #e2e2e2;
+	color: #333;
+	border-color: #9a9a9a;
+
+}
+
+main.app section article div.document div.paper div.pfooter table button.waiting {
+
+	background-color: #e2e2e2;
+	color: #333;
+	border-color: #9a9a9a;
+
+}
+
+main.app section article div.document div.paper div.pfooter li {
+
+	list-style: none;
+	width: 100%;
+	height: 36px;
+	display: none;
+
+}
+
+main.app section article div.document div.paper div.pfooter li.open {
+
+	display: block;
+
+}
+
+main.app section article div.document div.paper div.summary {
+
+	width: 100%;
+	padding: 20px;
+	width: calc(100% - 40px);
+	position: relative;
+	border-bottom: 1px solid #dddddd;
+
+}
+
+main.app section article div.document div.paper div.summary div.avatar {
+
+	width: 60px;
+	height: 60px;
+	background-color: #e2e2e2;
+	border-radius: 100%;
+	position: absolute;
+	right: 30px;
+	top: 20px;
+
+}
+
+main.app section article div.document div.paper div.actions {
+
+	width: 100%;
+	height: 30px;
+	padding-top: 10px;
+
+}
+
+main.app section article div.document div.paper div.actions table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.document div.paper div.actions table span {
+
+	color: #124088;
+
+}
+
+main.app section article div.document div.paper div.actions table td.btn {
+
+
+}
+
+main.app section article div.document div.paper div.actions table td.btn.a {
+
+	width: 60px;
+
+}
+
+main.app section article div.document div.paper div.actions table td.btn.b {
+
+	width: 70px;
+
+}
+
+main.app section article div.document div.paper div.actions table td.btn.c {
+
+	width: 94px;
+
+}
+
+main.app section article div.document div.paper div.actions table td.btn.d {
+
+	width: 84px;
+
+}
+
+main.app section article div.document div.paper div.actions table td.btn.e {
+
+	width: 84px;
+
+}
+
+main.app section article div.document div.paper div.actions table td.btn.f {
+
+	width: 130px;
+
+}
+
+main.app section article div.document div.paper div.actions table td.btn.g {
+
+	width: 144px;
+
+}
+
+main.app section article div.document div.paper div.actions table td.btn.h {
+
+	width: 70px;
+
+}
+
+main.app section article div.document div.paper div.actions table td.btn.i {
+
+	width: 80px;
+
+}
+
+
+main.app section article div.document div.paper div.actions table td.hide {
+
+	display: none;
+
+}
+
+main.app section article div.document div.paper div.actions table span:hover {
+
+	cursor: pointer;
+	text-decoration: underline;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper {
+
+	width: calc(100% - 120px);
+	height: 60px;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row {
+
+	list-style: none;
+	width: 100%;
+	height: 50%;
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.icon {
+
+	width: 40px;
+	text-align: center;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.label ,
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.label-1 {
+
+	width: 50px;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.label-2 {
+
+	width: 76px;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.time {
+
+	text-align: right;
+	width: 190px;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input {
+
+	width: 40%;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input  div.input {
+
+	position: relative;
+	
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input  div.input.open input {
+
+	border-bottom-left-radius: 0;
+	border-bottom-right-radius: 0;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input  div.input.open input[readonly="readonly"] {
+
+	border-color: transparent;
+	background-color: transparent;
+
+}
+
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input input {
+
+	width: calc(100% - 20px);
+	padding: 4px 0;
+	border: 1px solid #ccc;
+	text-indent: 10px;
+	border-radius: 4px;
+
+}
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input input[readonly="readonly"] {
+
+	border-color: transparent;
+	background-color: transparent;
+
+}
+
+
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.char {
+
+	width: 20px;
+	text-align: center;
+
+}
+
+main.app section article div.document div.body div.document-type {
+
+	position: absolute;
+	width: 400px;
+	text-align: center;
+	left: calc(50% - 200px);
+	top: 4px;
+	font-size: 32px;
+	color: #333;
+	text-transform: uppercase;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+main.app section article div.document div.body div.subject-line {
+
+	width: calc(100% - 104px);
+	height: 30px;
+	border-radius: 5px;
+	position: absolute;
+	left: 8px;
+	top: 295px;
+	background-color: #e9f8ff;
+	border: 1px solid #009cde;
+
+}
+
+main.app section article div.document div.body div.subject-line button {
+
+	position: absolute;
+	left: calc(100% + 8px);
+	width: 80px;
+	top: -1px;
+	padding: 6px 0;
+	text-align: center;
+	font-size: 15px;
+	font-family: 'Montserrat', sans-serif;
+	color: #0f7dac;
+	background-color: transparent;
+	border: none;
+	border-radius: 5px;
+	font-weight: bold;
+
+}
+
+#ActionWidget\.invoice\.sendInvoice:disabled {
+	opacity: 0.4;
+}
+
+main.app section article div.document div.body div.subject-line button:disabled {
+
+	opacity: 0.4;
+
+}
+
+main.app section article div.document div.body div.subject-line button:hover {
+
+	cursor: pointer;
+	background-color: rgba(233, 248, 255, 0.3);
+
+}
+
+main.app section article div.document div.body div.subject-line table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 14px;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+main.app section article div.document div.body div.subject-line table td.label {
+
+	width: 70px;
+	text-indent: 8px;
+
+}
+
+main.app section article div.document div.body div.subject-line table td.amount {
+
+	width: 130px;
+
+}
+
+main.app section article div.document div.body div.subject-line table td.amount input[type="text"] {
+
+	width: calc(100% - 10px);
+	padding: 4px 0;
+	font-size: 15px;
+	font-family: 'Montserrat', sans-serif;
+	background-color: transparent;
+	border: none;
+	text-align: right;
+
+}
+
+main.app section article div.document div.body div.subject-line table td.subject input[type="text"] {
+
+	width: calc(100% - 10px);
+	padding: 4px 0;
+	font-size: 15px;
+	font-family: 'Montserrat', sans-serif;
+	background-color: transparent;
+	border: none;
+
+}
+
+main.app section article div.document div.body div.subject-line table td.button {
+
+	width: 60px;
+
+}
+
+main.app section article div.document div.body div.subject-line table td.button button {
+
+	width: 100%;
+	padding: 2px 0;
+	background-color: transparent;
+	border: none;
+	color: #035ee8;
+	font-weight: bold;
+	text-transform: uppercase;
+
+}
+
+main.app section article div.document div.body div.amount-line {
+
+	position: absolute;
+	right: 8px;
+	border-radius: 5px;
+	height: 60px;
+	top: 95px;
+	width: 210px;
+	background-color: #e9f8ff;
+	border: 1px solid #009cde;
+
+}
+
+main.app section article div.document div.body div.amount-line span {
+
+	font-size: 14px;
+	font-family: 'Montserrat', sans-serif;
+	color: #555;
+	position: absolute;
+	top: 8px;
+	left: 10px;
+
+}
+
+main.app section article div.document div.body div.amount-line b {
+
+	font-size: 18px;
+	font-family: 'Montserrat', sans-serif;
+	color: #222;
+	position: absolute;
+	bottom: 8px;
+	right: 8px;
+	text-align: right;
+
+}
+
+main.app section article div.document div.body div.logo {
+
+	position: absolute;
+	left: 8px;
+	top: 4px;
+	width: calc(50% - 88px);
+	height: 90px;
+	border-radius: 5px;
+	display: flex;
+	justify-content: flex-start;
+	align-items: center;
+
+}
+
+main.app section article div.document div.body div.logo img {
+
+	height: 90%;
+	display: block;
+	
+}
+
+main.app section article div.document div.body div.terms {
+
+	position: absolute;
+	left: 270px;
+	top: 235px;
+	width: calc(100% - 270px);
+	height: 60px;
+
+}
+
+main.app section article div.document div.body div.terms table {
+
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 13px;
+	width: 100%;
+	height: 100%;
+
+}
+
+main.app section article div.document div.body div.terms table td {
+
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.document div.body ul.meta-data {
+
+	position: absolute;
+	left: 10px;
+	top: 5px;
+	width: 220px;
+	padding: 0;
+	margin: 0;
+
+}
+
+main.app section article div.document div.body ul.meta-data table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.body ul.meta-data table td {
+
+	font-size: 13px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.document div.body ul.meta-data table td.label {
+
+	text-indent: 4px;
+	width: 74px;
+
+}
+
+main.app section article div.document div.body ul.meta-data table td.char {
+
+	text-align: center;
+	width: 10px;
+
+
+}
+
+main.app section article div.document div.body ul.meta-data table td.value input {
+	text-align: right;
+}
+
+main.app section article div.document div.body ul input,
+main.app section article div.document div.body div.terms table td input {
+
+	display: block;
+	width: 100%;
+	padding: 2px 0;
+	margin: 0;
+	outline: none;
+	border: none;
+	background-color: rgba(0,0,0,0.1);
+	text-indent: 4px;
+
+}
+
+main.app section article div.document div.body ul.meta-data table td.value input {
+
+	display: block;
+	width: calc(100% - 8px);
+	padding: 0 4px;
+	margin: 0;
+	outline: none;
+	background-color: rgba(0,0,0,0.06);
+	text-indent: 4px;
+	border-radius: 5px;
+
+}
+
+main.app section article div.document div.body ul.from-company {
+
+	position: absolute;
+	left: calc(50% + 10px);
+	top: 100px;
+	width: calc(50% - 80px);
+	padding: 0;
+	margin: 0;
+
+}
+
+main.app section article div.document div.body ul.from-company table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.body ul.from-company table td {
+
+	font-size: 13px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.document div.body {
+
+	--address-top: 150px;
+	--address-height: 100px;
+	max-width: calc(100% - 40px);
+	display: none;
+	margin: 20px auto;
+	background-color: #fff;
+	width: 1200px;
+	border-radius: 4px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
+
+main.app section article div.document div.body div.from-widget {
+
+	position: absolute;
+	right: 4px;
+	width: calc(50% - 15px);
+	top: var(--address-top);
+	height: var(--address-height);
+	
+	--tab-width: 90px;
+
+}
+
+main.app section article div.document div.body div.contact-widget {
+
+	left: 8px;
+	top: 2px;
+	height: 34px;
+	border: 1px solid #ccc;
+	width: calc(100% - 280px);
+	max-width: 50%;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	position: absolute;
+
+}
+
+main.app section article div.document div.body div.from-widget div.container {
+
+	width: calc(100% - 2px);
+	height: calc(100% - 2px);
+
+}
+
+main.app section article div.document div.body div.from-widget div.tab-content table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.body div.from-widget div.tab-content table li {
+
+	list-style: none;
+	width: calc(100% - 10px);
+	padding: 0 5px;
+
+}
+
+main.app section article div.document div.body div.from-widget div.tab-content table li input {
+
+	border: none;
+	background-color: transparent;
+	font-family: 'Muli', sans-serif;
+	font-size: 13px;
+	width: 100%;
+
+}
+
+main.app section article div.document div.body div.from-widget div.tab-content table li input.top {
+
+	font-size: 15px;
+
+}
+
+main.app section article div.document div.body div.from-widget div.container div.tab-content {
+
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: calc(100% - var(--tab-width));
+	height: 100%;
+
+}
+
+main.app section article div.document div.body div.from-widget div.container div.tab-select {
+
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: calc(var(--tab-width));
+	height: 100%;
+	background-image: url(../img/100789_rgb.png);
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: 70%;
+	opacity: 0.7;
+
+}
+
+main.app section article div.document div.body div.meta-widget {
+
+	width: 250px;
+	position: absolute;
+	right: 4px;
+	top: 2px;
+
+}
+
+main.app section article div.document div.body div.input-widget {
+
+	width: calc(100% - 280px);
+	min-width: 280px;
+	max-width: 60%;
+	position: absolute;
+	top: 50px;
+	left: 8px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	height: 90px;
+	
+}
+
+main.app section article div.document div.body div.meta-widget table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	padding: 0;
+
+	font-family: 'Muli', sans-serif;
+	font-size: 12px;
+	color: #222;
+
+}
+
+main.app section article div.document div.body div.meta-widget table td {
+
+	padding: 0;
+
+}
+
+main.app section article div.document div.body div.meta-widget table td.char {
+
+	width: 20px;
+	text-align: center;
+
+}
+
+main.app section article div.document div.body div.meta-widget table td.text {
+
+	width: 80px;
+
+}
+
+main.app section article div.document div.body div.meta-widget table td input {
+
+	width: 100%;
+	border: none;
+	background-color: transparent;
+	text-align: right;
+
+}
+
+main.app section article div.document div.body div.to-widget {
+
+	position: absolute;
+	left: 8px;
+	width: calc(50% - 15px);
+	top: var(--address-top);
+	height: var(--address-height);
+	
+	--tab-width: 90px;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-content {
+
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: calc(100% - var(--tab-width));
+	height: 100%;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-content div.content {
+
+	width: 100%;
+	height: 100%;
+	display: none;
+	
+}
+
+main.app section article div.document div.body div.to-widget div.tab-content div.content.open {
+
+	display: block;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-content div.content table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-content div.content table li {
+
+	list-style: none;
+	width: calc(100% - 10px);
+	padding: 0 5px;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-content div.content table li input {
+
+	border: none;
+	background-color: transparent;
+	font-family: 'Muli', sans-serif;
+	font-size: 13px;
+	width: 100%;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-content div.content table li input.top {
+
+	font-size: 15px;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-select {
+
+	position: absolute;
+	right: 0;
+	top: 0;
+	height: 100%;
+	width: calc(var(--tab-width) - 1px);
+	border-left: 1px solid #ccc;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-select li {
+
+	list-style: none;
+	width: 100%;
+	height: 50%;
+	text-indent: 4px;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+
+}
+
+
+main.app section article div.document div.body div.to-widget div.tab-select li:first-child {
+
+	border-top-right-radius: 6px;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-select li:last-child {
+
+	border-bottom-right-radius: 6px;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-select li:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.06);
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-select li.active {
+
+	background-color: #2879b7 !important;
+	color: #fff;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-select li table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.body div.to-widget div.tab-select li table tr td:first-child {
+
+	width: 25px;
+	padding-right: 4px;
+	text-align: center;
+
+}
+
+main.app section article div.document div.body div.to-widget div.container {
+
+	width: calc(100% - 2px);
+	height: calc(100% - 2px);
+	border: 1px solid #cccc;
+	border-radius: 6px;
+	overflow: hidden;
+
+}
+
+main.app section article div.document div.body ul.to-company {
+
+	position: absolute;
+	top: 100px;
+	left: 10px;
+	width: calc(50% - 80px);
+	padding: 0;
+	margin: 0;
+
+}
+
+main.app section article div.document div.body ul.ship-company {
+
+	position: absolute;
+	top: 170px;
+	left: calc(50% + 10px);
+	width: 270px;
+	padding: 0;
+	margin: 0;
+
+}
+
+main.app section article div.document div.body ul.to-company table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.body ul.to-company table td {
+
+	font-size: 13px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.document div.body div.subject-row {
+
+	width: calc(100% - 20px);
+	left: 10px;
+	top: 258px;
+	min-height: 30px;
+	position: absolute;
+
+}
+
+main.app section article div.document div.body div.subject-row table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.body div.subject-row table div.outline {
+
+	border: 1px solid #6a6a6a;
+	border-radius: 5px;
+	background-color: #fff;
+	border-radius: 10px;
+	position: relative;
+	text-align: right;
+	padding: 10px;
+
+}
+
+main.app section article div.document div.body div.subject-row table div.outline span {
+
+	position: absolute;
+	left: 10px;
+	top: 4px;
+	font-size: 13px;
+	font-family: 'Muli', sans-serif;
+	color: #555;
+
+}
+
+main.app section article div.document div.body div.subject-row table div.outline h3 {
+
+	padding: 0;
+	margin: 0;
+	font-weight: 400;
+	font-size: 17px;
+	padding-top: 8px;
+	color: #333;
+
+}
+
+main.app section article div.document div.body div.subject-row table td.label {
+
+	width: 70px;
+	font-family: 'Muli', sans-serif;
+	color: #333;
+	font-size: 15px;
+
+}
+
+main.app section article div.document div.body div.subject-row table td.input {
+
+
+}
+
+main.app section article div.document div.body div.subject-row table td.input input {
+
+	width: calc(100% - 50px);
+
+}
+
+main.app section article div.document div.body div.subject-row table td.amount {
+
+	width: 210px;
+
+}
+
+main.app section article div.document div.body div.table {
+
+	width: calc(100% - 18px);
+	position: absolute;
+	left: 8px;
+	top: 340px;
+	height: calc(100% - 520px);
+	border: 1px solid #cecece;
+	border-radius: 2px;
+
+}
+
+main.app section article div.document div.body div.table.drag-over:before {
+
+	transform: scale(1,1);
+
+}
+
+main.app section article div.document div.body div.table:before {
+	
+	content: "Drop File Here";
+	position: absolute;
+	left: -5px;
+	top: -5px;
+	width: calc(100% + 8px);
+	height: calc(100% + 8px);
+	z-index: 10;
+	pointer-events: none;
+	background-color: rgba(120, 176, 240, 0.3);
+	border-radius: 10px;
+	border: 1px solid rgb(54, 102, 158);
+	display: flex;
+	text-align: center;
+	justify-content: center;
+	align-items: center;
+	opacity: 0.7;
+	font-family: 'Muli', sans-serif;
+	color: rgb(54, 102, 158);
+	transform: scale(0,0);
+	transition: transform 200ms;
+
+}
+
+main.app section article div.document div.body div.table div.thead {
+
+	height: 34px;
+	background-color: #f2f2f2;
+
+}
+
+main.app section article div.document div.body div.table div.thead table {
+
+	width: calc(100% - var(--scroll-width));
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+	color: #222;
+
+}
+
+
+main.app section article div.document div.body div.table div.thead table td {
+
+	font-weight: bold;
+	border-bottom: 1px solid #cecece;
+
+}
+
+main.app section article div.document div.body div.table div.tbody {
+
+	height: calc(100% - 34px);
+	overflow-y: scroll;
+	position: relative;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li {
+
+	border-bottom: 1px solid #ccc;
+	list-style: none;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li:last-child {
+
+	border-bottom: none;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li div.slide {
+
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 200ms;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li div.slide.open {
+
+	max-height: 500px;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li div.tax {
+
+	border-top: 1px solid #ccc;
+	min-height: 40px;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li div.details {
+
+	border-top: 1px dashed #ccc;
+	min-height: 40px;
+
+}
+
+
+main.app section article div.document div.body div.table div.tbody li table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li table td {
+
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+	padding-top: 0;
+	padding-bottom: 0;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li table td.focus {
+
+	position: relative;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li table td.focus:before {
+
+	content: "";
+	display: block;
+	position: absolute;
+	left: -1px;
+	top: 0px;
+	border: 1px solid #2f72d6;
+	width: 100%;
+	height: calc(100% - 1px);
+	pointer-events: none;
+	z-index: 5;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li table td div.tbody-shim {
+
+	width: 1px;
+
+}
+
+main.app section article div.document div.body div.table td.px {
+
+	width: 1px;
+
+}
+
+main.app section article div.document div.body div.table div.tbody td.no {
+
+	color: #444;
+	font-size: 13px;
+
+}
+
+main.app section article div.document div.body div.table td.no {
+	
+	border-right: 1px solid #ccc;
+	width: 28px;
+
+
+}
+
+main.app section article div.document div.body div.table td.date {
+
+	border-right: 1px solid #ccc;
+	width: 90px;
+	text-indent: 2px;
+
+}
+
+main.app section article div.document div.body div.table td.quan {
+
+	border-right: 1px solid #ccc;
+	width: 90px;
+
+}
+
+main.app section article div.document div.body div.table td.quan input[type="text"] {
+
+	border: none;
+	width: calc(100% - 10px);
+	padding-right: 4px;
+	text-align: right;
+
+}
+
+main.app section article div.document div.body div.table td.unit input[type="text"] {
+
+	border: none;
+	width: calc(100% - 4px);
+	text-indent: 3px;
+
+}
+
+main.app section article div.document div.body div.table td.price input[type="text"] {
+
+	border: none;
+	width: calc(100% - 4px);
+	text-align: right;
+	font-size: 13px;
+
+}
+
+main.app section article div.document div.body div.table td.subtotal input[type="text"] {
+
+	border: none;
+	width: calc(100% - 4px);
+	text-align: right;
+	font-size: 13px;
+
+}
+
+main.app section article div.document div.body div.table td.unit {
+
+	border-right: 1px solid #ccc;
+	width: 90px;
+
+}
+
+main.app section article div.document div.body div.table td.date input[type="text"] {
+
+	border: none;
+	width: calc(100% - 4px);
+	font-size: 13px;
+}
+
+main.app section article div.document div.body div.table td.tax {
+
+	border-right: 1px solid #ccc;
+	width: 34px;
+
+}
+
+main.app section article div.document div.body div.table td.tax div.percent {
+	
+	position: relative;
+
+}
+
+main.app section article div.document div.body div.table td.tax div.percent input[type="text"] {
+
+	border: none;
+	width: calc(100% - 18px);
+	text-align: right;
+
+}
+
+main.app section article div.document div.body div.table td.tax div.percent:after {
+
+	content: "%";
+	display: block;
+	color: #888;
+	position: absolute;
+	right: 2px;
+	top: 2px;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li table td.label {
+
+	width: 80px;
+	font-size: 13px;
+
+}
+
+main.app section article div.document div.body div.table td.price {
+
+	border-right: 1px solid #ccc;
+	width: 80px;
+
+}
+
+main.app section article div.document div.body div.table td.subtotal {
+
+	border-right: 1px solid #ccc;
+	width: 100px;
+
+}
+
+main.app section article div.document div.body div.table div.tbody li table td textarea {
+
+	height: 20px;
+	resize: none;
+	line-height: 20px;
+	width: calc(100% - 8px);
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+	border: none;
+	outline: none;
+
+}
+
+main.app section article div.document div.body div.totals {
+
+	position: absolute;
+	right: 8px;
+	border: 1px solid #cecece;
+	top: calc(100% - 179px);
+	width: 316px;
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+	height: 100px;
+	overflow: hidden;
+
+}
+
+main.app section article div.document div.body div.details {
+
+	position: absolute;
+	right: 8px;
+	top: calc(100% - 70px);
+	width: 346px;
+
+}
+
+main.app section article div.document div.body div.details table {
+
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+
+}
+
+main.app section article div.document div.body div.details table td {
+
+	white-space: nowrap;
+
+}
+
+main.app section article div.document div.body div.details table td.label_a,
+main.app section article div.document div.body div.details table td.label_b {
+
+	font-weight: bold;
+
+}
+
+main.app section article div.document div.body div.details table td.value_a {
+
+	text-align: right;
+	padding-right: 4px;
+
+}
+
+main.app section article div.document div.body div.details table td.value_b {
+
+	text-align: right;
+	padding-right: 4px;
+
+}
+
+main.app section article div.document div.body div.totals table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.document div.body div.totals td {
+
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+	border-bottom: 1px solid #cecece;
+
+}
+
+main.app section article div.document div.body div.totals td.label {
+
+	width: 110px;
+	border-right: 1px solid #cecece;
+	text-indent: 4px;
+
+}
+
+main.app section article div.document div.body div.totals tr:last-child td {
+
+	border-bottom: none;
+
+}
+
+main.app section article div.document div.body div.totals tr.totals td {
+
+	background-color: #f2f2f2;
+
+}
+
+main.app section article div.document div.body div.totals tr.totals td.label {
+
+	font-weight: bold;
+
+}
+
+main.app section article div.document div.body div.totals td input {
+
+	padding: 0;
+	margin: 0;
+	border: none;
+	background-color: transparent;
+	outline: none;
+	width: calc(100% - 4px);
+	text-align: right;
+
+}
+
+main.app section article div.document div.body div.comment {
+
+	width: 390px;
+	max-width: calc(100% - 370px);
+	position: absolute;
+	left: 8px;
+	height: 90px;
+	background-color: #fff;
+	bottom: 14px;
+	border: 1px solid #cecece;
+	border-radius: 4px;
+
+}
+
+main.app section article div.document div.body div.comment textarea {
+
+	width: calc(100% - 6px);
+	height: calc(100% - 6px);
+	background-color: transparent;
+	padding: 3px;
+	outline: none;
+	border: none;
+	text-indent: 50px;
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+	resize: none;
+	overflow: hidden;
+
+}
+
+main.app section article div.document div.body div.comment span {
+
+	font-family : 'Muli', sans-serif;
+	font-size: 14px;
+	position: absolute;
+	left: 3px;
+	top: 3px;
+	pointer-events: none;
+	font-weight: bold;
+	letter-spacing: 1px;
+
+}
+
+main.app section article div.document div.body div.terms table td {
+
+	font-size: 13px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.document div.body div.terms table td.label {
+
+	text-indent: 4px;
+	width: 64px;
+
+}
+
+main.app section article div.document div.body div.terms table td.char {
+
+	text-align: center;
+	width: 10px;
+
+}
+
+main.app section article div.chat div.log div.comment {
+
+	padding-top: 10px;
+	min-height: 80px;
+
+}
+
+main.app section article div.chat div.log div.comment div.line {
+
+	width: calc(100% - 8px);
+	margin: auto;
+	align-items: flex-start;
+	justify-content: space-between;
+	position: relative;
+	padding-top: 10px;
+}
+
+main.app section article div.chat div.log div.comment div.line div.profile {
+
+	width: 40px;
+	height: 40px;
+	border-radius: 100%;
+	position: absolute;
+	top: 0;
+	z-index: 1;
+
+}
+
+main.app section article div.chat div.log div.comment div.line.left div.profile {
+
+	left: 2px;
+
+}
+
+main.app section article div.chat div.log div.comment div.line.right div.profile {
+
+	right: 2px;
+
+}
+
+
+main.app section article div.chat div.log div.comment div.line div.quote {
+
+	width: calc(100% - 30px);
+	padding-top: 4px;
+	padding-bottom: 12px;
+	background-color: #e0f2ff;
+	min-height: 50px;
+	border-radius: 18px;
+	color: #495057;
+	font-size: 14px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+}
+
+main.app section article div.chat div.log div.comment div.line div.quote span {
+
+	font-weight: bold;
+	font-size: 14.5px;
+	color: #36383a;
+	display: block;
+	width: calc(100% - 24px);
+
+}
+
+main.app section article div.chat div.log div.comment div.line.right  div.quote span {
+
+	text-align: right;
+
+}
+
+main.app section article div.chat div.log div.comment div.line.left div.quote span {
+
+	padding-left: 20px;
+
+}
+
+main.app section article div.chat div.log div.comment div.line div.quote p {
+
+	padding: 0;
+	padding-top: 10px;
+	margin: 0;
+
+}
+
+main.app section article div.chat div.log div.comment div.line.left div.quote {
+
+	border-top-left-radius: 3px;
+	padding-left: 14px;
+	padding-right: 8px;
+	margin-left: 10px;
+
+}
+
+main.app section article div.chat div.log div.comment div.line.right div.quote {
+
+	border-top-right-radius: 3px;
+	padding-right: 4px;
+	padding-left: 8px;
+	margin-left: 2px;
+
+}
+
+main.app section article div.chat div.log div.comment div.time {
+
+	color: #495057;
+	font-size: 13px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+}
+
+main.app section article div.chat div.log div.comment div.left div.time {
+	
+	padding: 4px 0;
+	padding-left: 12px;
+
+}
+
+main.app section article div.chat div.log div.comment div.right div.time {
+	
+	padding: 4px 0;
+	padding-right: 19px;
+	text-align: right;
+
+}
+
+main.app section article div.chat div.log div.init {
+
+	height: 8px;
+
+}
+
+main.app section article div.chat div.log div.msg {
+
+	width: calc(100% - 50px);
+	padding: 4px 10px;
+	border-radius: 4px;
+	display: block;
+	background-color: #fff;
+	margin-bottom: 8px;
+	font-family: 'Muli', sans-serif;
+	position: relative;
+
+}
+
+main.app section article div.chat div.log div.msg.you {
+
+	margin-left: 20px;
+
+}
+
+main.app section article div.chat div.log div.msg.me {
+
+	margin-left: 10px;
+
+}
+
+main.app section article div.chat div.log div.msg.sys {
+
+	margin-left: 15px;
+	background-color: #cdd8df;
+
+}
+
+main.app section article div.chat div.log div.msg p {
+
+	padding: 0;
+	margin: 0;
+	font-size: 14px;
+	color: #222;
+	padding-top: 4px;
+
+}
+
+main.app section article div.chat div.log div.msg.me:before {
+
+	content: "";
+	display: block;
+	position: absolute;
+	top: 20px;
+	left: 100%;
+	width: 0;
+	height: 0;
+	border-top: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	border-left: 5px solid #fff;
+
+}
+
+main.app section article div.chat div.log div.msg.me:after {
+
+	content: "";
+	display: block;
+	margin: auto;
+	width: 20px;
+	height: 20px;
+	background-color: #f00;
+	border-radius: 100%;
+	position: absolute;
+	right: -10px;
+	top: -5px;
+
+}
+
+main.app section article div.chat div.log div.msg.you:before {
+
+	content: "";
+	display: block;
+	position: absolute;
+	top: 20px;
+	right: 100%;
+	width: 0;
+	height: 0;
+	border-top: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	border-right: 5px solid #fff;
+
+}
+
+main.app section article div.chat div.log div.msg.you:after {
+
+	content: "";
+	display: block;
+	margin: auto;
+	width: 20px;
+	height: 20px;
+	background-color: #149167;
+	border-radius: 100%;
+	position: absolute;
+	left: -10px;
+	top: -5px;
+
+}
+
+main.app section article div.chat div.log div.msg span.username {
+
+	font-size: 14px;
+	color: #444;
+	display: block;
+
+}
+
+main.app section article.settings {
+
+	--menu-width: 260px;
+
+}
+
+main.app section article div.settings-menu {
+
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: calc(var(--menu-width) - 1px);
+	height: 100%;
+	border-right: 1px solid #6a6a6a;
+	background-color: #ececec;
+
+}
+
+main.app section article div.settings-menu div.banner {
+
+	width: 100%;
+	height: 120px;
+	padding-bottom: 20px;
+	background-color: #d1dbda;
+
+}
+
+main.app section article div.settings-menu div.banner table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-menu div.banner table td.icon {
+
+	width: 120px;
+
+}
+
+
+
+main.app section article div.settings-menu div.banner h3 {
+
+	padding-top: 10px;
+	font-weight: 400;
+	font-size: 14px;
+	padding: 0;
+	margin: 0;
+
+}
+
+main.app section article div.settings-menu div.banner span {
+
+	font-size: 12px;
+	color: #8a8a8a;
+	display: block;
+
+}
+
+main.app section article div.settings-menu div.banner i {
+
+	font-size: 13px;
+	padding-right: 4px;
+
+}
+
+main.app section article div.settings-menu div.menu {
+
+	padding-top: 20px;
+	min-height: 60px;
+	
+}
+
+main.app section article div.settings-content {
+
+	position: absolute;
+	left: var(--menu-width);
+	top: 0;
+	width: calc(100% - var(--menu-width));
+	height: 100%;
+	background-color: #f5f5f5;
+	overflow-y: auto;
+
+}
+
+main.app section article div.settings-content div.page {
+
+	width: 100%;
+	max-width: 1200px;
+	display: block;
+	margin: auto;
+	min-height: 90px;
+	padding: 10px 0;
+	display: none;
+
+}
+
+main.app section article div.settings-content div.page h3.inv-header {
+
+	display: block;
+	font-size: 19px;
+	font-family: 'Muli', sans-serif;
+	margin: 0;
+	padding: 0;
+	font-weight: 400;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #cecece;
+	margin-bottom: 10px;
+
+}
+
+main.app section article div.settings-content div.page.active {
+
+	display: block;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen {
+
+	min-height: 320px;
+	width: 900px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen table th {
+
+	font-size: 14px;
+	text-align: left;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen table div.rel {
+
+	width: calc(100% - 40px);
+	border-radius: 8px;
+	min-height: 10px;
+	background-color: rgba(0,0,0,0.1);
+	position: relative;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen table div.rel i {
+
+	position: absolute;
+	right: 10px;
+	color: #666;
+	top: 10px;
+	font-size: 16px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen table div.rel select {
+
+	width: 100%;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	color: #000;
+	padding: 8px 0;
+	font-size: 14px;
+	text-indent: 8px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen table div.space {
+
+	height: 30px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen table span  {
+
+	display: block;
+	font-size: 13px;
+	text-indent: 30px;
+	color: #888;
+	padding-top: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen button.submit {
+
+	width: calc(100% - 40px);
+	border: none;
+	background-color: #007bff;
+	border-radius: 8px;
+	margin-top: 40px;
+	color: #fff;
+	font-family: 'Muli', sans-serif;
+	font-size: 18px;
+	padding: 7px 0;
+	text-transform: uppercase;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul {
+
+	padding: 0;
+	margin: 0;
+	padding-top: 40px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li {
+
+	list-style: none;
+	width: 100%;
+	padding: 8px 0;
+	width: calc(100% - 40px);
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li.line {
+
+	border-top: 1px solid #8a8a8a;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li.line:last-child {
+
+	border-bottom: 1px solid #8a8a8a;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul div li:nth-child(odd) {
+
+	background-color: rgba(0,0,0,0.1);
+
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li.labels td {
+
+	vertical-align: bottom;
+	font-weight: bold;
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table td.cancel {
+
+	width: 110px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table td.cancel a {
+
+	font-size: 13px;
+	font-family: 'Muli', sans-serif;
+	color: #007bff;
+	opacity: 0.7;
+	margin-left: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table td.cancel a i {
+	
+	padding-right: 4px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table td.cancel a:hover {
+
+	cursor: pointer;
+	text-decoration: underline;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table td.expire{
+
+	width: 80px;
+	white-space: nowrap;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table td.uses {
+
+	width: 80px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul div li table td.uses {
+
+	font-size: 13px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul div li table td.expire a,
+main.app section article div.settings-content div.page div.invite-gen ul div li table td.uses a {
+
+	padding-left: 14px;
+	font-size: 13px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul div li table td.uses a i {
+
+	padding-right: 4px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table div.outline {
+
+	border-radius: 5px;
+	width: calc(100% - 40px);
+	margin-left: 10px;
+	padding: 4px 0;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table div.outline i {
+
+	padding-left: 5px;
+	padding-right: 8px;
+	color: #888;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table div.outline i.ok {
+
+	color: #333;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table div.outline input {
+
+	width: calc(100% - 170px);
+	border: none;
+	outline: none;
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 5px;
+	text-indent: 10px;
+	padding: 4px 0;
+	font-size: 16px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table div.outline button {
+
+	width: 80px;
+	border: none;
+	background-color: #007bff;
+	border-radius: 8px;
+	color: #fff;
+	font-family: 'Muli', sans-serif;
+	font-size: 16px;
+	padding: 4px 0;	
+	margin-left: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen ul li table div.outline button:hover {
+
+	cursor: pointer;
+	opacity: 0.8;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen p {
+
+	font-weight: 14px;
+	font-family: 'Muli', sans-serif;
+	padding: 20px 0;
+	margin: 0;
+
+}
+
+main.app section article div.settings-content div.page div.breadcrumbs {
+
+	width: 100%;
+	padding-bottom: 10px;
+	font-size: 14px;
+
+}
+
+main.app section article div.settings-content div.page div.breadcrumbs table {
+
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.breadcrumbs table td {
+
+	padding-right: 10px;
+
+}
+
+main.app section article div.settings-content div.page div.breadcrumbs table td:last-child {
+
+	font-weight: bold;
+
+}
+
+main.app section article div.settings-menu div.menu li {
+
+	list-style: none;
+	width: calc(100% - 8px);
+	padding: 4px 0;
+	font-size: 14px;
+	height: 34px;
+	display: block;
+	margin: auto;
+	border-radius: 5px;
+	margin-bottom: 4px;
+
+}
+
+main.app section article div.settings-menu div.menu li.hide {
+
+	display: none;
+
+}
+
+main.app section article div.settings-menu div.menu li table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-menu div.menu li table td.icon {
+
+	width: 40px;
+	text-align: center;
+
+}
+
+main.app section article div.settings-menu div.menu li:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.4);
+	color: #fff;
+
+}
+
+main.app section article div.settings-menu div.menu li.active {
+
+	color: #fff;
+	background-color: #1e6399 !important;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data {
+
+	padding-top: 20px;
+	border-top: 1px solid #cecece;
+	padding-bottom: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.form-edit {
+
+	width: 470px;
+	padding: 30px 0;
+	border-top: 1px solid #e2e2e2;
+	margin-top: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.form-edit table {
+
+	table-layout: fixed;
+	width: 100%;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.form-edit button.cancel {
+
+	border: 1px solid #db3b21;
+	color: #db3b21;
+	background-color: transparent;
+	border-radius: 5px;
+	font-size: 14px;
+	padding: 6px 0;
+	width: 90%;
+	display: block;
+	margin: auto;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.form-edit button.cancel:hover {
+
+	cursor: pointer;
+	color: #fff;
+	background-color: #db3b21;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.form-edit button.confirm {
+
+	border: 1px solid #28a745;
+	color: #28a745;
+	background-color: transparent;
+	border-radius: 5px;
+	font-size: 14px;
+	padding: 6px 0;
+	width: 90%;
+	display: block;
+	margin: auto;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.form-edit button.confirm:hover {
+
+    cursor: pointer;
+	background-color: #28a745;
+	color: #fff;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.form-edit button.edit {
+
+	border: 1px solid #007bff ;
+	color: #007bff ;
+	background-color: transparent;
+	border-radius: 5px;
+	font-size: 14px;
+	padding: 6px 0;
+	width: 90%;
+	display: block;
+	margin: auto;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.form-edit button.edit:hover {
+
+    cursor: pointer;
+	background-color: #007bff;
+	color: #fff;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table h4 {
+
+	font-size: 20px;
+	width: 470px;
+	border-bottom: 1px solid #ccc;
+	font-family: 'Montserrat', sans-serif;
+	position: relative;
+	font-weight: 400;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table h4 span {
+
+	font-size: 15px;
+	position: absolute;
+	right: 10px;
+	top: calc(100% + 8px);
+	color: #007bff;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table h4 span:hover {
+
+	cursor: pointer;
+	text-decoration: underline;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.verification-status {
+
+	width: 470px;
+	height: 90px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.verification-status table td:first-child {
+
+	width: 100px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.verification-status table td:last-child {
+
+	padding-left: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.verification-status table td:last-child h5 {
+
+	font-size: 20px;
+	color: #3a3a3a;
+	margin: 0;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.verification-status table td:last-child h5.indent {
+
+	text-indent: 20px;
+	letter-spacing: 2px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.verification-status table td:last-child h5.indent:before {
+
+	content: "Not Verfied";
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.verification-status.good table td:last-child h5.indent:before {
+
+	content: "Verfied!";
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.verification-status div.status {
+
+	width: 84px;
+	height: 84px;
+	border: 1px solid #9a9a9a;
+	border-radius: 100%;
+	display: block;
+	margin: auto;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+
+	background-color: #db3b21;
+	background-image: url('../img/close-white-48dp.svg');
+	background-position: center;
+	background-size: 80%;
+	background-repeat: no-repeat;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.verification-status.good div.status {
+
+	background-color: #28a745;
+	background-image: url('../img/done-white-48dp.svg');
+	background-position: center;
+	background-size: 80%;
+	background-repeat: no-repeat;
+
+}
+
+
+main.app section article div.settings-content div.page div.profile-data table td.label {
+
+	width: 280px;
+	vertical-align: top;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.label p {
+
+	font-size: 14px;
+	color: #5a5a5a;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.label h3 {
+
+	font-family: 'Montserrat', sans-serif;
+	padding: 0;
+	margin: 0;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form {
+
+	padding-left: 10px;
+	vertical-align: top;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form li {
+
+	list-style: none;
+	padding: 5px 0;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form li button.enable {
+
+	background-color: #18a753;
+	border: 1px solid #18a753;
+	border-radius: 4px;
+	color: #fff;
+	margin-top: 15px;
+	padding: 8px;
+	display: block;
+	font-size: 15px;
+	letter-spacing: 1px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form li button.enable:hover {
+
+	background-color: #168f48;
+	border-color: #12753a;
+	cursor: pointer;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form li label {
+
+	font-size: 16px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form li label.block {
+
+	display: block;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.input input {
+
+	border: 1px solid #8a8a8a;
+	border-radius: 5px;
+	width: 450px;
+	background-color: #fff;
+	padding: 8px 5px;
+	text-indent: 4px;
+	color: #222;
+	font-size: 15px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.input input:focus {
+
+	box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.input input[readonly="readonly"] {
+
+	background-color: rgba(255, 255, 255, 0.3);
+	border-color: #dadada;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.input input[readonly="readonly"]:focus {
+
+	box-shadow: none;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.input input[type="checkbox"] {
+
+	width: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form li.break {
+
+	padding-top: 40px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form li p {
+
+	padding: 0;
+	margin: 0;
+	font-size: 13px;
+	color: #5a5a5a;
+	
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form p.notice {
+
+	font-size: 13px;
+	color: #3a3a3a;
+	width: 450px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline {
+
+	width: 500px;
+	border-radius: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline h5 {
+
+	padding: 0;
+	margin: 0;
+	padding-bottom: 10px;
+	font-size: 16px;
+	font-weight: 400;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline table {
+
+	height: 100%;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline table td.icon {
+
+	width: 140px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline table td.icon div.preview {
+
+	width: 110px;
+	height: 110px;
+	display: block;
+	border: 1px solid #9a9a9a;
+	border-radius: 5px;
+	background-color: #fff;
+
+	background-image: url(../img/100789_rgb.png);
+	background-size: 80%;
+	background-position: center;
+	background-repeat: no-repeat;
+	position: relative;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline table td.icon div.preview.pending {
+
+	-webkit-box-shadow: 0px 0px 10px 2px rgba(69,141,230,1);
+	/*
+	-moz-box-shadow: 0px 0px 10px 2px rgba(69,141,230,1);
+	*/
+	box-shadow: 0px 0px 10px 2px rgba(69,141,230,1);
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline table td.icon div.preview.dgl {
+
+	background-image: url(../img/placeholder.png);
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline button.confirm {
+
+	border: 1px solid #28a745;
+	color: #28a745;
+	background-color: transparent;
+	border-radius: 5px;
+	font-size: 14px;
+	padding: 6px 0;
+	width: 110px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline button.confirm:hover {
+
+	cursor: pointer;
+	background-color: #28a745;
+	color: #fff;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline button.cancel {
+
+	border: 1px solid #db3b21;
+	color: #db3b21;
+	background-color: transparent;
+	border-radius: 5px;
+	font-size: 14px;
+	padding: 6px 0;
+	width: 110px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline button.cancel:hover {
+
+	cursor: pointer;
+	color: #fff;
+	background-color: #db3b21;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.break {
+
+	padding-top: 6px;
+	border-bottom: 1px solid #cecece;
+	width: 320px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.social {
+
+	width: 120px;
+	border: 1px solid #9a9a9a;
+	border-radius: 5px;
+	font-size: 14px;
+	color: #4a4a4a;
+	font-family: 'Muli', sans-serif;
+	position: relative;
+	margin-top: 10px;
+	background-color: #e7e7e7;
+	color: #4fabe6;
+	font-weight: bold;
+	letter-spacing: 1px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.social i {
+
+	background-color: rgba(0,0,0,0.1);
+	padding: 6px 4px;
+	width: 20px;
+	text-align: center;
+	border-right: 1px solid #bababa;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.s-btn {
+
+	width: 130px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.social span {
+
+	padding-left: 8px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table div.social:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.s-btn.google i {
+
+	color: #d34836;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.s-btn.facebook i {
+
+	color: #3b5998;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.s-btn.twitter i {
+
+	color: #1daee3;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.screen {
+
+	width: 34px;
+	vertical-align: top;
+	text-align: right;
+	padding-right: 4px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.session {
+
+	width: 440px;
+	vertical-align: top;
+	padding-left: 10px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.revoke {
+
+	padding-left: 4px;
+	vertical-align: top;
+
+}
+
+
+main.app section article div.settings-content div.page div.profile-data table button.revoke {
+
+	border: 1px solid #d8381e;
+	background-color: #d8381e;
+	color: #fff;
+	border-radius: 5px;
+	padding: 6px 0;
+	width: 90px;
+	font-size: 15px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table button.revoke.hide {
+
+	display: none;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.session span {
+
+	display: block;
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+	color: #5a5a5a;
+	margin-bottom: 4px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form li.line {
+
+	border-bottom: 1px solid #cecece;
+	max-width: 700px;
+	margin-bottom: 10px;
+
+
+}
+
+
+main.app section article div.settings-content div.page div.contacts-header {
+
+	width: 100%;
+	min-height: 20px;
+	margin-bottom: 10px;
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: stretch;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card {
+
+	width: calc(50% - 10px);
+	border: 1px solid #9a9a9a;
+	display: block;
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 5px;
+	padding: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card div.drag-area.over {
+
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 4px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card table td.a {
+
+	width: 130px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card table td.b {
+
+	width: 20px;
+	text-align: center;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card table td.d {
+
+	width: 100px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card table td.d button,
+main.app section article div.settings-content div.page div.contacts-header div.card table td.v button {
+
+	width: 90%;
+	padding: 20px 0;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card.export {
+
+	width: calc(70% - 20px);
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card.import {
+
+	width: calc(30% - 10px);
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card h3 {
+
+	font-size: 16px;
+	padding: 0;
+	margin: 0;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card p {
+
+	padding: 0;
+	padding-top: 4px;
+	font-size: 14px;
+	color: #4a4a4a;
+	margin: 0;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card table {
+
+	font-size: 14px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter {
+
+	width: 100%;
+	height: 50px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th {
+
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	text-align: left;
+	font-family: 'Roboto', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table td {
+
+	font-family: 'Muli', sans-serif;
+	font-size: 14px;
+	color: #444;
+	white-space: nowrap;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table td span {
+	
+	position: relative;
+	margin-right: 14px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.rel {
+
+	width: 190px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table td span:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table td span:after {
+
+	content: "";
+	display: block;
+	height: 2px;
+	width: 100%;
+	background-color: #888;
+	border-radius: 8px;
+	position: absolute;
+	top: calc(100% + 3px);
+	left: 0;
+	opacity: 0;
+	transition: all 200ms;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table td span:hover:after {
+
+	opacity: 1;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table td span.active {
+
+	color: #1e6399;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table td span.active:after {
+
+	background-color: #1e6399;
+	opacity: 1;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.count {
+
+	width: 150px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table td.count {
+
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.order {
+
+	position: relative;
+	width: 280px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table td span.last {
+
+	margin-right: 0;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.order span {
+
+	position: absolute;
+	top: 2px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.order span.desc {
+
+	right: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.order span.asc {
+
+	right: 60px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.order span:after {
+
+	content: "";
+	display: block;
+	width: calc(100% + 10px);
+	height: calc(100% + 4px);
+	position: absolute;
+	left: -5px;
+	top: -2px;
+	background-color: rgba(0,0,0,0.08);
+	border-radius: 5px;
+	opacity: 0;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.order span:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.order span.active:after {
+
+	opacity: 1;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.order span:hover:after {
+
+	opacity: 1;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table th.search {
+
+	width: 210px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table div.search {
+
+	width: calc(100% - 10px);
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 5px;
+	position: relative;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table div.search i {
+
+	position: absolute;
+	top: 6px;
+	right: 8px;
+	color: #6a6a6a;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-filter table div.search input {
+
+	width: 100%;
+	border: none;
+	background-color: transparent;
+	padding: 4px 0;
+	text-indent: 10px;
+	font-family: 'Muli', sans-serif;
+	font-size: 13px;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list {
+
+	margin-top: 30px;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li {
+
+	list-style: none;
+	padding: 8px 0;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.check {
+
+	width: 30px;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.check label {
+
+	display: flex;
+	width: 100%;
+	padding: 15px 0;
+	justify-content: center;
+	align-items: center;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.avatar {
+
+	width: 110px;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.avatar div.avatar {
+
+	width: 70px;
+	height: 70px;
+	display: block;
+	margin: auto;
+	border-radius: 100%;
+	border: 1px solid #9a9a9a;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+	
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+
+}
+
+
+main.app section article div.settings-content div.page div.contact-list li table td.username {
+
+	padding-left: 8px;
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+	line-height: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.username span.name {
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.username span.comp,
+main.app section article div.settings-content div.page div.contact-list li table td.username span.dept {
+
+	color: #4a4a4a;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.icon {
+
+	width: 80px;
+	text-align: center;
+	color: #bababa;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.icon.able {
+
+	color: #4a4a4a;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.icon i {
+
+	font-size: 17px;	
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.icon span {
+
+	display: block;
+	text-align: center;
+	font-size: 10px;
+	text-transform: uppercase;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.count {
+
+	width: 80px;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.activity {
+
+	width: 180px;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.activity a,
+main.app section article div.settings-content div.page div.contact-list li table td.count a {
+
+	font-size: 12px;
+	display: block;
+	text-align: center;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.activity span,
+main.app section article div.settings-content div.page div.contact-list li table td.count span {
+
+	display: block;
+	margin: block;
+	text-align: center;
+	font-size: 10px;
+	text-transform: uppercase;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list div.thead {
+
+	height: 30px;
+	border-top-left-radius: 5px;
+	border-top-right-radius: 5px;
+	background-color: rgba(0,0,0,0.08);
+	padding-top: 4px;
+}
+
+main.app section article div.settings-content div.page div.contact-list div.thead table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list div.thead td.check {
+
+	width: 30px;
+	text-align: center;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list div.thead td.remove {
+
+	padding-right: 8px;
+	text-align: right;
+	font-family: 'Muli', sans-serif;
+	font-size: 13px;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list div.thead td.remove span {
+
+	color: #1376c8;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list div.thead td.remove span:hover {
+
+	cursor: pointer;
+	color: #339af0;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li:nth-child(odd) {
+
+	background-color: rgba(128,128,128,0.05);
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li:nth-child(even) {
+
+	background-color: rgba(128,128,128,0.1);
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li:last-child {
+
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list div.tfoot {
+
+	margin-top: 30px;
+	height: 40px;
+	width: 100%;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: center;
+	align-items: center;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list div.tfoot div.pg {
+
+	font-size: 15px;
+	width: 38px;
+	height: 38px;
+	line-height: 38px;
+	text-align: center;
+	margin-left: 10px;
+	margin-right: 10px;
+	border-radius: 100%;
+	
+}
+
+main.app section article div.settings-content div.page div.contact-list div.tfoot div.pg:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.1);
+
+}
+
+main.app section article div.settings-content div.page div.contact-list div.tfoot div.pg.active {
+
+	background-color: rgba(0,0,0,0.9) !important;
+	color: #fff;
+	font-weight: bold;
+
+}
+
+main.app section article div.settings-content div.page div.contact-list div.tfoot div.next {
+
+	color: #555
+
+}
+
+main.app section article div.settings-content div.page div.contact-list div.tfoot div.next:hover {
+
+	cursor: pointer;
+	color: #222;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary {
+
+	width: 100%;
+	height: 164px;
+	display: flex;
+	justify-content: space-between;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card {
+
+	width: calc(100% / 3 - 40px);
+	height: calc(100% - 20px);
+	padding: 10px;
+	background-color: #fff;
+	display: block;
+	border-radius: 4px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card label {
+
+	color: #12508f;
+	font-size: 14px;
+	display: block;
+	font-family: 'Roboto', sans-serif;
+	text-transform: uppercase;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card div.balance {
+
+	width: calc(100% - 20px);
+	padding: 10px;
+	display: flex;
+	height: 40px;
+	justify-content: flex-end;
+	align-items: flex-start;
+	flex-wrap: nowrap;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card div.balance.light {
+
+	color: #888;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card div.balance h4 {
+
+	font-size: 24px;
+	font-family: 'Roboto', sans-serif;
+	padding: 0;
+	margin: 0;
+	font-weight: 400;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card div.buttons {
+
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	flex-wrap: nowrap;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li {
+
+	list-style: none;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li:first-child {
+
+	padding-bottom: 24px;
+	
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li table td.icon {
+
+	width: 70px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li table td.conf {
+
+	width: 40px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li table td.conf div.check {
+
+	width: 25px;
+	height: 25px;
+	display: block;
+	margin: auto;
+	border: 1px solid #cecece;
+	border-radius: 100%;
+	color: #84b246;
+	text-align: center;
+	line-height: 25px;
+	font-size: 13px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li table td.icon div.circle {
+
+	width: 44px;
+	height: 44px;
+	border: 2px solid #333;
+	border-radius: 100%;
+	line-height: 44px;
+	text-align: center;
+	font-size: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li table td.icon div.circle.c-card {
+
+	color: #1b5db4;
+	border-color: #1b5db4;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li table td.icon div.circle.b-bank {
+
+	color: #e2c22f;
+	border-color: #e2c22f;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li table td h4 {
+
+	padding: 0;
+	margin: 0;
+	font-size: 16px;
+	font-weight: 400;
+	font-family: 'Roboto', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card li table td a {
+	
+	font-size: 15px;
+	display: block;
+	margin-top: 8px;
+	color: #888;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card div.takeout {
+
+	padding-top: 12px;
+	text-align: right;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card div.takeout span {
+
+	color: #1e6399;
+	font-family: 'Roboto', sans-serif;
+	font-size: 15px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card div.buttons button {
+
+	color: #fff;
+	background-color: #717075;
+	outline: none;
+	border-radius: 8px;
+	width: 170px;
+	padding: 5px 0;
+	border: none;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph {
+
+	width: calc(100% - 20px);
+	margin-top: 10px;
+	background-color: #fff;
+	padding: 10px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+	border-radius: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph img {
+
+	width: 100%;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	border-radius: 4px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph h3 {
+
+	padding: 0;
+	margin: 0;
+	font-size: 19px;
+	font-family: 'Muli', sans-serif;
+	padding-bottom: 14px;
+	border-bottom: 1px solid #ecf0f4;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul {
+
+	padding: 0;
+	margin: 10px 0;
+	overflow: hidden;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li {
+
+	list-style: none;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th {
+
+	text-align: left;
+	text-indent: 4px;
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid #ecf0f4;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table thead tr {
+
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table tbody tr {
+
+	border-bottom: 1px solid #ecf0f4;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table tbody tr:nth-child(odd) {
+
+	background-color: #f2f2f2;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.username {
+
+	width: 240px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.amount {
+
+	width: 180px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.status {
+
+	width: 180px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.date {
+
+	width: 140px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table td {
+
+	padding-top: 12px;
+	padding-bottom: 12px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.date {
+
+	padding-left: 4px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.amount {
+
+	text-align: right;
+	padding-right: 4px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.status span {
+
+	font-size: 13px;
+	display: block;
+	width: 90px;
+	text-align: center;
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 5px;
+	padding: 4px 0;
+	font-family: 'Muli', sans-serif;
+	color: #fff;
+	margin-left: 8px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.status span.complete {
+
+	background-color: #29a748;
+	
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.status span.cancel {
+
+	background-color: #dc3545;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul div.button {
+
+	padding-top: 30px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul div.button button {
+
+	border: none;
+	background-color: #007bff;
+	outline: none;
+	color: #fff;
+	padding: 8px 0;
+	width: 140px;
+	display: block;
+	margin: auto;
+	border-radius: 8px;
+	font-family: 'Muli', sans-serif;
+	font-size: 16px;
+
+}
+
+
+main.app section article div.settings-content div.page div.wallet-recent {
+
+	display: block;
+	margin-top: 10px;
+	display: flex;
+	justify-content: space-between;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-recent div.card {
+
+	width: calc(50% - 8px);
+	min-height: 230px;
+	background-color: #fff;
+	display: block;
+
+}
+
+main.app section article div.settings-content div.page div.profile-status {
+
+	width: 100%;
+	min-height: 60px;
+	padding: 20px 0;
+
+}
+
+
+main.app section article div.settings-content div.page div.profile-status h3 {
+	
+	font-family: 'Muli', sans-serif;
+	font-size: 17px;
+	width: 100%;
+	text-align: center;
+
+}
+
+main.app section article div.settings-content div.page div.profile-status p {
+	
+	font-family: 'Muli', sans-serif;
+	font-size: 14px;
+	width: 100%;
+	text-align: center;
+	color: #555;
+
+}
+
+main.app section article div.settings-content div.page div.profile-status button.request{
+
+	display: block;
+	margin: auto;
+	margin-top: 10px;
+	background-color: #1f78d1;
+	border: 1px solid #1b69b6;
+	color: #fff;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	border-radius: 5px;
+	padding: 4px 10px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans {
+
+	width: 100%;
+	min-height: 60px;
+	padding: 20px 0;
+	display: flex;
+	flex-wrap: nowrap;
+	justify-content: space-between;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card {
+
+	width: calc(100% / 3 - 40px);
+	min-height: 90px;
+	display: block;
+	margin: auto;
+	border: 1px solid #cecece;
+	border-radius: 4px;
+	background-color: #fff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.header {
+
+	border-bottom: 1px solid #cecece;
+	padding: 12px 0;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.header table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.header table td.plan-name {
+
+	padding-left: 20px;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.header table td.plan-curr {
+
+	text-align: right;
+	padding-right: 20px;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	color: #8a8a8a;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.pricing {
+
+	width: calc(100% - 40px);
+	margin: 10px auto;
+	border-bottom: 1px solid #cecece;
+	display: flex;
+	height: 80px;
+	flex-wrap: wrap;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.pricing div.money {
+
+	font-size: 44px;
+	color: #1f78d1;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.pricing div.notes {
+
+	padding-top: 6px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.pricing div.notes li {
+
+	display: block;
+	font-size: 14px;
+	color: #1f78d1;
+	font-family: 'Muli', sans-serif;
+	margin-left: 10px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.pricing div.break{
+
+	flex-basis: 100%;
+	height: 0;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.pricing div.full {
+
+	margin-top: -22px;
+	display: block;
+	font-size: 13px;
+	color: #1f78d1;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.features {
+
+	padding: 10px 20px;
+	padding-top: 10px;
+	padding-bottom: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.features li {
+
+	list-style: none;
+	color: #444;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.features a {
+
+	display: block;
+	text-decoration: none;
+	color: #1b69b6;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	padding-top: 8px;
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.footer {
+
+	border-top: 1px solid #cecece;
+	padding: 14px 20px;
+	text-align: right;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.footer button {
+
+	background-color: #1aaa55;
+	border: 1px solid #168f48;
+	color: #fff;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	border-radius: 5px;
+	padding: 4px 10px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-plans div.card div.footer button:hover {
+
+	cursor: pointer;
+	background-color: #168f48;
+	border-color: #12753a;
+
+}
+
+main.app section article div.settings-content div.page div.activity-filter {
+
+	width: 100%;
+	padding: 20px 0;
+
+}
+
+main.app section article div.settings-content div.page div.activity-filter table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.activity-filter table div.outline {
+
+	position: relative;
+
+}
+
+main.app section article div.settings-content div.page div.activity-filter table div.outline i.fa-sort {
+
+	position: absolute;
+	right: 24px;
+	top: 12px;
+	font-size: 15px;
+	color: #888;
+
+}
+
+main.app section article div.settings-content div.page div.activity-filter table input[type="text"] {
+
+	width: calc(100% - 10px);
+	display: block;
+	border: 1px solid #cecece;
+	border-radius: 5px;
+	background-color: #fff;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	padding: 8px 0;
+	text-indent: 8px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-filter table select {
+
+	width: calc(100% - 10px);
+	display: block;
+	border: 1px solid #cecece;
+	border-radius: 5px;
+	background-color: #fff;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	padding: 8px 0;
+	text-indent: 8px;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+
+}
+
+main.app section article div.settings-content div.page div.activity-filter table button {
+
+	width: 100%;
+	display: block;
+	border: 1px solid #cecece;
+	border-radius: 5px;
+	background-color: #007aff;
+	color: #fff;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	padding: 8px 0;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table {
+
+	padding-top: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table th {
+
+	background-color: #fff;
+	border-top: 1px solid #cecece;
+	border-bottom: 2px solid #cecece;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: left;
+	text-indent: 4px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table td {
+
+	border-bottom: 1px solid #cecece;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	text-align: left;
+	text-indent: 4px;
+	font-family: 'Muli', sans-serif;
+	font-size: 14px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table tr:nth-child(odd) {
+
+	background-color: #f2f2f2;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table tr:nth-child(even) {
+
+	background-color: #fff;
+
+}
+
+main.app section article div.settings-content div.page div.activity-pagination {
+
+	width: 100%;
+	display: flex;
+	padding-top: 30px;
+	padding-bottom: 10px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-pagination li {
+
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+	color: #007bff;
+	padding: .75rem 1rem;
+	border-top : 1px solid #cecece;
+	border-bottom: 1px solid #cecece;
+	border-right: 1px solid #cecece;
+	list-style: none;
+
+}
+
+main.app section article div.settings-content div.page div.activity-pagination li:first-child {
+
+	border-left: 1px solid #cecece;
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-pagination li:last-child {
+
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-pagination li:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.1);
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table td span {
+
+	font-size: 13px;
+	display: block;
+	width: 90px;
+	text-align: center;
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 5px;
+	padding: 4px 0;
+	font-family: 'Muli', sans-serif;
+	color: #fff;
+	margin-left: 8px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table td span.complete {
+
+	background-color: #29a748;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table td span.cancelled {
+
+	background-color: #dc3545;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table tr td.amount {
+
+	padding-right: 8px;
+	text-align: right;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table tr th.amount {
+
+	width: 140px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table tr th.status {
+
+	width: 110px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table tr th.date {
+
+	width: 100px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table tr th.num {
+
+	width: 110px;
+
+}
+
+main.app section article div.settings-content div.page div.activity-table table tr th.name {
+
+	width: 220px;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row {
+
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.break {
+
+	flex-basis: 100%;
+	height: 10px;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card {
+
+	width: calc(100% / 3 - 10px);
+	border: 1px solid #cecece;
+	border-radius: 5px;
+	min-height: 40px;
+	background-color: #fff;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info {
+
+	padding: 10px;
+	height: 200px;
+	padding-top: 0;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.footer {
+
+	border-top: 1px solid #cecece;
+	background-color: #ececec;
+	padding: 6px 10px;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.directory-filter {
+
+	width: 100%;
+	padding: 20px 0;
+
+}
+
+main.app section article div.settings-content div.page div.directory-filter table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list h3.username {
+
+	padding: 10px;
+	margin: 0;
+	padding-bottom: 0px;
+
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	color: #555;
+
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table td.pic {
+
+	width: 120px;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table h3.comp {
+
+	padding: 0;
+	margin: 0;
+
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	color: #333;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table h3.dept {
+
+	padding: 0;
+	margin: 0;
+
+	font-family: 'Muli', sans-serif;
+	font-size: 14px;
+	color: #555;
+	padding-top: 4px;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table li {
+
+	list-style: none;
+	padding: 8px 0;
+
+	font-family: 'Muli', sans-serif;
+	font-size: 14px;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile {
+
+	width: 115px;
+	height: 115px;
+	display: block;
+	margin: auto;
+	background-color: #fff;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	border-radius: 100%;
+
+	background-repeat: no-repeat;
+
+}
+
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.rating {
+
+	padding-top: 10px;
+	text-align: center;
+	font-size: 14px;
+	color: #666;
+
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.rank {
+
+	padding-top: 4px;
+	text-align: center;
+	font-size: 13px;
+	color: #888;
+	font-family: 'Muli', sans-serif;
+	text-align: center;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table td.summary {
+
+	padding-left: 10px;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.footer table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.footer table tr td:last-child {
+
+	text-align: right;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.footer table button {
+
+	background-color: #007bff;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	padding: 5px 0;
+	width: calc(100% - 5px);
+	font-family: 'Muli', sans-serif;
+	font-size: 13px;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.footer table button:hover {
+
+	cursor: pointer;
+	background-color: #3c5d82;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list {
+
+	padding-top: 40px;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen button.create {
+
+	width: calc(100% - 40px);
+	border: none;
+	background-color: #007bff;
+	border-radius: 8px;
+	margin-top: 4px;
+	color: #fff;
+	font-family: 'Muli', sans-serif;
+	font-size: 18px;
+	padding: 7px 0;
+	text-transform: uppercase;
+
+}
+
+main.app section article div.settings-content div.page div.invite-gen button.create:hover {
+
+	cursor: pointer;
+	background-color: #419bdd;
+
+}
+
+main.app section article div.settings-content div.page div.api-forms button {
+
+	padding: 4px 16px;
+	border-radius: 8px;
+	border: 1px solid #999;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	margin-bottom: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.api-forms button:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.1);
+
+}
+
+main.app section article div.settings-content div.page div.api-forms label {
+
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	display: block;
+	font-weight: bold;
+	color: #333;
+
+}
+
+main.app section article div.settings-content div.page div.api-forms label span {
+
+	color: #e87487;
+
+}
+
+main.app section article div.settings-content div.page div.api-forms div.input {
+
+	margin-bottom: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.api-forms div.input input[type="text"] {
+
+	padding: 10px 0;
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 5px;
+	border: 1px solid #cecece;
+	width: 50%;
+	text-indent: 10px;
+
+	font-family: 'Muli', sans-serif;
+	font-size: 14px;
+
+}
+
+main.app section article div.settings-content div.page div.api-forms p {
+
+	padding: 0;
+	margin: 4px 0;
+	font-family: 'Muli', sans-serif;
+	font-size: 15px;
+	display: block;
+
+}
+
+main.app section article div.settings-content div.page div.api-block {
+
+	width: 50%;
+	margin-top: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.api-block li {
+
+	list-style: none;
+	width: 100%;
+	height: 60px;
+
+}
+
+main.app section article div.settings-content div.page div.api-block li table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.api-block li table label {
+
+	display: flex;
+	align-items: center;
+
+}
+
+main.app section article div.settings-content div.page div.api-block li table label span {
+
+	font-family: 'Muli', sans-serif;
+	font-size: 14px;
+	display: block;
+	font-weight: bold;
+	color: #333;
+
+}
+
+main.app section article div.settings-content div.page div.api-block li table label p {
+
+	font-family: 'Muli', sans-serif;
+	font-size: 14px;
+	display: block;
+	color: #555;
+	padding: 0;
+	margin: 0;
+
+}
+
+main.app section article div.settings-content div.page div.api-block li table label input[type="checkbox"] {
+
+	margin-left: 5px;
+	margin-right: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.api-block li table label span.title {
+
+	color: #ff5050;
+
+}
+
+main.app section article div.settings-content div.page div.api-gen {
+
+	width: 50%;
+	margin-top: 30px;
+	padding-bottom: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.api-gen button {
+
+	width: 100%;
+	border: none;
+	background-color: #007bff;
+	border-radius: 8px;
+	margin-top: 4px;
+	color: #fff;
+	font-family: 'Muli', sans-serif;
+	font-size: 18px;
+	padding: 7px 0;
+	text-transform: uppercase;
+
+}
+
+main.app section article div.settings-content div.page div.api-gen button:hover {
+
+	cursor: pointer;
+	background-color: #419bdd;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter {
+
+	width: 100%;
+	padding: 20px 0;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table {
+	
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table div.flex {
+
+	display: flex;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table div.flex li {
+
+	font-size: 14px;
+	font-family: 'Muli', sans-serif;
+	color: #007bff;
+	padding: .75rem 1rem;
+	border-top : 1px solid #cecece;
+	border-bottom: 1px solid #cecece;
+	border-right: 1px solid #cecece;
+	list-style: none;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table div.flex li:first-child {
+
+	border-top-left-radius: 5px;
+	border-bottom-left-radius: 5px;
+	border-left: 1px solid #cecece;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table div.flex li:last-child {
+
+	border-top-right-radius: 5px;
+	border-bottom-right-radius: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table div.flex li:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.08);
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table td.right {
+
+	text-align: right;
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+	color: #333;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table td.right select {
+
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+	color: #333;
+	border: none;
+	outline: none;
+	background-color: transparent;
+	border-bottom: 1px solid #007bff;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	padding: 2px 0;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table td.right select:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.04);
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table td.btn {
+
+	width: 240px;
+	text-align: right;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table td.btn i {
+
+	color: #366acc;
+	padding-right: 14px;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table td.btn button {
+
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+	color: #333;
+	padding: 8px 0;
+	width: calc(100% - 40px);
+	border: 1px solid #cecece;
+	background-color: transparent;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.23);
+	border-radius: 5px;
+
+}
+
+main.app section article div.settings-content div.page div.staff-filter table td.btn button:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.08);
+
+}
+
+main.app section article div.settings-content div.page div.employee-list {
+
+	padding-top: 30px;
+	width: 100%;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li {
+
+	list-style: none;
+	padding-left: 10px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.title {
+
+	color: #7f7f82;
+	font-weight: bold;
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+	text-indent: 4px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.more {
+
+	width: 40px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.more i {
+
+	position: relative;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.more i:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.more i:after {
+
+	content: "";
+	display: block;
+	position: absolute;
+	width: 30px;
+	height: 30px;
+	border-radius: 100%;
+	background-color: rgba(0,0,0,0.08);
+	left: -13px;
+	top: -8px;
+	transition: transform 200ms;
+	transform: scale(0,0);
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.more i:hover:after {
+
+	transform: scale(1,1);
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.stat {
+
+	width: 140px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.join {
+
+	width: 140px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.perm {
+
+	width: 170px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.dept {
+
+	width: 240px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.des {
+
+	width: 120px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.pic {
+
+	width: 120px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff {
+
+	padding: 14px 0;
+	background-color: #fff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.16), 0 1px 3px rgba(0,0,0,0.23);
+	border-radius: 5px;
+	margin-top: 10px;
+	padding-left: 10px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff div.pic {
+
+	width: 100px;
+	height: 100px;
+	display: block;
+	margin: auto;
+	border-radius: 100%;
+	border: 1px solid #9a9a9a;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+	
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+
+
+}
+
+
+main.app section article div.settings-content div.page div.employee-list li table td.stat div.stat {
+
+	width: calc(100% - 30px);
+	background-color: rgba(0,0,0,0.1);
+	padding: 8px 0;
+	text-align: center;
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+	border-radius: 5px;
+	border: 1px solid #555;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li table td.stat div.stat.active {
+
+	background-color: #2ecc71;
+	color: #fff;
+	border-color: #12c55e;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff td.join {
+
+	color: #555;
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff td.perm i {
+
+	color: #ccc;
+	font-size: 16px;
+	padding-left: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff td.perm i.ok {
+
+	color: #333;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff table td.name {
+
+	padding-left: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff table td.name span.name {
+
+	display: block;
+	font-size: 20px;
+	font-family: 'Muli', sans-serif;
+	color: #333;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff table td.name span.username {
+
+	display: block;
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+	color: #777;
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff table td.dept {
+
+	font-size: 15px;
+	font-family: 'Muli', sans-serif;
+	color: #444;
+
+}
+
+main.app section article div.settings-content div.page div.statement {
+
+	border-radius: 5px;
+	background-color: #fff;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+	min-height: 500px;
+	width: calc(100% - 40px);
+	padding: 20px;
+
+}
+
+main.app section article div.settings-content div.page div.statement div.header {
+
+	padding-bottom: 30px;
+
+}
+
+main.app section article div.settings-content div.page div.statement div.header table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+main.app section article div.settings-content div.page div.statement div.header table h3 {
+
+	font-size: 19px;
+	font-family: 'Muli', sans-serif;
+	color: #333;
+	padding: 0;
+	margin: 0;
+	font-weight: 400;
+
+}
+
+main.app section article div.settings-content div.page div.statement div.header table button {
+
+	width: 130px;
+	padding: 6px 0;
+	background-color: #ececec;
+	border: 2px solid #9a9a9a;
+	border-radius: 20px;
+	font-family: 'Muli', sans-serif;
+	font-size: 16px;
+	opacity: 0.5;
+
+}
+
+main.app section article div.settings-content div.page div.statement div.header table td:last-child {
+
+	text-align: right;
+
+}
+
+main.app section article div.settings-content div.page div.statement div.header table select {
+
+	color: #333;
+	border: none;
+	outline: none;
+	background-color: transparent;
+	border-bottom: 1px solid #007bff;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	padding: 2px 8px;
+
+	font-size: 19px;
+	font-family: 'Muli', sans-serif;
+	color: #333;
+	
+}
+
+main.app section article div.settings-content div.page div.statement ul {
+
+	padding: 0;
+	margin: 0;
+	border-top: 1px solid #cecece;
+	padding-bottom: 30px;
+
+}
+
+main.app section article div.settings-content div.page div.statement ul li {
+
+	list-style: none;
+	padding: 20px 0;
+	border-bottom: 1px solid #cecece;
+	padding-left: 20px;
+
+	font-size: 17px;
+	font-family: 'Muli', sans-serif;
+	color: #333;
+
+}
+
+main.app section article div.settings-content div.page div.statement ul li i {
+
+	padding-left: 10px;
+	padding-right: 10px;
+
+}
+
+main.app section article div.settings-content div.page div.statement ul li.disabled {
+
+	color: #bbb;
+
+}
+
+main.app section article div.tab {
+
+	width: 100%;
+	left: 0;
+	top: 4px;
+	transition: all 200ms;
+
+}
+
+main.app section article div.box-group {
+
+	display: block;
+	width: calc(100% - 8px);
+	display: block;
+	margin: auto;
+
+}
+
+main.app section article div.tab.open {
+
+	opacity: 1;
+	pointer-events: all;
+
+}
+
+main.app section article div.box-group div.header {
+	
+	height: 38px;
+	border-bottom: 1px solid #cdcdcd;
+
+}
+
+main.app section article div.box-group div.collapse {
+
+}
+
+main.app section article div.box-group div.header table {
+
+	width: 100%;
+	height: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 15px;
+	font-family: 'Montserrat', sans-serif;
+	color: #124088;
+
+}
+
+main.app section article div.box-group div.header table td.icon {
+
+	text-indent: 4px;
+	text-transform: uppercase;
+
+}
+
+main.app section article div.box-group div.header table td.icon span {
+
+	padding-left: 4px;
+
+}
+
+main.app section article div.box-group div.header table td.btn {
+
+	width: 34px;
+	text-align: center;
+	color: #222;
+	font-size: 14px;
+
+}
+	
+main.app section article div.box-group div.header table td.btn i {
+
+	position: relative;
+
+}
+
+main.app section article div.box-group div.header table td.btn i:after{
+
+	content: "";
+	display: block;
+	position: absolute;
+	width: 27px;
+	height: 27px;
+	background-color: rgba(0,0,0,0.07);
+	border-radius: 100%;
+	left: -7px;
+	top: -7px;
+	transform: scale(0,0);
+	transition: transform 200ms;
+
+}
+
+main.app section article div.box-group div.header table td.btn:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.box-group div.header table td.btn:hover i:after{
+
+	transform: scale(1,1);
+
+}
+
+main.app section article div.box-group h3 {
+
+	color: #000;
+	font-size: 14px;
+	padding: 5px 0;
+	margin: 0;
+	position: relative;
+	font-family: 'Muli', sans-serif;
+	text-indent: 8px;
+	font-weight: 400;
+	
+}
+
+main.app section article div.box-group h3 div.toggle {
+
+	width: 30px;
+	height: 100%;
+	position: absolute;
+	right: 0;
+	top: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: #777;
+	font-size: 15px;
+
+}
+
+main.app section article div.box-group h3 div.toggle:hover {
+
+	cursor: pointer;
+
+}
+
+main.app section article div.box-group h3 div.toggle:after {
+
+	content: "";
+	display: block;
+	position: absolute;
+	left: calc(54.2% - 12px);
+	top: calc(50% - 12px);
+	width: 24px;
+	height: 24px;
+	background-color: rgba(0,0,0,0.1);
+	border-radius: 100%;
+	transform: scale(0,0);
+	transition: transform 200ms;
+
+}
+
+main.app section article div.box-group h3 div.toggle:hover:after {
+
+	transform: scale(1,1);
+
+}
+
+main.app section article div.compose {
+
+	padding-bottom: 10px;
+
+}
+
+input[type="checkbox"].toggle {
+
+	appearance: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+
+	width: 34px;
+	height: 20px;
+	border: 1px solid #cecece;
+	border-radius: 20px;
+	position: relative;
+	background-color: #a8a8a8;
+	transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+	top: 2px;
+
+}
+
+input[type="checkbox"].toggle:before {
+	
+	content: "";
+	display: block;
+	position: absolute;
+	width: 16px;
+	height: 16px;
+	border-radius: 100%;
+	background-color: #fff;
+	left: 2px;
+	top: 1px;
+	transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+	
+	/*
+	-webkit-box-shadow: inset 1px -1px 3px 1px rgba(140,140,140,1);
+	-moz-box-shadow: inset 1px -1px 3px 1px rgba(140,140,140,1);
+	box-shadow: inset 1px -1px 3px 1px rgba(140,140,140,1);
+	*/
+
+}
+
+input[type="checkbox"].toggle:hover {
+
+	cursor: pointer;
+
+}
+
+input[type="checkbox"].toggle:checked {
+
+	background-color: #8888ff;
+
+}
+
+input[type="checkbox"].toggle:checked:before {
+
+	transform: translateX(12px);
+
+}
+
+div.session-widget {
+
+	position: fixed;
+	right: 4px;
+	top: calc(var(--header-height) + 4px);
+	width: 326px;
+	min-height: 240px;
+	background-color: #fff;
+	border-radius: 8px;
+	box-shadow: 0 2px 10px rgba(0,0,0,.2);
+	z-index: 100;
+
+	opacity: 0;
+	pointer-events: none;
+	transform: translateY(-4px);
+	transition: all 200ms;
+
+}
+
+div.session-widget.open {
+
+	opacity: 1;
+	pointer-events: all;
+	transform: translateY(0px);
+
+}
+
+div.session-widget div.profile {
+
+	margin: 20px 33px;
+
+}
+
+div.session-widget div.profile div.img {
+
+	width: 80px;
+	height: 80px;
+	display: block;
+	margin: auto;
+	position: relative;
+	border-radius : 100%;
+	background-image: url(../img/user_placeholder.png);
+	background-position: center bottom;
+	background-size: 90%;
+	background-repeat: no-repeat;
+	border: 2px solid #000;
+
+}
+
+div.session-widget div.profile div.name {
+
+	font-size: 16px;
+	font-family: Google Sans,Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
+	font-weight: 500;
+	text-align: center;
+	letter-spacing: 0.29px;
+	color: #232323;
+	padding: 3px 0;
+
+}
+
+div.session-widget div.profile div.account {
+
+	font-size: 14px;
+	color: #5f6368;
+	font-family: Google Sans,Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
+	font-weight: 500;
+	text-align: center;
+
+}
+
+div.session-widget div.profile button {
+
+	padding: 4px 0;
+	background-color: #fff;
+	font-size: 14px;
+	border: 1px solid #dadce0;
+	border-radius: 50px;
+	color: #3c4043;
+	width: 80%;
+	display: block;
+	margin: 20px auto;
+	
+}
+
+div.session-widget div.profile button:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.1);
+
+}
+
+div.session-widget ul {
+
+	padding: 0;
+	margin: 0;
+	border-top: 1px solid #ddd;
+	display: none;
+
+}
+
+div.session-widget ul li {
+
+	list-style: none;
+	padding: 16px 0;
+
+}
+
+div.session-widget ul li:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.1);
+
+}
+
+div.session-widget ul li table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+div.session-widget ul li table td.icon {
+
+	width: 60px;
+	text-align: right;
+
+}
+
+div.session-widget ul li table td.icon td.circle {
+
+	width: 20px;
+	height: 20px;
+	background-color: #fff;
+	border-radius: 100%;
+
+}
+
+div.session-widget ul li table td.name {
+
+	padding-left: 20px;
+	font-size: 15px;
+
+}
+
+div.session-widget div.signout {
+
+	border-top: 1px solid #ddd;
+	padding: 4px 0;
+	border-bottom: 1px solid #ddd;
+
+}
+
+div.session-widget div.signout button {
+
+	padding: 8px 0;
+	background-color: #fff;
+	font-size: 15px;
+	border: 1px solid #dadce0;
+	border-radius: 8px;
+	color: #282828;
+	width: 80%;
+	display: block;
+	margin: 20px auto;
+
+}
+
+div.session-widget div.signout button:hover {
+
+	cursor: pointer;
+	background-color: rgba(0,0,0,0.1);
+
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+
+	appearance: none !important;
+	-webkit-appearance: none !important;
+	-moz-appearance: none !important;
+}

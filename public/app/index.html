@@ -1,0 +1,1762 @@
+<!--
+/**
+
+ Apache-2.0 License
+ Copyright 2020 - 2022 Web Service Development Inc.
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+ http://www.apache.org/licenses/LICENSE-2.0
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
+ Author: Ogawa Kousei (kogawa@wsd.co.jp)
+
+**/
+-->
+
+<!doctype html>
+<html>
+
+	<head>
+
+		<title>Private Invoice</title>
+
+		<meta charset="utf-8"/>
+		<link rel="shortcut icon" type="image/png" href="img/favicon_wsd.png"/>
+
+		<link rel="stylesheet" type="text/css" href="css/layout.css"/>
+		<link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Muli" rel="stylesheet"> 
+		<link href="lib/fontawesome/css/all.css" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="lib/flatpickr.min.css"/>
+
+
+	</head>
+
+	<body>
+
+		<!-- Payment Modal -->
+
+		<aside id='ActionWidget.modal.body'>
+
+			<div class="modal">
+
+				<div class="header">
+					<h3>Make Payment</h3>
+					<div id='ActionWidget.modal.close' class="close"></div>
+				</div>
+
+				<div class="body">
+					<li class='label'>
+						Current Balance
+					</li>
+					<li class='balance'>
+						$1,000.00
+					</li>
+					<li class='label'>
+						Make Payment To
+					</li>
+					<li class='balance'>
+						$110.00
+					</li>
+					<li class='label'>
+						Transfer Cost
+					</li>
+					<li class='balance'>
+						$0.50
+					</li>
+					<div class='line'></div>
+					<li class='label'>
+						End Balance
+					</li>
+					<li class='balance'>
+						$889.50
+					</li>
+
+				</div>
+
+				<div class="footer">
+					<table>
+						<tr>
+							<td>
+								<button class='close' id='ActionWidget.modal.cancel'>Close</button>
+							</td>
+							<td>
+							</td>
+							<td>
+								<button class='submit' id='ActionWidget.modal.submit'>Make Payment</button>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+			</div>
+
+		</aside>
+
+		<!-- Contact Modal -->
+
+		<aside id='SettingsContacts.modal.body'>
+
+			<div class="modal">
+
+				<div class="header">
+					<h3>Confirm Contact</h3>
+					<div id='SettingsContacts.modal.close' class="close"></div>
+				</div>
+
+				<div class="body">
+
+					<li class='label'>
+						User Info
+					</li>
+					<li class='balance' id='SettingsContacts.form.origin'>
+						origin
+					</li>
+					<li class='balance' id='SettingsContacts.form.username'>
+						Username
+					</li>
+					<li class='balance' id='SettingsContacts.form.work_email'>
+						Work Email
+					</li>
+
+					<li class='label'>
+						Company
+					</li>
+					<li class='balance' id='SettingsContacts.form.company_name'>
+						Company Name
+					</li>
+					<li class='balance' id='SettingsContacts.form.company_postcode'>
+						Company Postcode
+					</li>
+					<li class='balance' id='SettingsContacts.form.company_address'>
+						Company Address
+					</li>
+					<li class='balance' id='SettingsContacts.form.company_building'>
+						Company Building
+					</li>
+					<li class='balance' id='SettingsContacts.form.company_department'>
+						Company Department
+					</li>
+
+				</div>
+
+				<div class="footer">
+					<table>
+						<tr>
+							<td>
+								<button class='close' id='SettingsContacts.modal.cancel'>Cancel</button>
+							</td>
+							<td>
+							</td>
+							<td>
+								<button class='submit' id='SettingsContacts.modal.submit'>Add Contact</button>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+			</div>
+
+		</aside>
+
+		<!-- START MAIN -->
+
+		<main class="app">
+
+			<div class="session-widget" id="SessionWidget.menu.body">
+				
+				<div class="profile">
+					<div class="img"></div>
+					<div class="name">User Display Name</div>
+					<div class="account">user.contact@email.com</div>
+
+					<button>Manage your Account</button>
+
+				</div>
+
+				<ul>
+					<li>
+						<table>
+							<tr>
+								<td class="icon">
+									<div class="circle add">
+										<svg class="gb_Ab" enable-background="new 0 0 24 24" focusable="false" height="20" viewBox="0 0 24 24" width="20" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><path d="M9 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 7c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm6 5H3v-.99C3.2 16.29 6.3 15 9 15s5.8 1.29 6 2v1zm3-4v-3h-3V9h3V6h2v3h3v2h-3v3h-2z"></path></svg>
+									</div>
+								</td>
+								<td class="name">
+									Add Another User
+								</td>
+							</tr>
+						</table>
+					</li>
+				</ul>
+				<div class="signout">
+					
+					<button id="SessionWidget.menu.signout">Sign Out</button>
+
+				</div>
+
+			</div>
+
+			<header>
+
+				<table class="layout">
+					<tr>
+						<td class="icon">
+							<img src="img/concept_black-01.png"/>
+						</td>
+						<td class="title">
+							<h1><b>Private</b> Invoice</h1>
+						</td>
+						<td class="search">
+							<div class="search-widget">
+								<input type="text" placeholder="Keyword Search"/>
+								<i class="hint fas fa-search"></i>
+							</div>
+						</td>
+						<td class="email" id="SessionWidget.menu.username">
+							username@instance
+						</td>
+						<td class="menu">
+							<div class="btn" id="TabWidget.tab.bell">
+								<i class="fas fa-bell"></i>
+							</div>
+						</td>
+						<td class="menu">
+							<div class="btn" id="TabWidget.tab.settings">
+								<i class="fas fa-cog"></i>
+							</div>
+						</td>
+						<td class="menu">
+							<div class="btn" id="SessionWidget.menu.toggle">
+								<i class="fas fa-bars"></i>
+							</div>
+						</td>
+					</tr>
+				</table>
+			</header>
+
+			<section>
+
+				<article class="settings" id="TabWidget.section.settings">
+
+					<div class="settings-menu">
+
+						<div class="menu" id="SettingsMenu.area.menu">
+
+							<li id="SettingsMenu.menu.back">
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-chevron-left"></i>
+										</td>
+										<td>
+											Back to Private Invoice
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li id="SettingsMenu.menu.company">
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-building"></i>
+										</td>
+										<td>
+											Company
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li id="SettingsMenu.menu.profile">
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-user"></i>
+										</td>
+										<td>
+											Profile
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li id="SettingsMenu.menu.contacts">
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-users"></i>
+										</td>
+										<td>
+											Contacts
+										</td>
+									</tr>
+								</table>
+							</li>
+
+						</div>
+
+					</div>
+
+					<div class="settings-content">
+
+						<div class="page" id="SettingsMenu.pages.contacts">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Contacts</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class='contacts-header'>
+
+								<div class='card export'>
+									<h3>Export Contact Details</h3>
+									<p>Export this file and give it to other people
+									to have them add you to their contacts</p>
+
+									<table>
+										<tr>
+											<td class='a'>Number of uses</td>
+											<td class='b'>:</td>
+											<td class='c'>
+												<input type='number' value='1' disabled='disabled' id='SettingsContacts.exportDetails.uses'/> Times(s)
+											</td>
+											<td class='d' rowspan='3'>
+												<button id='SettingsContacts.exportDetails.submit'>Export</button>
+											</td>
+										</tr>
+										<tr>
+											<td>Invite Contact As</td>
+											<td class='b'>:</td>
+											<td colspan='2'>
+												<label>
+													<input type='radio' name='contact-type' value='partner' disabled='disabled' checked id='SettingsContacts.exportDetails.partner'/> Partner
+												</label>
+												<label>
+													<input type='radio' name='contact-type' value='supplier' disabled='disabled' id='SettingsContacts.exportDetails.supplier'/> Supplier (Can send to you)
+												</label>
+												<label>
+													<input type='radio' name='contact-type' value='client' disabled='disabled' id='SettingsContacts.exportDetails.client'/> Client (You can send to them)
+												</label>
+											</td>
+										</tr>
+										<tr>
+											<td>Expiration Date</td>
+											<td class='b'>:</td>
+											<td colspan='2'>
+												<input type='date' disabled='disabled' id='SettingsContacts.exportDetails.expire'/>
+											</td>
+										</tr>
+									</table>
+
+
+								</div>
+
+								<div class='card import'>
+									<h3>Import Contact Details</h3>
+									<p>
+									Drag and Drop contact details here to add a new contact, or click the button to import
+
+									</p>
+
+									<input type='file' id='SettingsContacts.importDetails.file' style='display: none' accept='.json'/>
+
+									<div class='drag-area' id='SettingsContacts.importDetails.area'>
+										<table>
+											<tr>
+												<td class='u'>
+												</td>
+												<td class='v'>
+													<button id='SettingsContacts.importDetails.select'>Select</button>
+												</td>
+											</tr>
+										</table>
+									</div>
+
+								</div>
+								
+
+							</div>
+
+							<div class="contacts-filter" style='display: none;'>
+
+								<table>
+									<thead>
+										<tr>
+											<th class="rel">
+												Relationship
+											</th>
+											<th class="count">
+												Clients
+											</th>
+											<th class="count">
+												Suppliers
+											</th>
+											<th></th>
+											<th class="search">
+												Search
+											</th>
+											<th class="order">
+												Order By
+
+												<span class="asc active">ASC</span>
+												<span class="desc">DESC</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>
+												<span class="active">All</span>
+												<span>Clients</span>
+												<span>Suppliers</span>
+											</td>
+											<td class="count">
+												30 Companies
+											</td>
+											<td class="count">
+												15 Companies
+											</td>
+											<td></td>
+											<td>
+												<div class="search">
+													<input type="text" placeholder="Enter Keyword"/>
+													<i class="fas fa-search"></i>
+												</div>
+											</td>
+											<td>
+												<span class="active">Username</span>
+												<span>Company Name</span>
+												<span class="last">Last Active</span>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+
+							<div class="contact-list">
+
+								<div class="thead">
+									<table>
+										<tr>
+											<td class='check'></td>
+											<td	class="username">
+												<label>
+													Contact Table
+												</label>
+											</td>
+											<td>
+											</td>
+										</tr>
+									</table>
+								</div>
+								
+								<div class="tbody" id='SettingsContacts.table.page'>
+									<li>
+										<table>
+											<tr>
+												<td class='check'></td>
+												<td class="username">
+
+													<span class="name">username@instance</span> <br>
+													<span class="comp">Company Name</span>
+													<span class="dept">Department Name</span>
+
+												</td>
+												<td class="icon able">
+													<i class="fas fa-paper-plane"></i>
+													<span>Can Send</span>
+												</td>
+												<td class="icon">
+													<i class="fas fa-inbox"></i>
+													<span>Can Receive</span>
+												</td>
+												<td class='count'></td>
+												<td class="activity">
+													<a>Added On</a>
+													<span>Yester Day</span>
+												</td>
+												<td class='count'></td>
+												<td class="icon able">
+													<i class="fas fa-trash"></i>
+													<span>Remove</span>
+												</td>
+											</tr>
+										</table>
+									</li>
+								</div>
+
+							</div>
+
+						</div>
+
+						<div class="page" id="SettingsMenu.pages.company">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Company</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="profile-data">
+								<table>
+									<tr>
+										<td class="label">
+											<h3>Company Settings</h3>
+											<p>This information will appear on documents</p>
+
+										</td>
+										<td class="form">
+
+											<div class="stamp-outline" style='display: none;'>
+
+												<table>
+													<tr>
+														<td class="icon" rowspan="2">
+															<div id="SettingsProfile.logo.img" class="preview dgl"></div>
+														</td>
+														<td colspan="2">
+
+															<h5>Upload a new logo</h5>
+
+															<input id="SettingsProfile.logo.file" type="file"/>
+															<div class="break"></div>
+														
+														</td>
+													</tr>
+													<tr>
+														<td>
+															<button id="SettingsProfile.logo.cancel" class="cancel">Cancel</button>
+														</td>
+														<td>
+															<button id="SettingsProfile.logo.submit" class="confirm">Confirm</button>
+														</td>
+													</tr>
+												</table>
+
+											</div>
+
+											<h4>
+												Company Details
+												<span id='SettingsProfile.company.edit'>Edit</span>
+											</h4>
+
+											<li>
+												<label>Company Name</label>
+												<div class="input">
+													<input type="text" placeholder="My Awesome Company" id="SettingsProfile.company.company_name"/>
+												<p>This is your legal company or personal name</p>
+												</div>
+											</li>
+
+											<li>
+												<label>Postcode</label>
+												<div class="input">
+													<input type="text" placeholder="Postcode" id="SettingsProfile.company.company_postcode"/>
+												<p>This is the postcode of where you live</p>
+												</div>
+											</li>
+
+											<li>
+												<label>Address</label>
+												<div class="input">
+													<input type="text" placeholder="Address Line 1" id="SettingsProfile.company.company_address"/>
+												<p>This is first line of your address</p>
+												</div>
+											</li>
+
+											<li>
+												<label>Building Name</label>
+												<div class="input">
+													<input type="text" placeholder="Address Line 2" id="SettingsProfile.company.company_building"/>
+												<p>This is second line of your address</p>
+												</div>
+											</li>
+
+											<li>
+												<label>Department</label>
+												<div class="input">
+													<input type="text" placeholder="Your Role Here" id="SettingsProfile.company.company_department"/>
+												<p>This is the name of the department (if it exists)</p>
+												</div>
+											</li>
+											
+
+											<li>
+												<label>Company Tax Id</label>
+												<div class="input">
+													<input type="text" placeholder="1234567890123" id="SettingsProfile.company.company_tax_id"/>
+													<p>This is the tax identification number (TIN) of your legal entity</p>
+												</div>
+											</li>
+											
+
+											<div class="form-edit">
+												<table>
+													<tr>
+														<td>
+															<button class="cancel" id='SettingsProfile.company.cancel'>Cancel</button>
+														</td>
+														<td></td>
+														<td>
+															<button class="confirm" id='SettingsProfile.company.save'>Confirm</button>
+														</td>
+													</tr>
+												</table>
+											</div>
+
+										</td>
+									</tr>
+								</table>
+							</div>
+
+						</div>
+					
+
+						<div class="page" id="SettingsMenu.pages.profile">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Profile</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="profile-data">
+
+								<table>
+									<tr>
+										<td class="label">
+											<h3>Profile Settings</h3>
+											<p>
+												This information will appear in your
+												profile.
+											</p>
+										</td>
+										<td class="form">
+
+											<h4>
+												Profile Details
+												<span id='SettingsProfile.profile.edit'>Edit</span>
+											</h4>
+
+											<li>
+												<label>Username</label>
+												<div class="input">
+													<input type="text" placeholder="username@instance" id="SettingsProfile.profile.username" readonly="readonly"/>
+												</div>
+												<p>This is the username used to address documents</p>
+											</li>
+
+											<li>
+												<label>User UUID</label>
+												<div class="input">
+													<input type="text" placeholder="xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx" id="SettingsProfile.profile.user_uuid" readonly="readonly"/>
+												</div>
+												<p>This is your user uuid for reference</p>
+											</li>
+
+											<li>
+												<label>Email Address</label>
+												<div class="input">
+													<input type="text" placeholder="username@email.com" id="SettingsProfile.profile.work_email" readonly="readonly"/>
+												</div>
+												<p>Notifications will be sent to this email address</p>
+											</li>
+
+											<p class="notice">
+											Currently this form does not allow for you to 
+											change your username or contact email as it affects
+											the auto-complete for other user's contacts.
+											<br>
+											<br>
+											If you would like to change your username or contact
+											email address please contact 
+											<a href="#">customer support</a>.
+											</p>
+
+											<div class="form-edit">
+												<table>
+													<tr>
+														<td>
+															<button class="cancel" id='SettingsProfile.profile.cancel'>Cancel</button>
+														</td>
+														<td></td>
+														<td>
+															<button class="confirm" id='SettingsProfile.profile.save'>Confirm</button>
+														</td>
+													</tr>
+												</table>
+											</div>
+										</td>
+									</tr>
+								</table>
+						</div>
+
+					</div>
+
+				</article>
+				
+				<article id="TabWidget.section.client" class="send">
+
+					A bebe!
+
+				</article>
+
+				<article id="TabWidget.section.supplier" class="send">
+
+					<!-- START FOLDERS -->
+
+					<div class="folders">
+
+						<!-- START TAB A -->
+
+						<!-- END TAB -->
+						
+						<div class="tab" id="FolderWidget.display.c">
+
+						<div class="box-group">
+
+							<div class="header">
+								<table>
+									<tr>
+										<td class="icon">
+											<span>Invoices OUT</span>
+										</td>
+										<td class="btn">
+											<i id="FolderWidget.create.invoice" class="fas fa-plus"></i>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="collapse">
+
+								<ul id="FolderWidget.groups.invoice_out">
+									<li data-folder="draft" data-role="supplier" data-type="invoice" data-archive="0" id="FolderWidget.groups.draft">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Drafts
+												</td>
+												<td id="FolderWidget.c.draft" class="count"></td>
+											</tr>
+										</table>
+									</li>
+									<li data-folder="sent" data-role="supplier" data-type="invoice" data-archive="0">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Sent
+												</td>
+												<td id="FolderWidget.c.sent" class="count"></td>
+											</tr>
+										</table>
+									</li>
+									<li class="sub" data-folder="returned" data-role="supplier" data-type="invoice" data-archive="0">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Returned
+												</td>
+												<td id="FolderWidget.c.returned" class="count"></td>
+											</tr>
+										</table>
+									</li>
+									<li data-folder="confirmed" data-role="supplier" data-type="invoice" data-archive="0">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Await Payment
+												</td>
+												<td id="FolderWidget.c.confirmed" class="count"></td>
+											</tr>
+										</table>
+									</li>
+									<li data-folder="paid" data-role="supplier" data-type="invoice" data-archive="0">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Paid
+												</td>
+												<td id="FolderWidget.c.paid" class="count"></td>
+											</tr>
+										</table>
+									</li>
+									<li data-folder="paid" data-role="supplier" data-type="invoice" data-archive="1">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Complete
+												</td>
+												<td class="count"></td>
+											</tr>
+										</table>
+									</li>
+									<li data-folder="trash" data-role="supplier" data-type="invoice" data-archive="0">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Trash
+												</td>
+												<td class="count"></td>
+											</tr>
+										</table>
+									</li>
+								</ul>
+							</div>
+
+						</div>
+						</div>
+
+						<! -- END GROUP C -->
+
+						<!-- START GROUP D -->
+						
+						<div class="tab" id="FolderWidget.display.d">
+						<div class="box-group">
+
+							<div class="header">
+								<table>
+									<tr>
+										<td class="icon">
+											<span>Invoices In</span>
+										</td>
+										<td class="btn">
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="collapse">
+
+								<ul id="FolderWidget.groups.invoice_in">
+									<li data-folder="sent" data-role="client" data-type="invoice" data-archive="0">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Received
+												</td>
+												<td id="FolderWidget.d.sent" class="count">000</td>
+											</tr>
+										</table>
+									</li>
+									<li class="sub" data-folder="returned" data-role="client" data-type="invoice" data-archive="0">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Returned
+												</td>
+												<td id="FolderWidget.d.returned" class="count">000</td>
+											</tr>
+										</table>
+									</li>
+									<li data-folder="confirmed" data-role="client" data-type="invoice" data-archive="0">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Confirmed
+												</td>
+												<td id="FolderWidget.d.confirmed" class="count">000</td>
+											</tr>
+										</table>
+									</li>
+									<li data-folder="paid" data-role="client" data-type="invoice" data-archive="0">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Paid
+												</td>
+												<td id="FolderWidget.d.paid" class="count">000</td>
+											</tr>
+										</table>
+									</li>
+									<li data-folder="paid" data-role="client" data-type="invoice" data-archive="1">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Complete
+												</td>
+												<td class="count"></td>
+											</tr>
+										</table>
+									</li>
+									<li data-folder="trash" data-role="client" data-type="invoice" data-archive="0">
+										<table>
+											<tr>
+												<td class="icon">
+													<i class="far fa-folder"></i>
+												</td>
+												<td class="label">
+													Trashed (by seller)
+												</td>
+												<td class="count"></td>
+											</tr>
+										</table>
+									</li>
+								</ul>
+							</div>
+
+						</div>
+						</div>
+
+						<!-- END GROUP D -->
+
+
+					</div>
+
+					<!-- END FOLDERS -->
+
+					<!-- START TRAY -->
+
+					<div class="tray">
+
+						<div class="batch">
+							<table>
+								<tr>
+									<td class="dropdown">
+										Select
+									</td>
+									<td class="check">
+										<input type="checkbox" class="toggle" id="TrayWidget.header.select"/>
+									</td>
+									<td class="total">
+									</td>
+									<td class="actions">
+										<span id="TrayWidget.header.batch">Batch
+											<i class="fas fa-chevron-down"></i>
+										</span>
+									</td>
+								</tr>
+							</table>
+						</div>
+
+						<div class="list" id="TrayWidget.tray.body">
+
+						</div>
+
+						<div class="pages">
+
+							<div class="row">
+								<table>
+									<tr>
+										<td class="angle">
+											<i class="fas fa-angle-double-left" id="TrayWidget.Showing.double_left"></i>
+										</td>
+										<td class="angle">
+											<i class="fas fa-angle-left" id="TrayWidget.Showing.left"></i>
+										</td>
+										<td class="page">
+											Page <span id="TrayWidget.Showing.currentPage">0</span> of <span id="TrayWidget.Showing.maxPage">0</span>
+										</td>
+										<td class="angle">
+											<i class="fas fa-angle-right" id="TrayWidget.Showing.right"></i>
+										</td>
+										<td class="angle">
+											<i class="fas fa-angle-double-right" id="TrayWidget.Showing.double_right"></i>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="row">
+								<table>
+									<tr>
+										<td class="show">
+											Showing: 
+											<span id="TrayWidget.Showing.start">0</span> - <span id="TrayWidget.Showing.end">0</span> of <span id="TrayWidget.Showing.all">0</span>
+										</td>
+										<td class="label" id="TrayWidget.Showing.label_total">
+											Total:
+										</td>
+										<td class="numbers" id="TrayWidget.Showing.total">
+											$0.00
+										</td>
+									</tr>
+								</table>
+							</div>
+
+						</div>
+
+					</div>
+
+					<!-- END TRAY -->
+
+					<div class="toolset" style='display: none'>
+						<table>
+							<tr>
+<!--
+								<td class="create">
+									<span>Compose</span>
+								</td>
+								<td class="icon">
+									<span data-text="Copy">
+										<i class="fas fa-copy"></i>
+									</span>
+								</td>
+								<td class="icon">
+									<span data-text="Send">
+										<i class="fas fa-paper-plane"></i>
+									</span>
+								</td>
+								<td class="icon">
+									<span data-text="Decline">
+										<i class="fas fa-window-close"></i>
+									</span>
+								</td>
+								<td class="icon">
+									<span data-text="Accept">
+										<i class="fas fa-check-square"></i>
+									</span>
+								</td>
+								<td class="icon">
+									<span data-text="Revise">
+										<i class="fas fa-file-alt"></i>
+									</span>
+								</td>
+								<td class="icon">
+									<span data-text="Trash">
+										<i class="fas fa-trash"></i>
+									</span>
+								</td>
+								<td class="icon">
+									<span data-text="Archive">
+										<i class="fas fa-archive"></i>
+									</span>
+								</td>
+								<td class="icon">
+									<span data-text="Save">
+										<i class="fas fa-save"></i>
+									</span>
+								</td>
+								<td></td>
+								<td class="dl">
+									<span>
+										<i class="far fa-file-alt"></i>
+										Download CSV
+									</span>
+								</td>
+-->
+								<td class="dl">
+									<span>
+										<i class="far fa-file-code"></i> 
+										Download JSON
+									</span>
+								</td>
+							</tr>
+						</table>
+					</div>
+
+					<!-- START DOCUMENT -->
+
+					<div class="document">
+
+						<div class="paper">
+
+							<div class="summary">
+
+								<div class="wrapper">
+
+									<li class="row one">
+										<table>
+											<tr>
+												<td class="label-1">Subject</td>
+												<td class="char">:</td>
+												<td class="input">
+													<div class="input">
+														<input type="text" id="DocumentWidget.inputs.subject"/>
+													</div>
+												</td>
+												<td></td>
+												<td class="label-2" >Created On </td>
+												<td class="time" id="DocumentWidget.label.created_on">yyyy-mm-dd hh:mm:ss</td>
+											</tr>
+										</table>
+									</li>
+
+									<li class="row two">
+										<table>
+											<tr>
+												<td class="label" id="DocumentWidget.label.to_from"></td>
+												<td class="char">:</td>
+												<td class="input">
+													<div class="input" id="ContactWidget.line">
+														<input type="text" id="ContactWidget.input"/>
+														<div id="ContactWidget.list" class="overflow">
+
+														</div>
+
+													</div>
+												</td>
+												<td></td>
+												<td class="icon">Star</td>
+												<td class="icon">Flag</td>
+												<td id="DocumentWidget.inputs.save" class="icon">Save</td>
+											</tr>
+										</table>
+									</li>
+
+								</div>
+
+								<div class="avatar">
+
+								</div>
+
+								<!-- 
+
+								<div class="actions">
+									<table>
+										<tr>
+											<td class="btn a">
+												<span>Send</span>
+											</td>
+											<td class="btn b">
+												<span>Trash</span>
+											</td>
+											<td class="btn c hide">
+												<span>Withdraw</span>
+											</td>
+											<td class="btn d hide">
+												<span>Reject</span>
+											</td>
+											<td class="btn e hide">
+												<span>Confirm</span>
+											</td>
+											<td class="btn f hide">
+												<span>Make Payment</span>
+											</td>
+											<td class="btn g hide">
+												<span>Confirm Payment</span>
+											</td>
+											<td class="btn h">
+												<span>Save</span>
+											</td>
+											<td class="btn i hide">
+												<span>Archive</span>
+											</td>
+											<td></td>
+										</tr>
+									</table>
+								</div>
+
+								-->
+
+							</div>
+
+							<!-- END SUMMARY -->
+
+							<!-- START CONTENT -->
+							
+							<div class="content">
+
+								<div class="pmeta">
+
+									<div class="plogo">
+
+									</div>
+
+									<div class="pdata">
+
+										<h3 id="DocumentWidget.label.doc_type">Invoice</h3>
+
+										<li>
+											<table>
+												<tr>
+													<td class="label">Invoice No.</td>
+													<td class="char">:</td>
+													<td class="value" id="DocumentWidget.meta.document_number"></td>
+												</tr>
+											</table>
+										</li>
+
+										<li>
+											<table>
+												<tr>
+													<td class="label">Created On.</td>
+													<td class="char">:</td>
+													<td class="value" id="DocumentWidget.meta.created_on"></td>
+												</tr>
+											</table>
+										</li>
+
+										<li>
+											<table>
+												<tr>
+													<td class="label">Tax Number.</td>
+													<td class="char">:</td>
+													<td class="value" id="DocumentWidget.meta.tax_id"></td>
+												</tr>
+											</table>
+										</li>
+
+										<li>
+											<table>
+												<tr>
+													<td class="label" id='DocumentWidget.label.due_by'>Due By.</td>
+													<td class="char">:</td>
+													<td class="value" id="DocumentWidget.meta.due_by"></td>
+												</tr>
+											</table>
+										</li>
+
+									</div>
+
+								</div>
+
+								<div class="pdue">
+									
+									<span class="label">Amount Due</span>
+									<span class="value" id="DocumentWidget.totals.display">$100.00</span>
+
+								</div>
+
+								<div class="paddr">
+
+
+									<table>
+										<tr>
+											<td class="text">
+												<ul>
+													<li class="label">To</li>
+													<li class="text">
+								<input type="text" class="top" id="DocumentWidget.to.company_name" value="Internet Foundation" placeholder="Company Name"/>
+													</li>
+													<li class="text">
+								<input type="text" id="DocumentWidget.to.company_address" value="6627 Fisher ave." placeholder="Company Address"/>
+													</li>
+													<li class="text">
+								<input type="text" id="DocumentWidget.to.company_building" value="Falls Church VA 22046" placeholder="Company Building"/>
+													</li>
+													<li class="text">
+								<input type="text" id="DocumentWidget.to.company_department" value="Richard Collins" placeholder="Company Department"/>
+													</li>
+												</ul>
+											</td>
+											<td class="stamp">
+												<div class="box">
+												</div>
+											</td>
+											<td class="text">
+												<ul>
+													<li class="label">From</li>
+													<li class="text">
+								<input id="DocumentWidget.from.company_name" type="text" class="top" value="DashGL Project" placeholder="Company Name"/>
+													</li>
+													<li class="text">
+								<input id="DocumentWidget.from.company_address" type="text" value="6627 Fisher ave." placeholder="Company Address"/>
+													</li>
+													<li class="text">
+								<input id="DocumentWidget.from.company_building" type="text" value="Falls Church VA 22046" placeholder="Company Building"/>
+													</li>
+													<li class="text">
+								<input id="DocumentWidget.from.company_department" type="text" value="Benjamin Collins" placeholder="Company Department"/>
+													</li>
+												</ul>
+											</td>
+											<td class="stamp">
+												<div class="box">
+												</div>
+											</td>
+										</tr>
+									</table>
+
+								</div>
+
+								<!-- END Address -->
+
+								<!-- Start Table Body -->
+
+								<div class='ptable'>
+									
+									<div class="thead">
+										<table>
+											<tr>
+												<td class="no">No.</td>
+												<td class="date">Date</td>
+												<td class="desc">Description</td>
+<!-- 20220410 del
+												<td class="tax">Tax</td>
+-->
+												<td class="price">Price</td>
+												<td class="quan">Quanity</td>
+												<td class="unit">Unit</td>
+												<td class="sub">Subtotal</td>
+											</tr>
+										</table>
+									</div>
+
+									<div class="tbody" id="DocumentWidget.inputs.body">
+
+										<li>
+											<table border="1">
+												<tr>
+													<td class="no">No.</td>
+													<td class="date">
+														<input type="text" placeholder="yyyy-mm-dd"/>
+													</td>
+													<td class="desc">
+														<textarea placeholder="Description"></textarea>
+													</td>
+													<td class="tax">
+														<input type="text"/> %
+													</td>
+													<td class="price">
+														<input type="text" placeholder="price"/>
+													</td>
+													<td class="quan">
+														<input type="text" placeholder="quan"/>
+													</td>
+													<td class="unit">
+														<input type="text" placeholder="unit"/>
+													</td>
+													<td class="sub">
+														<input type="text" placeholder="sub"/>
+													</td>
+												</tr>
+											</table>
+										</li>
+
+									</div>
+
+								</div>
+
+								<!-- End Table Body -->
+
+								<!-- Start Totals -->
+
+								<div class="rel">
+
+								<div class="ptotals">
+									<table id="DocumentWidget.totals.table">
+										<tr>
+											<td class="label">Subtotal</td>
+											<td class="value" id="DocumentWidget.totals.subtotal">$0.00</td>
+										</tr>
+										<tr>
+											<td class="label">Sales Tax(8%)</td>
+											<td class="value">$0.00</td>
+										</tr>
+										<tr>
+											<td class="label">Sales Tax(10%)</td>
+											<td class="value" id="DocumentWidget.totals.sales_tax">$0.00</td>
+										</tr>
+										<tr>
+											<td class="label">Total</td>
+											<td class="value" id="DocumentWidget.totals.total"></td>
+										</tr>
+									</table>
+								</div>
+
+								<div class="pnotes">
+									<textarea placeholder="Terms and Conditions"></textarea>
+								</div>
+
+								</div>
+
+								<!-- End Totals -->
+
+							</div>
+
+							<!-- END CONTENT -->
+
+							<!-- START FOOTER -->
+
+							<div class="pfooter">
+
+							<li class="panel" id="supplier.invoice.draft.0">
+								<table>
+									<tr>
+										<td>
+											<button class="cancel" id="ActionWidget.invoice.removeDraft">
+												<i class="fas fa-trash-alt"></i> Move to Trash
+											</button>
+										</td>
+										<td></td>
+										<td>
+											<button id="ActionWidget.invoice.sendInvoice">
+												<i class="fas fa-paper-plane"></i> Send Invoice
+											</button>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="client.invoice.sent.0">
+								<table>
+									<tr>
+										<td>
+											<button class="cancel" id="ActionWidget.invoice.returnToSender">
+												<i class="fas fa-reply"></i> Return to Sender
+											</button>
+										</td>
+										<td></td>
+										<td>
+											<button id="ActionWidget.invoice.confirmInvoice">
+												<i class="fas fa-check"></i> Confirm Invoice
+											</button>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="supplier.invoice.returned.0">
+								<table>
+									<tr>
+										<td>
+											<button class="cancel" id="ActionWidget.invoice.moveToTrash">
+												<i class="fas fa-trash-alt"></i> Move to Trash
+											</button>
+										</td>
+										<td></td>
+										<td>
+											<button id="ActionWidget.invoice.recreate">
+												<i class="far fa-file"></i> Move to Draft
+											</button>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="client.invoice.confirmed.0">
+								<table>
+									<tr>
+										<td>
+											<button class="cancel" id="ActionWidget.invoice.unconfirm">
+												<i class="fas fa-reply"></i> Unconfirm
+											</button>
+										</td>
+										<td></td>
+										<td>
+											<button id="ActionWidget.invoice.makePayment">
+												<i class="fas fa-coins"></i> Make Payment
+											</button>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="supplier.invoice.confirmed.0">
+								<table>
+									<tr>
+										<td>
+<!--
+											<button class="cancel" id="ActionWidget.invoice.withdrawConf">
+												<i class="fas fa-reply"></i> Withdraw
+	 										</button>
+-->
+											 <button id="ActionWidget.invoice.makePaymentWaiting" class="waiting" isabled='disabled'>
+												<i class="fas fa-pause"></i> Waiting for Make Payment
+											</button>
+										</td>
+										<td></td>
+										<td>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="supplier.invoice.sent.0">
+								<table>
+									<tr>
+										<td>
+											<button class="cancel" id="ActionWidget.invoice.withdrawSent">
+												<i class="fas fa-reply"></i> Withdraw
+											</button>
+										</td>
+										<td></td>
+										<td>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="client.invoice.paid.0">
+								<table>
+									<tr>
+										<td>
+<!--
+											<button id="ActionWidget.invoice.clientArchive">
+												<i class="fas fa-pause"></i> Move to Archive
+											</button>
+-->
+											 <button id="ActionWidget.invoice.clientWaiting" class="waiting" isabled='disabled'>
+												<i class="fas fa-waiting"></i> Waiting for Confirmation
+											</button>
+										</td>
+										<td></td>
+										<td>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="client.invoice.trash.0">
+								<table>
+									<tr>
+										<td>
+											<button class="cancel" id="ActionWidget.invoice.clientTrash">
+												<i class="far fa-trash-alt"></i> Soft Delete
+											</button>
+										</td>
+										<td></td>
+										<td>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="supplier.invoice.paid.0">
+								<table>
+									<tr>
+										<td>
+										</td>
+										<td></td>
+										<td>
+											<button id="ActionWidget.invoice.supplierArchive">
+												<i class="fas fa-archive"></i> Move to Archive
+											</button>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="supplier.invoice.trash.0">
+								<table>
+									<tr>
+										<td>
+											<button class="cancel" id="ActionWidget.invoice.supplierTrash">
+												<i class="far fa-trash-alt"></i> Soft Delete
+											</button>
+										</td>
+										<td></td>
+										<td>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							</div>
+
+							<!-- END FOOTER -->
+
+
+						</div>
+						
+						<div class="body">
+
+							<div class="logo">
+								<img src="img/placeholder_logo.png"/>
+							</div>
+
+							<div class="document-type" id=''>
+								Invoice
+							</div>
+
+							<div class="my-company" data-text="From:">
+							</div>
+
+							<div class="document-meta">
+								<table>
+									<tr>
+										<td class="label">Document #</td>
+										<td class="char">:</td>
+										<td class="value">1234567</td>
+									</tr>
+									<tr>
+										<td class="label">Created On</td>
+										<td class="char">:</td>
+										<td class="value">yyyy-mm-dd</td>
+									</tr>
+									<tr>
+										<td class="label">Tax Id</td>
+										<td class="char">:</td>
+										<td class="value">1234567890123</td>
+									</tr>
+									<tr>
+										<td class="label">Due by</td>
+										<td class="char">:</td>
+										<td class="value">yyyy-mm-dd</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="their-company" data-text="Bill To:" id='DocumentWidget.label.bill_to'>
+							</div>
+
+							<div class="amount-line">
+								<span>Amount Due:</span>
+								<b id="">$1,000.00 USD</b>
+							</div>
+
+							<div class="subject-line">
+								<table>
+									<tr>
+										<td class="label">
+											Subject:
+										</td>
+										<td class="subject">
+											<input type="text" value="This is the Subject"/>
+										</td>
+									</tr>
+								</table>
+								<button id="">
+									Save
+								</button>
+							</div>
+
+							<!-- END FROM WIDGET -->
+
+							<div class="table" id="DocumentWidget.inputs.dragarea">	
+
+								<div class="thead">
+
+									<table>
+										<tr>
+											<td class="px"></td>
+											<td class="no">No.</td>
+											<td class="date">Date</td>
+											<td>Desc</td>
+											<td class="tax">Tax</td>
+											<td class="price">Price</td>
+											<td class="quan">Quan</td>
+											<td class="unit">Unit</td>
+											<td class="subtotal">Subtotal</td>
+										</tr>
+									</table>
+
+								</div>
+
+							</div>
+
+							<div class="details" id="DocumentWidget.totals.details"></div>
+
+							<div class="comment">
+								<span>Notes</span>
+								<textarea placeholder="Terms and Conditions"></textarea>
+							</div>
+
+						</div>
+
+
+					</div>
+
+					<!-- END DOCUMENT -->
+
+				</article>
+				
+
+			</section>
+
+		</main>
+
+		<!-- END MAIN -->
+
+		<!-- Import Libraries -->
+		
+
+		<script type="text/javascript" src="lib/FileSaver.js"></script>
+		<script type="text/javascript" src="lib/moment.min.js"></script>
+		<script type="text/javascript" src="lib/scrollwidth.js"></script>
+		<script type="text/javascript" src="lib/autosize.min.js"></script>
+		<script type="text/javascript" src="lib/AutoGrowTextArea.js"></script>
+		<script type="text/javascript" src="lib/currency.min.js"></script>
+		<script type="text/javascript" src="lib/flatpickr.min.js"></script>
+		<script type="text/javascript" src="lib/clipboard.min.js"></script>
+
+		<!-- Import Application Widgets -->
+
+		<script type="text/javascript" src="js/FolderWidget.js"></script>
+		<script type="text/javascript" src="js/TrayWidget.js"></script>
+		<script type="text/javascript" src="js/ActionWidget.js"></script>
+		<script type="text/javascript" src="js/ContactWidget.js"></script>
+		<script type="text/javascript" src="js/DocumentWidget.js"></script>
+
+		<script type="text/javascript" src="js/TabWidget.js"></script>
+		<script type="text/javascript" src="js/SettingsMenu.js"></script>
+		
+		<script type="text/javascript" src="js/SessionWidget.js"></script>
+		<script type="text/javascript" src="js/SettingsProfile.js"></script>
+		<script type="text/javascript" src="js/SettingsContacts.js"></script>
+
+		<script type="text/javascript" src="lib/xlsx.full.min.js"></script>
+
+		<!-- END SCRIPTS -->
+
+	</body>
+
+</html>
