@@ -1,0 +1,30 @@
+{
+	"CURRENCY" : {
+		"currency" : {
+			"formatWithSymbol" : true,
+			"symbol" : "$",
+			"separator" : ",",
+			"decimal" : ".",
+			"precision" : 2
+		}
+	},
+	"DATABASE" : {
+		"connectionLimit" : 4,
+		"host" : "localhost",
+		"user" : "pi_user",
+		"password" : "raspberry",
+		"database" : "PrivateInvoice"
+	},
+	"SESSION" : {
+		"secret" : "KeyboardCat",
+		"resave" : false,
+		"saveUninitialized" : false,
+		"cookie" : {
+			"path" : "/",
+			"httpOnly" : true,
+			"secure" : false,
+			"maxAge" : null,
+			"sameSite" : true
+		}
+	}
+}

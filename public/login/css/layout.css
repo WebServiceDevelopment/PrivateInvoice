@@ -1,0 +1,541 @@
+html {
+
+	padding: 0;
+	margin: 0;
+	height: 100%;
+
+}
+
+body {
+
+	padding: 0;
+	margin: 0;
+	height: 100%;
+	background-color: #16018d;
+	
+}
+
+.particles-js-canvas-el {
+
+	position: fixed;
+	left: 0;
+	top: 0;
+	z-index: -1;
+
+}
+
+div.title {
+
+	width: 400px;
+	padding: 30px 0;
+	display: flex;
+	margin: auto;
+	justify-content: center;
+	align-items: center;
+
+}
+
+div.title img {
+
+	height: 70px;
+
+}
+
+div.title span {
+
+	color: #fff;
+	font-size: 2.0em;
+	font-family: 'Montserrat', sans-serif;
+	padding-left: 20px;
+	padding-right: 20px;
+
+}
+
+div.social-signin {
+	
+	margin-top: 5px;
+}
+
+div.social-signin button.google{
+
+	display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #0061eb;
+    border-radius: 4px;
+    padding: 13px 30px 12px 16px;
+    margin: 12px 0;
+    width: 100%;
+
+}
+
+div.social-signin button.google:hover {
+
+	cursor: pointer;
+	background-color: #f2f2f2;
+
+}
+
+div.social-signin button.google p {
+
+	width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    color: #7a7d85;
+    padding: 0;
+	margin: 0;
+
+}
+
+div.social-signin button.facebook {
+
+	display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    background-color: #3b5998;
+    border: 1px solid #4267b2;
+    border-radius: 4px;
+    width: 100%;
+	padding: 13px 30px 12px 16px;
+	margin-bottom: 10px;
+
+}
+
+div.social-signin button.facebook:hover {
+
+	cursor: pointer;
+	background-color: #37528c;
+
+}
+
+div.social-signin button.facebook span {
+
+	width: 18px;
+    height: 18px;
+    fill: white;
+
+}
+div.social-signin button.facebook p {
+
+	width: 100%;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    padding: 0;
+	margin: 0;
+
+}
+
+div.outline {
+
+	width: 400px;
+	display: block;
+	margin: auto;
+	border-radius: 10px;
+	background-color: #fcfcfc;
+	box-shadow : 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+	overflow: hidden;
+
+}
+
+div.outline h1 {
+
+	color: #333;
+	font-size: 24px;
+	text-align: center;
+	font-weight: 400;
+	font-family: 'Montserrat', sans-serif;
+	padding: 0;
+	margin: 0;
+	padding-bottom: 10px;
+
+}
+
+div.outline div.form {
+
+	width: calc(100% - 60px);
+	padding: 20px 30px;
+
+}
+
+div.outline div.form div.divide {
+
+	height: 12px;
+    margin: 16px 0 22px;
+    text-align: center;
+    border-bottom: 1px solid #e4e5e7;
+
+}
+
+div.outline div.form div.divide span {
+
+	font-size: 14px;
+    font-weight: 600;
+    line-height: 24px;
+    text-transform: uppercase;
+    padding: 0 8px;
+    background-color: #fcfcfc;
+    color: #404145;
+
+}
+
+div.outline label.header {
+
+	display: block;
+	margin: auto;
+	font-size: 17px;
+	color: #333;
+	font-family: 'Montserrat', sans-serif;
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	transition: all 200ms;
+	padding-left: 4px;
+	padding-right: 4px;
+	border-radius: 5px;
+	z-index: 10;
+
+}
+
+div.outline div.input.focus label.header {
+
+	font-size: 10px;
+	transform: translateY(-4px) translateY(-15px);
+	color: #3f51b5;
+	background-color: #fff;
+
+}
+
+div.outline div.input.fill label.header {
+
+	font-size: 10px;
+	transform: translateY(-4px) translateY(-15px);
+	background-color: #fff;
+
+}
+
+div.outline div.input {
+	width: calc(100% - 2px);
+	position: relative;
+	margin-top: 2px;
+	margin-bottom: 16px;
+
+}
+
+div.outline div.input div.underline {
+
+	width: 100%;
+	height: 1px;
+	background-color: #b9b9b9;
+	position: absolute;
+	left: 0;
+	bottom: 0;
+
+}
+
+div.outline div.input div.underline:before {
+
+	content: "";
+	display: block;
+	height: 2px;
+	width: 100%;
+	background-color: #3f51b5;
+	left: 0;
+	bottom: 1px;
+	transform: scaleX(0);
+	transition: transform 200ms;
+
+}
+
+div.outline div.input.focus div.underline:before {
+
+	transform: scaleX(1);
+
+}
+
+div.outline div.input input {
+
+	border-radius: 5px;
+	border: 1px solid #bababa;
+	padding: 12px 0;
+	font-size: 15px;
+	text-indent: 16px;
+	background-color: #fff;
+	width: 100%;
+	outline: none;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+div.outline div.input.focus input {
+
+	border-color: #3f51b5;
+
+}
+
+div.outline div.input input:focus {
+	
+	/*
+	-webkit-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.25);
+	-moz-box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.25);
+	box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.25);
+	*/
+
+}
+
+div.outline div.input i {
+
+	position: absolute;
+	font-size: 17px;
+	color: #8a8787;
+	left: 10px;
+	top: 12px;
+	z-index : 2;
+
+}
+
+div.outline div.input svg {
+
+	position: absolute;
+	font-size: 17px;
+	color: #8a8787;
+	left: 10px;
+	top: 12px;
+	width: 18px;
+	height: 18px;
+	z-index : 2;
+
+}
+
+div.outline div.table {
+
+	width: 100%;
+	padding-top: 4px;
+	padding-bottom: 10px;
+
+}
+
+div.outline div.table table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+	font-size: 14px;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+div.outline div.table table td.forgot {
+
+	text-align: right;
+
+}
+
+div.outline a {
+
+	color: #3088d4;
+	text-decoration: none;
+
+}
+
+div.outline a:hover {
+
+	cursor: pointer;
+	text-decoration: underline;
+
+}
+
+div.outline button.submit {
+
+	display: block;
+	margin: auto;
+	color: #fff;
+	text-align: center;
+	width: 100%;
+	padding: 10px 0;
+	font-family: 'Montserrat', sans-serif;
+	border: none;
+	border-radius: 4px;
+	background-color: transparent;
+	background: linear-gradient(159deg, rgba(20,167,229,1) 0%, rgba(1,122,233,1) 100%);
+	color: #fff;
+	border: none;
+
+	font-size: 18px;
+	font-weight: 600;
+	margin-top: 10px;
+
+}
+
+div.outline button.submit:hover {
+
+	cursor: pointer;
+	background-color: #3088d4;
+
+}
+
+div.outline div.social {
+
+	padding: 0px 20px;
+	padding-bottom: 20px;
+
+}
+
+div.outline div.social h2 {
+
+	color: #333;
+	font-size: 22px;
+	text-align: center;
+	font-weight: 400;
+	font-family: 'Montserrat', sans-serif;
+	padding: 0;
+	margin: 0;
+	padding-bottom: 8px;
+
+}
+
+div.outline div.social p {
+
+	color: #222;
+	font-size: 15px;
+	text-align: center;
+	padding: 0;
+	margin: 0;
+	font-family: 'Montserrat', sans-serif;
+
+}
+
+div.outline div.social div.table {
+
+	padding-top: 8px;
+	width: 100%;
+
+}
+
+div.outline div.social div.table table {
+
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+
+}
+
+div.outline div.social div.table table div.button {
+
+	width: calc(100% - 2px);
+	border-radius: 4px;
+	background-color: #999;
+	height: 34px;
+	overflow: hidden;
+	color: #fff;
+
+}
+
+div.outline div.social div.table table div.button table {
+
+	height: 100%;
+
+}
+
+div.outline div.social div.table table div.button table td.icon {
+
+	width: 27px;
+	text-align: center;
+
+}
+
+div.outline div.social div.table table div.button table td.text {
+
+	font-weight: 600;
+	font-family: "Open Sans", sans-serif;
+	text-align: center;
+
+
+}
+
+div.outline div.social div.table table div.button.twitter table td.icon {
+
+	background-color: #1ca4d6;
+
+}
+
+div.outline div.social div.table table div.button.facebook table td.icon {
+
+	background-color: #37528c;
+
+}
+
+div.outline div.social div.table table div.button.google table td.icon {
+
+	background-color: #c74534;
+
+}
+
+div.outline div.social div.table table div.button.twitter {
+
+	background-color: #1daee3;
+
+}
+
+div.outline div.social div.table table div.button.twitter:hover {
+
+	cursor: pointer;
+	background-color: #1ca4d6;
+
+}
+
+div.outline div.social div.table table div.button.facebook {
+
+	display: block;
+	margin: auto;
+	background-color: #3b5998;
+
+}
+
+div.outline div.social div.table table div.button.facebook:hover {
+
+	cursor: pointer;
+	background-color: #37528c;
+
+}
+
+div.outline div.social div.table table div.button.google {
+
+	display: block;
+	float: right;
+	background-color: #d34836;
+
+}
+
+div.outline div.social div.table table div.button.google:hover {
+
+	cursor: pointer;
+	background-color: #c74534;
+
+}
+
+div.outline div.social div.line {
+
+	border-top: 1px solid #cccccc;
+	padding-bottom: 14px;
+
+
+}
+
+div.copyright {
+
+	width: 100%;
+	text-align: center;
+	color: #fff;
+	padding-top: 60px;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 14px;
+
+}
