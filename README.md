@@ -5,7 +5,7 @@ P2P based invoicing system where anyone can create their own Node
 or join a managed Node in order to manage their own keys, assets,
 and financial records.
 
-### 🔥🔥🔥🔥🔥🔥 WARNING!!!!! 🔥🔥🔥🔥🔥
+### 🔥🔥🔥🔥🔥🔥 WARNING!!!!! 🔥🔥🔥🔥🔥🔥
 
 Private Invoice is still a work in progress, it does not include best practices
 for security. Also the data format is still subject to change which will require
@@ -31,6 +31,7 @@ are currently provided.
 # source ~/.bashrc
 # nvm install 16
 # nvm use 16
+# npm i pm2 -g
 ```
 
 ### Install Ganache
@@ -111,3 +112,56 @@ Reload privilege tables now? [Y/n] Y
 ## Clone and Run
 
 The next step is to clone and run the Private Invoice.
+Most of the server configurations can be found in `config.json`
+for currency format and database connections. 
+
+We use `.env` files to allow for testing multiple instances on a
+single server for testing interactions between Nodes.
+
+
+```
+# cd /opt
+# git clone https://github.com/WebServiceDevelopment/PrivateInvoice.git
+# cd PrivateInvoice
+# npm i
+# cd model
+# mysql PrivateInvoice_dev < PrivateInvoice.sql
+# mysql PrivateInvoice_client < PrivateInvoice.sql
+# mysql PrivateInvoice_supply < PrivateInvoice.sql
+# vim .env
+--- Create File ---
+SERVER_PORT=3000
+DATABASE_NAME=PrivateInvoice_dev
+--- EOF ---
+# vim client.env
+--- Create File ---
+SERVER_PORT=3001
+DATABASE_NAME=PrivateInvoice_client
+--- EOF ---
+# vim supply.env
+--- Create File ---
+SERVER_PORT=3002
+DATABASE_NAME=PrivateInvoice_supply
+--- EOF ---
+```
+
+From there, each of the three instances can be run with a script with:
+```
+# npm run dev
+# npm num dev:client
+# npm num dev:supply
+```
+
+Or start with pm2 to run in the background
+```
+# pm2 start npm -- dev
+# pm2 start npm -- dev:client
+# pm2 start npm -- dev:supply
+```
+
+From there the application will be available on port:3000, 3001, 3002
+
+
+## Copyright
+
+Copyright Web Service Development Inc. 2020-2022 Apache 2.0 License
