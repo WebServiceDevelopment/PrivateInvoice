@@ -501,10 +501,14 @@ router.post('/create', async function(req, res) {
 		});
 	}
 
+	console.log(config.CURRENCY);
+
 	const document_totals = {
 		subtotal : currency(0, config.CURRENCY).format(true),
 		total : currency(0, config.CURRENCY).format(true)
 	};
+
+	console.log(document_totals);
 
 	//console.log("req.session.data.user_uuid="+req.session.data.user_uuid);
 
