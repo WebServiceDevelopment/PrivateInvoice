@@ -128,6 +128,7 @@ single server for testing interactions between Nodes.
 # mysql PrivateInvoice_dev < PrivateInvoice.sql
 # mysql PrivateInvoice_client < PrivateInvoice.sql
 # mysql PrivateInvoice_supply < PrivateInvoice.sql
+# cd ..
 # vim .env
 --- Create File ---
 SERVER_PORT=3000
@@ -159,7 +160,7 @@ Or start with pm2 to run in the background
 # pm2 start npm -- dev:supply
 ```
 
-From there the application will be available on port:3000, 3001, 3002
+From there the application will be available on port 3000, 3001, 3002
 
 
 ## Copyright
