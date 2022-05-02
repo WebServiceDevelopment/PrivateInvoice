@@ -1,12 +1,11 @@
 {
 	"CURRENCY" : {
-		"currency" : {
-			"formatWithSymbol" : true,
-			"symbol" : "$",
-			"separator" : ",",
-			"decimal" : ".",
-			"precision" : 2
-		}
+		"formatWithSymbol" : true,
+		"symbol" : "Gwei",
+		"separator" : ",",
+		"decimal" : ".",
+		"precision" : 0,
+		"pattern" : "# !"
 	},
 	"DATABASE" : {
 		"connectionLimit" : 4,
