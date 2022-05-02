@@ -1,5 +1,7 @@
 # PrivateInvoice
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 Private Invoice is a 
 P2P based invoicing system where anyone can create their own Node
 or join a managed Node in order to manage their own keys, assets,
