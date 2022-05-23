@@ -17,15 +17,15 @@ data to be migrated. If you create a Node, only use it for testing with fake dat
 
 Create Invoice, send to member on a different node.
 
-![pstep_00](https://user-images.githubusercontent.com/5275924/169722398-4499ec31-717f-4e77-afc7-b59383d6d9b7.JPG)
+![Private Invoice screenshot create draft](https://user-images.githubusercontent.com/5275924/169722398-4499ec31-717f-4e77-afc7-b59383d6d9b7.JPG)
 
 Make payment on invoice.
 
-![pstep_05](https://user-images.githubusercontent.com/5275924/169722466-e01e427b-c188-4c7b-985b-7b6cf34dbe1e.JPG)
+![Private Invoice screenshot make payment](https://user-images.githubusercontent.com/5275924/169722466-e01e427b-c188-4c7b-985b-7b6cf34dbe1e.JPG)
 
 See transaction details.
 
-![pstep_06](https://user-images.githubusercontent.com/5275924/169722476-ab025113-2931-496b-9681-fd0644eed0fa.JPG)
+![Private Invoice screenshot view transaction details](https://user-images.githubusercontent.com/5275924/169722698-be760277-b2db-488a-b409-ffd11f36bb3b.JPG)
 
 ## Install Instructions
 
