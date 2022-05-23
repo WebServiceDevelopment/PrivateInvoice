@@ -13,6 +13,19 @@ Private Invoice is still a work in progress, it does not include best practices
 for security. Also the data format is still subject to change which will require
 data to be migrated. If you create a Node, only use it for testing with fake data. 
 
+## Screenshots
+
+Create Invoice, send to member on a different node.
+
+![pstep_00](https://user-images.githubusercontent.com/5275924/169722398-4499ec31-717f-4e77-afc7-b59383d6d9b7.JPG)
+
+Make payment on invoice.
+
+![pstep_05](https://user-images.githubusercontent.com/5275924/169722466-e01e427b-c188-4c7b-985b-7b6cf34dbe1e.JPG)
+
+See transaction details.
+
+![pstep_06](https://user-images.githubusercontent.com/5275924/169722476-ab025113-2931-496b-9681-fd0644eed0fa.JPG)
 
 ## Install Instructions
 
@@ -163,20 +176,6 @@ Or start with pm2 to run in the background
 ```
 
 From there the application will be available on port 3000, 3001, 3002
-
-## Screenshots
-
-Create Invoice, send to member on a different node.
-
-![pstep_00](https://user-images.githubusercontent.com/5275924/169722398-4499ec31-717f-4e77-afc7-b59383d6d9b7.JPG)
-
-Make payment on invoice.
-
-![pstep_05](https://user-images.githubusercontent.com/5275924/169722466-e01e427b-c188-4c7b-985b-7b6cf34dbe1e.JPG)
-
-See transaction details.
-
-![pstep_06](https://user-images.githubusercontent.com/5275924/169722476-ab025113-2931-496b-9681-fd0644eed0fa.JPG)
 
 ## Copyright
 
