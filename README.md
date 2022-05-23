@@ -179,4 +179,4 @@ From there the application will be available on port 3000, 3001, 3002
 
 ## Copyright
 
-Copyright Web Service Development Inc. 2020-2022 Apache 2.0 License
+Copyright Web Service Development Inc. 2020 - 2022 Apache 2.0 License
