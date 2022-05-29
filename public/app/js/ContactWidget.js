@@ -87,26 +87,32 @@ const ContactWidget = (function() {
 	function api_setAddress(doc) {
 	
 		let session = SessionWidget.API.getSessionMemory();
-		//this.MEM.setEditable( doc.editable );
 
-		if(session.user_uuid === doc.supplier_uuid) {
+/*
+*		if(session.member_uuid === doc.seller_uuid) {
+*
+*			if(doc.buyer_membername != null) {
+*				this.DOM.input.value = doc.buyer_membername;
+*			} else {
+*				this.DOM.input.value = "";
+*			}
+*
+*		} else {
+*
+*			if(doc.buyer_membername != null) {
+*				this.DOM.input.value = doc.seller_membername;
+*			} else {
+*				this.DOM.input.value = "";
+*			}
+*
+*		}
+*/
 
-			if(doc.client_username) {
-				this.DOM.input.value = doc.client_username;
-			} else {
-				this.DOM.input.value = "";
-			}
-
-		} else {
-
-			this.DOM.input.value = doc.supplier_username;
-
-		}
-
-		//if(this.MEM.getEditable()) {
 		const elem =  FolderWidget.MEM.getActiveFolder();
+
 		if( elem != null) {
 			const folder = elem.getAttribute("data-folder");
+
 			if(folder == "draft") {
 				this.DOM.input.removeAttribute("readonly");
 			} else {
@@ -116,35 +122,84 @@ const ContactWidget = (function() {
 
 	}
 
+/*
+ * api_updateAddress()
+ *
+ * Extract member data of To.
+ * Generate contactPoint from membername and remote_origin.
+ * Set taxId.
+ * Update document.
+ */
 	function api_updateAddress() {
 		
 		this.MEM.initSaveTimeout();
 
-		let username = this.DOM.input.value;
-		let userData = this.MEM.getLookup( username );
+		let membername = this.DOM.input.value;
+		let memberData = this.MEM.getLookup( membername );
 
-		if(!userData) {
+		if(!memberData) {
 			this.DOM.input.value = "";
 			TrayWidget.API.updateCompany("");
+
 		} else {
-			TrayWidget.API.updateCompany(userData.company_name);
+			TrayWidget.API.updateCompany(memberData.organization_name);
+
+			memberData.contactPoint = _contactPoint(membername, memberData.remote_origin);
+			//memberData.taxId = memberData.organization_tax_id;
+
 		}
+		//console.log("memberData.contactPoint ="+memberData.contactPoint);
+
 		
-		DocumentWidget.API.updateToInfo(userData);
+/*
+		for(let key in memberData) {
+			console.log(key+"="+memberData[key])
+			for(let key1 in memberData[key]) {
+				if(typeof memberData[key] == "object") {
+					console.log(key1+"="+memberData[key][key1])
+				}
+			}
+		}
+		console.log("memberData.taxId ="+memberData.taxId);
+*/
+
+		
+		DocumentWidget.API.updateToInfo(memberData);
+
+		return;
+
+		function _contactPoint (membername, remote_origin) {
+
+			const HTTP = "http://";
+			const HTTPS = "https://";
+
+			let http_addr = "";
+
+			if(remote_origin.indexOf(HTTP) !== -1) {
+				http_addr =remote_origin.split(HTTP)[1];
+
+			} else if(remote_origin.indexOf(HTTPS) !== -1) {
+				http_addr =remote_origin.split(HTTPS)[1];
+			}
+
+			return membername + "@"+ http_addr;
+		}
 
 	}
+
+	
 
 	function evt_handleListClick(evt) {
 		
 		let elem = evt.target;
-		while(!elem.userData) {
+		while(!elem.memberData) {
 			if(elem === this.DOM.list) {
 				return;
 			}
 			elem = elem.parentNode;
 		}
 
-		this.DOM.input.value = elem.userData.username;
+		this.DOM.input.value = elem.memberData.membername;
 
 		clearTimeout(this.MEM.getSaveTimeout());
 		this.MEM.initSaveTimeout();
@@ -183,7 +238,7 @@ const ContactWidget = (function() {
 		}
 
 		const params = {
-			contactType : "clients"
+			contactType : "buyers"
 		};
 
 		const ajax = new XMLHttpRequest();
@@ -203,11 +258,12 @@ const ContactWidget = (function() {
 			this.MEM.initSaveTimeout();
 			
 			const list = res.msg;
+
 			this.MEM.setList( list );
 
 			this.MEM.lookup = {};
 			list.forEach( contact => {
-				this.MEM.setLookup( contact.username, contact );
+				this.MEM.setLookup( contact.membername, contact );
 				if(contact == null) {
 					return;
 				}
@@ -250,9 +306,15 @@ const ContactWidget = (function() {
 				return;
 			}
 
-			let a = contact.username;
-			let b = contact.company_name;
-			let c = contact.company_department;
+			let a = contact.membername;
+			let b = contact.organization_name;
+			let c = contact.organization_department;
+
+/*
+			for(let key in contact) {
+				//console.log(key +":"+contact[key])
+			}
+*/
 
 			let regex;
 			try {
@@ -268,7 +330,7 @@ const ContactWidget = (function() {
 			}
 
 			const li = document.createElement("li");
-			li.userData = contact;
+			li.memberData = contact;
 			const table = document.createElement('table');
 
 			const row_1 = table.insertRow();
@@ -277,7 +339,7 @@ const ContactWidget = (function() {
 
 			const prof_cell = row_1.insertCell();
 			const name_cell = row_1.insertCell();
-			const comp_cell = row_2.insertCell();
+			const org_cell = row_2.insertCell();
 			const dept_cell = row_3.insertCell();
 
 			const profile = document.createElement("div");
@@ -285,13 +347,14 @@ const ContactWidget = (function() {
 
 			prof_cell.setAttribute("rowspan", "3");
 			prof_cell.setAttribute("class", "profile");
-			name_cell.setAttribute("class", "username");
-			comp_cell.setAttribute("class", "company");
+			org_cell.setAttribute("class", "organization");
+
+			name_cell.setAttribute("class", "membername");
 
 			hits++;
 
 			name_cell.innerHTML = a.replace(regex, (m) => `<b>${m}</b>`);
-			comp_cell.innerHTML = b.replace(regex, (m) => `<b>${m}</b>`);
+			org_cell.innerHTML = b.replace(regex, (m) => `<b>${m}</b>`);
 			dept_cell.innerHTML = c.replace(regex, (m) => `<b>${m}</b>`);
 
 			prof_cell.appendChild(profile);

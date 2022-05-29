@@ -29,7 +29,7 @@ const TabWidget = (function() {
 			settings : document.getElementById('TabWidget.tab.settings')
 		},
 		section : {
-			supplier : document.getElementById('TabWidget.section.supplier'),
+			supplier : document.getElementById('TabWidget.section.seller'),
 			settings : document.getElementById('TabWidget.section.settings')
 		}
 	}
@@ -51,12 +51,14 @@ const TabWidget = (function() {
 			this.DOM.tab[key].addEventListener('click', this.EVT.handleToggleClick);
 		}
 
-		this.API.openSection("supplier");
-		// this.API.openSection("settings");
+		// this.API.openSection("supplier");
+
+		this.API.openSection("settings");
 
 	}
 
 	function api_openSection(leaf) {
+		console.log(leaf);
 
 		for(let key in this.DOM.tab) {
 			if(this.DOM.tab[key]) {

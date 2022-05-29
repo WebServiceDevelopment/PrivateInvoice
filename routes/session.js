@@ -34,7 +34,7 @@ const bip39 = require('bip39')
 // Database
 
 const db = require('../database.js');
-const USERS_TABLE = "dat_users";
+const MEMBERS_TABLE = "members";
 
 // End Points
 
@@ -55,30 +55,30 @@ router.all('/check', async function(req, res) {
 // Should be in settings (profile)
 router.post('/updateCompany', async function(req, res) {
 
-	// Step 1 : Update dat_users table
+	// Step 1 : Update members table
 
 	let sql = `
 		UPDATE
-			${USERS_TABLE}
+			${MEMBERS_TABLE}
 		SET
-			company_name = ?,
-			company_postcode = ?,
-			company_address = ?,
-			company_building = ?,
-			company_department = ?,
-			company_tax_id = ?
+			organization_name = ?,
+			organization_postcode = ?,
+			organization_address = ?,
+			organization_building = ?,
+			organization_department = ?,
+			organization_tax_id = ?
 		WHERE
-			user_uuid = ?
+			member_uuid = ?
 	`;
 
 	let args = [
-		req.body.company_name,
-		req.body.company_postcode,
-		req.body.company_address,
-		req.body.company_building,
-		req.body.company_department,
-		req.body.company_tax_id,
-		req.session.data.user_uuid
+		req.body.organization_name,
+		req.body.organization_postcode,
+		req.body.organization_address,
+		req.body.organization_building,
+		req.body.organization_department,
+		req.body.organization_tax_id,
+		req.session.data.member_uuid
 	];
 
 	// Step 2 : Write Changes to log database
@@ -91,12 +91,12 @@ router.post('/updateCompany', async function(req, res) {
 
 	// Step 3 : Update Current Reddis Session
 
-	req.session.data.company_name = req.body.company_name;
-	req.session.data.company_postcode = req.body.company_postcode;
-	req.session.data.company_address = req.body.company_address;
-	req.session.data.company_building = req.body.company_building;
-	req.session.data.company_department = req.body.company_department;
-	req.session.data.company_tax_id = req.body.company_tax_id;
+	req.session.data.organization_name = req.body.organization_name;
+	req.session.data.organization_postcode = req.body.organization_postcode;
+	req.session.data.organization_address = req.body.organization_address;
+	req.session.data.organization_building = req.body.organization_building;
+	req.session.data.organization_department = req.body.organization_department;
+	req.session.data.organization_tax_id = req.body.organization_tax_id;
 
 	res.json({
 		err : 0,
@@ -108,24 +108,24 @@ router.post('/updateCompany', async function(req, res) {
 // Should be in settings
 router.post('/updateProfile', async function(req, res) {
 
-	// Step 1 : Update dat_users table
+	// Step 1 : Update members table
 
 	let sql = `
 		UPDATE
-			${USERS_TABLE}
+			${MEMBERS_TABLE}
 		SET
-			user_uuid = ?,
-			username = ?,
+			member_uuid = ?,
+			membername = ?,
 			work_email = ?
 		WHERE
-			user_uuid = ?
+			member_uuid = ?
 	`;
 
 	let args = [
-		req.body.user_uuid,
-		req.body.username,
+		req.body.member_uuid,
+		req.body.membername,
 		req.body.work_email,
-		req.session.data.user_uuid
+		req.session.data.member_uuid
 	];
 
 	// Step 2 : Write Changes to log database
@@ -145,8 +145,8 @@ router.post('/updateProfile', async function(req, res) {
 
 	// Step 3 : Update Current Reddis Session
 
-	req.session.data.user_uuid = req.body.user_uuid;
-	req.session.data.username = req.body.username;
+	req.session.data.member_uuid = req.body.member_uuid;
+	req.session.data.membername = req.body.membername;
 	req.session.data.work_email = req.body.work_email;
 
 	res.json({
@@ -161,34 +161,34 @@ router.post('/login', async function(req, res) {
 
 	const sql = `
 		SELECT
-			user_uuid,
-			username,
+			member_uuid,
+			membername,
 			work_email,
 			password_hash,
-			company_name,
-			company_postcode,
-			company_address,
-			company_building,
-			company_department,
-			company_tax_id,
+			organization_name,
+			organization_postcode,
+			organization_address,
+			organization_building,
+			organization_department,
+			organization_tax_id,
 			created_on,
 			wallet_address,
 			avatar_uuid
 		FROM
-			${USERS_TABLE}
+			${MEMBERS_TABLE}
 		WHERE
-			username = ?
+			membername = ?
 	`;
 
-	let user_data;
+	let member_data;
 
 	try {
-		user_data = await db.selectOne(sql, [req.body.username]);
+		member_data = await db.selectOne(sql, [req.body.membername]);
 	} catch(err) {
 		throw err;
 	}
 
-	if(!user_data) {
+	if(!member_data) {
 		return res.json({
 			err : 100,
 			msg : "USERNAME NOT FOUND"
@@ -198,7 +198,7 @@ router.post('/login', async function(req, res) {
 	let match = false;
 
 	try {
-		match = await db.compare(req.body.password, user_data.password_hash);
+		match = await db.compare(req.body.password, member_data.password_hash);
 	} catch(err) {
 		throw err;
 	}
@@ -210,10 +210,10 @@ router.post('/login', async function(req, res) {
 		});
 	}
 
-	delete user_data.password_hash;
-	user_data.user_uuid = user_data.user_uuid.toString();
-	user_data.avatar_uuid = user_data.avatar_uuid.toString();
-	req.session.data = user_data;
+	delete member_data.password_hash;
+	member_data.member_uuid = member_data.member_uuid.toString();
+	member_data.avatar_uuid = member_data.avatar_uuid.toString();
+	req.session.data = member_data;
 
 	res.json({
 		err : 0,
@@ -226,19 +226,19 @@ router.post('/signup', async function(req, res) {
 
 	// First we insert into the database
 
-	const user_uuid = uuidv1();
+	const member_uuid = uuidv1();
 
 	let sql = `
-		INSERT INTO ${USERS_TABLE} (
-			user_uuid,
-			username,
+		INSERT INTO ${MEMBERS_TABLE} (
+			member_uuid,
+			membername,
 			work_email,
 			password_hash,
-			company_name,
-			company_postcode,
-			company_address,
-			company_building,
-			company_department,
+			organization_name,
+			organization_postcode,
+			organization_address,
+			organization_building,
+			organization_department,
 			wallet_address,
 			avatar_uuid,
 			logo_uuid
@@ -275,15 +275,15 @@ router.post('/signup', async function(req, res) {
 
 
 	let args = [
-		user_uuid,
-		req.body.account.username,
+		member_uuid,
+		req.body.account.membername,
 		req.body.account.work_email,
 		req.body.hash,
-		req.body.company.name,
-		req.body.company.postcode,
-		req.body.company.address,
-		req.body.company.building,
-		req.body.company.department,
+		req.body.organization.name,
+		req.body.organization.postcode,
+		req.body.organization.address,
+		req.body.organization.building,
+		req.body.organization.department,
 		mnemonic
 	];
 
@@ -298,34 +298,34 @@ router.post('/signup', async function(req, res) {
 
 	sql = `
 		SELECT
-			user_uuid,
-			username,
+			member_uuid,
+			membername,
 			work_email,
 			password_hash,
-			company_name,
-			company_postcode,
-			company_address,
-			company_building,
-			company_department,
+			organization_name,
+			organization_postcode,
+			organization_address,
+			organization_building,
+			organization_department,
 			created_on,
 			avatar_uuid
 		FROM
-			${USERS_TABLE}
+			${MEMBERS_TABLE}
 		WHERE
-			user_uuid = ?
+			member_uuid = ?
 	`;
 
-	let user_data;
+	let member_data;
 	try {
-		user_data = await db.selectOne(sql, [user_uuid]);
+		member_data = await db.selectOne(sql, [member_uuid]);
 	} catch(err) {
 		throw err;
 	}
 
-	delete user_data.password_hash;
-	user_data.user_uuid = user_data.user_uuid.toString();
-	user_data.avatar_uuid = user_data.avatar_uuid.toString();
-	req.session.data = user_data;
+	delete member_data.password_hash;
+	member_data.member_uuid = member_data.member_uuid.toString();
+	member_data.avatar_uuid = member_data.avatar_uuid.toString();
+	req.session.data = member_data;
 
 	res.json({
 		err : 0,

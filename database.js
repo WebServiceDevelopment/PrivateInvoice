@@ -1,6 +1,6 @@
 /**
  
- Apache-2.0 License
+  Apache-2.0 License
  Copyright 2020 - 2022 Web Service Development Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,108 +31,101 @@ const pool = mysql.createPool(config.DATABASE);
 const SALT_ROUNDS = 10;
 
 module.exports = {
-	insert : function (sql, args) {
+	insert		: _insert,
+	update		: _update,
+	delete		: _delete,
+	selectOne	: _selectOne,
+	selectAll	: _selectAll, 
+	hash		: _hash,
+	compare		: _compare
+}
+
+function _insert (sql, args) {
 	
-		return new Promise ((resolve, reject) => {
-			
-			pool.query(sql, args, (err, result) => {
-				if(err) {
-					return reject (err);
-				}
-				resolve(result);
-			});
-
+	return new Promise ((resolve, reject) => {
+		pool.query(sql, args, (err, result) => {
+			if(err) {
+				return reject (err);
+			}
+			resolve(result);
 		});
+	});
 
-	},
-	update : function (sql, args) {
+}
+
+function _update(sql, args) {
 	
-		return new Promise ((resolve, reject) => {
-			
-			pool.query(sql, args, (err, result) => {
-				if(err) {
-					return reject (err);
-				}
-				resolve(result);
-			});
-
-
+	return new Promise ((resolve, reject) => {
+		pool.query(sql, args, (err, result) => {
+			if(err) {
+				return reject (err);
+			}
+			resolve(result);
 		});
+	});
 
-	},
-	delete : function (sql, args) {
+}
+
+function _delete(sql, args) {
 	
-		return new Promise ((resolve, reject) => {
-			
-			pool.query(sql, args, (err, result) => {
-				if(err) {
-					return reject (err);
-				}
-				resolve(result);
-			});
-
+	return new Promise ((resolve, reject) => {
+		pool.query(sql, args, (err, result) => {
+			if(err) {
+				return reject (err);
+			}
+			resolve(result);
 		});
+	});
 
-	},
-	selectOne : function (sql, args) {
+}
+
+function _selectOne(sql, args) {
 		
-		return new Promise ((resolve, reject) => {
-			
-			pool.query(sql, args, (err, row) => {
-				if(err) {
-					return reject (err);
-				}
-
-				resolve(row[0]);
-			});
-
+	return new Promise ((resolve, reject) => {
+		pool.query(sql, args, (err, row) => {
+			if(err) {
+				return reject (err);
+			}
+			resolve(row[0]);
 		});
+	});
 
-	},
-	selectAll : function api_selectAll(sql, args) {
+}
+
+function _selectAll(sql, args) {
 		
-		return new Promise( (resolve, reject) => {
-
-			pool.query(sql, args, (err, rows) => {
-				if(err) {
-					return reject (err);
-				}
-
-				resolve(rows);
-			});
-
+	return new Promise( (resolve, reject) => {
+		pool.query(sql, args, (err, rows) => {
+			if(err) {
+				return reject (err);
+			}
+			resolve(rows);
 		});
+	});
 
-	},
-	hash : function (raw) {
+}
 
-		return new Promise( (resolve, reject) => {
+function _hash(raw) {
 
-			bcrypt.hash(raw, SALT_ROUNDS, (err, hash) => {
-				if(err) {
-					return reject(err);
-				}
-				
-				resolve(hash);
-			});
-
+	return new Promise( (resolve, reject) => {
+		bcrypt.hash(raw, SALT_ROUNDS, (err, hash) => {
+			if(err) {
+				return reject(err);
+			}
+			resolve(hash);
 		});
+	});
 
-	},
-	compare : function (raw, hash) {
+}
 
-		return new Promise( (resolve, reject) => {
+function _compare(raw, hash) {
 
-			bcrypt.compare(raw, hash, (err, result) => {
-				if(err) {
-					return reject(err);
-				}
-
-				resolve(result);
-
-			});
-
+	return new Promise( (resolve, reject) => {
+		bcrypt.compare(raw, hash, (err, result) => {
+			if(err) {
+				return reject(err);
+			}
+			resolve(result);
 		});
-
-	}
+	});
 }

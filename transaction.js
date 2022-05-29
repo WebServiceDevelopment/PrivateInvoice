@@ -1,6 +1,6 @@
 /**
  
- Apache-2.0 License
+  Apache-2.0 License
  Copyright 2020 - 2022 Web Service Development Inc.
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,13 +20,13 @@
 
 "use script";
 
-const fs = require('fs');
-const mysql = require('mysql');
+const fs			= require('fs');
+const mysql			= require('mysql');
 
-const configStr = fs.readFileSync('config.json').toString();
-const config = JSON.parse(configStr);
+const configStr		= fs.readFileSync('config.json').toString();
+const config		= JSON.parse(configStr);
 config.DATABASE.database = process.env.DATABASE_NAME;
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS 	= 10;
 
 
 module.exports = {
