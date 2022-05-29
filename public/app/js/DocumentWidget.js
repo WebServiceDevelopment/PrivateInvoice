@@ -28,7 +28,7 @@ const DocumentWidget = (function() {
 		saveTimeout : null,
 		getSaveTimeout : () => this.MEM.saveTimeout,
 		setSaveTimeout : (timeout) => this.MEM.saveTimeout = timeout,
-		initSaveTimeout : () => this.MEM.saveTimeout = null,
+		initSaveTimeout : () => { clearTimeout(this.MEM.saveTimeout); this.MEM.saveTimeout = null},
 
 		document : null,
 		getDocument : () => this.MEM.document,
@@ -38,15 +38,26 @@ const DocumentWidget = (function() {
 		getFocus : () => this.MEM.focus,
 		setFocus : (focus) => this.MEM.focus = focus,
 		initFocus : () => this.MEM.focus = null,
+
+		currency_options : {
+			"formatWithSymbol" : true,
+			"symbol" : "Gwei",
+			"separator" : ",",
+			"decimal" : ".",
+			"precision" : 0,
+			"pattern" : "# !"
+		},
 	};
 
 	this.DOM = {
+
 		meta : {
 			document_number : document.getElementById('DocumentWidget.meta.document_number'),
 			created_on : document.getElementById('DocumentWidget.meta.created_on'), 
-			tax_id : document.getElementById('DocumentWidget.meta.tax_id'),
+			taxId : document.getElementById('DocumentWidget.meta.taxId'),
 			due_by : document.getElementById('DocumentWidget.meta.due_by'),
 		},
+
 		label : {
 			doc_type : document.getElementById('DocumentWidget.label.doc_type'),
 			due_by : document.getElementById('DocumentWidget.label.due_by'),
@@ -54,18 +65,21 @@ const DocumentWidget = (function() {
 			created_on : document.getElementById('DocumentWidget.label.created_on'),
 			to_from : document.getElementById('DocumentWidget.label.to_from'),
 		},
+
 		from : {
-			company_name : document.getElementById('DocumentWidget.from.company_name'),
-			company_address : document.getElementById('DocumentWidget.from.company_address'),
-			company_building : document.getElementById('DocumentWidget.from.company_building'),
-			company_department : document.getElementById('DocumentWidget.from.company_department')
+			organization_name : document.getElementById('DocumentWidget.from.organization_name'),
+			organization_address : document.getElementById('DocumentWidget.from.organization_address'),
+			organization_building : document.getElementById('DocumentWidget.from.organization_building'),
+			organization_department : document.getElementById('DocumentWidget.from.organization_department')
 		},
+
 		to : {
-			company_name : document.getElementById('DocumentWidget.to.company_name'),
-			company_address : document.getElementById('DocumentWidget.to.company_address'),
-			company_building : document.getElementById('DocumentWidget.to.company_building'),
-			company_department : document.getElementById('DocumentWidget.to.company_department')
+			organization_name : document.getElementById('DocumentWidget.to.organization_name'),
+			organization_address : document.getElementById('DocumentWidget.to.organization_address'),
+			organization_building : document.getElementById('DocumentWidget.to.organization_building'),
+			organization_department : document.getElementById('DocumentWidget.to.organization_department')
 		},
+
 		inputs : {
 			subject : document.getElementById('DocumentWidget.inputs.subject'),
 			body : document.getElementById('DocumentWidget.inputs.body'),
@@ -75,9 +89,15 @@ const DocumentWidget = (function() {
 			getSubject : () =>  this.DOM.inputs.subject.value,
 
 		},
+
+		textarea : {
+			comments :  document.getElementById('DocumentWidget.textarea.comments'),
+		},
+
 		contact : {
 			input : document.getElementById('ContactWidget.input'),
 		},
+
 		totals : {
 			table : document.getElementById('DocumentWidget.totals.table'),
 			subtotal : document.getElementById('DocumentWidget.totals.subtotal'),
@@ -89,41 +109,51 @@ const DocumentWidget = (function() {
 
 
 	this.EVT = {
-		handleSubjectInput : evt_handleSubjectInput.bind(this),
-		handleDocumentResize :  evt_handleDocumentResize.bind(this),
-		handleTextChange : evt_handleTextChange.bind(this),
-		handleNumberChange : evt_handleNumberChange.bind(this),
-		handleNumberBlur : evt_handleNumberBlur.bind(this),
-		handleInputFocus : evt_handleInputFocus.bind(this),
-		handleInputBlur : evt_handleInputBlur.bind(this),
-		handleDueChange : evt_handleDueChange.bind(this),
-		handleFileDrop : evt_handleFileDrop.bind(this),
-		handleDragEnter : evt_handleDragEnter.bind(this),
-		handleDragLeave : evt_handleDragLeave.bind(this),
-		handleSaveClick : evt_handleSaveClick.bind(this)
+		handleSubjectInput		: evt_handleSubjectInput.bind(this),
+		handleDocumentResize	: evt_handleDocumentResize.bind(this),
+		handleTextChange		: evt_handleTextChange.bind(this),
+		handleNumberChange		: evt_handleNumberChange.bind(this),
+		handleNumberBlur		: evt_handleNumberBlur.bind(this),
+		handleInputFocus		: evt_handleInputFocus.bind(this),
+		handleInputBlur			: evt_handleInputBlur.bind(this),
+		handleDueChange			: evt_handleDueChange.bind(this),
+		handleFileDrop			: evt_handleFileDrop.bind(this),
+		handleDragEnter			: evt_handleDragEnter.bind(this),
+		handleDragLeave			: evt_handleDragLeave.bind(this),
+		handleSaveClick			: evt_handleSaveClick.bind(this),
+		handleComments			: evt_handleComments.bind(this),
 	};
 
 	this.API = {
-		openDocument : api_openDocument.bind(this),
-		renderDocument : api_renderDocument.bind(this),
-		renderDocumentBody : api_renderDocumentBody.bind(this),
-		updateShimHeight : api_updateShimHeight.bind(this),
-		triggerSavePoint : api_triggerSavePoint.bind(this),
-		updateDocument : api_updateDocument.bind(this),
-		updateTotals : api_updateTotals.bind(this),
-		renderTotals : api_renderTotals.bind(this),
-		readFileAsync : api_readFileAsync.bind(this),
-		updateToInfo : api_updateToInfo.bind(this),
-		clearDocument : api_clearDocument.bind(this),
-		checkInvoiceSendable : api_checkInvoiceSendable.bind(this),
-		getDocument : api_getDocument.bind(this),
-		setTo_from : api_setTo_from.bind(this),
-		checkSaveTimeout : api_checkSaveTimeout.bind(this),
-		readOnly : api_readOnly.bind(this),
+		openDocument			: api_openDocument.bind(this),
+		renderDocument			: api_renderDocument.bind(this),
+		renderDocumentBody		: api_renderDocumentBody.bind(this),
+		updateShimHeight		: api_updateShimHeight.bind(this),
+		triggerSavePoint		: api_triggerSavePoint.bind(this),
+		updateDocument			: api_updateDocument.bind(this),
+		updateTotals			: api_updateTotals.bind(this),
+		renderTotals			: api_renderTotals.bind(this),
+		readFileAsync			: api_readFileAsync.bind(this),
+		updateToInfo			: api_updateToInfo.bind(this),
+		clearDocument			: api_clearDocument.bind(this),
+		checkInvoiceSendable	: api_checkInvoiceSendable.bind(this),
+		getDocument				: api_getDocument.bind(this),
+		setTo_from				: api_setTo_from.bind(this),
+		checkSaveTimeout		: api_checkSaveTimeout.bind(this),
+		readOnly				: api_readOnly.bind(this),
+		renderComments			: api_renderComments.bind(this),
+		getCurrencyOptions		: api_getCurrencyOptions.bind(this),
 	};
+
+	this.ATTR = {
+		removeAttribute : attr_removeAttribute.bind(this),
+		setAttribute : attr_setAttribute.bind(this),
+	}
 
 	init.apply(this);
 	return this;
+
+	
 
 	function api_readOnly () {
 		this.DOM.inputs.subject.setAttribute("readonly", "readonly");
@@ -140,6 +170,8 @@ const DocumentWidget = (function() {
 		}, 50);
 
 		window.addEventListener('resize', this.EVT.handleDocumentResize);
+
+		// for inputs
 		this.DOM.inputs.save.setAttribute("disabled", "disabled");
 
 		this.DOM.inputs.dragarea.addEventListener('drop', this.EVT.handleFileDrop);
@@ -147,7 +179,13 @@ const DocumentWidget = (function() {
 		this.DOM.inputs.dragarea.addEventListener('dragleave', this.EVT.handleDragLeave);
 		this.DOM.inputs.save.addEventListener('click', this.EVT.handleSaveClick);
 
+		// for comments
+		this.DOM.textarea.comments.addEventListener('blur', this.EVT.handleComments);
+		this.DOM.textarea.comments.addEventListener('input', this.EVT.handleComments);
+
 		this.API.readOnly ();
+
+
 	}
 
     function api_checkSaveTimeout() {
@@ -164,10 +202,10 @@ const DocumentWidget = (function() {
 		//console.log("role="+role);
 
 		switch(role) {
-		case 'supplier':
+		case 'seller':
 			to_from = "To";
 		break;
-		case 'client':
+		case 'buyer':
 			to_from = "From";
 		break;
 		default:
@@ -188,21 +226,23 @@ const DocumentWidget = (function() {
  * 20220405 add 
  * Add judgment
  * (1) this.DOM.contact.input.value
- * (2) this.DOM.to.company_name.value
- *
+ * (2) this.DOM.to.organization_name.value
+ * call [Send] button
 */
 	function api_checkInvoiceSendable() {
 
-		if(!this.MEM.document.client_uuid) {
-			return "NO CLIENT";
+		let document_json = Traceability.API.getCredentialSubject();
+
+		if(!document_json.buyer.name) {
+			return "NO CLIENT : buyer name";
 		}
 
 		if(this.DOM.contact.input.value == "") {
-			return "NO CLIENT";
+			return "NO CLIENT : to";
 		}
 
-		if(this.DOM.to.company_name.value == "") {
-			return "NO CLIENT";
+		if(this.DOM.to.organization_name.value == "") {
+			return "NO CLIENT : organization_name";
 		}
 
 		if(this.MEM.getSaveTimeout()) {
@@ -210,8 +250,6 @@ const DocumentWidget = (function() {
 			this.MEM.initSaveTimeout();
 		}
 
-		ActionWidget.DOM.invoice.sendInvoiceDisabled();
-		this.API.updateDocument();
 		return null;
 
 	}
@@ -238,7 +276,7 @@ const DocumentWidget = (function() {
 		this.MEM.document = {
 			document_meta : {
 				created_on : "",
-				tax_id : "",
+				taxId : "",
 				due_by : ""
 			},
 			document_totals : {
@@ -249,31 +287,51 @@ const DocumentWidget = (function() {
 		}
 
 		this.API.renderDocument();
-		this.API.renderDocumentBody();
-		this.API.renderTotals();
+
+		setTimeout( function () {
+			this.API.renderDocumentBody();
+			this.API.renderTotals();
+			this.API.renderComments();
+		}.bind(this), 100);
 
 		ContactWidget.API.clearAddress();
 		ActionWidget.API.closePanel();
 
+		let f = this.ATTR.setAttribute;
+
+		f( this.DOM.inputs.subject );
+		f( this.DOM.contact.input );
+
+		f( this.DOM.from.organization_name );
+		f( this.DOM.from.organization_address );
+		f( this.DOM.from.organization_building );
+		f( this.DOM.from.organization_department );
+
+		f( this.DOM.to.organization_name );
+		f( this.DOM.to.organization_address );
+		f( this.DOM.to.organization_building );
+		f( this.DOM.to.organization_department );
 	}
 
-	function api_updateToInfo(userData) {
+	function api_updateToInfo(memberData) {
 		
-		if(userData) {
-			this.MEM.document.client_uuid = userData.user_uuid;
-			this.DOM.to.company_name.value = userData.company_name || "";
-			this.DOM.to.company_address.value = userData.company_address || "";
-			this.DOM.to.company_building.value = userData.company_building || "";
-			this.DOM.to.company_department.value = userData.company_department || "";
+		if(memberData) {
+			this.MEM.document.buyer_uuid = memberData.member_uuid;
+			this.DOM.to.organization_name.value = memberData.organization_name || "";
+			this.DOM.to.organization_address.value = memberData.organization_address || "";
+			this.DOM.to.organization_building.value = memberData.organization_building || "";
+			this.DOM.to.organization_department.value = memberData.organization_department || "";
 		} else {
-			this.MEM.document.client_uuid = null;
-			this.DOM.to.company_name.value = "";
-			this.DOM.to.company_address.value = "";
-			this.DOM.to.company_building.value = "";
-			this.DOM.to.company_department.value = "";
+			this.MEM.document.buyer_uuid = null;
+			this.DOM.to.organization_name.value = "";
+			this.DOM.to.organization_address.value = "";
+			this.DOM.to.organization_building.value = "";
+			this.DOM.to.organization_department.value = "";
 		}
 
-		this.MEM.document.client_details = userData;
+		//this.MEM.document.buyer_details = memberData;
+		this.MEM.document.buyer_details = memberData;
+
 		this.API.triggerSavePoint();
 
 	}
@@ -413,7 +471,7 @@ const DocumentWidget = (function() {
 					});
 				}
 			
-				const opts = this.MEM.document.currency_options;
+				const opts = this.API.getCurrencyOptions();
 
 				for(let i = 0; i < rows.length; i++) {
 					let row = rows[i];
@@ -586,20 +644,20 @@ const DocumentWidget = (function() {
 	function evt_handleTaxFocus(evt) {
 
 		const elem = evt.target;
-		const userData = elem.userData;
-		if(!userData) {
+		const memberData = elem.memberData;
+		if(!memberData) {
 			return;
 		}
 		
 
-		if(userData.dom.tax.value.length) {
+		if(memberData.dom.tax.value.length) {
 			return;
 		}
 
 		
 
-		userData.dom.tax.value = this.MEM.document.default_sales_tax;
-		userData.data.sales_tax = userData.dom.tax.value;
+		memberData.dom.tax.value = this.MEM.document.default_sales_tax;
+		memberData.data.sales_tax = memberData.dom.tax.value;
 
 
 	}
@@ -635,36 +693,35 @@ const DocumentWidget = (function() {
 	function evt_handleNumberBlur(evt) {
 
 		const elem = evt.target;
-		const userData = elem.userData;
-		if(!userData) {
+		const memberData = elem.memberData;
+		if(!memberData) {
 			return;
 		}
 		
-		const opts = this.MEM.document.currency_options;
-		const c = currency(userData.dom.price.value, opts);
-		userData.dom.price.value = c.format(true);
+		const opts = this.API.getCurrencyOptions();
+
+		const c = currency(memberData.dom.price.value, opts);
+		memberData.dom.price.value = c.format(true);
 
 	}
 
 	function api_updateTotals() {
 		
-		const opts = this.MEM.document.currency_options;
+		const opts = this.API.getCurrencyOptions();
 		
 		const totals = {
 			subtotal : currency(0, opts),
-/* 20220410 del
-			sales_tax : currency(0, opts),
-*/
 			total : currency(0, opts),
 /* 20220410 del
+			sales_tax : currency(0, opts),
 			sales_tax_details : []
 */
 		};
 
-		this.MEM.items.forEach( userData => {
+		this.MEM.items.forEach( memberData => {
 			
-			const dom = userData.dom;
-			const data = userData.data;
+			const dom = memberData.dom;
+			const data = memberData.data;
 
 			if(!data.quan.length || !data.price.length) {
 				dom.subtotal.value = "";
@@ -726,26 +783,32 @@ const DocumentWidget = (function() {
 		totals.sales_tax = totals.sales_tax.format(true);
 */
 		totals.total = totals.total.format(true);
-		console.log("totals.total"+totals.total);
+		//console.log("totals.total"+totals.total);
 
 		TrayWidget.API.updateSelectTotal(totals.total);
 
 		this.MEM.document.document_totals = totals;
-		this.API.renderTotals();
+
+		setTimeout( function () {
+			this.API.renderTotals();
+			this.API.renderComments();
+		}.bind(this), 20);
 
 	}
 
 	function evt_handleTextChange(evt) {
+		console.log("evt_handleTextChange");
 
 		const elem = evt.target;
-		const userData = elem.userData;
-		if(!userData) {
+		const memberData = elem.memberData;
+		if(!memberData) {
 			return;
 		}
 
-		userData.data.date = userData.dom.date.value;
-		userData.data.desc = userData.dom.desc.value;
-		userData.data.unit = userData.dom.unit.value;
+		memberData.data.date = memberData.dom.date.value;
+		memberData.data.desc = memberData.dom.desc.value;
+		memberData.data.unit = memberData.dom.unit.value;
+
 		this.API.triggerSavePoint();
 
 	}
@@ -753,18 +816,21 @@ const DocumentWidget = (function() {
 	function evt_handleNumberChange(evt) {
 
 		const elem = evt.target;
-		const userData = elem.userData;
-		if(!userData) {
+		const memberData = elem.memberData;
+		if(!memberData) {
 			return;
 		}
 		
-		const opts = this.MEM.document.currency_options;
+		// 20220524
+		const opts = this.API.getCurrencyOptions();
 
 /*
-*		userData.data.sales_tax = userData.dom.tax.value;
+*		memberData.data.sales_tax = memberData.dom.tax.value;
 */
-		userData.data.quan = userData.dom.quan.value;
-		userData.data.price = currency(userData.dom.price.value, opts).format(true);
+		memberData.data.quan = memberData.dom.quan.value;
+		memberData.data.price = currency(memberData.dom.price.value, opts).format(true);
+
+		console.log("memberData.data.price="+memberData.data.price) 
 
 		this.API.triggerSavePoint();
 		this.API.updateTotals();
@@ -775,11 +841,18 @@ const DocumentWidget = (function() {
  *
 */
 	function api_updateDocument() {
-		//console.log("updateDocument");
+		//console.trace();
+		//console.log(JSON.stringify(this.MEM.document.buyer_details));
+
+		Traceability.API.setSign(this.MEM.document);
+
+		console.log(JSON.stringify(this.MEM.document.buyer_details));
 
 		//debugger;
 
 		this.DOM.inputs.save.setAttribute("disabled", "disabled");
+
+		const document_json = Traceability.API.getCredentialSubject();
 
 		const param = {
 			document_uuid : this.MEM.document.document_uuid,
@@ -787,7 +860,8 @@ const DocumentWidget = (function() {
 			document_totals : this.MEM.document.document_totals,
 			document_meta : this.MEM.document.document_meta,
 			subject_line : this.MEM.document.subject_line,
-			client_details : this.MEM.document.client_details
+			buyer_details : this.MEM.document.buyer_details,
+			document_json : document_json,
 		}
 
 		const ajax = new XMLHttpRequest();
@@ -800,7 +874,7 @@ const DocumentWidget = (function() {
 		ajax.onload = () => {
 			
 			ActionWidget.DOM.invoice.sendInvoiceEnabled();
-			console.log(ajax.response);
+			//console.log(ajax.response);
 
 		}
 
@@ -852,6 +926,10 @@ const DocumentWidget = (function() {
 		this.MEM.initFocus();
 
 		this.DOM.inputs.body.innerHTML = "";
+		if(this.MEM.document.document_body == null) {
+			return;
+		}
+
 		for(let i = 0; i < this.MEM.document.document_body.length; i++) {
 			
 			let item = this.MEM.document.document_body[i] || {};
@@ -947,7 +1025,7 @@ const DocumentWidget = (function() {
 			li.appendChild(table_a);
 			this.DOM.inputs.body.appendChild(li);
 
-			const userData = {
+			const memberData = {
 				data : item,
 				dom : {
 					// shim : shim,
@@ -960,11 +1038,11 @@ const DocumentWidget = (function() {
 				}
 			};
 			
-			for(let key in userData.dom) {
+			for(let key in memberData.dom) {
 				if(key === "shim") {
 					continue;
 				}
-				userData.dom[key].userData = userData;
+				memberData.dom[key].memberData = memberData;
 			}
 
 			date_input.addEventListener('input', this.EVT.handleTextChange);
@@ -994,16 +1072,26 @@ const DocumentWidget = (function() {
 				if(folder == "draft") {
 					flatpickr(date_input, {});
 					autosize(textarea);
+					subtotal_input.setAttribute("readonly", "readonly");
+					subtotal_input.setAttribute("disabled", "disabled");
 				} else {
 					date_input.setAttribute("readonly", "readonly");
 					textarea.setAttribute("readonly", "readonly");
 					quan_input.setAttribute("readonly", "readonly");
 					unit_input.setAttribute("readonly", "readonly");
 					price_input.setAttribute("readonly", "readonly");
+					subtotal_input.setAttribute("readonly", "readonly");
+
+					date_input.setAttribute("disabled", "disabled");
+					textarea.setAttribute("disabled", "disabled");
+					quan_input.setAttribute("disabled", "disabled");
+					unit_input.setAttribute("disabled", "disabled");
+					price_input.setAttribute("disabled", "disabled");
+					subtotal_input.setAttribute("disabled", "disabled");
 				}
 			}
 
-			this.MEM.items.push(userData);
+			this.MEM.items.push(memberData);
 
 		}
 		
@@ -1039,11 +1127,11 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 		let ROLE;
 
         switch(role) {
-        case 'supplier':
-            ROLE = 'Supplier';
+        case 'seller':
+            ROLE = 'Seller';
         break;
-        case 'client':
-            ROLE = 'Client';
+        case 'buyer':
+            ROLE = 'Buyer';
         break;
         default:
             return;
@@ -1104,17 +1192,50 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
             return;
         }
 
-		this.MEM.document = res.msg;
+		//console.log("openDocument");
+
+		Traceability.API.setCredentialSubject(res.msg.document_json);
+/*
+ *
+ * Traceability.API.getSign (res.msg)
+ *
+ * Add buyer_uuid and buyer_membername information to 
+ * this.MEM.document.buyer_details
+ *
+ * If buyer_uuid and buyer_membername information is insufficient,
+ * Send operation will result in an error.
+ */
+		let doc =  Traceability.API.getSign (res.msg);
+
+		this.MEM.document = doc;
+	
 		this.API.renderDocument();
 		this.API.renderDocumentBody();
 		this.API.renderTotals();
+		this.API.renderComments();
 
 		// Render the contact name
 
 		ContactWidget.API.setAddress(this.MEM.document);
 		ActionWidget.API.openPanel(this.MEM.document);
 
+		return;
 	}
+
+	function api_renderComments () {
+		if(this.MEM.document.comments == null) {
+			this.DOM.textarea.comments.value = "";
+			return;
+		}
+	
+		this.DOM.textarea.comments.value = this.MEM.document.comments;
+	}
+
+
+	function api_getCurrencyOptions () {
+		return Object.assign({}, this.MEM.currency_options);
+	}
+
 
 	function api_renderDocument() {
 	
@@ -1154,68 +1275,83 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 		}
 
 
-		this.DOM.meta.document_number.textContent = this.MEM.document.document_meta.document_number;
-		this.DOM.meta.created_on.textContent = this.MEM.document.document_meta.created_on;
-		this.DOM.meta.tax_id.textContent = this.MEM.document.document_meta.tax_id;
 
+		if(this.MEM.document.document_meta.document_number== null) {
+// 
+// If the number of corresponding Folders is 0, it will be null.
+//
+			//console.log("Info: this.MEM.document.document_meta.document_number is null.");
+		} else {
 
-		this.DOM.meta.due_by.textContent = "";
-		let due_input = document.createElement("input");
-		due_input.setAttribute("type", "text");
-		due_input.value = this.MEM.document.document_meta.due_by;
-		this.DOM.meta.due_by.appendChild(due_input);
-		flatpickr(due_input, {});
-		due_input.addEventListener('change', this.EVT.handleDueChange);
+			this.DOM.meta.document_number.textContent = this.MEM.document.document_meta.document_number;
+			this.DOM.meta.created_on.textContent = this.MEM.document.document_meta.created_on;
+			this.DOM.meta.taxId.textContent = this.MEM.document.document_meta.taxId;
+			this.DOM.meta.due_by.textContent = "";
+
+			let due_input = document.createElement("input");
+			due_input.setAttribute("type", "text");
+			this.DOM.meta.due_by.appendChild(due_input);
+			due_input.addEventListener('change', this.EVT.handleDueChange);
+	
+
+			if( this.MEM.document!= null) {
+				if( this.MEM.document.document_meta != null) {
+					due_input.value = this.MEM.document.document_meta.due_by;
+				}
+			}
+			flatpickr(due_input, {});
+		}
+
 
 		// Then we render the to / from areas
 		
 		if(this.MEM.document.document_type === 'order') {
 
-			let sd = this.MEM.document.supplier_details;
-			this.DOM.to.company_name.value = sd.company_name;
-			this.DOM.to.company_address.value = sd.company_address;
-			this.DOM.to.company_building.value = sd.company_building;
-			this.DOM.to.company_department.value = sd.company_department;
+			let sd = this.MEM.document.seller_details;
+			this.DOM.to.organization_name.value = sd.organization_name;
+			this.DOM.to.organization_address.value = sd.organization_address;
+			this.DOM.to.organization_building.value = sd.organization_building;
+			this.DOM.to.organization_department.value = sd.organization_department;
 				
-			let cd = this.MEM.document.client_details;
-			this.DOM.from.company_name.value = cd.company_name || "";
-			this.DOM.from.company_address.value = cd.company_address || "";
-			this.DOM.from.company_building.value = cd.company_building || "";
-			this.DOM.from.company_department.value = cd.company_department || "";
+			let cd = this.MEM.document.buyer_details;
+			this.DOM.from.organization_name.value = cd.organization_name || "";
+			this.DOM.from.organization_address.value = cd.organization_address || "";
+			this.DOM.from.organization_building.value = cd.organization_building || "";
+			this.DOM.from.organization_department.value = cd.organization_department || "";
 
 		} else {
 
-			if(this.MEM.document.supplier_details) {
+			if(this.MEM.document.seller_details) {
 
-				let sd = this.MEM.document.supplier_details;
-				this.DOM.from.company_name.value = sd.company_name;
-				this.DOM.from.company_address.value = sd.company_address;
-				this.DOM.from.company_building.value = sd.company_building;
-				this.DOM.from.company_department.value = sd.company_department;
+				let sd = this.MEM.document.seller_details;
+				this.DOM.from.organization_name.value = sd.organization_name;
+				this.DOM.from.organization_address.value = sd.organization_address;
+				this.DOM.from.organization_building.value = sd.organization_building;
+				this.DOM.from.organization_department.value = sd.organization_department;
 
 			} else {
 
-				this.DOM.from.company_name.value = "";
-				this.DOM.from.company_address.value = "";
-				this.DOM.from.company_building.value = "";
-				this.DOM.from.company_department.value = "";
+				this.DOM.from.organization_name.value = "";
+				this.DOM.from.organization_address.value = "";
+				this.DOM.from.organization_building.value = "";
+				this.DOM.from.organization_department.value = "";
 
 			}
 	
-			if(this.MEM.document.client_details) {
+			if(this.MEM.document.buyer_details) {
 				
-				let cd = this.MEM.document.client_details;
-				this.DOM.to.company_name.value = cd.company_name || "";
-				this.DOM.to.company_address.value = cd.company_address || "";
-				this.DOM.to.company_building.value = cd.company_building || "";
-				this.DOM.to.company_department.value = cd.company_department || "";
+				let cd = this.MEM.document.buyer_details;
+				this.DOM.to.organization_name.value = cd.organization_name || "";
+				this.DOM.to.organization_address.value = cd.organization_address || "";
+				this.DOM.to.organization_building.value = cd.organization_building || "";
+				this.DOM.to.organization_department.value = cd.organization_department || "";
 
 			} else {
 
-				this.DOM.to.company_name.value = "";
-				this.DOM.to.company_address.value = "";
-				this.DOM.to.company_building.value = "";
-				this.DOM.to.company_department.value = "";
+				this.DOM.to.organization_name.value = "";
+				this.DOM.to.organization_address.value = "";
+				this.DOM.to.organization_building.value = "";
+				this.DOM.to.organization_department.value = "";
 
 			}
 
@@ -1225,17 +1361,69 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 
 		this.DOM.inputs.subject.value = this.MEM.document.subject_line || "";
 
+		this.DOM.contact.input.value = this.MEM.document.buyer_membername || "";
+
+
 		const elem =  FolderWidget.MEM.getActiveFolder();
 		if( elem != null)  {
+			let f;
 			const folder = elem.getAttribute("data-folder");
 			if(folder == "draft") {
-				this.DOM.inputs.subject.removeAttribute("readonly");
+				//this.DOM.inputs.subject.removeAttribute("readonly");
+				f = this.ATTR.removeAttribute;
+				
 			} else {
-				this.DOM.inputs.subject.setAttribute("readonly", "readonly");
+				//this.DOM.inputs.subject.setAttribute("readonly", "readonly");
+				f = this.ATTR.setAttribute;
 			}
+			f( this.DOM.inputs.subject );
+			f( this.DOM.contact.input );
+
+			f( this.DOM.from.organization_name );
+			f( this.DOM.from.organization_address );
+			f( this.DOM.from.organization_building );
+			f( this.DOM.from.organization_department );
+
+			f( this.DOM.to.organization_name );
+			f( this.DOM.to.organization_address );
+			f( this.DOM.to.organization_building );
+			f( this.DOM.to.organization_department );
+
 		}
 
 		this.DOM.label.created_on.innerText = this.MEM.document.created_on || "";
+
+	}
+
+	function attr_removeAttribute(elm) {
+		elm.removeAttribute("readonly");
+		elm.removeAttribute("disabled");
+	}
+
+	function attr_setAttribute(elm) {
+		elm.setAttribute("readonly", "readonly");
+		elm.setAttribute("disabled", "disabled");
+	}
+
+	async function evt_handleComments(evt) {
+
+		evt.stopPropagation(); 
+		evt.preventDefault();
+
+		let wk = this.DOM.textarea.comments.value;
+		wk = wk.split("\n");
+		for(let key in wk) {
+			console.log(key+":"+wk[key]);
+		}
+
+		this.MEM.document.comments = wk;
+
+		this.MEM.initSaveTimeout();
+		const timeout = await setTimeout(function() {
+			this.EVT.handleSaveClick();
+		}.bind(this), this.MEM.getTimeout());
+
+		this.MEM.setSaveTimeout(timeout);
 
 	}
 

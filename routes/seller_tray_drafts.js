@@ -21,40 +21,52 @@
 "use strict";
 
 // Inport
-const sub           = require("./tray_sub.js");
+const sub				= require("./tray_sub.js");
 
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express			= require('express');
+const router			= express.Router();
+module.exports			= router;
 
 // Database
 
-const SUPPLIER_DRAFT_STATUS = "supplier_status_draft";
+const SELLER_DRAFT_STATUS = "seller_status_draft";
 
-// Total
-router.post('/getTotalSupplier', async function(req, res) {
+// ------------------------------- End Points -------------------------------
 
-    sub.getTotal(req, res, SUPPLIER_DRAFT_STATUS);
+/*
+ * getTotalSellergetTotalSeller
+ */
+router.post('/getTotalSeller', async function(req, res) {
 
-});
-
-// End Points
-router.post('/getCountSupplier', function(req, res) {
-
-    sub.getCount(req, res, SUPPLIER_DRAFT_STATUS);
+    sub.getTotal(req, res, SELLER_DRAFT_STATUS);
 
 });
 
+/*
+ * getCountSeller
+ */
+router.post('/getCountSeller', function(req, res) {
+
+    sub.getCount(req, res, SELLER_DRAFT_STATUS);
+
+});
+
+/*
+ * count
+ */
 router.post('/count', async function(req, res) {
 
-    sub.count (req, res, SUPPLIER_DRAFT_STATUS);
+    sub.count (req, res, SELLER_DRAFT_STATUS);
 
 });
 
-router.post('/getFolderSupplier', function(req, res) {
+/*
+ * getFolderSeller
+ */
+router.post('/getFolderSeller', function(req, res) {
 
-    sub.getFolder(req, res, SUPPLIER_DRAFT_STATUS);
+    sub.getFolder(req, res, SELLER_DRAFT_STATUS);
 
 });

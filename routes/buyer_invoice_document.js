@@ -22,37 +22,40 @@
 
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express					= require('express');
+const router					= express.Router();
+module.exports					= router;
 
 // Libraries
 
 
 // Database 
 
-const config = require('../config.json');
-const db = require('../database.js');
+const config					= require('../config.json');
+const db						= require('../database.js');
 
 
-const CLIENT_DOCUMENT = "client_document";
+const BUYER_DOCUMENT			= "buyer_document";
 
-const CLIENT_ARCHIVE_DOCUMENT = "client_document_archive";
+const BUYER_ARCHIVE_DOCUMENT	= "buyer_document_archive";
 
-const SUPPLIER_DOCUMENT = "supplier_document";
-const SUPPLIER_ARCHIVE_DOCUMENT = "supplier_document_archive";
+const SELLER_DOCUMENT 			= "seller_document";
+const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
 
 
-// End Points
+// ------------------------------- End Points -------------------------------
 
-router.post('/getDocumentClient', async function(req, res) {
+/*
+ * getDocumentBuyer
+ */
+router.post('/getDocumentBuyer', async function(req, res) {
 
     let sql = `
         SELECT
             document_uuid,
             document_json
         FROM
-            ${CLIENT_DOCUMENT}
+            ${BUYER_DOCUMENT}
         WHERE
             document_uuid = ?
     `;
@@ -72,11 +75,12 @@ router.post('/getDocumentClient', async function(req, res) {
 	if(!result) {
 		return res.json({
 			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR USER"
+			msg : "DOCUMENT NOT FOUND FOR MEMBER"
 		});
 	}
 
-	doc =  JSON.parse(result.document_json);
+	doc = {};
+	doc.document_json =  JSON.parse(result.document_json);
 
 	res.json({
 		err : 0,
@@ -85,14 +89,17 @@ router.post('/getDocumentClient', async function(req, res) {
 
 });
 
-router.post('/getDocumentSupplier', async function(req, res) {
+/*
+ * getDocumentSeller
+ */
+router.post('/getDocumentSeller', async function(req, res) {
 
     let sql = `
         SELECT
             document_uuid,
             document_json
         FROM
-            ${SUPPLIER_DOCUMENT}
+            ${SELLER_DOCUMENT}
         WHERE
             document_uuid = ?
     `;
@@ -112,11 +119,12 @@ router.post('/getDocumentSupplier', async function(req, res) {
 	if(!result) {
 		return res.json({
 			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR USER"
+			msg : "DOCUMENT NOT FOUND FOR MEMBER"
 		});
 	}
 
-	doc =  JSON.parse(result.document_json);
+	doc = {};
+	doc.document_json = JSON.parse(result.document_json);
 
 	res.json({
 		err : 0,
@@ -125,14 +133,17 @@ router.post('/getDocumentSupplier', async function(req, res) {
 
 });
 
-router.post('/getArchiveDocumentClient', async function(req, res) {
+/*
+ * getArchiveDocumentBuyer
+ */
+router.post('/getArchiveDocumentBuyer', async function(req, res) {
 
     let sql = `
         SELECT
             document_uuid,
             document_json
         FROM
-            ${CLIENT_ARCHIVE_DOCUMENT}
+            ${BUYER_ARCHIVE_DOCUMENT}
         WHERE
             document_uuid = ?
     `;
@@ -152,11 +163,12 @@ router.post('/getArchiveDocumentClient', async function(req, res) {
 	if(!result) {
 		return res.json({
 			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR USER"
+			msg : "DOCUMENT NOT FOUND FOR MEMBER"
 		});
 	}
 
-	doc =  JSON.parse(result.document_json);
+	doc = {};
+	doc.document_json =  JSON.parse(result.document_json);
 
 	res.json({
 		err : 0,
@@ -165,14 +177,17 @@ router.post('/getArchiveDocumentClient', async function(req, res) {
 
 });
 
-router.post('/getArchiveDocumentSupplier', async function(req, res) {
+/*
+ * getArchiveDocumentSeller
+ */
+router.post('/getArchiveDocumentSeller', async function(req, res) {
 
     let sql = `
         SELECT
             document_uuid,
             document_json
         FROM
-            ${SUPPLIER_ARCHIVE_DOCUMENT}
+            ${SELLER_ARCHIVE_DOCUMENT}
         WHERE
             document_uuid = ?
     `;
@@ -192,11 +207,12 @@ router.post('/getArchiveDocumentSupplier', async function(req, res) {
 	if(!result) {
 		return res.json({
 			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR USER"
+			msg : "DOCUMENT NOT FOUND FOR MEMBER"
 		});
 	}
 
-	doc =  JSON.parse(result.document_json);
+	doc = {};
+	doc.document_json =  JSON.parse(result.document_json);
 
 	res.json({
 		err : 0,

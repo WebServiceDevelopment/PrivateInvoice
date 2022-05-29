@@ -1,13 +1,15 @@
 {
   "name": "privateinvoice",
   "version": "0.0.1",
-  "description": "P2P based invoicing system where anyone can create their own Node",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx dotenv -e .env node index.js",
-    "dev:supply": "npx dotenv -e .supply.env node index.js",
-    "dev:client": "npx dotenv -e .client.env node index.js"
+    "dev:seller": "npx dotenv -e .seller.env node index.js",
+    "dev:buyer": "npx dotenv -e .buyer.env node index.js",
+    "dev:collins": "npx dotenv -e .collins.env node index.js",
+    "ganache": "ganache --wallet.seed myCustomSeed"
   },
   "repository": {
     "type": "git",
@@ -20,30 +22,38 @@
   },
   "homepage": "https://PrivateInvoice.io",
   "dependencies": {
-    "axios": "^0.26.1",
+    "@ethereumjs/common": "^2.6.4",
+    "axios": "^0.27.1",
     "bcrypt": "^5.0.1",
     "binary-uuid": "^2.0.3",
     "bip39": "^3.0.4",
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.20.0",
     "connect-redis": "^4.0.4",
-    "currency.js": "^1.2.2",
-    "dotenv": "^16.0.0",
-    "express": "^4.17.1",
-    "express-session": "^1.17.0",
-    "finalhandler": "^1.1.2",
-    "moment": "^2.24.0",
+    "currency.js": "^2.0.4",
+    "dotenv": "^16.0.1",
+    "ethereumjs-tx": "^2.1.2",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "finalhandler": "^1.2.0",
+    "ganache": "^7.1.0",
+    "got": "^12.0.4",
+    "ip": "^1.1.8",
+    "ipfs-http-client": "^56.0.3",
+    "moment": "^2.29.3",
     "mysql": "^2.18.1",
-    "redis": "^3.0.2",
-    "serve-static": "^1.14.1",
-    "session-file-store": "^1.4.0",
-    "sqlite3": "^4.1.1",
-    "tslib": "^2.0.3",
-    "uniqid": "^5.2.0",
-    "uuid": "^7.0.2"
+    "node-gyp-build": "^4.4.0",
+    "redis": "^3.1.2",
+    "serve-static": "^1.15.0",
+    "session-file-store": "^1.5.0",
+    "sqlite3": "^5.0.8",
+    "tslib": "^2.4.0",
+    "uniqid": "^5.4.0",
+    "uuid": "^8.3.2",
+    "web3": "^1.7.3"
   },
   "devDependencies": {
     "dotenv-cli": "^5.1.0",
-    "eslint": "^8.13.0",
+    "eslint": "^8.15.0",
     "eslint-plugin-react": "^7.29.4"
   }
 }
