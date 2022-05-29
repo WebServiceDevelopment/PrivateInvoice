@@ -18,22 +18,32 @@
     
 **/
 
+"use strict";
+
+// Libraries
+const currency                  = require('currency.js');
+
 // Database
 
-const db = require('../database.js');
+const config                    = require('../config.json');
+const db 						= require('../database.js');
 
 // Exports
 module.exports = {
-	getCount	: api_getCount,
-	count		: api_count,
-	getFolder	: api_getFolder,
-	getTotal	: api_getTotal,
+	getCount		: api_getCount,
+	count			: api_count,
+	getFolder		: api_getFolder,
+	getTotal		: api_getTotal,
 }
 
-// getTotal
+//------------------------------- export modules ------------------------------
+
+/*
+ * getTotal
+ */
 async function api_getTotal (req, res, table) {
 
-	let user_uuid, archive;
+	let member_uuid, archive;
 
 	if(req.body.archive == null) {
 		res.json({ err : 8, msg : null });
@@ -53,16 +63,16 @@ async function api_getTotal (req, res, table) {
 	}
 
 	switch(req.body.role) {
-	case 'supplier':
+	case 'seller':
 
-		user_uuid = "supplier_uuid";
-		archive = "supplier_archived";
+		member_uuid = "seller_uuid";
+		archive = "seller_archived";
 
 		break;
-	case 'client':
+	case 'buyer':
 
-		user_uuid = "client_uuid";
-		archive = "client_archived";
+		member_uuid = "buyer_uuid";
+		archive = "buyer_archived";
 
 		break;
 	default:
@@ -77,7 +87,7 @@ async function api_getTotal (req, res, table) {
 		FROM
 			${table}
 		WHERE
-			${user_uuid} = ?
+			${member_uuid} = ?
 		AND
 			document_type = ?
 		AND
@@ -89,7 +99,7 @@ async function api_getTotal (req, res, table) {
 	`;
 
 	let args = [
-		req.session.data.user_uuid,
+		req.session.data.member_uuid,
 		req.body.type,
 		req.body.folder,
 		req.body.archive
@@ -107,7 +117,7 @@ async function api_getTotal (req, res, table) {
 	}
 
 	let max = rows.length;
-	let total = 0;
+	let total = BigInt(0);
 
 	let v;
 
@@ -122,44 +132,76 @@ async function api_getTotal (req, res, table) {
 			v = v.substr(1);
 		}
 
-		if(v === "0" || v === "0.0" || v === "0.00" || v === "0.000" || v === ".0" || v === ".00" || v === ".000" || v === ".") {
+//
+// To get rid of Gwei
+//
+		if(v != null ) {
+			if( v.indexOf(" ") !== -1) {
+				v = v.split(" ")[0];
+			}
+		}
+
+
+		if(v === "0" || v === "0.0" || v === "0.00" || v === "0.000" || v === "0.0000" || v === "0.00000" || v === ".0" || v === ".00" || v === ".000" || v === ".") {
 			continue;
 		}
 
+		//console.log(v);
+
 		v = v.replace(/,/g, '');
-		total += parseFloat(v)*100;
+		//total += parseFloat(v)*100;
+		total += BigInt(parseInt(v));
 
 	}
 
-	total = total/100;
+	//total = total / BigInt(1000000000);
+	let t = parseFloat(total) / 1000000000;
+
+	//console.log(total+":"+t);
+
+	const CURRENCY =  {
+        "formatWithSymbol" : true,
+        "symbol" : "ETH",
+        "separator" : ",",
+        "decimal" : ".",
+        "precision" : 9,
+        "pattern" : "# !"
+    }
+	let msg;
+	if( total >1000) {
+		msg ={ total:  currency(t.toString(),CURRENCY).format(true) }
+	} else {
+		msg ={ total:  currency(total.toString(),config.CURRENCY).format(true) }
+	}
 
 	res.json({
 		err : 0,
-		msg : {total: total}
+		msg : msg 
 	});
 
 }
 
-// getCount
-
+/*
+ * getCount
+ */
 async function api_getCount(req, res, table) {
 	let counts = new Array(req.body.length);
 
 	for(let i = 0; i < req.body.length; i++) {
 
-		let user_uuid, archive;
+		let member_uuid, archive;
 
 		switch(req.body[i].role) {
-		case 'supplier':
+		case 'seller':
 
-			user_uuid = "supplier_uuid";
-			archive = "supplier_archived";
+			member_uuid = "seller_uuid";
+			archive = "seller_archived";
 
 			break;
-		case 'client':
+		case 'buyer':
 
-			user_uuid = "client_uuid";
-			archive = "client_archived";
+			member_uuid = "buyer_uuid";
+			archive = "buyer_archived";
 
 			break;
 		default:
@@ -173,7 +215,7 @@ async function api_getCount(req, res, table) {
 			FROM
 				${table}
 			WHERE
-				${user_uuid} = ?
+				${member_uuid} = ?
 			AND
 				document_type = ?
 			AND
@@ -199,18 +241,14 @@ async function api_getCount(req, res, table) {
 
 		}
 
-		if(req.session.data.hasOwnProperty('user_uuid')) {
 			try {
-				user_uuid = req.session.data.user_uuid|| null;
+				member_uuid = req.session.data.member_uuid|| null;
 		} catch(e) {
-				user_uuid = null;
+				member_uuid = null;
 			}
-		} else {
-				user_uuid = null;
-		}
 	
 		let args = [
-			user_uuid,
+			member_uuid,
 			req.body[i].type,
 			req.body[i].folder,
 			req.body[i].archive
@@ -237,9 +275,9 @@ async function api_getCount(req, res, table) {
 
 }
 
-
-// count
-
+/*
+ * count
+ */
 async function api_count (req, res, table) {
 
 	const data = {};
@@ -252,20 +290,20 @@ async function api_count (req, res, table) {
 
 			// Here is where we query the database
 
-			let user_uuid, archive;
+			let member_uuid, archive;
 			switch(req.body[key].type) {
-			case "supplier":
-				user_uuid = "supplier_uuid";
-				archive = "supplier_archived";
+			case "seller":
+				member_uuid = "seller_uuid";
+				archive = "seller_archived";
 				break;
-			case "client":
-				user_uuid = "client_uuid";
-				archive = "client_archived";
+			case "buyer":
+				member_uuid = "buyer_uuid";
+				archive = "buyer_archived";
 				break;
 			default:
 				return res.json({
 					err : 1,
-					msg : "INVALID USER ROLE"
+					msg : "INVALID MEMBER ROLE"
 				});
 			}
 
@@ -275,7 +313,7 @@ async function api_count (req, res, table) {
 				FROM
 					${table}
 				WHERE
-					${user_uuid} = ?
+					${member_uuid} = ?
 				AND
 					document_type = ?
 				AND
@@ -287,7 +325,7 @@ async function api_count (req, res, table) {
 			`;
 
 			let args = [
-				req.session.data.user_uuid,
+				req.session.data.member_uuid,
 				key,
 				req.body[key].folders[i]
 			];
@@ -314,31 +352,32 @@ async function api_count (req, res, table) {
 
 }
 
-// getFolder
-
+/*
+ * getFolder
+ */
 async function api_getFolder(req, res, table) {
-	let user_uuid, archive, sort_rule;
+	let member_uuid, archive, sort_rule;
 
 	switch(req.body.role) {
-	case "supplier":
+	case "seller":
 
-		user_uuid = "supplier_uuid";
-		archive = "supplier_archived";
-		sort_rule = " supplier_last_action DESC ";
+		member_uuid = "seller_uuid";
+		archive = "seller_archived";
+		sort_rule = " seller_last_action DESC ";
 
 		break;
-	case "client":
+	case "buyer":
 
-		user_uuid = "client_uuid";
-		archive = "client_archived";
-		sort_rule = " supplier_last_action DESC ";
+		member_uuid = "buyer_uuid";
+		archive = "buyer_archived";
+		sort_rule = " seller_last_action DESC ";
 
 		break;
 	default:
 
 		return res.json({
 			err : 1,
-			msg : "INVALID USER ROLE"
+			msg : "INVALID MEMBER ROLE"
 		});
 
 	}
@@ -358,16 +397,16 @@ async function api_getFolder(req, res, table) {
 			document_type,
 			document_number,
 			document_folder,
-			supplier_uuid,
-			supplier_username,
-			supplier_company,
-			supplier_archived,
-			DATE_FORMAT(supplier_last_action,'%Y-%m-%d %H:%i:%s') AS supplier_last_action,
-			client_uuid,
-			client_username,
-			client_company,
-			client_archived,
-			client_last_action,
+			seller_uuid,
+			seller_membername,
+			seller_organization,
+			seller_archived,
+			DATE_FORMAT(seller_last_action,'%Y-%m-%d %H:%i:%s') AS seller_last_action,
+			buyer_uuid,
+			buyer_membername,
+			buyer_organization,
+			buyer_archived,
+			buyer_last_action,
 			created_from,
 			root_document,
 			DATE_FORMAT(created_on,'%Y-%m-%d %H:%i:%s') AS created_on,
@@ -378,7 +417,7 @@ async function api_getFolder(req, res, table) {
 		FROM
 			${table}
 		WHERE
-			${user_uuid} = ?
+			${member_uuid} = ?
 		AND
 			document_type = ?
 		AND
@@ -397,7 +436,7 @@ async function api_getFolder(req, res, table) {
 	`;
 
 	let args = [
-		req.session.data.user_uuid,
+		req.session.data.member_uuid,
 		req.body.type,
 		req.body.folder,
 		req.body.archive

@@ -28,7 +28,7 @@ const SignupForm = (function() {
 
 	this.DOM = {
 		account : {
-			username : document.getElementById('SignupForm.account.username'),
+			membername : document.getElementById('SignupForm.account.membername'),
 			work_email : document.getElementById('SignupForm.account.work_email'),
 			password : document.getElementById('SignupForm.account.password'), 
 			confirm_password : document.getElementById('SignupForm.account.confirm_password')
@@ -149,7 +149,7 @@ const SignupForm = (function() {
 
 		const args = {
 			account : {
-				username : this.DOM.account.username.value,
+				membername : this.DOM.account.membername.value,
 				work_email : this.DOM.account.work_email.value,
 				password : this.DOM.account.password.value,
 				confirm_password : this.DOM.account.confirm_password.value

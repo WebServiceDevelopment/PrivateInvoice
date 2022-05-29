@@ -32,7 +32,7 @@ const SessionWidget = (function() {
 		menu : {
 			toggle : document.getElementById('SessionWidget.menu.toggle'),
 			body : document.getElementById('SessionWidget.menu.body'),
-			username : document.getElementById('SessionWidget.menu.username'),
+			membername : document.getElementById('SessionWidget.menu.membername'),
 			signout : document.getElementById('SessionWidget.menu.signout')
 		}
 	}
@@ -86,7 +86,12 @@ const SessionWidget = (function() {
 
 			FolderWidget.API.init();
 			SettingsProfile.API.renderForm( session );
-			this.DOM.menu.username.textContent = session.username;
+/*
+			for(let key in session ) {
+				console.log(key+":"+session[key])
+			}
+*/
+			this.DOM.menu.membername.textContent = session.membername;
 
 		}
 

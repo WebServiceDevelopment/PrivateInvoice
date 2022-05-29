@@ -343,12 +343,29 @@ const TrayWidget = (function() {
 
 		let activeLi = this.STATUS.getActiveLi();
 
+		if( activeLi == null) {
+			console.log("activeLi == null");
+			return;
+		}
+		if( activeLi.memberData == null) {
+			console.log("activeLi.memberData == null");
+			return;
+		}
+		if( activeLi.memberData.dom == null) {
+			console.log("activeLi.memberData.dom == null");
+			return;
+		}
+		if( activeLi.memberData.dom.organization == null) {
+			console.log("activeLi.memberData.dom.organization == null");
+			return;
+		}	
+
 		if(txt.length) {
-			activeLi.userData.dom.company.classList.remove("unset");
-			activeLi.userData.dom.company.textContent = txt;
+			activeLi.memberData.dom.organization.classList.remove("unset");
+			activeLi.memberData.dom.organization.textContent = txt;
 		} else {
-			activeLi.userData.dom.company.classList.add("unset");
-			activeLi.userData.dom.company.textContent = "Company Name";
+			activeLi.memberData.dom.organization.classList.add("unset");
+			activeLi.memberData.dom.organization.textContent = "Company Name";
 		}
 
 	}
@@ -359,7 +376,7 @@ const TrayWidget = (function() {
 
 		let activeLi = this.STATUS.getActiveLi();
 
-		activeLi.userData.dom.due_by.textContent = "Due by: " + txt;
+		activeLi.memberData.dom.due_by.textContent = "Due by: " + txt;
 
 	}
 
@@ -369,7 +386,7 @@ const TrayWidget = (function() {
 
 		let activeLi = this.STATUS.getActiveLi();
 
-		activeLi.userData.dom.amount.textContent = txt;
+		activeLi.memberData.dom.amount.textContent = txt;
 
 	}
 
@@ -380,11 +397,11 @@ const TrayWidget = (function() {
 		let activeLi = this.STATUS.getActiveLi();
 
 		if(txt.length) {
-			activeLi.userData.dom.subject_line.classList.remove("unset");
-			activeLi.userData.dom.subject_line.textContent = txt;
+			activeLi.memberData.dom.subject_line.classList.remove("unset");
+			activeLi.memberData.dom.subject_line.textContent = txt;
 		} else {
-			activeLi.userData.dom.subject_line.classList.add("unset");
-			activeLi.userData.dom.subject_line.textContent = "Subject Line";
+			activeLi.memberData.dom.subject_line.classList.add("unset");
+			activeLi.memberData.dom.subject_line.textContent = "Subject Line";
 		}
 
 	}
@@ -412,7 +429,7 @@ const TrayWidget = (function() {
 			elem = elem.parentNode;
 		}
 		
-		if(!elem.userData) {
+		if(!elem.memberData) {
 			return;
 		}
 
@@ -426,7 +443,7 @@ const TrayWidget = (function() {
 			activeLi.classList.remove(ACTIVE);
 		}
 
-		this.MEM.setDocument_uuid( elem.userData.doc.document_uuid );
+		this.MEM.setDocument_uuid( elem.memberData.doc.document_uuid );
 
 		elem.classList.add(ACTIVE);
 		this.STATUS.setActiveLi( elem );
@@ -436,7 +453,7 @@ const TrayWidget = (function() {
         const archive = FolderWidget.API.getActiveFolderArchive();
 		//console.log("folder = "+folder+":archive="+archive);
 
-		DocumentWidget.API.openDocument( elem.userData.doc.document_uuid , role, folder, archive);
+		DocumentWidget.API.openDocument( elem.memberData.doc.document_uuid , role, folder, archive);
 
 	}
 
@@ -493,22 +510,22 @@ const TrayWidget = (function() {
 			div_a.appendChild(table_a);
 			hold_div.appendChild(div_a);
 
-			if(!doc.client_company || !doc.client_company.length) {
+			if(!doc.buyer_organization || !doc.buyer_organization.length) {
 				cell_a0.classList.add("unset");
 				cell_a0.textContent = "Company Name";
 			} else {
 
-				if(session.user_uuid === doc.supplier_uuid) {
-					cell_a0.textContent = doc.client_company || "";
+				if(session.member_uuid === doc.seller_uuid) {
+					cell_a0.textContent = doc.buyer_organization || "";
 				} else {
-					cell_a0.textContent = doc.supplier_company || "";
+					cell_a0.textContent = doc.seller_organization || "";
 				}
 
 			}
 
 			cell_a1.textContent = doc.created_on.substr(0, 10);
-			// Display the last operation time of the supplierer.
-			cell_a1.title = "last action : "+doc.supplier_last_action.substr(0, 16);
+			// Display the last operation time of the sellerer.
+			cell_a1.title = "last action : "+doc.seller_last_action.substr(0, 16);
 			
 
 			// Row 02
@@ -554,12 +571,12 @@ const TrayWidget = (function() {
 			li.appendChild(label);
 			this.DOM.tray.body.appendChild(li);
 
-			const userData = {
+			const memberData = {
 				doc : doc,
 				dom : {
 					li : li,
 					checkbox : checkbox,
-					company : cell_a0,
+					organization : cell_a0,
 					last_action : cell_a1,
 					subject_line : cell_b0,
 					doc_number : cell_b1,
@@ -568,8 +585,8 @@ const TrayWidget = (function() {
 				}
 			}
 
-			li.userData = userData;
-			checkbox.userData = userData;
+			li.memberData = memberData;
+			checkbox.memberData = memberData;
 			this.STATUS.checkboxes.push(checkbox);
 
 		});
@@ -644,11 +661,11 @@ const TrayWidget = (function() {
 
 	
         switch(role) {
-        case 'supplier':
-            ROLE = 'Supplier';
+        case 'seller':
+            ROLE = 'Seller';
         break;
-        case 'client':
-            ROLE = 'Client';
+        case 'buyer':
+            ROLE = 'Buyer';
         break;
         default:
             return;
@@ -818,14 +835,14 @@ const TrayWidget = (function() {
 		}
 
 
-		this.MEM.setDocument_uuid( elem.userData.doc.document_uuid );
+		this.MEM.setDocument_uuid( elem.memberData.doc.document_uuid );
 
 		elem.classList.add(ACTIVE );
 		this.STATUS.setActiveLi( elem );
 
 		console.log("folder = "+folder);
 
-		DocumentWidget.API.openDocument(elem.userData.doc.document_uuid, role, folder, archive);
+		DocumentWidget.API.openDocument(elem.memberData.doc.document_uuid, role, folder, archive);
 	}
 
 	function evt_handleSelectChange() {
