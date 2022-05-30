@@ -22,7 +22,7 @@
 
 // Import sub
 const sub						= require("./invoice_sub.js");
-const to_client					= require("./supplier_to_client.js");
+const to_buyer					= require("./seller_to_buyer.js");
 const tran                  	= require("./invoice_sub_transaction.js");
 
 // Import Router
@@ -35,29 +35,36 @@ module.exports					= router;
 // Database 
 
 // Table Name
-const SUPPLIER_DOCUMENT			= "supplier_document";
-const SUPPLIER_STATUS			= "supplier_status";
+const SELLER_DOCUMENT			= "seller_document";
+const SELLER_STATUS				= "seller_status";
 
-const SUPPLIER_ARCHIVE_DOCUMENT	= "supplier_document_archive";
-const SUPPLIER_ARCHIVE_STATUS	= "supplier_status_archive";
+const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
+const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
 
 const CONTACTS					= "contacts"
 
 
-// End Points
+// ------------------------------- End Points -------------------------------
 
-router.post('/supplierArchive', async function(req, res) {
+
+/*
+ * [ Move to Archive ]
+ */
+router.post('/sellerArchive', async function(req, res) {
+	const _NO = "190";
 
 	let start = Date.now();
+
+	const FOLDER  = 'paid';
  
     const { document_uuid } = req.body;
-    const { user_uuid } = req.session.data;
+    const { member_uuid } = req.session.data;
 
 	let err, errno, code;
 
     // 1.
 	//
-    const [ client_uuid, err1 ] = await sub.getClientUuid(SUPPLIER_STATUS, document_uuid, user_uuid);
+    const [ buyer_uuid, err1 ] = await sub.getBuyerUuid(SELLER_STATUS, document_uuid, member_uuid);
 
     if(err1) {
         console.log("Error 1 status = 400 err="+err1);
@@ -67,7 +74,7 @@ router.post('/supplierArchive', async function(req, res) {
 
     // 2.
 	//
-    const [ client_host, err2 ] = await sub.getClientHost(CONTACTS, user_uuid, client_uuid);
+    const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_uuid, buyer_uuid);
 
     if(err2) {
         console.log("Error 2.status = 400 err="+err2);
@@ -76,17 +83,24 @@ router.post('/supplierArchive', async function(req, res) {
     }
 
     // 3.
-	// client connect check
+	// buyer connect check
 	//
-    const [ code3, err3 ] = await to_client.connect(client_host, user_uuid, client_uuid);
+    const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
 
     if(code3 !== 200) {
         //console.log("Error 3 status = 400 code="+code3);
         let msg;
         if(code == 500) {
-            msg = {"err":"client connect check:ECONNRESET"};
+            msg = {"err":"buyer connect check:ECONNRESET"};
         } else {
-            msg = {"err":err3};
+            switch(err3) {
+            case "Not found.":
+                msg = {"err":"The destination node cannot be found."};
+            break;
+            default:
+                msg = {"err":err3};
+            break;
+            }
         }
         return res.status(400).json(msg);
     }
@@ -95,7 +109,7 @@ router.post('/supplierArchive', async function(req, res) {
 	// STATUS
     // First we go ahead and get the status.
     //
-    const [ old_status , _4 ] = await sub.getStatus( SUPPLIER_STATUS, document_uuid) ;
+    const [ old_status , _4 ] = await sub.getStatus( SELLER_STATUS, document_uuid) ;
 
     if(old_status == undefined) {
         res.json({
@@ -107,7 +121,7 @@ router.post('/supplierArchive', async function(req, res) {
 
     // 5. Second we go ahead and get the document
     //
-	const [ old_document , _5 ] = await sub.getDocument( SUPPLIER_DOCUMENT, document_uuid) ;
+	const [ old_document , _5 ] = await sub.getDocument( SELLER_DOCUMENT, document_uuid) ;
 
     if(old_document == undefined) {
         res.json({
@@ -116,11 +130,13 @@ router.post('/supplierArchive', async function(req, res) {
         });
         return;
     }
+	//console.log("here 1")
+	//console.log(old_document)
 
 	// 6.
 	// Does document_uuid already exist in the archive status table?
 	//
-	const [ _6, err6 ] = await sub.notexist_check( SUPPLIER_ARCHIVE_STATUS, document_uuid)
+	const [ _6, err6 ] = await sub.notexist_check( SELLER_ARCHIVE_STATUS, document_uuid)
 
 	if (err6 ) {
         errno = 6;
@@ -131,7 +147,7 @@ router.post('/supplierArchive', async function(req, res) {
 	// 7.
 	// Does document_uuid already exist in the archive document table?
 	//
-	const [ _7, err7 ] = await sub.notexist_check( SUPPLIER_ARCHIVE_DOCUMENT, document_uuid)
+	const [ _7, err7 ] = await sub.notexist_check( SELLER_ARCHIVE_DOCUMENT, document_uuid)
 
 	if (err6 ) {
         errno = 7;
@@ -149,12 +165,12 @@ router.post('/supplierArchive', async function(req, res) {
 	// Then we go ahead and insert into the archive status
 	//
 
-    old_status.document_folder  = 'paid';
+    old_status.document_folder  = FOLDER;
     
-    old_status.supplier_archived  = 1;
-    old_status.client_archived  = 1;
+    old_status.seller_archived  = 1;
+    old_status.buyer_archived  = 1;
 
-	const [ _9, err9] = await tran.insertArchiveStatus(conn, SUPPLIER_ARCHIVE_STATUS, old_status);
+	const [ _9, err9] = await tran.insertArchiveStatus(conn, SELLER_ARCHIVE_STATUS, old_status);
 	if (err ) {
         errno = 9;
         code = 400;
@@ -164,17 +180,19 @@ router.post('/supplierArchive', async function(req, res) {
 	// 10.
 	// And then we need to insert into the archive document 
 	//
-	const [ _10, err10] = await tran.insertDocument(conn, SUPPLIER_ARCHIVE_DOCUMENT, old_status, old_document.document_json);
-	if(err) {
+	const [ _10, err10] = await tran.insertArchiveDocument(conn, SELLER_ARCHIVE_DOCUMENT, old_document);
+	if(err10) {
+		//console.log("ERR insertArchiveDocument seller_invoice_archive.js err="+err10)
+		//console.log(old_document)
         errno = 10;
         code = 400;
         return res.status(400).json(tran.rollbackAndReturn(conn, code, err10, errno));
     }
 
 	// 11.
-	// Remove recoiored from SUPPLIER_STATUS with docunent_uuid key
+	// Remove recoiored from SELLER_STATUS with docunent_uuid key
 	//
-	const [ _11, err11 ] = await tran.deleteStatus(conn, SUPPLIER_STATUS, old_status) ;
+	const [ _11, err11 ] = await tran.deleteStatus(conn, SELLER_STATUS, old_status) ;
     if (err11 ) {
         errno = 11;
         code = 400;
@@ -182,9 +200,9 @@ router.post('/supplierArchive', async function(req, res) {
     }
 
 	// 12.
-	// Remove recoiored from SUPPLIER_DOCUMENT with docunent_uuid key
+	// Remove recoiored from SELLER_DOCUMENT with docunent_uuid key
 	//
-	const [ _12, err12 ] = await tran.deleteDocument(conn, SUPPLIER_DOCUMENT, old_status) ;
+	const [ _12, err12 ] = await tran.deleteDocument(conn, SELLER_DOCUMENT, old_status) ;
     if (err12 ) {
         errno = 12;
         code = 400;
@@ -194,7 +212,7 @@ router.post('/supplierArchive', async function(req, res) {
 
 	// 13.
 	//
-    const [ code13, err13 ] = await to_client.archive(client_host, document_uuid, client_uuid);
+    const [ code13, err13 ] = await to_buyer.archive(buyer_host, document_uuid, buyer_uuid);
     if(code13 !== 200) {
         errno = 12;
         return res.status(400).json(tran.rollbackAndReturn(conn, code13, err13, errno));
@@ -215,7 +233,7 @@ router.post('/supplierArchive', async function(req, res) {
 	//
 	conn.end();
 
-	//console.log("/supplierArchive accepted");
+	//console.log("/sellerArchive accepted");
 
 	res.json({
 		err : 0,
@@ -223,6 +241,6 @@ router.post('/supplierArchive', async function(req, res) {
 	});
 
 	let end = Date.now();
-    console.log("/supplierArchive Time: %d ms", end - start);
+    console.log("/sellerArchive Time: %d ms", end - start);
 	
 });

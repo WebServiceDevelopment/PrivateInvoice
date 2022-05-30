@@ -27,54 +27,57 @@ const tran                      = require("./invoice_sub_transaction.js");
 
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express					= require('express');
+const router					= express.Router();
+module.exports					= router;
 
 // Database
 
 // Table Name
-const CLIENT_DOCUMENT       	= "client_document";
-const CLIENT_STATUS         	= "client_status";
+const BUYER__DOCUMENT       	= "buyer_document";
+const BUYER__STATUS         	= "buyer_status";
 const CONTACTS					= "contacts";
 
-// Accept an Invoice
+// ------------------------------- End Points -------------------------------
 
-router.post('/clientToConnect', async (req, res) => {
+/*
+ * ToConnect
+ */
+router.post('/buyerToConnect', async (req, res) => {
 
-	//console.log(supplier_uuid);
-	//console.log(client_uuid);
+	//console.log(seller_uuid);
+	//console.log(buyer_uuid);
 
-	const { supplier_uuid, client_uuid } = req.body;
+	const { seller_uuid, buyer_uuid } = req.body;
 
 	// 1.
 	//
-	const [ supplier_host, err ] = await sub.getSupplierHost(CONTACTS, supplier_uuid, client_uuid);
+	const [ seller_host, err ] = await sub.getSellerHost(CONTACTS, seller_uuid, buyer_uuid);
 	if(err) {
-        console.log("Error getSupplierHost");
+        console.log("Error getSellerHost");
 		return res.status(400).json(err);
 	}
 
 	// 2.
 	//
-    if(!check_ipadder(req.ip , supplier_host)) {
-        console.log("invalid request : req.ip="+req.ip+":supplier_host="+supplier_host);
+    if(!check_ipadder(req.ip , seller_host)) {
+        console.log("invalid request : req.ip="+req.ip+":seller_host="+seller_host);
         return res.status(400).json(err);
     }
 
-	console.log("/clientToConnect accepted");
 /*
+	console.log("/buyerToConnect accepted");
 	console.log(req.socket.localPort);
 	console.log(req.socket.remotePort);
 */
 
 	return res.status(200).end('accepted');
 
-    function check_ipadder (req_ip , supplier_host) {
+    function check_ipadder (req_ip , seller_host) {
 
         let ip = req_ip.split(":")[3];
 
-        if(supplier_host.indexOf(ip) != -1) {
+        if(seller_host.indexOf(ip) != -1) {
                 return true;
         }
         return false;
@@ -82,38 +85,41 @@ router.post('/clientToConnect', async (req, res) => {
 
 });
 
-router.post('/clientToSend', async (req, res) => {
+/*
+ * form seller node <<< [ Send Invoice ]
+ *
+ * buyerToSend
+ */
+router.post('/buyerToSend', async (req, res) => {
 
-	//console.log("/clientToSend");
+	//console.log("/buyerToSend");
 
 	const { document, status } = req.body;
-	const { document_uuid, supplier_uuid, client_uuid} = document;
+	const { document_uuid, seller_uuid, buyer_uuid, document_json} = document;
 
+	//console.log(document);
 	let errno, code;
 
 	// 1.
-	let  document_json;
-	try {
-		document_json = JSON.stringify(document);
-	} catch (err1) {
-		return res.status(400).end(err1);
-	}
-	
+
+	//console.log("/buyerToSend:"+CONTACTS+":"+ seller_uuid+":"+ buyer_uuid);
 
 	// 2. 
 	// Second we check to see if there is any contact information
-	const [ supplier_host, err2 ] = await sub.getSupplierHost(CONTACTS, supplier_uuid, client_uuid);
+	const [ _2 , err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, buyer_uuid);
 
 	if(err2) {
+		console.log("/buyerToSend:err 2");
 		return res.status(400).json(err2);
 	}
 
 	// 3.
 	// Then we check to see if there is any data already registered
 	//
-	const [ _3, err3] = await sub.checkForExistingDocument(CLIENT_DOCUMENT, document_uuid);
+	const [ _3, err3] = await sub.checkForExistingDocument(BUYER__DOCUMENT, document_uuid);
 
 	if(err3) {
+		console.log("/buyerToSend:err 3");
 		return res.status(400).json(err3);
 	}
 
@@ -131,9 +137,10 @@ router.post('/clientToSend', async (req, res) => {
     await tran.beginTransaction(conn);
 
 	// 6.
-	const [ _6, err6 ] = await tran.insertDocument(conn, CLIENT_DOCUMENT, status, document_json);
+	const [ _6, err6 ] = await tran.insertDocument(conn, BUYER__DOCUMENT, status, document_json);
 
 	if(err6) {
+		console.log("/buyerToSend:err 6");
 		errno = 6;
         code = 400;
         return res.status(400).json(tran.rollbackAndReturn(conn, code, err6, errno));
@@ -141,9 +148,10 @@ router.post('/clientToSend', async (req, res) => {
 
 	// 7.
 	//
-	const [ _7, err7] = await tran.insertStatus(conn, CLIENT_STATUS, status);
+	const [ _7, err7] = await tran.insertStatus(conn, BUYER__STATUS, status);
 
 	if(err7) {
+		console.log("/buyerToSend:err 7");
 		errno = 7;
         code = 400;
         return res.status(400).json(tran.rollbackAndReturn(conn, code, err7, errno));
@@ -155,6 +163,7 @@ router.post('/clientToSend', async (req, res) => {
     const [ _8, err8] = await tran.commit(conn);
 
 	if (err8) {
+		console.log("/buyerToSend:err 8");
         errno = 8;
         code = 400;
         return res.status(400).json(tran.rollbackAndReturn(conn, code, err8, errno));
@@ -163,21 +172,25 @@ router.post('/clientToSend', async (req, res) => {
 	// 9.
 	//
    	conn.end();
+res.status(200).end('accepted');
 
-	res.status(200).end('accepted');
-
-	console.log("/clientToSend accepted");
+	console.log("/buyerToSend accepted");
 });
 
-router.post('/clientToWithdraw', async (req, res) => {
+/*
+ * from seller node <<< [ Withdraw ]
+ *
+ * buyerToWithdraw
+ */
+router.post('/buyerToWithdraw', async (req, res) => {
 
-	const { document_uuid, client_uuid, document_folder} = req.body;
+	const { document_uuid, buyer_uuid, document_folder} = req.body;
 
     // 1.
 	// STATUS
     // First we go ahead and get the status.
     //
-    const [ old_status , _1 ] = await sub.getStatus( CLIENT_STATUS, document_uuid) ;
+    const [ old_status , _1 ] = await sub.getStatus( BUYER__STATUS, document_uuid) ;
 
     if(old_status == undefined) {
         res.json({
@@ -190,7 +203,7 @@ router.post('/clientToWithdraw', async (req, res) => {
     // 2.
     // Second we go ahead and get the document
     //
-    const [ old_document , _2 ] = await sub.getDocument( CLIENT_DOCUMENT, document_uuid) ;
+    const [ old_document , _2 ] = await sub.getDocument( BUYER__DOCUMENT, document_uuid) ;
 
 	if(old_document == undefined) {
         res.json({
@@ -201,30 +214,33 @@ router.post('/clientToWithdraw', async (req, res) => {
     }
 
 	// 3.
-	const [ _3, err3] = await sub.setWithdrawClient(CLIENT_STATUS, document_uuid , client_uuid, document_folder );
+	const [ _3, err3] = await sub.setWithdrawBuyer(BUYER__STATUS, document_uuid , buyer_uuid, document_folder );
 	if(err3) {
-		console.log('/clientToWithdraw err='+err3);
+		console.log('/buyerToWithdraw err='+err3);
 		if(err3 == null) {
 			return res.status(400).json({message:"Record is not found."});
 		}
 		return res.status(400).json(err3);
 	}
 
-	console.log("/clientToWithdraw accepted");
+	console.log("/buyerToWithdraw accepted");
 
 	res.status(200).end('accepted');
 
 });
 
-router.post('/clientRollbackReturnToSent', async (req, res) => {
+/*
+ * buyerRollbackReturnToSent
+ */
+router.post('/buyerRollbackReturnToSent', async (req, res) => {
 
-	const { document_uuid, client_uuid, document_folder} = req.body;
+	const { document_uuid, buyer_uuid, document_folder} = req.body;
 
     // 1.
 	// STATUS
     // First we go ahead and get the status.
     //
-    const [ old_status , _1 ] = await sub.getStatus( CLIENT_STATUS, document_uuid) ;
+    const [ old_status , _1 ] = await sub.getStatus( BUYER__STATUS, document_uuid) ;
 
     if(old_status == undefined) {
         res.json({
@@ -237,7 +253,7 @@ router.post('/clientRollbackReturnToSent', async (req, res) => {
     // 2.
     // Second we go ahead and get the document
     //
-    const [ old_document , _2 ] = await sub.getDocument( CLIENT_DOCUMENT, document_uuid) ;
+    const [ old_document , _2 ] = await sub.getDocument( BUYER__DOCUMENT, document_uuid) ;
 
 	if(old_document == undefined) {
         res.json({
@@ -248,7 +264,7 @@ router.post('/clientRollbackReturnToSent', async (req, res) => {
     }
 
 	// 3.
-	const [ _3, err3] = await sub.rollbackReturnToSent(CLIENT_STATUS, document_uuid , client_uuid, document_folder );
+	const [ _3, err3] = await sub.rollbackReturnToSent(BUYER__STATUS, document_uuid , buyer_uuid, document_folder );
 	if(err3) {
 		console.log('/rollbackReturnToSent err='+err3);
 
