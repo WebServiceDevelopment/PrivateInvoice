@@ -63,20 +63,20 @@ router.post('/setProfileImage', async function(req, res) {
 		throw err;
 	}
 
-	// Set this in the user's table
+	// Set this in the member's table
 
 	sql = `
 		UPDATE
-			dat_users
+			members
 		SET
 			avatar_uuid = ?
 		WHERE
-			user_uuid = ?
+			member_uuid = ?
 	`;
 
 	args = [
 		avatar_uuid,
-		req.session.data.user_uuid,
+		req.session.data.member_uuid,
 	];
 
 	// Update the current changes in session object
@@ -97,7 +97,7 @@ router.post('/setCompanyLogo', async function(req, res) {
 	// Insert Image Into Database
 
 	let sql = `
-		INSERT INTO dat_company_img (
+		INSERT INTO organization_img (
 			logo_uuid,
 			img_data
 		) VALUES (
@@ -117,20 +117,20 @@ router.post('/setCompanyLogo', async function(req, res) {
 		throw err;
 	}
 
-	// Set this in the user's table
+	// Set this in the member's table
 
 	sql = `
 		UPDATE
-			dat_users
+			members
 		SET
 			logo_uuid = ?
 		WHERE
-			user_uuid = ?
+			member_uuid = ?
 	`;
 
 	args = [
 		logo_uuid,
-		req.session.data.user_uuid,
+		req.session.data.member_uuid,
 	];
 
 	// Update the current changes in session object
@@ -185,7 +185,7 @@ router.post('/getCompanyLogo', async function(req, res) {
 		SELECT
 			UNCOMPRESS(img_data) AS dataUrl
 		FROM
-			dat_company_img
+			organization_img
 		WHERE
 			logo_uuid = ?
 		LIMIT 1

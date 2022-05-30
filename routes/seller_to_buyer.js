@@ -33,26 +33,30 @@ const axios					= require('axios');
 
 // Exports
 module.exports = {
-	connect					: client_connect,
-	sendInvoice				: client_sendInvoice,
-	recreate				: client_recreate,
-	withdraw				: client_withdraw,
-	archive					: client_archive,
-	trash					: client_trash,
-	rollbackReturnToSent	: client_rollbackReturnToSent,
+	connect					: buyer_connect,
+	sendInvoice				: buyer_sendInvoice,
+	recreate				: buyer_recreate,
+	withdraw				: buyer_withdraw,
+	archive					: buyer_archive,
+	trash					: buyer_trash,
+	rollbackReturnToSent	: buyer_rollbackReturnToSent,
 }
 
+//------------------------------- export modules ------------------------------
 
-async function client_connect(client_host, supplier_uuid, client_uuid) {
+/*
+ * buyer_connect
+ */
+async function buyer_connect(buyer_host, seller_uuid, buyer_uuid) {
 
-    const url = `${client_host}/api/message/clientToConnect`;
+    const url = `${buyer_host}/api/message/buyerToConnect`;
 
     const params = {
         method : 'post',
         url : url,
         data : {
-            supplier_uuid,
-            client_uuid
+            seller_uuid,
+            buyer_uuid
         }
     };
 
@@ -77,9 +81,12 @@ async function client_connect(client_host, supplier_uuid, client_uuid) {
 
 }
 
-async function client_sendInvoice(client_host, document, status) {
+/*
+ * buyer_sendInvoice
+ */
+async function buyer_sendInvoice(buyer_host, document, status) {
 
-	const url = `${client_host}/api/message/clientToSend`;
+	const url = `${buyer_host}/api/message/buyerToSend`;
 
     document.editable = 0;
     status.document_folder = 'sent';
@@ -114,118 +121,19 @@ async function client_sendInvoice(client_host, document, status) {
 
 }
 
-async function  client_recreate(client_host, document_uuid, supplier_uuid) {
+/*
+ * buyer_recreate
+ */
+async function  buyer_recreate(buyer_host, document_uuid, seller_uuid) {
 
-	const url = `${client_host}/api/message/clientToRecreate`;
-
-    const params = {
-        method : 'post',
-        url : url,
-        data : {
-            document_uuid,
-            supplier_uuid
-        }
-    };
-
-    let response;
-    try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
-            response = {
-                status : 500,
-                data : 'ECONNRESET'
-            }
-        } else {
-            response = {
-                status : 400,
-                data : "Not found."
-            }
-        }
-    }
-
-    return [ response.status, response.data ];
-
-}
-
-async function  client_withdraw(client_host, document_uuid, client_uuid, document_folder) {
-
-	const url = `${client_host}/api/message/clientToWithdraw`;
+	const url = `${buyer_host}/api/message/buyerToRecreate`;
 
     const params = {
         method : 'post',
         url : url,
         data : {
             document_uuid,
-            client_uuid,
-			document_folder
-        }
-    };
-
-    let response;
-    try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
-            response = {
-                status : 500,
-                data : 'ECONNRESET'
-            }
-        } else {
-            response = {
-                status : 400,
-                data : "Not found."
-            }
-        }
-    }
-
-    return [ response.status, response.data ];
-
-}
-
-
-async function  client_archive(client_host, document_uuid, client_uuid) {
-
-	const url = `${client_host}/api/message/clientToArchive`;
-
-    const params = {
-        method : 'post',
-        url : url,
-        data : {
-            document_uuid,
-            client_uuid
-        }
-    };
-
-    let response;
-    try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
-            response = {
-                status : 500,
-                data : 'ECONNRESET'
-            }
-        } else {
-            response = {
-                status : 400,
-                data : "Not found."
-            }
-        }
-    }
-
-    return [ response.status, response.data ];
-
-}
-
-async function  client_trash(client_host, document_uuid, client_uuid) {
-
-    const params = {
-        method : 'post',
-        url : `${client_host}/api/message/clientToTrash`,
-        data : {
-            document_uuid,
-            client_uuid
+            seller_uuid
         }
     };
 
@@ -251,18 +159,128 @@ async function  client_trash(client_host, document_uuid, client_uuid) {
 }
 
 /*
-*  return to sent
-*/
-async function client_rollbackReturnToSent (client_host, document_uuid, client_uuid) {
+ * buyer_withdraw
+ */
+async function  buyer_withdraw(buyer_host, document_uuid, buyer_uuid, document_folder) {
 
-    const url = `${client_host}/api/message/clientRollbackReturnToSent`;
+	const url = `${buyer_host}/api/message/buyerToWithdraw`;
 
     const params = {
         method : 'post',
         url : url,
         data : {
             document_uuid,
-            client_uuid
+            buyer_uuid,
+			document_folder
+        }
+    };
+
+    let response;
+    try {
+        response = await axios(params);
+    } catch(err) {
+        if(err.code === 'ECONNRESET') {
+            response = {
+                status : 500,
+                data : 'ECONNRESET'
+            }
+        } else {
+            response = {
+                status : 400,
+                data : "Not found."
+            }
+        }
+    }
+
+    return [ response.status, response.data ];
+
+}
+
+/*
+ * buyer_archive
+ */
+async function  buyer_archive(buyer_host, document_uuid, buyer_uuid) {
+
+	const url = `${buyer_host}/api/message/buyerToArchive`;
+
+    const params = {
+        method : 'post',
+        url : url,
+        data : {
+            document_uuid,
+            buyer_uuid
+        }
+    };
+
+    let response;
+    try {
+        response = await axios(params);
+    } catch(err) {
+        if(err.code === 'ECONNRESET') {
+            response = {
+                status : 500,
+                data : 'ECONNRESET'
+            }
+        } else {
+            response = {
+                status : 400,
+                data : "Not found."
+            }
+        }
+    }
+
+    return [ response.status, response.data ];
+
+}
+
+/*
+ * buyer_trash
+ */
+async function  buyer_trash(buyer_host, document_uuid, buyer_uuid) {
+
+    const params = {
+        method : 'post',
+        url : `${buyer_host}/api/message/buyerToTrash`,
+        data : {
+            document_uuid,
+            buyer_uuid
+        }
+    };
+
+    let response;
+    try {
+        response = await axios(params);
+    } catch(err) {
+        if(err.code === 'ECONNRESET') {
+            response = {
+                status : 500,
+                data : 'ECONNRESET'
+            }
+        } else {
+            response = {
+                status : 400,
+                data : "Not found."
+            }
+        }
+    }
+
+    return [ response.status, response.data ];
+
+}
+
+/*
+*  buyer_rollbackReturnToSent
+*/
+async function buyer_rollbackReturnToSent (buyer_host, document_uuid, buyer_uuid) {
+
+    const url = `${buyer_host}/api/message/buyerRollbackReturnToSent`;
+
+    const params = {
+        method : 'post',
+        url : url,
+        data : {
+            document_uuid,
+            buyer_uuid
         }
     };
 

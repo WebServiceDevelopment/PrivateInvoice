@@ -20,19 +20,21 @@
 
 "use strict";
 
+// Import sub
+
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express				= require('express');
+const router				= express.Router();
+module.exports				= router;
 
 // Import Libraries
 
-const uuidv1 = require('uuid').v1
+const uuidv1				= require('uuid').v1
 
 // Database
+const db					= require('../database.js');
 
-const db = require('../database.js');
 
 // Helper functions
 
@@ -41,15 +43,15 @@ const checkInviteCodeValid = async(local_uuid, invite_code) => {
 	const sql = `
 		SELECT
 			invite_code,
-			rel_client,
-			rel_supplier,
+			rel_buyer,
+			rel_seller,
 			use_count,
 			max_count,
 			expires_on
 		FROM
-			dat_invite
+			invite
 		WHERE
-			host_user_uuid = ?
+			local_member_uuid = ?
 		AND
 			invite_code = ?
 	`;
@@ -91,9 +93,9 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 		FROM
 			contacts
 		WHERE
-			local_user_uuid = ?
+			local_member_uuid = ?
 		AND
-			remote_user_uuid = ?
+			remote_member_uuid = ?
 		AND
 			removed_on IS NULL
 	`;
@@ -109,7 +111,7 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 
 }
 
-const insertNewContact = async (invite, localUser, remote_user, remote_company) => {
+const insertNewContact = async (invite, localUser, remote_member, remote_organization) => {
 
 	// TODO update use_count on invite table
 
@@ -117,12 +119,12 @@ const insertNewContact = async (invite, localUser, remote_user, remote_company) 
 		INSERT INTO contacts (
 			_id,
 			invite_code,
-			local_user_uuid,
-			local_username,
+			local_member_uuid,
+			local_membername,
 			remote_origin,
-			remote_user_uuid,
-			remote_username,
-			remote_company,
+			remote_member_uuid,
+			remote_membername,
+			remote_organization,
 			local_to_remote,
 			remote_to_local
 		) VALUES (
@@ -139,23 +141,23 @@ const insertNewContact = async (invite, localUser, remote_user, remote_company) 
 		)
 	`;
 
-	console.log(remote_user);
-	console.log(remote_company);
-	console.log(JSON.stringify(remote_company));
+	console.log(remote_member);
+	console.log(remote_organization);
+	console.log(JSON.stringify(remote_organization));
 
 	const _id = uuidv1();
 
 	const args = [
 		_id,
 		invite.invite_code,
-		localUser.user_uuid,
-		localUser.username,
-		remote_user.origin,
-		remote_user.user_uuid,
-		remote_user.username,
-		JSON.stringify(remote_company),
-		invite.rel_client,
-		invite.rel_supplier
+		localUser.member_uuid,
+		localUser.membername,
+		remote_member.origin,
+		remote_member.member_uuid,
+		remote_member.membername,
+		JSON.stringify(remote_organization),
+		invite.rel_buyer,
+		invite.rel_seller
 	];
 
 	
@@ -169,7 +171,8 @@ const insertNewContact = async (invite, localUser, remote_user, remote_company) 
 
 }
 
-// Define Endpoints
+//------------------------------ define endpoints ------------------------------
+
 
 router.all('/contactRequest', async(req, res) => {
 
@@ -180,22 +183,22 @@ router.all('/contactRequest', async(req, res) => {
 
 	// First we see if the invite code is still valid
 
-	const { invite_code, local_user, remote_user, remote_company } = body;
-	const [ invite, inviteEr ] = await checkInviteCodeValid(local_user.user_uuid, invite_code);
+	const { invite_code, local_member, remote_member, remote_organization } = body;
+	const [ invite, inviteEr ] = await checkInviteCodeValid(local_member.member_uuid, invite_code);
 	if(inviteEr) {
 		return res.status(400).end(inviteEr.toString());
 	}
 
 	// Then we see if the contact already exists
 	
-	const exists = await checkForExistingContact(local_user.user_uuid, remote_user.user_uuid);
+	const exists = await checkForExistingContact(local_member.member_uuid, remote_member.member_uuid);
 	if(exists) {
 		return res.status(400).end('Contact already exists');
 	}
 
 	// Then we try to insert the contact
 	
-	const [ created, creatErr ] = await insertNewContact(invite, local_user, remote_user, remote_company);
+	const [ created, creatErr ] = await insertNewContact(invite, local_member, remote_member, remote_organization);
 	if(creatErr) {
 		return res.status(400).end(creatErr.toString());
 	}

@@ -35,13 +35,14 @@ module.exports					= router;
 
 // Table Name
 
-const CLIENT_DOCUMENT			= "client_document";
-const CLIENT_STATUS				= "client_status";
+const BUYER_DOCUMENT			= "buyer_document";
+const BUYER_STATUS				= "buyer_status";
 
-const CLIENT_ARCHIVE_DOCUMENT	= "client_document_archive";
-const CLIENT_ARCHIVE_STATUS		= "client_status_archive";
+const BUYER_ARCHIVE_DOCUMENT	= "buyer_document_archive";
+const BUYER_ARCHIVE_STATUS		= "buyer_status_archive";
 
-// End Points
+// ------------------------------- End Points -------------------------------
+
 /*
  * Execution of'Move to Trash'when folder is draft.
 */
@@ -50,7 +51,7 @@ const CLIENT_ARCHIVE_STATUS		= "client_status_archive";
  * Execution of 'Move to Trash' when folder is returned.
 */
 
-router.post('/clientToTrash', async function(req, res) {
+router.post('/buyerToTrash', async function(req, res) {
 
     //console.log("trash");
 
@@ -62,7 +63,7 @@ router.post('/clientToTrash', async function(req, res) {
 	// STATUS
     // First we go ahead and get the status.
     //
-    const [ old_status , _1 ] = await sub.getStatus( CLIENT_STATUS, req.body.document_uuid) ;
+    const [ old_status , _1 ] = await sub.getStatus( BUYER_STATUS, req.body.document_uuid) ;
 
     if(old_status == undefined) {
         res.json({
@@ -75,7 +76,7 @@ router.post('/clientToTrash', async function(req, res) {
     // 2.
     // Second we go ahead and get the document
     //
-	const [ old_document , _2 ] = await sub.getDocument( CLIENT_DOCUMENT, req.body.document_uuid) ;
+	const [ old_document , _2 ] = await sub.getDocument( BUYER_DOCUMENT, req.body.document_uuid) ;
 
     if(old_document == undefined) {
 
@@ -91,7 +92,7 @@ router.post('/clientToTrash', async function(req, res) {
 	// 3.
 	// Does document_uuid already notexist in the archive status table?
 	//
-	const [ _3, err3 ] = await sub.notexist_check( CLIENT_ARCHIVE_STATUS, req.body.document_uuid)
+	const [ _3, err3 ] = await sub.notexist_check( BUYER_ARCHIVE_STATUS, req.body.document_uuid)
 
 	if (err3 ) {
         errno = 3;
@@ -102,7 +103,7 @@ router.post('/clientToTrash', async function(req, res) {
 	// 4.
 	// Does document_uuid already notexist in the archive document table?
 	//
-	const [ _4, err4] = await sub.notexist_check( CLIENT_ARCHIVE_DOCUMENT, req.body.document_uuid)
+	const [ _4, err4] = await sub.notexist_check( BUYER_ARCHIVE_DOCUMENT, req.body.document_uuid)
 	if (err4 ) {
         errno = 4;
         console.log("Error: "+errno);
@@ -121,11 +122,11 @@ router.post('/clientToTrash', async function(req, res) {
 
     old_status.document_folder  = 'trash';
     
-    //old_status.client_archived  = 1;
-    //old_status.client_archived  = 1;
+    //old_status.buyer_archived  = 1;
+    //old_status.buyer_archived  = 1;
 
 	// 7.
-	const [ _7, err7 ] = await tran.insertArchiveStatus(conn, CLIENT_ARCHIVE_STATUS, old_status);
+	const [ _7, err7 ] = await tran.insertArchiveStatus(conn, BUYER_ARCHIVE_STATUS, old_status);
 	if (err7 ) {
         errno = 7;
         code = 400;
@@ -135,7 +136,7 @@ router.post('/clientToTrash', async function(req, res) {
 	// 8.
 	// And then we need to insert into the archive document 
 	//
-	const [ _8, err8 ] = await tran.insertDocument(conn, CLIENT_ARCHIVE_DOCUMENT, old_status, old_document.document_json);
+	const [ _8, err8 ] = await tran.insertDocument(conn, BUYER_ARCHIVE_DOCUMENT, old_status, old_document.document_json);
 	if(err8) {
         errno = 8;
         code = 400;
@@ -143,9 +144,9 @@ router.post('/clientToTrash', async function(req, res) {
     }
 	
 	// 9.
-	// Remove recoiored from CLIENT_STATUS with docunent_uuid key
+	// Remove recoiored from BUYER_STATUS with docunent_uuid key
 	//
-	const [ _9, err9 ] = await tran.deleteStatus(conn, CLIENT_STATUS, old_status) ;
+	const [ _9, err9 ] = await tran.deleteStatus(conn, BUYER_STATUS, old_status) ;
 	if(err9) {
         errno = 9;
         code = 400;
@@ -153,9 +154,9 @@ router.post('/clientToTrash', async function(req, res) {
     }
 
 	// 10
-	// Remove recoiored from CLIENT_DOCUMENT with docunent_uuid key
+	// Remove recoiored from BUYER_DOCUMENT with docunent_uuid key
 	//
-	const [ _10, err10 ] = await tran.deleteDocument(conn, CLIENT_DOCUMENT, old_status) ;
+	const [ _10, err10 ] = await tran.deleteDocument(conn, BUYER_DOCUMENT, old_status) ;
 	if(err10) {
         errno = 10;
         code = 400;
@@ -177,7 +178,7 @@ router.post('/clientToTrash', async function(req, res) {
 	//
     conn.end();
 
-	//console.log("clientToRash accepted");
+	//console.log("buyerToRash accepted");
 
 	res.json({
 		err : 0,
@@ -185,6 +186,6 @@ router.post('/clientToTrash', async function(req, res) {
 	});
 
     let end = Date.now();
-    console.log("/clientToTrash Time: %d ms", end - start);
+    console.log("/buyerToTrash Time: %d ms", end - start);
 
 });
