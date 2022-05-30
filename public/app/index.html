@@ -19,18 +19,18 @@
 
 **/
 -->
-
 <!doctype html>
 <html>
 
 	<head>
 
-		<title>Private Invoice</title>
+		<title>Private Invoice | Supply</title>
 
 		<meta charset="utf-8"/>
 		<link rel="shortcut icon" type="image/png" href="img/favicon_wsd.png"/>
 
 		<link rel="stylesheet" type="text/css" href="css/layout.css"/>
+		<link rel="stylesheet" type="text/css" href="css/loading.css"/>
 		<link href="https://fonts.googleapis.com/css2?family=Montserrat&family=Muli" rel="stylesheet"> 
 		<link href="lib/fontawesome/css/all.css" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="lib/flatpickr.min.css"/>
@@ -55,28 +55,55 @@
 					<li class='label'>
 						Current Balance
 					</li>
-					<li class='balance'>
-						$1,000.00
+					<li class='balance' id='ActionWidget.modal.balanceGwei'>
+						1,000 Gwai
 					</li>
 					<li class='label'>
 						Make Payment To
 					</li>
-					<li class='balance'>
-						$110.00
+					<li class='balance' id='ActionWidget.modal.makePaymantTo'>
+						110.00 Gwei
 					</li>
 					<li class='label'>
 						Transfer Cost
 					</li>
-					<li class='balance'>
-						$0.50
+					<li class='balance' id='ActionWidget.modal.transferCost'>
+						0 Gwei
 					</li>
-					<div class='line'></div>
 					<li class='label'>
-						End Balance
+						Expect Gas Cost ( gas x estimateGas )
 					</li>
-					<li class='balance'>
-						$889.50
+					<li class='balance' id='ActionWidget.modal.gas'>
+						0 Gwei
 					</li>
+
+					<div class='line'></div>
+
+					<li class='label'>
+						Gas Limit
+					</li>
+					<li class='balance Price' id='ActionWidget.modal.gaslimit'>
+						<input type="text" placeholder="Gwai" id='ActionWidget.modal.gasLimit.input'/>
+					</li>
+
+					<!--
+					<li class='label'>
+						Priority Fee Per Gas ( Tip )
+					</li>
+					<li class='balance price' id='ActionWidget.modal.priorityFree'>
+						<input type="text" placeholder="Gwai" id='ActionWidget.modal.priorityFree.input'/>
+					</li>
+					<li class='label'>
+						Max Fee Per Gas ( Max Fee )
+					</li>
+					<li class='balance price' id='ActionWidget.modal.maxFeePerGas'>
+						<input type="text" placeholder="Gwai" id='ActionWidget.modal.maxFeePerGas.input'/>
+					</li>
+					-->
+					<div class="sender-wrap">
+						<div class="loader" id='ActionWidget.modal.sending'>sending...</div>
+					</div>
+
 
 				</div>
 
@@ -89,7 +116,245 @@
 							<td>
 							</td>
 							<td>
+<!--
 								<button class='submit' id='ActionWidget.modal.submit'>Make Payment</button>
+-->
+								<button class='submit' id='ActionWidget.modal.submit'> Send Transaction </button>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+			</div>
+
+		</aside>
+
+		<!-- Transaction Receit Modal -->
+
+		<aside id='ActionWidget.modal_transaction.body'>
+
+			<div class="modal">
+
+				<div class="header">
+					<h3>View Transaction Result </h3>
+					<div id='ActionWidget.modal_transaction.close' class="close"></div>
+				</div>
+
+				<div class="body">
+					<li class='label'>
+						type
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.type'>
+
+					<li class='label'>
+						hash
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.hash'>
+
+					<li class='label'>
+						ipfs cid ( hexToAscii )
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.input'>
+
+<!--
+					<li class='label'>
+						chainId 
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.chainId'>
+					</li>
+-->
+
+					<li class='label'>
+						nonce 
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.nonce'>
+
+					<li class='label'>
+						blockNumber 
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.blockNumber'>
+
+					</li>
+					<li class='label'>
+						blockHash
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.blockHash'>
+
+					</li>
+
+					<div class='line'></div>
+
+					<li class='label'>
+						from
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.from'>
+
+					</li>
+					<li class='label'>
+						to
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.to'>
+
+					</li>
+
+					<div class='line'></div>
+
+					<li class='label'>
+						value
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.value'>
+
+<!--
+					<li class='label'>
+						maxPriorityFeePerGas
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.maxPriorityFeePerGas'>
+
+					</li>
+
+					<li class='label'>
+						maxFeePerGas
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.maxFeePerGas'>
+					</li>
+-->
+
+					<li class='label'>
+						gasPrice
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.gasPrice'>
+					</li>
+
+					</li>
+
+					<li class='label'>
+						gas
+					</li>
+					<li class='balance' id='ActionWidget.modal_transaction.gas'>
+
+					</li>
+
+				</div>
+
+				<div class="footer">
+					<table>
+						<tr>
+							<td>
+								<button class='close' id='ActionWidget.modal_transaction.ipfs_cid'> JSON DATA </button>
+							</td>
+							<td>
+							</td>
+							<td>
+								<button class='submit' id='ActionWidget.modal_transaction.cancel'>Close</button>
+							</td>
+						</tr>
+					</table>
+				</div>
+
+			</div>
+
+		</aside>
+
+		<!-- Transaction Receit Modal -->
+
+		<aside id='ActionWidget.modal_receipt.body'>
+
+			<div class="modal">
+
+				<div class="header">
+					<h3>View Transaction Receipt </h3>
+					<div id='ActionWidget.modal_receipt.close' class="close"></div>
+				</div>
+
+				<div class="body">
+					<li class='label'>
+						TransactionHash
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.transactionHash'>
+					</li>
+
+					<li class='label'>
+						transactionIndex 
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.transactionIndex'>
+
+					<li class='label'>
+						blockNumber 
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.blockNumber'>
+
+					</li>
+					<li class='label'>
+						blockHash
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.blockHash'>
+
+					</li>
+
+					<div class='line'></div>
+
+					<li class='label'>
+						from
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.from'>
+
+					</li>
+					<li class='label'>
+						to
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.to'>
+
+					</li>
+
+					<div class='line'></div>
+
+					<li class='label'>
+						cumulativeGasUsed
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.cumulativeGasUsed'>
+
+					</li>
+
+					<li class='label'>
+						gasUsed
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.gasUsed'>
+
+					</li>
+
+					<li class='label'>
+						contractAddress
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.contractAddress'>
+
+					</li>
+
+					<li class='label'>
+						type
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.type'>
+
+					</li>
+
+					<li class='label'>
+						effectiveGasPrice
+					</li>
+					<li class='balance' id='ActionWidget.modal_receipt.effectiveGasPrice'>
+
+					</li>
+
+				</div>
+
+				<div class="footer">
+					<table>
+						<tr>
+							<td>
+								<button class='close' id='ActionWidget.modal_receipt.ipfs_cid'> JSON DATA </button>
+							</td>
+							<td>
+							</td>
+							<td>
+								<button class='submit' id='ActionWidget.modal_receipt.cancel'>Close</button>
 							</td>
 						</tr>
 					</table>
@@ -118,30 +383,30 @@
 					<li class='balance' id='SettingsContacts.form.origin'>
 						origin
 					</li>
-					<li class='balance' id='SettingsContacts.form.username'>
-						Username
+					<li class='balance' id='SettingsContacts.form.membername'>
+						Member name
 					</li>
 					<li class='balance' id='SettingsContacts.form.work_email'>
 						Work Email
 					</li>
 
 					<li class='label'>
-						Company
+						Organization
 					</li>
-					<li class='balance' id='SettingsContacts.form.company_name'>
-						Company Name
+					<li class='balance' id='SettingsContacts.form.organization_name'>
+						Organization Name
 					</li>
-					<li class='balance' id='SettingsContacts.form.company_postcode'>
-						Company Postcode
+					<li class='balance' id='SettingsContacts.form.organization_postcode'>
+						Organization Postcode
 					</li>
-					<li class='balance' id='SettingsContacts.form.company_address'>
-						Company Address
+					<li class='balance' id='SettingsContacts.form.organization_address'>
+						Organization Address
 					</li>
-					<li class='balance' id='SettingsContacts.form.company_building'>
-						Company Building
+					<li class='balance' id='SettingsContacts.form.organization_building'>
+						Organization Building
 					</li>
-					<li class='balance' id='SettingsContacts.form.company_department'>
-						Company Department
+					<li class='balance' id='SettingsContacts.form.organization_department'>
+						Organization Department
 					</li>
 
 				</div>
@@ -174,7 +439,7 @@
 				<div class="profile">
 					<div class="img"></div>
 					<div class="name">User Display Name</div>
-					<div class="account">user.contact@email.com</div>
+					<div class="account">member.contact@email.com</div>
 
 					<button>Manage your Account</button>
 
@@ -220,8 +485,8 @@
 								<i class="hint fas fa-search"></i>
 							</div>
 						</td>
-						<td class="email" id="SessionWidget.menu.username">
-							username@instance
+						<td class="email" id="SessionWidget.menu.membername">
+							membername@instance
 						</td>
 						<td class="menu">
 							<div class="btn" id="TabWidget.tab.bell">
@@ -248,6 +513,32 @@
 
 					<div class="settings-menu">
 
+<!--
+20220417 del
+						<div class="banner">
+							
+
+							<table>
+								<tr>
+									<td class="icon">
+										<div class="gravatar"></div>
+									</td>
+									<td>
+										<h3>Benjamin Collins</h3>
+										<span>Level 20 Creator</span>
+
+										<i class="fas fa-star"></i>
+										<i class="fas fa-star"></i>
+										<i class="fas fa-star"></i>
+										<i class="far fa-star"></i>
+										<i class="far fa-star"></i>
+									</td>
+								</tr>
+							</table>
+
+						</div>
+-->
+
 						<div class="menu" id="SettingsMenu.area.menu">
 
 							<li id="SettingsMenu.menu.back">
@@ -263,14 +554,14 @@
 								</table>
 							</li>
 
-							<li id="SettingsMenu.menu.company">
+							<li id="SettingsMenu.menu.organization">
 								<table>
 									<tr>
 										<td class="icon">
 											<i class="fas fa-building"></i>
 										</td>
 										<td>
-											Company
+											Organization
 										</td>
 									</tr>
 								</table>
@@ -280,7 +571,7 @@
 								<table>
 									<tr>
 										<td class="icon">
-											<i class="fas fa-user"></i>
+											<i class="fas fa-member"></i>
 										</td>
 										<td>
 											Profile
@@ -289,14 +580,139 @@
 								</table>
 							</li>
 
+							<li id="SettingsMenu.menu.groups" class='hide'>
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-members"></i>
+										</td>
+										<td>
+											Employees
+										</td>
+									</tr>
+								</table>
+							</li>
+
+<!--
+20220417 del
+							<li id="SettingsMenu.menu.security">
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-shield-alt"></i>
+										</td>
+										<td>
+											Security
+										</td>
+									</tr>
+								</table>
+							</li>
+-->
+
 							<li id="SettingsMenu.menu.contacts">
 								<table>
 									<tr>
 										<td class="icon">
-											<i class="fas fa-users"></i>
+											<i class="fas fa-members"></i>
 										</td>
 										<td>
 											Contacts
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li id="SettingsMenu.menu.directory" class='hide'>
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-address-book"></i>
+										</td>
+										<td>
+											Directory
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li id="SettingsMenu.menu.wallet">
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-wallet"></i>
+										</td>
+										<td>
+											Wallet
+										</td>
+									</tr>
+								</table>
+							</li>
+
+<!--
+20220417 del
+							<li id="SettingsMenu.menu.activity">
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-stopwatch"></i>
+										</td>
+										<td>
+											Activity
+										</td>
+									</tr>
+								</table>
+							</li>
+-->
+
+							<li id="SettingsMenu.menu.statement" class='hide'>
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-file-alt"></i>
+										</td>
+										<td>
+											Statements
+										</td>
+									</tr>
+								</table>
+							</li>
+
+<!--
+							<li id="SettingsMenu.menu.invite">
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-member-plus"></i>
+										</td>
+										<td>
+											Invite People
+										</td>
+									</tr>
+								</table>
+							</li>
+
+-->
+							<li id="SettingsMenu.menu.api" class='hide'>
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-code"></i>
+										</td>
+										<td>
+											API Access
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li id="SettingsMenu.menu.pro" class='hide'>
+								<table>
+									<tr>
+										<td class="icon">
+											<i class="fas fa-member-tie"></i>
+										</td>
+										<td>
+											Go Pro!
 										</td>
 									</tr>
 								</table>
@@ -307,6 +723,1749 @@
 					</div>
 
 					<div class="settings-content">
+
+						<div class="page" id="SettingsMenu.pages.statement">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Statement</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="statement">
+
+								<div class="header">
+									<table>
+										<tr>
+											<td>
+												<h3>
+													Download account statements for <select>
+														<option>2020</option>
+													</select>
+												</h3>
+											</td>
+											<td>
+												<button>Download</button>
+											</td>
+										</tr>
+									</table>
+								</div>
+
+								<ul>
+
+									<li>
+										<label>
+											<input type="checkbox"/>
+											<i class="far fa-file-pdf"></i>
+											January 2020
+										</label>
+									</li>
+
+									<li>
+										<label>
+											<input type="checkbox"/>
+											<i class="far fa-file-pdf"></i>
+											February 2020
+										</label>
+									</li>
+
+									<li class="disabled">
+										<label>
+											<input type="checkbox" disabled="disabled"/>
+											<i class="far fa-file-pdf"></i>
+											March 2020
+										</label>
+									</li>
+
+									<li class="disabled">
+										<label>
+											<input type="checkbox" disabled="disabled"/>
+											<i class="far fa-file-pdf"></i>
+											April 2020
+										</label>
+									</li>
+
+									<li class="disabled">
+										<label>
+											<input type="checkbox" disabled="disabled"/>
+											<i class="far fa-file-pdf"></i>
+											May 2020
+										</label>
+									</li>
+
+									<li class="disabled">
+										<label>
+											<input type="checkbox" disabled="disabled"/>
+											<i class="far fa-file-pdf"></i>
+											June 2020
+										</label>
+									</li>
+
+									<li class="disabled">
+										<label>
+											<input type="checkbox" disabled="disabled"/>
+											<i class="far fa-file-pdf"></i>
+											July 2020
+										</label>
+									</li>
+
+									<li class="disabled">
+										<label>
+											<input type="checkbox" disabled="disabled"/>
+											<i class="far fa-file-pdf"></i>
+											August 2020
+										</label>
+									</li>
+
+									<li class="disabled">
+										<label>
+											<input type="checkbox" disabled="disabled"/>
+											<i class="far fa-file-pdf"></i>
+											September 2020
+										</label>
+									</li>
+
+									<li class="disabled">
+										<label>
+											<input type="checkbox" disabled="disabled"/>
+											<i class="far fa-file-pdf"></i>
+											October 2020
+										</label>
+									</li>
+
+									<li class="disabled">
+										<label>
+											<input type="checkbox" disabled="disabled"/>
+											<i class="far fa-file-pdf"></i>
+											November 2020
+										</label>
+									</li>
+
+									<li class="disabled">
+										<label>
+											<input type="checkbox" disabled="disabled"/>
+											<i class="far fa-file-pdf"></i>
+											December 2020
+										</label>
+									</li>
+
+								</ul>
+
+							</div>
+
+						</div>
+
+						<div class="page" id="SettingsMenu.pages.api_details">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>API Access</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Create API</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="api-forms">
+
+								<button id="SettingsMenu.btns.cancelApi"><i class="fas fa-chevron-left"></i> Cancel</button>
+
+								<label>Application Name<span>*</span></label>
+								<div class="input">
+									<input type="text" placeholder="My Awesome App"/>
+								</div>
+
+								<label>Application Website</label>
+								<div class="input">
+									<input type="text" placeholder="https://MyAwesomeApp.website"/>
+								</div>
+
+								<label>Scopes</label>
+								<p>
+								Which APIs the application will be allowed to access. If you select a top-level scope, you don't need to select individual ones.
+								</p>
+
+							</div>
+
+							<div class="api-block">
+
+							</div>
+
+							<div class="api-block">
+
+							</div>
+
+							<div class="api-block">
+
+							</div>
+
+							<div class="api-gen">
+								<button class="create">Create Application</button>
+							</div>
+
+						</div>
+
+						<div class="page" id="SettingsMenu.pages.api">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>API Access</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="invite-gen">
+
+								<p>Create an application that can call and use the application on your behaf</p>
+
+								<button id="SettingsMenu.btns.createApi" class="create">Create Application</button>
+
+								<ul>
+
+									<li class="labels">
+										<table>
+											<tr>
+												<td class="link">Application</td>
+												<td class="uses">Scope</td>
+												<td class="expire">Last Active</td>
+												<td class="cancel"></td>
+											</tr>
+										</table>
+									</li>
+
+									<li class="odd line">
+										<table>
+											<tr>
+												<td class="link">
+													<div class="outline">
+														<i class="fas fa-server"></i>
+
+														<input type="text" value="Connection to Inventory" readonly="readonly">
+														<button>Edit</button>
+													</div>
+												</td>
+												<td class="uses">
+													<a>
+														<i class="fab fa-telegram-plane ok"></i>
+														<i class="fas fa-inbox"></i>
+													</a>
+												</td>
+												<td class="expire">
+													<a>3 Days</a>
+												</td>
+												<td class="cancel"> 
+													<a><i class="fas fa-times"></i> Deactivate</a>
+												</td>
+											</tr>
+										</table>
+									</li>
+
+									<li class="odd line">
+										<table>
+											<tr>
+												<td class="link">
+													<div class="outline">
+														<i class="fas fa-server"></i>
+
+														<input type="text" value="Import Employee Hours" readonly="readonly">
+														<button>Edit</button>
+													</div>
+												</td>
+												<td class="uses">
+													<a>
+														<i class="fab fa-telegram-plane"></i>
+														<i class="fas fa-inbox ok"></i>
+													</a>
+												</td>
+												<td class="expire">
+													<a>1 Week</a>
+												</td>
+												<td class="cancel"> 
+													<a><i class="fas fa-times"></i> Deactivate</a>
+												</td>
+											</tr>
+										</table>
+									</li>
+
+									<li class="odd line">
+										<table>
+											<tr>
+												<td class="link">
+													<div class="outline">
+														<i class="fas fa-server"></i>
+
+														<input type="text" value="Legacy Sales Force data" readonly="readonly">
+														<button>Edit</button>
+													</div>
+												</td>
+												<td class="uses">
+													<a>
+														<i class="fab fa-telegram-plane ok"></i>
+														<i class="fas fa-inbox ok"></i>
+													</a>
+												</td>
+												<td class="expire">
+													<a>1 month</a>
+												</td>
+												<td class="cancel"> 
+													<a><i class="fas fa-times"></i> Deactivate</a>
+												</td>
+											</tr>
+										</table>
+									</li>
+
+								</ul>
+
+							</div>
+
+						</div>
+
+						<div class="page" id="SettingsMenu.pages.groups">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Employees</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="staff-filter">
+								<table>
+									<tr>
+										<td>
+										
+											<div class="flex">
+												<li>All</li>
+												<li>Active</li>
+												<li>Locked</li>
+												<li>Removed</li>
+											</div>
+
+										</td>
+										<td class="right">
+											Filter by
+											<select>
+												<option>Choose Employee Type</option>
+											</select>
+										</td>
+										<td class="btn">
+											<button><i class="fas fa-plus"></i> Add New Staff</button>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="employee-list">
+
+								<li class="title">
+									<table>
+										<tr>
+											<td class="name">Employee Name</td>
+											<td class="dept">Department</td>
+											<td class="perm">Permissions</td>
+											<td class="join">Joined</td>
+											<td class="stat">Status</td>
+											<td class="more"></td>
+										</tr>
+									</table>
+								</li>
+
+								<li class="staff">
+									<table>
+										<tr>
+											<td class="pic">
+												<div class="pic ben"></div>
+											</td>
+											<td class="name">
+												<span class="name">Benjamin Collins</span>
+												<span class="membername">bcollins.dashgl@instance</span>
+											</td>
+											<td class="dept">Admin</td>
+											<td class="perm">
+												<i class="fas fa-paper-plane ok"></i>
+												<i class="fas fa-inbox ok"></i>
+											</td>
+											<td class="join">Feb 2, 2020</td>
+											<td class="stat">
+												<div class="stat active">Active</div>
+											</td>
+											<td class="more">
+												<i class="fas fa-ellipsis-v"></i>
+											</td>
+										</tr>
+									</table>
+								</li>
+
+								<li class="staff">
+									<table>
+										<tr>
+											<td class="pic">
+												<div class="pic bingbing"></div>
+											</td>
+											<td class="name">
+												<span class="name">Bingbing Yu</span>
+												<span class="membername">yu_bingbing.dashgl@instance</span>
+											</td>
+											<td class="dept">Marketing Consultant</td>
+											<td class="perm">
+												<i class="fas fa-paper-plane ok"></i>
+												<i class="fas fa-inbox"></i>
+											</td>
+											<td class="join">Feb 13, 2020</td>
+											<td class="stat">
+												<div class="stat active">Active</div>
+											</td>
+											<td class="more">
+												<i class="fas fa-ellipsis-v"></i>
+											</td>
+										</tr>
+									</table>
+								</li>
+
+								<li class="staff">
+									<table>
+										<tr>
+											<td class="pic">
+												<div class="pic jessica"></div>
+											</td>
+											<td class="name">
+												<span class="name">Jessica Yu Collins</span>
+												<span class="membername">jessica_yu.dashgl@instance</span>
+											</td>
+											<td class="dept">Customer Support</td>
+											<td class="perm">
+												<i class="fas fa-paper-plane"></i>
+												<i class="fas fa-inbox ok"></i>
+											</td>
+											<td class="join">Feb 14, 2020</td>
+											<td class="stat">
+												<div class="stat active">Active</div>
+											</td>
+											<td class="more">
+												<i class="fas fa-ellipsis-v"></i>
+											</td>
+										</tr>
+									</table>
+								</li>
+
+
+							</div>
+
+						</div>
+
+						<div class="page" id="SettingsMenu.pages.directory">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Directory</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+							
+							<div class="contacts-filter">
+
+								<table>
+									<thead>
+										<tr>
+											<th class="rel">
+												Relationship
+											</th>
+											<th class="search">
+												Search
+											</th>
+											<th></th>
+											<th class="order">
+												Order By
+
+												<span class="asc active">ASC</span>
+												<span class="desc">DESC</span>
+											</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>
+												<span class="active">All</span>
+												<span>Buyers</span>
+												<span>Sellers</span>
+											</td>
+											<td>
+												<div class="search">
+													<input type="text" placeholder="Enter Keyword"/>
+													<i class="fas fa-search"></i>
+												</div>
+											</td>
+											<td></td>
+											<td>
+												<span class="active">Member name</span>
+												<span>Organization Name</span>
+												<span class="last">Last Active</span>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+							</div>
+
+							<div class="directory-list">
+
+								
+								<div class="row">
+									
+									<div class="card">
+										<h3 class="membername">@membername@instance</h3>
+										<div class="info">
+											<table>
+												<tr>
+													<td class="pic">
+														<div class="profile wsd"></div>
+
+														<div class="rating">
+															<i class="fas fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+														</div>
+														<div class="rank">
+															Level 1 Sales
+														</div>
+													</td>
+													<td class="summary">
+														<h3 class="comp">Web Service Development Inc.</h3>
+														<h3 class="dept">AI Specialist Hirou Watai</h3>
+														<li>〒416-0942<br>
+														静岡県富士市上横割１８４－３<br>
+														ニュープラザ横割３階BC</li>
+
+														<li>携帯: 050-3569-8312</li>
+													</td>
+												</tr>
+											</table>
+										</div>
+										<div class="footer">
+											<table>
+												<tr>
+													<td>
+													</td>
+													<td>
+														<button><i class="fas fa-arrow-down"></i> Connect as Buyer</button>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+									
+									<div class="card">
+										<h3 class="membername">@membername@instance</h3>
+										<div class="info">
+											<table>
+												<tr>
+													<td class="pic">
+														<div class="profile writeup"></div>
+
+														<div class="rating">
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+														</div>
+														<div class="rank">
+															Level 35 Boss
+														</div>
+													</td>
+													<td class="summary">
+														<h3 class="comp">Write Up Ltd.</h3>
+														<h3 class="dept">Sales God Takano</h3>
+														<li>〒150-0002<br>
+														東京都渋谷区渋谷2-15-1<br>
+														渋谷クロスタワー32F</li>
+
+														<li>電話: 03-5784-0700</li>
+													</td>
+												</tr>
+											</table>
+										</div>
+										<div class="footer">
+											<table>
+												<tr>
+													<td>
+													</td>
+													<td>
+														<button><i class="fas fa-arrow-down"></i> Connect as Buyer</button>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+									
+									<div class="card">
+										<h3 class="membername">@membername@instance</h3>
+										<div class="info">
+											<table>
+												<tr>
+													<td class="pic">
+														<div class="profile bs"></div>
+
+														<div class="rating">
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+														</div>
+														<div class="rank">
+															Level 23 Manager
+														</div>
+													</td>
+													<td class="summary">
+														<h3 class="comp">BS Shizuoka Co.,Ltd.</h3>
+														<h3 class="dept">Project Manager Tanaka</h3>
+														<li>〒４１６－０９０７<br>
+														静岡県富士市中島４７２－３<br>
+														山幸ビル１F</li>
+
+														<li>電話: 0545-64-2693</li>
+													</td>
+												</tr>
+											</table>
+										</div>
+										<div class="footer">
+											<table>
+												<tr>
+													<td>
+														<button><i class="fas fa-arrow-up"></i> Connect as Seller</button>
+													</td>
+													<td>
+														<button><i class="fas fa-arrow-down"></i> Connect as Buyer</button>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+									
+									<div class="break"></div>
+
+									
+									<div class="card">
+										<h3 class="membername">@membername@instance</h3>
+										<div class="info">
+											<table>
+												<tr>
+													<td class="pic">
+														<div class="profile paper"></div>
+
+														<div class="rating">
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+														</div>
+														<div class="rank">
+															Level 15 Seller
+														</div>
+													</td>
+													<td class="summary">
+														<h3 class="comp">Hayashi Paper LLC.</h3>
+														<h3 class="dept">President Hayashi</h3>
+														<li>〒417-0847<br>
+														静岡県富士市比奈626<br>
+														</li>
+
+														<li>電話:  0545-34-1441</li>
+													</td>
+												</tr>
+											</table>
+										</div>
+										<div class="footer">
+											<table>
+												<tr>
+													<td>
+														<button><i class="fas fa-arrow-up"></i> Connect as Seller</button>
+													</td>
+													<td>
+														<button><i class="fas fa-arrow-down"></i> Connect as Buyer</button>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+									
+									<div class="card">
+										<h3 class="membername">@membername@instance</h3>
+										<div class="info">
+											<table>
+												<tr>
+													<td class="pic">
+														<div class="profile gel"></div>
+
+														<div class="rating">
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+														</div>
+														<div class="rank">
+															Level 25 Consultant
+														</div>
+													</td>
+													<td class="summary">
+														<h3 class="comp">Absorlab Inc.</h3>
+														<h3 class="dept">Kobayashi Tatsuya</h3>
+														<li>〒427-0024<br>
+														静岡県島田市横井1-1-2<br>
+														大河原運送株式会社内</li>
+
+														<li>電話: 050-3557-5884</li>
+													</td>
+												</tr>
+											</table>
+										</div>
+										<div class="footer">
+											<table>
+												<tr>
+													<td>
+													</td>
+													<td>
+														<button><i class="fas fa-arrow-down"></i> Connect as Buyer</button>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+									
+									<div class="card">
+										<h3 class="membername">@membername@instance</h3>
+										<div class="info">
+											<table>
+												<tr>
+													<td class="pic">
+														<div class="profile jatco"></div>
+
+														<div class="rating">
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+														</div>
+														<div class="rank">
+															Level 21 Buyer
+														</div>
+													</td>
+													<td class="summary">
+														<h3 class="comp">JATCO Ltd.</h3>
+														<h3 class="dept">Procurement Department</h3>
+														<li>〒416-0953<br>
+														静岡県富士市今泉700番地の1<br>
+														</li>
+
+														<li>電話: 0545-64-2693</li>
+													</td>
+												</tr>
+											</table>
+										</div>
+										<div class="footer">
+											<table>
+												<tr>
+													<td>
+														<button><i class="fas fa-arrow-up"></i> Connect as Seller</button>
+													</td>
+													<td>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+
+									<div class="break"></div>
+									
+									<div class="card">
+										<h3 class="membername">@membername@instance</h3>
+										<div class="info">
+											<table>
+												<tr>
+													<td class="pic">
+														<div class="profile yamaji"></div>
+
+														<div class="rating">
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="far fa-star"></i>
+														</div>
+														<div class="rank">
+															Level 28 Producer
+														</div>
+													</td>
+													<td class="summary">
+														<h3 class="comp">Premium ARTS Inc.</h3>
+														<h3 class="dept">Producer Yamaji</h3>
+														<li>〒105-0001<br>
+														東京都港区虎ノ門5-11-1<br>
+														オランダヒルズ森タワーRoP 906</li>
+
+														<li>TEL: 03-6402-5252</li>
+													</td>
+												</tr>
+											</table>
+										</div>
+										<div class="footer">
+											<table>
+												<tr>
+													<td>
+														<button><i class="fas fa-arrow-up"></i> Connect as Seller</button>
+													</td>
+													<td>
+														<button><i class="fas fa-arrow-down"></i> Connect as Buyer</button>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+									
+									<div class="card">
+										<h3 class="membername">@membername@instance</h3>
+										<div class="info">
+											<table>
+												<tr>
+													<td class="pic">
+														<div class="profile digi"></div>
+
+														<div class="rating">
+															<i class="fas fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+														</div>
+														<div class="rank">
+															Level 9 Engineer
+														</div>
+													</td>
+													<td class="summary">
+														<h3 class="comp">Digi∞Base Co.</h3>
+														<h3 class="dept">Akira Suzuki</h3>
+														<li>〒417-0801<br>
+														静岡県富士市大淵2611 - 2<br>
+														新東名 新富士インターすぐ</li>
+
+														<li>電話: 0545-67-5539</li>
+													</td>
+												</tr>
+											</table>
+										</div>
+										<div class="footer">
+											<table>
+												<tr>
+													<td>
+													</td>
+													<td>
+														<button><i class="fas fa-arrow-down"></i> Connect as Buyer</button>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+									
+									<div class="card">
+										<h3 class="membername">@membername@instance</h3>
+										<div class="info">
+											<table>
+												<tr>
+													<td class="pic">
+														<div class="profile dashie"></div>
+
+														<div class="rating">
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="fas fa-star"></i>
+															<i class="far fa-star"></i>
+															<i class="far fa-star"></i>
+														</div>
+														<div class="rank">
+															Level 20 Creator
+														</div>
+													</td>
+													<td class="summary">
+														<h3 class="comp">DashGL Project</h3>
+														<h3 class="dept">Benjamin Collins</h3>
+														<li>〒416-0945<br>
+														静岡県富士市宮島75-8<br>
+														クラヴィエM１０２号室</li>
+
+														<li>携帯: 080-7795-6690</li>
+													</td>
+												</tr>
+											</table>
+										</div>
+										<div class="footer">
+											<table>
+												<tr>
+													<td>
+														<button><i class="fas fa-arrow-up"></i> Connect as Seller</button>
+													</td>
+													<td>
+														<button><i class="fas fa-arrow-down"></i> Connect as Buyer</button>
+													</td>
+												</tr>
+											</table>
+										</div>
+									</div>
+									
+								</div>
+							
+							</div>
+
+							<div class="activity-pagination">
+
+								<li>Prev</li>
+								<li>1</li>
+								<li>2</li>
+								<li>3</li>
+								<li>4</li>
+								<li>5</li>
+								<li>Next</li>
+
+							</div>
+								
+
+						</div>
+
+						<div class="page" id="SettingsMenu.pages.activity">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Activity</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="activity-filter">
+
+								<table>
+									<tr>
+										<td>
+											<div class="outline">
+												<input type="text" placeholder="Document Id"/>
+											</div>
+										</td>
+										<td>
+											<div class="outline">
+												<input type="text" placeholder="@Membername"/>
+											</div>
+										</td>
+										<td>
+											<div class="outline">
+												<input type="text" placeholder="Start Date"/>
+											</div>
+										</td>
+										<td>
+											<div class="outline">
+												<input type="text" placeholder="End Date"/>
+											</div>
+										</td>
+										<td>
+											<div class="outline">
+												<i class="fas fa-sort"></i>
+												<select>
+													<option>Document Status</option>
+												</select>
+											</div>
+										</td>
+										<td>
+											<button><i class="fas fa-search"></i> Search</button>
+										</td>
+									</tr>
+								</table>
+
+							</div>
+
+							<div class="activity-table">
+								
+								<table>
+									<thead>
+										<tr>
+											<th class="date">Date</th>
+											<th class="name">Member name</th>
+											<th class="num">Doc No.</th>
+											<th>Subject</th>
+											<th class="status">Status</th>
+											<th class="amount">Amount</th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+
+							</div>
+
+							<div class="activity-pagination">
+
+								<li>Prev</li>
+								<li>1</li>
+								<li>2</li>
+								<li>3</li>
+								<li>4</li>
+								<li>5</li>
+								<li>Next</li>
+
+							</div>
+
+						</div>
+
+						<div class="page" id="SettingsMenu.pages.pro">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Go Pro</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="profile-status">
+
+								<div class="profile-pic"></div>
+
+								<h3>@membername@instance you are currently using the Free Plan</h3>
+
+								<p>
+								See what Private Invoice can do for you by looking at the
+								plans below. 
+								</p>
+
+								<button class="request">Request a Trial</button>
+
+							</div>
+
+							<div class="profile-plans">
+								
+								<!-- FREE CARD -->
+
+								<div class="card">
+									<div class="header">
+										<table>
+											<tr>
+												<td class="plan-name">
+													Free Plan
+												</td>
+												<td class="plan-curr">
+													Current Plan
+												</td>
+											</tr>
+										</table>
+									</div>
+
+									<div class="pricing">
+
+										<div class="money">
+											$0
+										</div>
+
+										<div class="notes">
+											<li>per member</li>
+											<li>monthy</li>
+										</div>
+
+										<div class="break">
+										</div>
+										<!--
+										<div class="full">
+											billed annually at $0
+										</div>
+										-->
+
+									</div>
+
+									<div class="features">
+										<li>5 Contacts</li>
+										<li>10 Invoices per Month</li>
+										<li>Only Pay on Delivery</li>
+										<li>Email Support</li>
+										<li>No Group Support</li>
+										
+										<a>See all free features</a>
+
+									</div>
+
+									<div class="footer">
+										<button>Upgrade</button>
+									</div>
+
+								</div>
+
+								<div class="card">
+									<div class="header">
+										<table>
+											<tr>
+												<td class="plan-name">
+													Basic Plan
+												</td>
+												<td class="plan-curr">
+												</td>
+											</tr>
+										</table>
+									</div>
+
+									<div class="pricing">
+
+										<div class="money">
+											$7
+										</div>
+
+										<div class="notes">
+											<li>per member</li>
+											<li>monthy</li>
+										</div>
+
+										<div class="break">
+										</div>
+
+										<div class="full">
+											billed annually at $75
+										</div>
+
+									</div>
+
+									<div class="features">
+										<li>20 Contacts</li>
+										<li>100 Invoices per Month</li>
+										<li>Pay on Order Option</li>
+										<li>Chat Support</li>
+										<li>No Group Support</li>
+										
+										<a>See all basic features</a>
+
+									</div>
+
+									<div class="footer">
+										<button>Upgrade</button>
+									</div>
+								</div>
+
+								<div class="card">
+									<div class="header">
+										<table>
+											<tr>
+												<td class="plan-name">
+													Pro Plan
+												</td>
+												<td class="plan-curr">
+												</td>
+											</tr>
+										</table>
+									</div>
+
+									<div class="pricing">
+
+										<div class="money">
+											$50
+										</div>
+
+										<div class="notes">
+											<li>base price</li>
+											<li>monthly</li>
+										</div>
+
+										<div class="break">
+										</div>
+
+										<div class="full">
+											additional members are $10/month
+										</div>
+
+									</div>
+
+									<div class="features">
+										<li>100 Contacts</li>
+										<li>1,000 Invoices per Month</li>
+										<li>On Account Support</li>
+										<li>Phone Support</li>
+										<li>Group Support</li>
+										
+										<a>See all Pro features</a>
+
+									</div>
+
+									<div class="footer">
+										<button>Upgrade</button>
+									</div>
+								</div>
+
+							</div>
+
+						</div>
+
+						<div class="page" id="SettingsMenu.pages.invite">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Invite People</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<h3 class="inv-header">Invite People</h3>
+
+							<div class="invite-gen">
+
+								<p>Generate and share links with others to grant access to this server</p>
+
+								<table>
+									<thead>
+										<tr>
+											<th>Max number of uses</th>
+											<th>Expire after</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>
+												<div class="rel">
+													<select id="SettingsInvite.form.count">
+														<option value="unlimited">Unlimited</option>
+														<option value="1">1 Use</option>
+														<option value="5">5 Uses</option>
+														<option value="10">10 Uses</option>
+														<option value="25">25 Uses</option>
+														<option value="50">50 Uses</option>
+														<option value="100">100 Uses</option>
+													</select>
+													<i class="fas fa-sort"></i>
+												</div>
+											</td>
+											<td>
+												<div class="rel">
+													<select id="SettingsInvite.form.minutes">
+														<option value="unlimited">Never</option>
+														<option value="30">30 minutes</option>
+														<option value="60">1 hour</option>
+														<option value="360">6 hours</option>
+														<option value="760">12 hours</option>
+														<option value="1520">1 day</option>
+														<option value="10640">1 week</option>
+													</select>
+													<i class="fas fa-sort"></i>
+												</div>
+											</td>
+										</tr>
+										<tr>
+											<td>
+												<div class="space"></div>
+												<label>
+													<input type="checkbox" name="invite-roll" id="SettingsInvite.form.buyer" checked> Invite as a buyer
+												</label>
+												<span>You will be able to send invoices to the member</span>
+											</td>
+											<td>
+												<div class="space"></div>
+												<label>
+													<input type="checkbox" name="invite-roll" id="SettingsInvite.form.seller"> Invite as a seller
+												</label>
+												<span>The member will be able to send invoices to you</span>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+
+								<button class="submit" id="SettingsInvite.form.submit">Generate Invite Link</button>
+
+								<ul>
+
+									<li class="labels">
+										<table>
+											<tr>
+												<td class="link"></td>
+												<td class="uses">Uses</td>
+												<td class="expire">Expires</td>
+												<td class="cancel"></td>
+											</tr>
+										</table>
+									</li>
+
+									<div id="SettingsInvite.form.list">
+
+									<li class="even">
+										<table>
+											<tr>
+												<td class="link">
+													<div class="outline">
+														<i class="fab fa-telegram-plane ok"></i>
+														<i class="fas fa-inbox"></i>
+
+														<input type="text" value="https://privateinvoice.com/invite/5e4f23bb502d6" readonly="readonly">
+														<button>Copy</button>
+													</div>
+												</td>
+												<td class="uses">
+													<a><i class="fas fa-member"></i> 0/1</a>
+												</td>
+												<td class="expire">
+													<a>3 Days</a>
+												</td>
+												<td class="cancel"> 
+													<a><i class="fas fa-times"></i> Deactivate</a>
+												</td>
+											</tr>
+										</table>
+									</li>
+
+									<li class="odd">
+										<table>
+											<tr>
+												<td class="link">
+													<div class="outline">
+														<i class="fab fa-telegram-plane"></i>
+														<i class="fas fa-inbox ok"></i>
+														<input type="text" value="https://privateinvoice.com/invite/5e4f23bb502d6" readonly="readonly">
+														<button>Copy</button>
+													</div>
+												</td>
+												<td class="uses">
+													<a><i class="fas fa-member"></i> 1/2</a>
+												</td>
+												<td class="expire">
+													<a>1 Week</a>
+												</td>
+												<td class="cancel"> 
+													<a><i class="fas fa-times"></i> Deactivate</a>
+												</td>
+											</tr>
+										</table>
+									</li>
+
+									<li class="even">
+										<table>
+											<tr>
+												<td class="link">
+													<div class="outline">
+														<i class="fab fa-telegram-plane ok"></i>
+														<i class="fas fa-inbox ok"></i>
+														<input type="text" value="https://privateinvoice.com/invite/5e4f23bb502d6" readonly="readonly">
+														<button>Copy</button>
+													</div>
+												</td>
+												<td class="uses">
+													<a><i class="fas fa-member"></i> 3</a>
+												</td>
+												<td class="expire">
+													<a>∞</a>
+												</td>
+												<td class="cancel"> 
+													<a><i class="fas fa-times"></i> Deactivate</a>
+												</td>
+											</tr>
+										</table>
+									</li>
+
+									</div>
+
+								</ul>
+
+							</div>
+
+						</div>
+
+						<div class="page" id="SettingsMenu.pages.wallet">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Wallet</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="wallet-summary">
+								<div class="card">
+
+									<li>
+										<table>
+											<tr>
+												<td class="icon">
+													<div class="circle c-card">
+														<i class="far fa-credit-card"></i>
+													</div>
+												</td>
+												<td>
+													<h4>Add a payment method</h4>
+													<a>Link a card to charge credits</a>
+												</td>
+												<td class="conf">
+													<div class="check"/>
+														<i class="fas fa-check"></i>
+													</div>
+												</td>
+											</tr>
+										</table>
+									</li>
+
+									<li>
+										<table>
+											<tr>
+												<td class="icon">
+													<div class="circle b-bank">
+														<i class="fas fa-university"></i>
+													</div>
+												</td>
+												<td>
+													<h4>Add a bank account</h4>
+													<a>Set withdraw account info</a>
+												</td>
+												<td class="conf">
+													<div class="check"/>
+														<i class="fas fa-check"></i>
+													</div>
+												</td>
+											</tr>
+										</table>
+									</li>
+									
+
+								</div>
+
+								<div class="card">
+									
+									<label>Pending Income</label>
+
+									<div class="balance light">
+										<h4>+$400.00 USD</h4>
+									</div>
+									
+									<label>Pending Costs</label>
+
+									<div class="balance light">
+										<h4>-$600.00 USD</h4>
+									</div>
+
+								</div>
+
+								<div class="card">
+
+									<label>Balance</label>
+
+									<div class="balance light">
+										<h4>$3,120.40 USD</h4>
+									</div>
+
+									<div class="buttons">
+										<button>Charge with Paypal</button>
+										<button>Charge with Credit Card</button>
+									</div>
+
+									<div class="takeout">
+										<span>Withdraw</span>
+									</div>
+									
+								</div>
+							</div>
+
+							<div class="wallet-graph">
+								
+								<h3>Finances</h3>
+
+								<img src="img/jl0inzi8zz401.png"/>
+
+								<h3>Recent Activity</h3>
+
+								<ul>
+
+									<li>
+										<table>
+											<thead>
+											<tr>
+												<th class="date">
+													Date
+												</th>
+												<th class="membername">	
+													Member name
+												</th>
+												<th class="subject">
+													Subject
+												</th>
+												<th class="status">
+													Status
+												</th>
+												<th class="amount">
+													Amount
+												</th>
+											</tr>
+											</thead>
+											<tbody>
+											<tr>
+												<td class="date">
+													02 Mar 2019
+												</td>
+												<td class="membername">	
+													membername@instance
+												</td>
+												<td class="subject">
+													Payment to Emo Doe
+												</td>
+												<td class="status">
+													<span class="complete">Completed</span>
+												</td>
+												<td class="amount">
+													-$400.00
+												</td>
+											</tr>
+											<tr>
+												<td class="date">
+													02 Mar 2019
+												</td>
+												<td class="membername">	
+													membername@instance
+												</td>
+												<td class="subject">
+													Payment to Emo Doe
+												</td>
+												<td class="status">
+													<span class="complete">Completed</span>
+												</td>
+												<td class="amount">
+													-$400.00
+												</td>
+											</tr>
+											<tr>
+												<td class="date">
+													02 Mar 2019
+												</td>
+												<td class="membername">	
+													membername@instance
+												</td>
+												<td class="subject">
+													Payment to Emo Doe
+												</td>
+												<td class="status">
+													<span class="complete">Completed</span>
+												</td>
+												<td class="amount">
+													-$400.00
+												</td>
+											</tr>
+											<tr>
+												<td class="date">
+													02 Mar 2019
+												</td>
+												<td class="membername">	
+													membername@instance
+												</td>
+												<td class="subject">
+													Payment to Emo Doe
+												</td>
+												<td class="status">
+													<span class="complete">Completed</span>
+												</td>
+												<td class="amount">
+													-$400.00
+												</td>
+											</tr>
+											<tr>
+												<td class="date">
+													02 Mar 2019
+												</td>
+												<td class="membername">	
+													membername@instance
+												</td>
+												<td class="subject">
+													Payment to Emo Doe
+												</td>
+												<td class="status">
+													<span class="cancel">Cancelled</span>
+												</td>
+												<td class="amount">
+													-$400.00
+												</td>
+											</tr>
+											<tr>
+												<td class="date">
+													02 Mar 2019
+												</td>
+												<td class="membername">	
+													membername@instance
+												</td>
+												<td class="subject">
+													Payment to Emo Doe
+												</td>
+												<td class="status">
+													<span class="complete">Completed</span>
+												</td>
+												<td class="amount">
+													-$400.00
+												</td>
+											</tr>
+											<tr>
+												<td class="date">
+													02 Mar 2019
+												</td>
+												<td class="membername">	
+													membername@instance
+												</td>
+												<td class="subject">
+													Payment to Emo Doe
+												</td>
+												<td class="status">
+													<span class="complete">Completed</span>
+												</td>
+												<td class="amount">
+													-$400.00
+												</td>
+											</tr>
+											<tr>
+												<td class="date">
+													02 Mar 2019
+												</td>
+												<td class="membername">	
+													membername@instance
+												</td>
+												<td class="subject">
+													Payment to Emo Doe
+												</td>
+												<td class="status">
+													<span class="complete">Completed</span>
+												</td>
+												<td class="amount">
+													-$400.00
+												</td>
+											</tr>
+											<tr>
+												<td class="date">
+													02 Mar 2019
+												</td>
+												<td class="membername">	
+													membername@instance
+												</td>
+												<td class="subject">
+													Payment to Emo Doe
+												</td>
+												<td class="status">
+													<span class="complete">Completed</span>
+												</td>
+												<td class="amount">
+													-$400.00
+												</td>
+											</tr>
+											<tr>
+												<td class="date">
+													02 Mar 2019
+												</td>
+												<td class="membername">	
+													membername@instance
+												</td>
+												<td class="subject">
+													Payment from Jimmy Boo
+												</td>
+												<td class="status">
+													<span class="complete">Completed</span>
+												</td>
+												<td class="amount">
+													+$400.00
+												</td>
+											</tr>
+											</tbody>
+										</table>
+									</li>
+
+									<div class="button">
+										
+										<button>View More</button>
+
+									</div>
+
+								</ul>
+
+							</div>
+
+						</div>
 
 						<div class="page" id="SettingsMenu.pages.contacts">
 
@@ -352,10 +2511,10 @@
 													<input type='radio' name='contact-type' value='partner' disabled='disabled' checked id='SettingsContacts.exportDetails.partner'/> Partner
 												</label>
 												<label>
-													<input type='radio' name='contact-type' value='supplier' disabled='disabled' id='SettingsContacts.exportDetails.supplier'/> Supplier (Can send to you)
+													<input type='radio' name='contact-type' value='seller' disabled='disabled' id='SettingsContacts.exportDetails.seller'/> Seller (Can send to you)
 												</label>
 												<label>
-													<input type='radio' name='contact-type' value='client' disabled='disabled' id='SettingsContacts.exportDetails.client'/> Client (You can send to them)
+													<input type='radio' name='contact-type' value='buyer' disabled='disabled' id='SettingsContacts.exportDetails.buyer'/> Buyer (You can send to them)
 												</label>
 											</td>
 										</tr>
@@ -406,10 +2565,10 @@
 												Relationship
 											</th>
 											<th class="count">
-												Clients
+												Buyers
 											</th>
 											<th class="count">
-												Suppliers
+												Sellers
 											</th>
 											<th></th>
 											<th class="search">
@@ -427,8 +2586,8 @@
 										<tr>
 											<td>
 												<span class="active">All</span>
-												<span>Clients</span>
-												<span>Suppliers</span>
+												<span>Buyers</span>
+												<span>Sellers</span>
 											</td>
 											<td class="count">
 												30 Companies
@@ -444,8 +2603,8 @@
 												</div>
 											</td>
 											<td>
-												<span class="active">Username</span>
-												<span>Company Name</span>
+												<span class="active">Member name</span>
+												<span>Organization Name</span>
 												<span class="last">Last Active</span>
 											</td>
 										</tr>
@@ -460,7 +2619,7 @@
 									<table>
 										<tr>
 											<td class='check'></td>
-											<td	class="username">
+											<td	class="membername">
 												<label>
 													Contact Table
 												</label>
@@ -476,10 +2635,10 @@
 										<table>
 											<tr>
 												<td class='check'></td>
-												<td class="username">
+												<td class="membername">
 
-													<span class="name">username@instance</span> <br>
-													<span class="comp">Company Name</span>
+													<span class="name">membername@instance</span> <br>
+													<span class="comp">Organization Name</span>
 													<span class="dept">Department Name</span>
 
 												</td>
@@ -510,7 +2669,7 @@
 
 						</div>
 
-						<div class="page" id="SettingsMenu.pages.company">
+						<div class="page" id="SettingsMenu.pages.security">
 
 							<div class="breadcrumbs">
 								<table>
@@ -522,7 +2681,7 @@
 											<i class="fas fa-angle-double-right"></i>
 										</td>
 										<td>
-											<label>Company</label>
+											<label>Security</label>
 										</td>
 									</tr>
 								</table>
@@ -532,13 +2691,235 @@
 								<table>
 									<tr>
 										<td class="label">
-											<h3>Company Settings</h3>
+											<h3>Two-Factor Authentication</h3>
+											<p>
+												Increase your account's security
+												by enabling Two-Factor Authentication
+												(2FA)
+											</p>
+										</td>
+										<td class="form">
+
+											<li>
+												<label>Status: Disabled</label>
+
+												<button class="enable">
+													Enable two-factor authentication
+												</button>
+											</li>
+
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="profile-data">
+								<table>
+									<tr>
+										<td class="label">
+											<h3>Social Sign-in</h3>
+											<p>
+												Activate signin with one of the 
+												following services
+											</p>
+										</td>
+										<td class="form">
+
+											<li>
+												<label>Connected Accounts</label>
+
+												<p>Click on an icon to active
+												signin with one of the following
+												services</p>
+
+												<table>
+													<tr>
+														<td class="s-btn google">
+															<div class="social">
+																<i class="fab fa-google-plus-g"></i> <span>Connect</span>
+															</div>
+														</td>
+														<td class="s-btn facebook">
+															<div class="social">
+																<i class="fab fa-facebook-f"></i> <span>Connect</span>
+															</div>
+														</td>
+														<td class="s-btn twitter">
+															<div class="social">
+																<i class="fab fa-twitter"></i> <span>Connect</span>
+															</div>
+														</td>
+														<td></td>
+													</tr>
+												</table>
+
+											</li>
+
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="profile-data">
+								<table>
+									<tr>
+										<td class="label">
+											<h3>Active Sessions</h3>
+											<p>
+												This is a list of devices that have
+												logged into your account. Revoke
+												any sessions that you do not 
+												recognize.
+											</p>
+										</td>
+										<td class="form">
+
+											<li class="line">
+												<table>
+													<tr>
+														<td class="screen">
+															<i class="fas fa-desktop"></i>
+														</td>
+														<td class="session">
+
+															<span><b>111.239.153.212</b></span>
+															<span>Last Access on Feb 13, 2020</span>
+															<span><b>Firefox</b> on <b>GNU/Linux</b></span>
+															<span><b>Sign in</b> on Feb 03, 2020</span>
+
+														</td>
+														<td class="revoke">
+															<button class="revoke">Revoke</button>
+		
+														</td>
+													</tr>
+												</table>
+											</li>
+
+											<li class="line">
+												<table>
+													<tr>
+														<td class="screen">
+															<i class="fas fa-desktop"></i>
+														</td>
+														<td class="session">
+
+															<span><b>111.239.154.34</b></span>
+															<span>Last Access on Feb 14, 2020</span>
+															<span><b>Chrome</b> on <b>Windows 10</b></span>
+															<span><b>Sign in</b> on Feb 04, 2020</span>
+
+														</td>
+														<td class="revoke">
+															<button class="revoke">Revoke</button>
+		
+														</td>
+													</tr>
+												</table>
+											</li>
+
+											<li class="line">
+												<table>
+													<tr>
+														<td class="screen">
+															<i class="fas fa-mobile-alt"></i>
+														</td>
+														<td class="session">
+
+															<span><b>212.13.194.212</b></span>
+															<span>Last Access on Dec 13, 2019</span>
+															<span><b>Chrome</b> on <b>Android</b></span>
+															<span><b>Sign in</b> on Feb 11, 2019</span>
+
+														</td>
+														<td class="revoke">
+															<button class="revoke">Revoke</button>
+		
+														</td>
+													</tr>
+												</table>
+											</li>
+
+											<li class="line">
+												<table>
+													<tr>
+														<td class="screen">
+															<i class="fas fa-mobile-alt"></i>
+														</td>
+														<td class="session">
+
+															<span><b>115.123.125.114</b></span>
+															<span>Last Access on Feb 13, 2020</span>
+															<span><b>Safari</b> on <b>iOS</b></span>
+															<span><b>Sign in</b> on Feb 03, 2020</span>
+
+														</td>
+														<td class="revoke">
+															<button class="revoke">Revoke</button>
+		
+														</td>
+													</tr>
+												</table>
+											</li>
+
+											<li class="line">
+												<table>
+													<tr>
+														<td class="screen">
+															<i class="fas fa-desktop"></i>
+														</td>
+														<td class="session">
+
+															<span><b>111.239.153.212</b></span>
+															<span>This is your current session</span>
+															<span><b>Firefox</b> on <b>GNU/Linux</b></span>
+															<span><b>Sign in</b> on Feb 03, 2020</span>
+
+														</td>
+														<td class="revoke">
+															<button class="revoke hide">Revoke</button>
+		
+														</td>
+													</tr>
+												</table>
+											</li>
+
+										</td>
+									</tr>
+								</table>
+							</div>
+
+						</div>
+
+						<div class="page" id="SettingsMenu.pages.organization">
+
+							<div class="breadcrumbs">
+								<table>
+									<tr>
+										<td>
+											<label>Settings</label>
+										</td>
+										<td>
+											<i class="fas fa-angle-double-right"></i>
+										</td>
+										<td>
+											<label>Organization</label>
+										</td>
+									</tr>
+								</table>
+							</div>
+
+							<div class="profile-data">
+								<table>
+									<tr>
+										<td class="label">
+											<h3>Organization Settings</h3>
 											<p>This information will appear on documents</p>
 
 										</td>
 										<td class="form">
 
-											<div class="stamp-outline" style='display: none;'>
+											<div class="stamp-outline">
 
 												<table>
 													<tr>
@@ -567,22 +2948,22 @@
 											</div>
 
 											<h4>
-												Company Details
-												<span id='SettingsProfile.company.edit'>Edit</span>
+												Organization Details
+												<span id='SettingsProfile.organization.edit'>Edit</span>
 											</h4>
 
 											<li>
-												<label>Company Name</label>
+												<label>Organization Name</label>
 												<div class="input">
-													<input type="text" placeholder="My Awesome Company" id="SettingsProfile.company.company_name"/>
-												<p>This is your legal company or personal name</p>
+													<input type="text" placeholder="My Awesome Organization" id="SettingsProfile.organization.organization_name"/>
+												<p>This is your legal organization or personal name</p>
 												</div>
 											</li>
 
 											<li>
 												<label>Postcode</label>
 												<div class="input">
-													<input type="text" placeholder="Postcode" id="SettingsProfile.company.company_postcode"/>
+													<input type="text" placeholder="Postcode" id="SettingsProfile.organization.organization_postcode"/>
 												<p>This is the postcode of where you live</p>
 												</div>
 											</li>
@@ -590,7 +2971,7 @@
 											<li>
 												<label>Address</label>
 												<div class="input">
-													<input type="text" placeholder="Address Line 1" id="SettingsProfile.company.company_address"/>
+													<input type="text" placeholder="Address Line 1" id="SettingsProfile.organization.organization_address"/>
 												<p>This is first line of your address</p>
 												</div>
 											</li>
@@ -598,7 +2979,7 @@
 											<li>
 												<label>Building Name</label>
 												<div class="input">
-													<input type="text" placeholder="Address Line 2" id="SettingsProfile.company.company_building"/>
+													<input type="text" placeholder="Address Line 2" id="SettingsProfile.organization.organization_building"/>
 												<p>This is second line of your address</p>
 												</div>
 											</li>
@@ -606,16 +2987,16 @@
 											<li>
 												<label>Department</label>
 												<div class="input">
-													<input type="text" placeholder="Your Role Here" id="SettingsProfile.company.company_department"/>
+													<input type="text" placeholder="Your Role Here" id="SettingsProfile.organization.organization_department"/>
 												<p>This is the name of the department (if it exists)</p>
 												</div>
 											</li>
 											
 
 											<li>
-												<label>Company Tax Id</label>
+												<label>Organization Tax Id</label>
 												<div class="input">
-													<input type="text" placeholder="1234567890123" id="SettingsProfile.company.company_tax_id"/>
+													<input type="text" placeholder="1234567890123" id="SettingsProfile.organization.organization_tax_id"/>
 													<p>This is the tax identification number (TIN) of your legal entity</p>
 												</div>
 											</li>
@@ -625,11 +3006,11 @@
 												<table>
 													<tr>
 														<td>
-															<button class="cancel" id='SettingsProfile.company.cancel'>Cancel</button>
+															<button class="cancel" id='SettingsProfile.organization.cancel'>Cancel</button>
 														</td>
 														<td></td>
 														<td>
-															<button class="confirm" id='SettingsProfile.company.save'>Confirm</button>
+															<button class="confirm" id='SettingsProfile.organization.save'>Confirm</button>
 														</td>
 													</tr>
 												</table>
@@ -680,36 +3061,36 @@
 											</h4>
 
 											<li>
-												<label>Username</label>
+												<label>Member name</label>
 												<div class="input">
-													<input type="text" placeholder="username@instance" id="SettingsProfile.profile.username" readonly="readonly"/>
+													<input type="text" placeholder="membername@instance" id="SettingsProfile.profile.membername" readonly="readonly"/>
 												</div>
-												<p>This is the username used to address documents</p>
+												<p>This is the membername used to address documents</p>
 											</li>
 
 											<li>
 												<label>User UUID</label>
 												<div class="input">
-													<input type="text" placeholder="xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx" id="SettingsProfile.profile.user_uuid" readonly="readonly"/>
+													<input type="text" placeholder="xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx" id="SettingsProfile.profile.member_uuid" readonly="readonly"/>
 												</div>
-												<p>This is your user uuid for reference</p>
+												<p>This is your member uuid for reference</p>
 											</li>
 
 											<li>
 												<label>Email Address</label>
 												<div class="input">
-													<input type="text" placeholder="username@email.com" id="SettingsProfile.profile.work_email" readonly="readonly"/>
+													<input type="text" placeholder="membername@email.com" id="SettingsProfile.profile.work_email" readonly="readonly"/>
 												</div>
 												<p>Notifications will be sent to this email address</p>
 											</li>
 
 											<p class="notice">
 											Currently this form does not allow for you to 
-											change your username or contact email as it affects
-											the auto-complete for other user's contacts.
+											change your membername or contact email as it affects
+											the auto-complete for other member's contacts.
 											<br>
 											<br>
-											If you would like to change your username or contact
+											If you would like to change your membername or contact
 											email address please contact 
 											<a href="#">customer support</a>.
 											</p>
@@ -736,13 +3117,13 @@
 
 				</article>
 				
-				<article id="TabWidget.section.client" class="send">
+				<article id="TabWidget.section.buyer" class="send">
 
 					A bebe!
 
 				</article>
 
-				<article id="TabWidget.section.supplier" class="send">
+				<article id="TabWidget.section.seller" class="send">
 
 					<!-- START FOLDERS -->
 
@@ -772,7 +3153,7 @@
 							<div class="collapse">
 
 								<ul id="FolderWidget.groups.invoice_out">
-									<li data-folder="draft" data-role="supplier" data-type="invoice" data-archive="0" id="FolderWidget.groups.draft">
+									<li data-folder="draft" data-role="seller" data-type="invoice" data-archive="0" id="FolderWidget.groups.draft">
 										<table>
 											<tr>
 												<td class="icon">
@@ -785,7 +3166,7 @@
 											</tr>
 										</table>
 									</li>
-									<li data-folder="sent" data-role="supplier" data-type="invoice" data-archive="0">
+									<li data-folder="sent" data-role="seller" data-type="invoice" data-archive="0">
 										<table>
 											<tr>
 												<td class="icon">
@@ -798,7 +3179,7 @@
 											</tr>
 										</table>
 									</li>
-									<li class="sub" data-folder="returned" data-role="supplier" data-type="invoice" data-archive="0">
+									<li class="sub" data-folder="returned" data-role="seller" data-type="invoice" data-archive="0">
 										<table>
 											<tr>
 												<td class="icon">
@@ -811,7 +3192,7 @@
 											</tr>
 										</table>
 									</li>
-									<li data-folder="confirmed" data-role="supplier" data-type="invoice" data-archive="0">
+									<li data-folder="confirmed" data-role="seller" data-type="invoice" data-archive="0">
 										<table>
 											<tr>
 												<td class="icon">
@@ -824,7 +3205,7 @@
 											</tr>
 										</table>
 									</li>
-									<li data-folder="paid" data-role="supplier" data-type="invoice" data-archive="0">
+									<li data-folder="paid" data-role="seller" data-type="invoice" data-archive="0">
 										<table>
 											<tr>
 												<td class="icon">
@@ -837,7 +3218,7 @@
 											</tr>
 										</table>
 									</li>
-									<li data-folder="paid" data-role="supplier" data-type="invoice" data-archive="1">
+									<li data-folder="paid" data-role="seller" data-type="invoice" data-archive="1">
 										<table>
 											<tr>
 												<td class="icon">
@@ -846,11 +3227,11 @@
 												<td class="label">
 													Complete
 												</td>
-												<td class="count"></td>
+												<td id="FolderWidget.c.complete" class="count"></td>
 											</tr>
 										</table>
 									</li>
-									<li data-folder="trash" data-role="supplier" data-type="invoice" data-archive="0">
+									<li data-folder="trash" data-role="seller" data-type="invoice" data-archive="0">
 										<table>
 											<tr>
 												<td class="icon">
@@ -891,7 +3272,7 @@
 							<div class="collapse">
 
 								<ul id="FolderWidget.groups.invoice_in">
-									<li data-folder="sent" data-role="client" data-type="invoice" data-archive="0">
+									<li data-folder="sent" data-role="buyer" data-type="invoice" data-archive="0">
 										<table>
 											<tr>
 												<td class="icon">
@@ -904,7 +3285,7 @@
 											</tr>
 										</table>
 									</li>
-									<li class="sub" data-folder="returned" data-role="client" data-type="invoice" data-archive="0">
+									<li class="sub" data-folder="returned" data-role="buyer" data-type="invoice" data-archive="0">
 										<table>
 											<tr>
 												<td class="icon">
@@ -917,7 +3298,7 @@
 											</tr>
 										</table>
 									</li>
-									<li data-folder="confirmed" data-role="client" data-type="invoice" data-archive="0">
+									<li data-folder="confirmed" data-role="buyer" data-type="invoice" data-archive="0">
 										<table>
 											<tr>
 												<td class="icon">
@@ -930,7 +3311,7 @@
 											</tr>
 										</table>
 									</li>
-									<li data-folder="paid" data-role="client" data-type="invoice" data-archive="0">
+									<li data-folder="paid" data-role="buyer" data-type="invoice" data-archive="0">
 										<table>
 											<tr>
 												<td class="icon">
@@ -943,7 +3324,7 @@
 											</tr>
 										</table>
 									</li>
-									<li data-folder="paid" data-role="client" data-type="invoice" data-archive="1">
+									<li data-folder="paid" data-role="buyer" data-type="invoice" data-archive="1">
 										<table>
 											<tr>
 												<td class="icon">
@@ -952,11 +3333,11 @@
 												<td class="label">
 													Complete
 												</td>
-												<td class="count"></td>
+												<td id="FolderWidget.d.complete" class="count"></td>
 											</tr>
 										</table>
 									</li>
-									<li data-folder="trash" data-role="client" data-type="invoice" data-archive="0">
+									<li data-folder="trash" data-role="buyer" data-type="invoice" data-archive="0">
 										<table>
 											<tr>
 												<td class="icon">
@@ -1045,7 +3426,7 @@
 											Total:
 										</td>
 										<td class="numbers" id="TrayWidget.Showing.total">
-											$0.00
+											0 Gwai
 										</td>
 									</tr>
 								</table>
@@ -1057,7 +3438,7 @@
 
 					<!-- END TRAY -->
 
-					<div class="toolset" style='display: none'>
+					<div class="toolset">
 						<table>
 							<tr>
 <!--
@@ -1259,7 +3640,7 @@
 												<tr>
 													<td class="label">Tax Number.</td>
 													<td class="char">:</td>
-													<td class="value" id="DocumentWidget.meta.tax_id"></td>
+													<td class="value" id="DocumentWidget.meta.taxId"></td>
 												</tr>
 											</table>
 										</li>
@@ -1281,7 +3662,7 @@
 								<div class="pdue">
 									
 									<span class="label">Amount Due</span>
-									<span class="value" id="DocumentWidget.totals.display">$100.00</span>
+									<span class="value" id="DocumentWidget.totals.display"></span>
 
 								</div>
 
@@ -1294,16 +3675,16 @@
 												<ul>
 													<li class="label">To</li>
 													<li class="text">
-								<input type="text" class="top" id="DocumentWidget.to.company_name" value="Internet Foundation" placeholder="Company Name"/>
+								<input type="text" class="top" id="DocumentWidget.to.organization_name" value="Internet Foundation" placeholder="Organization Name"/>
 													</li>
 													<li class="text">
-								<input type="text" id="DocumentWidget.to.company_address" value="6627 Fisher ave." placeholder="Company Address"/>
+								<input type="text" id="DocumentWidget.to.organization_address" value="6627 Fisher ave." placeholder="Organization Address"/>
 													</li>
 													<li class="text">
-								<input type="text" id="DocumentWidget.to.company_building" value="Falls Church VA 22046" placeholder="Company Building"/>
+								<input type="text" id="DocumentWidget.to.organization_building" value="Falls Church VA 22046" placeholder="Organization Building"/>
 													</li>
 													<li class="text">
-								<input type="text" id="DocumentWidget.to.company_department" value="Richard Collins" placeholder="Company Department"/>
+								<input type="text" id="DocumentWidget.to.organization_department" value="Richard Collins" placeholder="Organization Department"/>
 													</li>
 												</ul>
 											</td>
@@ -1315,16 +3696,16 @@
 												<ul>
 													<li class="label">From</li>
 													<li class="text">
-								<input id="DocumentWidget.from.company_name" type="text" class="top" value="DashGL Project" placeholder="Company Name"/>
+								<input id="DocumentWidget.from.organization_name" type="text" class="top" value="DashGL Project" placeholder="Organization Name"/>
 													</li>
 													<li class="text">
-								<input id="DocumentWidget.from.company_address" type="text" value="6627 Fisher ave." placeholder="Company Address"/>
+								<input id="DocumentWidget.from.organization_address" type="text" value="6627 Fisher ave." placeholder="Organization Address"/>
 													</li>
 													<li class="text">
-								<input id="DocumentWidget.from.company_building" type="text" value="Falls Church VA 22046" placeholder="Company Building"/>
+								<input id="DocumentWidget.from.organization_building" type="text" value="Falls Church VA 22046" placeholder="Organization Building"/>
 													</li>
 													<li class="text">
-								<input id="DocumentWidget.from.company_department" type="text" value="Benjamin Collins" placeholder="Company Department"/>
+								<input id="DocumentWidget.from.organization_department" type="text" value="Benjamin Collins" placeholder="Organization Department"/>
 													</li>
 												</ul>
 											</td>
@@ -1353,7 +3734,7 @@
 												<td class="tax">Tax</td>
 -->
 												<td class="price">Price</td>
-												<td class="quan">Quanity</td>
+												<td class="quan">Quantity</td>
 												<td class="unit">Unit</td>
 												<td class="sub">Subtotal</td>
 											</tr>
@@ -1405,15 +3786,15 @@
 									<table id="DocumentWidget.totals.table">
 										<tr>
 											<td class="label">Subtotal</td>
-											<td class="value" id="DocumentWidget.totals.subtotal">$0.00</td>
+											<td class="value" id="DocumentWidget.totals.subtotal">0 Gwai</td>
 										</tr>
 										<tr>
 											<td class="label">Sales Tax(8%)</td>
-											<td class="value">$0.00</td>
+											<td class="value">0 Gwai</td>
 										</tr>
 										<tr>
 											<td class="label">Sales Tax(10%)</td>
-											<td class="value" id="DocumentWidget.totals.sales_tax">$0.00</td>
+											<td class="value" id="DocumentWidget.totals.sales_tax">0 Gwai</td>
 										</tr>
 										<tr>
 											<td class="label">Total</td>
@@ -1423,7 +3804,7 @@
 								</div>
 
 								<div class="pnotes">
-									<textarea placeholder="Terms and Conditions"></textarea>
+									<textarea id="DocumentWidget.textarea.comments" placeholder="Terms and Conditions"></textarea>
 								</div>
 
 								</div>
@@ -1438,7 +3819,7 @@
 
 							<div class="pfooter">
 
-							<li class="panel" id="supplier.invoice.draft.0">
+							<li class="panel" id="seller.invoice.draft.0">
 								<table>
 									<tr>
 										<td>
@@ -1456,7 +3837,7 @@
 								</table>
 							</li>
 
-							<li class="panel" id="client.invoice.sent.0">
+							<li class="panel" id="buyer.invoice.sent.0">
 								<table>
 									<tr>
 										<td>
@@ -1474,7 +3855,7 @@
 								</table>
 							</li>
 
-							<li class="panel" id="supplier.invoice.returned.0">
+							<li class="panel" id="seller.invoice.returned.0">
 								<table>
 									<tr>
 										<td>
@@ -1492,7 +3873,7 @@
 								</table>
 							</li>
 
-							<li class="panel" id="client.invoice.confirmed.0">
+							<li class="panel" id="buyer.invoice.confirmed.0">
 								<table>
 									<tr>
 										<td>
@@ -1510,17 +3891,12 @@
 								</table>
 							</li>
 
-							<li class="panel" id="supplier.invoice.confirmed.0">
+							<li class="panel" id="seller.invoice.confirmed.0">
 								<table>
 									<tr>
 										<td>
-<!--
-											<button class="cancel" id="ActionWidget.invoice.withdrawConf">
-												<i class="fas fa-reply"></i> Withdraw
-	 										</button>
--->
-											 <button id="ActionWidget.invoice.makePaymentWaiting" class="waiting" isabled='disabled'>
-												<i class="fas fa-pause"></i> Waiting for Make Payment
+											 <button id="ActionWidget.invoice.makePaymentWaiting" class="waiting" >
+												<i class="fas fa-pause"></i> Make Payment Waiting 
 											</button>
 										</td>
 										<td></td>
@@ -1530,7 +3906,7 @@
 								</table>
 							</li>
 
-							<li class="panel" id="supplier.invoice.sent.0">
+							<li class="panel" id="seller.invoice.sent.0">
 								<table>
 									<tr>
 										<td>
@@ -1545,17 +3921,12 @@
 								</table>
 							</li>
 
-							<li class="panel" id="client.invoice.paid.0">
+							<li class="panel" id="buyer.invoice.paid.0">
 								<table>
 									<tr>
 										<td>
-<!--
-											<button id="ActionWidget.invoice.clientArchive">
-												<i class="fas fa-pause"></i> Move to Archive
-											</button>
--->
-											 <button id="ActionWidget.invoice.clientWaiting" class="waiting" isabled='disabled'>
-												<i class="fas fa-waiting"></i> Waiting for Confirmation
+											 <button id="ActionWidget.viewReport.moveToArciveBuyer" class="waiting" title="Waiting Move to Archive">
+												<i class="fas fa-pause"></i> View Transaction Receipt
 											</button>
 										</td>
 										<td></td>
@@ -1565,11 +3936,26 @@
 								</table>
 							</li>
 
-							<li class="panel" id="client.invoice.trash.0">
+							<li class="panel" id="buyer.invoice.paid.1">
 								<table>
 									<tr>
 										<td>
-											<button class="cancel" id="ActionWidget.invoice.clientTrash">
+											 <button id="ActionWidget.viewReport.completeBuyer" class="waiting" >
+												<i class="fas fa-pause"></i> View Transaction Receipt
+											</button>
+										</td>
+										<td></td>
+										<td>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="buyer.invoice.trash.0">
+								<table>
+									<tr>
+										<td>
+											<button class="cancel" id="ActionWidget.invoice.buyerTrash">
 												<i class="far fa-trash-alt"></i> Soft Delete
 											</button>
 										</td>
@@ -1580,14 +3966,17 @@
 								</table>
 							</li>
 
-							<li class="panel" id="supplier.invoice.paid.0">
+							<li class="panel" id="seller.invoice.paid.0">
 								<table>
 									<tr>
 										<td>
+											 <button id="ActionWidget.viewReport.moveToArciveSeller" class="waiting" >
+												<i class="fas fa-pause"></i> View Transaction Receipt
+											</button>
 										</td>
 										<td></td>
 										<td>
-											<button id="ActionWidget.invoice.supplierArchive">
+											<button id="ActionWidget.invoice.sellerArchive">
 												<i class="fas fa-archive"></i> Move to Archive
 											</button>
 										</td>
@@ -1595,11 +3984,26 @@
 								</table>
 							</li>
 
-							<li class="panel" id="supplier.invoice.trash.0">
+							<li class="panel" id="seller.invoice.paid.1">
 								<table>
 									<tr>
 										<td>
-											<button class="cancel" id="ActionWidget.invoice.supplierTrash">
+											 <button id="ActionWidget.viewReport.completeSeller" class="waiting" >
+												<i class="fas fa-pause"></i> View Transaction Receipt
+											</button>
+										</td>
+										<td></td>
+										<td>
+										</td>
+									</tr>
+								</table>
+							</li>
+
+							<li class="panel" id="seller.invoice.trash.0">
+								<table>
+									<tr>
+										<td>
+											<button class="cancel" id="ActionWidget.invoice.sellerTrash">
 												<i class="far fa-trash-alt"></i> Soft Delete
 											</button>
 										</td>
@@ -1620,14 +4024,14 @@
 						<div class="body">
 
 							<div class="logo">
-								<img src="img/placeholder_logo.png"/>
+								<img src="img/dashgl_logo.png"/>
 							</div>
 
 							<div class="document-type" id=''>
 								Invoice
 							</div>
 
-							<div class="my-company" data-text="From:">
+							<div class="my-organization" data-text="From:">
 							</div>
 
 							<div class="document-meta">
@@ -1655,7 +4059,7 @@
 								</table>
 							</div>
 
-							<div class="their-company" data-text="Bill To:" id='DocumentWidget.label.bill_to'>
+							<div class="their-organization" data-text="Bill To:" id='DocumentWidget.label.bill_to'>
 							</div>
 
 							<div class="amount-line">
@@ -1738,6 +4142,9 @@
 		<script type="text/javascript" src="lib/flatpickr.min.js"></script>
 		<script type="text/javascript" src="lib/clipboard.min.js"></script>
 
+		<!-- Import traceability -->
+		<script type="text/javascript" src="js/traceability.js"></script>
+
 		<!-- Import Application Widgets -->
 
 		<script type="text/javascript" src="js/FolderWidget.js"></script>
@@ -1750,10 +4157,13 @@
 		<script type="text/javascript" src="js/SettingsMenu.js"></script>
 		
 		<script type="text/javascript" src="js/SessionWidget.js"></script>
+		<script type="text/javascript" src="js/SettingsInvite.js"></script>
 		<script type="text/javascript" src="js/SettingsProfile.js"></script>
 		<script type="text/javascript" src="js/SettingsContacts.js"></script>
 
+<!--
 		<script type="text/javascript" src="lib/xlsx.full.min.js"></script>
+-->
 
 		<!-- END SCRIPTS -->
 

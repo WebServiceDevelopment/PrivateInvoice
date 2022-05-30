@@ -14,7 +14,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
  
- Author: Ogawa Kousei (kogawa@wsd.co.jp)
+ Author: Kousei Ogawa (kogawa@wsd.co.jp)
 
 **/
 
@@ -35,6 +35,7 @@ require('dotenv').config()
 const config = require('./config.json');
 const db = require('./database.js');
 
+const netUtil = require('./routes/netUtil.js');
 // Create server
 
 const app = express();
@@ -117,26 +118,28 @@ app.use('/api/session', require('./routes/session.js'));
 app.use('/api/invite', require('./routes/invite.js'));
 app.use('/api/contacts', require('./routes/contacts.js'));
 
-app.use('/api/invoice', require('./routes/client_invoice.js'));
-app.use('/api/invoice', require('./routes/client_invoice_document.js'));
-app.use('/api/message', require('./routes/client_invoice_archive.js'));
-app.use('/api/message', require('./routes/client_invoice_trash.js'));
-app.use('/api/message', require('./routes/client_message.js'));
+app.use('/api/invoice', require('./routes/buyer_invoice.js'));
+app.use('/api/invoice', require('./routes/buyer_invoice_document.js'));
+app.use('/api/message', require('./routes/buyer_invoice_archive.js'));
+app.use('/api/message', require('./routes/buyer_invoice_trash.js'));
+app.use('/api/message', require('./routes/buyer_message.js'));
 
-app.use('/api/invoice', require('./routes/supplier_invoice_document.js'));
-app.use('/api/invoice', require('./routes/supplier_invoice.js'));
-app.use('/api/invoice', require('./routes/supplier_invoice_archive.js'));
-app.use('/api/invoice', require('./routes/supplier_invoice_trash.js'));
-app.use('/api/message', require('./routes/supplier_message.js'));
+app.use('/api/invoice', require('./routes/seller_invoice_document.js'));
+app.use('/api/invoice', require('./routes/seller_invoice.js'));
+app.use('/api/invoice', require('./routes/seller_invoice_archive.js'));
+app.use('/api/invoice', require('./routes/seller_invoice_trash.js'));
+app.use('/api/message', require('./routes/seller_message.js'));
 
 app.use('/api/tray', require('./routes/tray.js'));
-app.use('/api/trayDrafts', require('./routes/supplier_tray_drafts.js'));
+app.use('/api/trayDrafts', require('./routes/seller_tray_drafts.js'));
 app.use('/api/trayArchive', require('./routes/tray_archive.js'));
 
 app.use('/api/invoice', require('./routes/softDelete.js'));
 
 app.use('/api/settings', require('./routes/settings.js'));
 app.use('/api/message', require('./routes/contact_message.js'));
+
+app.use('/api/wallet', require('./routes/wallet.js'));
 
 
 // Public Directory and listen
@@ -147,6 +150,7 @@ app.listen(parseInt(process.env.SERVER_PORT), function() {
 	
 	console.log('--- Starting HTTP Server ---')
 	console.log('Private Invoice is using database: %s', process.env.DATABASE_NAME);
+	console.log('Private Invoice is listening on IP: %s', process.env.SERVER_IP_ADDRESS||netUtil.getLocalIp());
 	console.log('Private Invoice is listening on Port: %d', process.env.SERVER_PORT);
 
 });

@@ -1,5 +1,4 @@
 /**
-
  Apache-2.0 License
  Copyright 2020 - 2022 Web Service Development Inc.
 
@@ -24,9 +23,9 @@
 
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express					= require('express');
+const router					= express.Router();
+module.exports					= router;
 
 // Libraries
 
@@ -34,18 +33,23 @@ module.exports = router;
 
 const db						= require('../database.js');
 
-const CLIENT_ARCHIVE_STATUS		= "client_status_archive";
-const SUPPLIER_ARCHIVE_STATUS	= "supplier_status_archive";
+const BUYER__ARCHIVE_STATUS		= "buyer_status_archive";
+const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
 
 
 
-// End Points
+// ------------------------------- End Points -------------------------------
 
-router.post('/softDeleteSupplier', async function(req, res) {
+/*
+ * softDeleteSeller
+ */
+router.post('/softDeleteSeller', async function(req, res) {
 
-	const user_uuid				 = "supplier_uuid";
-	const archive				= "supplier_archived";
-	const table					= SUPPLIER_ARCHIVE_STATUS;
+	const METHOD = '/softDeleteSeller';
+
+	const member_uuid			= "seller_uuid";
+	const archive				= "seller_archived";
+	const table					= SELLER_ARCHIVE_STATUS;
 
 	let sql = `
 		UPDATE
@@ -53,7 +57,7 @@ router.post('/softDeleteSupplier', async function(req, res) {
 		SET
 			${archive} = 1
 		WHERE
-			${user_uuid} = ?
+			${member_uuid} = ?
 		AND
 			document_uuid = ?
 		AND
@@ -63,7 +67,7 @@ router.post('/softDeleteSupplier', async function(req, res) {
 	`;
 
 	let args = [
-		req.session.data.user_uuid,
+		req.session.data.member_uuid,
 		req.body.document_uuid
 	];
 
@@ -94,13 +98,16 @@ router.post('/softDeleteSupplier', async function(req, res) {
 
 });
 
-router.post('/softDeleteClient', async function(req, res) {
+/*
+ * softDeleteBuyer
+ */
+router.post('/softDeleteBuyer', async function(req, res) {
 
-	const METHOD = '/softDeleteClient';
+	const METHOD = '/softDeleteBuyer';
 
-	const user_uuid = "client_uuid";
-	const archive = "client_archived";
-	const table = CLIENT_ARCHIVE_STATUS;
+	const member_uuid		= "buyer_uuid";
+	const archive			= "buyer_archived";
+	const table				= BUYER__ARCHIVE_STATUS;
 
 	let sql = `
 		UPDATE
@@ -108,7 +115,7 @@ router.post('/softDeleteClient', async function(req, res) {
 		SET
 			${archive} = 1
 		WHERE
-			${user_uuid} = ?
+			${member_uuid} = ?
 		AND
 			document_uuid = ?
 		AND
@@ -118,7 +125,7 @@ router.post('/softDeleteClient', async function(req, res) {
 	`;
 
 	let args = [
-		req.session.data.user_uuid,
+		req.session.data.member_uuid,
 		req.body.document_uuid
 	];
 
@@ -147,4 +154,3 @@ router.post('/softDeleteClient', async function(req, res) {
 	});
 
 });
-

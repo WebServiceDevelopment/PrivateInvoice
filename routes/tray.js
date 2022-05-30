@@ -21,58 +21,71 @@
 "use strict";
 
 // Inport
-const sub			= require("./tray_sub.js");
+const sub				= require("./tray_sub.js");
 
 // Import Router
 
-const express		= require('express');
-const router		= express.Router();
-module.exports		= router;
+const express			= require('express');
+const router			= express.Router();
+module.exports			= router;
 
 // Database
 
-const CLIENT_STATUS	= "client_status";
-const SUPPLIER_STATUS   = "supplier_status";
+const BUYER_STATUS		= "buyer_status";
+const SELLER_STATUS		= "seller_status";
 
-// Total
-router.post('/getTotalClient', async function(req, res) {
+// ------------------------------- End Points -------------------------------
 
-	sub.getTotal(req, res, CLIENT_STATUS);
+/*
+ * getTotalBuyer
+ */
+router.post('/getTotalBuyer', async function(req, res) {
 
-});
-
-router.post('/getTotalSupplier', async function(req, res) {
-
-	sub.getTotal(req, res, SUPPLIER_STATUS);
+	sub.getTotal(req, res, BUYER_STATUS);
 
 });
 
-// End Points
-router.post('/getCountClient', function(req, res) {
-	//console.log("2 CLIENT /getCountClient "+req.body.role);
+/*
+ * getTotalSeller
+ */
+router.post('/getTotalSeller', async function(req, res) {
 
-	sub.getCount(req, res, CLIENT_STATUS);
-
-});
-
-router.post('/getCountSupplier', function(req, res) {
-	//console.log("1 SUPPLIER /getCountSupplier "+req.body.role);
-
-	sub.getCount(req, res, SUPPLIER_STATUS);
+	sub.getTotal(req, res, SELLER_STATUS);
 
 });
 
+/*
+ * getCountBuyer
+ */
+router.post('/getCountBuyer', function(req, res) {
 
-router.post('/getFolderClient', function(req, res) {
-	//console.log("CLIENT /getFolderClient");
-
-	sub.getFolder(req, res, CLIENT_STATUS);
+	sub.getCount(req, res, BUYER_STATUS);
 
 });
 
-router.post('/getFolderSupplier', function(req, res) {
-	//console.log("CLIENT /getFolderSupplier");
+/*
+ * getCountSeller
+ */
+router.post('/getCountSeller', function(req, res) {
 
-	sub.getFolder(req, res, SUPPLIER_STATUS);
+	sub.getCount(req, res, SELLER_STATUS);
+
+});
+
+/*
+ * getFolderBuyer
+ */
+router.post('/getFolderBuyer', function(req, res) {
+
+	sub.getFolder(req, res, BUYER_STATUS);
+
+});
+
+/*
+ * getFolderSeller
+ */
+router.post('/getFolderSeller', function(req, res) {
+
+	sub.getFolder(req, res, SELLER_STATUS);
 
 });
