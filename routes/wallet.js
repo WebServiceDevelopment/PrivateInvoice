@@ -259,7 +259,13 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	let gasPriceGwei = web3.utils.fromWei(gasPrice , 'Gwei');
 	let gasGwei = estimateGas * gasPriceGwei;
 
-	let payment = doc.document_totals.total.replace(/,/g,"");
+/*
+	for (let key in doc.document_totals){
+		console.log(key +":"+ doc.document_totals[key]);
+	}
+*/
+
+	let payment = doc.credentialSubject.totalPaymentDue.price.replace(/,/g,"");
 
 	let makePaymantTo = parseFloat(payment);
 	let transferCost  = 0;

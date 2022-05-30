@@ -98,7 +98,7 @@ const SettingsProfile = (function() {
 		this.DOM.organization.cancel.setAttribute('disabled', 'disabled');
 		this.DOM.organization.edit.classList.remove('disabled');
 
-		console.log(this.DOM);
+		//console.log(this.DOM);
 
 	}
 

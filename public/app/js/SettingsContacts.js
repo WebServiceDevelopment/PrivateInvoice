@@ -149,7 +149,7 @@ const SettingsContacts = (function() {
 
 		contacts.forEach ( contact => {
 
-			console.log(contact);
+			//console.log(contact);
 
 			const li = document.createElement('li');
 			const table = document.createElement('table');
@@ -227,7 +227,7 @@ const SettingsContacts = (function() {
 			const label = document.createElement('a');
 			const sinceSpan = document.createElement('span');
 			label.textContent = 'Addon On';
-			console.log(contact.created_on);
+			//console.log(contact.created_on);
 			const since = moment(contact.created_on);
 			sinceSpan.textContent = since.fromNow();
 

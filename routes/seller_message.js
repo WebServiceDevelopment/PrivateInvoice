@@ -229,16 +229,19 @@ router.post('/sellerToMakePayment', async (req, res) => {
 	//
     const [ document, _3 ] = await sub.getDocument(SELLER_DOCUMENT, document_uuid);
 	const document_json = JSON.parse(document.document_json);
-	const document_totals = document_json.document_totals;
+	const totalPaymentDue = document_json.credentialSubject.totalPaymentDue;
 
-	console.log("document_totals="+document_totals.total);
+	console.log("totalPaymentDue="+totalPaymentDue.price);
 
 	let wk = '0';
-	if( document_totals != null && document_totals.total != null) {
-		if( document_totals.total.indexOf(" ") !== -1) {
-			wk =  document_totals.total.split(" ")[0]
+	if( totalPaymentDue != null && totalPaymentDue.price != null) {
+/*
+		if( totalPaymentDue.price.indexOf(" ") !== -1) {
+			wk =  totalPaymentDue.price.split(" ")[0]
 			wk = wk.replace(/,/g,'');
 		}
+*/
+		wk = totalPaymentDue.price;
 	}
 	const total = web3.utils.toWei(wk , 'Gwei');
 

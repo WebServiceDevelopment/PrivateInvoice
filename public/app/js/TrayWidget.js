@@ -795,8 +795,6 @@ const TrayWidget = (function() {
 
 			this.MEM.setResults( res.msg );
 
-
-			 console.log("folder = "+folder);
 			this.SIMULATE.clickNewDocument(role, folder, archive);
 
 			this.API.renderFolder(role, folder, archive);
@@ -839,8 +837,6 @@ const TrayWidget = (function() {
 
 		elem.classList.add(ACTIVE );
 		this.STATUS.setActiveLi( elem );
-
-		console.log("folder = "+folder);
 
 		DocumentWidget.API.openDocument(elem.memberData.doc.document_uuid, role, folder, archive);
 	}
