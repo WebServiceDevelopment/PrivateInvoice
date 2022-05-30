@@ -564,7 +564,7 @@ router.post('/makePayment', async function(req, res) {
 	// Ask for payment from document.
 	// And Convert payment to hex.
 	//
-	let payment = doc.document_totals.total.replace(/,/g,"")
+	let payment = doc.credentialSubject.totalPaymentDue.price.replace(/,/g,"")
 
 	if(payment.indexOf(' ')) {
         payment = payment.split(" ")[0];

@@ -58,7 +58,7 @@ const TabWidget = (function() {
 	}
 
 	function api_openSection(leaf) {
-		console.log(leaf);
+		//console.log(leaf);
 
 		for(let key in this.DOM.tab) {
 			if(this.DOM.tab[key]) {

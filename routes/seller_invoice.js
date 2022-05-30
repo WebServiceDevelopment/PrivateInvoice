@@ -435,15 +435,16 @@ router.post('/recreate', async function(req, res) {
 //
     let document_json = JSON.parse(old_document.document_json);
 
-	document_json.type = 'Invoice';
+	document_json.credentialSubject.type = 'Invoice';
 
 	// Update if customerReferenceNumber is revised.
 	//
-	// document_json.customerReferenceNumber = document_json.customerReferenceNumber;
-	document_json.identifier = status.document_uuid;
-	document_json.invoiceNumber = status.document_number;
-	document_json.purchaseDate = status.due_by;
-	document_json.invoiceDate = status.create_on;
+	// document_json.credentialSubject.customerReferenceNumber = document_json.credentialSubject.customerReferenceNumber;
+
+	document_json.credentialSubject.identifier = status.document_uuid;
+	document_json.credentialSubject.invoiceNumber = status.document_number;
+	document_json.credentialSubject.purchaseDate = status.due_by;
+	document_json.credentialSubject.invoiceDate = status.create_on;
 
 	document.document_json = JSON.stringify(document_json);
 
@@ -466,7 +467,7 @@ router.post('/recreate', async function(req, res) {
 
 // 7.7 seller_details
 //
-    let seller = document_json.seller;
+    let seller = document_json.credentialSubject.seller;
     let seller_details = {}
     seller_details.organization_name = seller.name;
     seller_details.organization_tax_id = seller.taxId;
@@ -478,7 +479,7 @@ router.post('/recreate', async function(req, res) {
 
 // 7.8 seller_membername
 //
-	let seller_membername = document_json.seller.contactPoint.split("@")[0];
+	let seller_membername = document_json.credentialSubject.seller.contactPoint.split("@")[0];
 	document.seller_membername = seller_membername;
 
 // 7.9 buyer_uuid
@@ -487,7 +488,7 @@ router.post('/recreate', async function(req, res) {
 
 // 7.10 buyer_details
 //
-    let buyer = document_json.buyer;
+    let buyer = document_json.credentialSubject.buyer;
     let buyer_details = {}
     buyer_details.organization_name = buyer.name;
     buyer_details.organization_tax_id = buyer.taxId;
@@ -499,7 +500,7 @@ router.post('/recreate', async function(req, res) {
 
 // 7.11 buyer_membername
 //
-	let buyer_membername = document_json.buyer.contactPoint.split("@")[0];
+	let buyer_membername = document_json.credentialSubject.buyer.contactPoint.split("@")[0];
 	document.buyer_membername = buyer_membername;
 
 // 7.12 create_on
@@ -513,7 +514,7 @@ router.post('/recreate', async function(req, res) {
 	let document_meta =  {}
 	document_meta.document_number = status.document_number;
 	document_meta.created_on = status.create_on.substr(0,10);
-	document_meta.tax_id = document_json.seller.taxId;
+	document_meta.taxId = document_json.credentialSubject.seller.taxId;
 	document_meta.due_by = status.due_by;
 
     document.document_meta = JSON.stringify(document_meta);
@@ -521,7 +522,7 @@ router.post('/recreate', async function(req, res) {
 // 7.14 document_body
 //
     let document_body = [];
-    let iS = document_json.itemsShipped;
+    let iS = document_json.credentialSubject.itemsShipped;
 	let max_rows = iS.length;
 	for ( let i = 0; i< max_rows; i++) {
 		document_body[i] = {};
@@ -540,8 +541,8 @@ router.post('/recreate', async function(req, res) {
 // 7.15 document_totals
 //
 	let document_totals = {}
-    document_totals.subtotal = document_json.invoiceSubtotal.price +" "+document_json.invoiceSubtotal.priceCurrency;
-    document_totals.total = document_json.totalPaymentDue.price +" "+document_json.totalPaymentDue.priceCurrency;
+    document_totals.subtotal = document_json.credentialSubject.invoiceSubtotal.price +" "+document_json.credentialSubject.invoiceSubtotal.priceCurrency;
+    document_totals.total = document_json.credentialSubject.totalPaymentDue.price +" "+document_json.credentialSubject.totalPaymentDue.priceCurrency;
 
 	document.document_totals = JSON.stringify(document_totals);
 
