@@ -317,6 +317,7 @@ const DocumentWidget = (function() {
 		
 		if(memberData) {
 			this.MEM.document.buyer_uuid = memberData.member_uuid;
+
 			this.DOM.to.organization_name.value = memberData.organization_name || "";
 			this.DOM.to.organization_address.value = memberData.organization_address || "";
 			this.DOM.to.organization_building.value = memberData.organization_building || "";
@@ -331,6 +332,11 @@ const DocumentWidget = (function() {
 
 		//this.MEM.document.buyer_details = memberData;
 		this.MEM.document.buyer_details = memberData;
+
+		let doc = this.MEM.document;
+		for(let key in doc) {
+			console.log(key +"="+doc[key]);
+		}
 
 		this.API.triggerSavePoint();
 
@@ -846,13 +852,12 @@ const DocumentWidget = (function() {
 
 		Traceability.API.setSign(this.MEM.document);
 
-		console.log(JSON.stringify(this.MEM.document.buyer_details));
-
 		//debugger;
 
 		this.DOM.inputs.save.setAttribute("disabled", "disabled");
 
-		const document_json = Traceability.API.getCredentialSubject();
+		const document_json = Traceability.API.getCredential();
+		document_json.credentialSubject = Traceability.API.getCredentialSubject();
 
 		const param = {
 			document_uuid : this.MEM.document.document_uuid,
@@ -1194,7 +1199,9 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 
 		//console.log("openDocument");
 
-		Traceability.API.setCredentialSubject(res.msg.document_json);
+		Traceability.API.setCredential (res.msg.document_json);
+
+		Traceability.API.setCredentialSubject(res.msg.document_json.credentialSubject);
 /*
  *
  * Traceability.API.getSign (res.msg)
@@ -1285,7 +1292,13 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 
 			this.DOM.meta.document_number.textContent = this.MEM.document.document_meta.document_number;
 			this.DOM.meta.created_on.textContent = this.MEM.document.document_meta.created_on;
+
 			this.DOM.meta.taxId.textContent = this.MEM.document.document_meta.taxId;
+			let document_meta = this.MEM.document.document_meta;
+			for(let key in document_meta) {
+				console.log(key +"="+document_meta[key]);
+			}
+
 			this.DOM.meta.due_by.textContent = "";
 
 			let due_input = document.createElement("input");

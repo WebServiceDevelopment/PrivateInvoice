@@ -119,7 +119,7 @@ const SettingsMenu = (function() {
 
 	function api_openPage(leaf) {
 
-		console.log("Open : %s", leaf);
+		//console.log("Open : %s", leaf);
 
 		//if(this.MEM.leaf === leaf) {
 		if(this.MEM.getLeaf() === leaf) {
@@ -137,7 +137,7 @@ const SettingsMenu = (function() {
 			break;
 		}
 
-		console.log(leaf)
+		//console.log(leaf)
 		//this.MEM.leaf = leaf;
 		this.MEM.setLeaf( leaf );
 		this.DOM.activeMenu = this.DOM.menu[leaf];
@@ -150,7 +150,7 @@ const SettingsMenu = (function() {
 
 	function evt_handleMenuClick(evt) {
 
-		console.log("click");
+		//console.log("click");
 
 		let elem = evt.target;
 		while(elem.parentNode && elem.tagName !== "LI") {

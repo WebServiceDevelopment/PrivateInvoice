@@ -32,8 +32,11 @@ function  Traceability_class () {
 		setCredentialSubject	: api_setCredentialSubject.bind(this),
 		getCredentialSubject	: api_getCredentialSubject.bind(this),
 		init					: api_initCredentialSubject.bind(this),
+		setCredential			: api_setCredential.bind(this),
+		getCredential			: api_getCredential.bind(this),
 	}
 
+	this.credential = null;
 	this.credentialSubject = new credentialSubject_object();
 
 	function credentialSubject_object () {
@@ -158,6 +161,13 @@ function  Traceability_class () {
 
 	return this;
 
+	function api_setCredential(credential) {
+		this.credential = credential;
+	}
+	function api_getCredential() {
+		return this.credential;
+	}
+
 	function api_initCredentialSubject() {
 
 		this.credentialSubject = new credentialSubject_object();
@@ -201,6 +211,10 @@ function  Traceability_class () {
  *
  * Add buyer_uuid and buyer_membername information to
  * DocumentWidget.MEM.document.buyer_details
+ *
+ *
+ * Tax Number refers to "credentialSubject.seller.taxId".
+ *
  */
 	function api_getSign (document) {
 
@@ -227,17 +241,10 @@ function  Traceability_class () {
 		doc.seller_details				= get.seller();
 		doc.buyer_details				= get.buyer();
 
-/* 20220529
-		doc.buyer_details.buyer_uuid	= document.buyer_uuid;
-		doc.buyer_details.buyer_membername	= document.buyer_membername;
-*/
 		doc.buyer_details.member_uuid	= document.buyer_uuid;
 		doc.buyer_details.membername	= document.buyer_membername;
 
-		console.log("doc.buyer_details.buyer_uuid="+doc.buyer_details.buyer_uuid)
-		console.log("doc.buyer_details.buyer_membername="+doc.buyer_details.buyer_membername)
-
-        doc.document_meta.taxId		= doc.seller_details.taxId;
+        doc.document_meta.taxId			= document.document_json.credentialSubject.seller.taxId;
 
 
 		w = [];
@@ -286,17 +293,14 @@ function  Traceability_class () {
 
 		doc.comments					= get.comments();
 
-		//console.log("doc.comments="+doc.comments);
 
 		if(doc.seller_details.contactPoint != null && doc.seller_details.contactPoin != "") {
 			
 			if( doc.seller_details.contactPoint.indexOf("@") !== -1) {
 				wk = doc.seller_details.contactPoint.split("@"); 
 				doc.seller_membername	= wk[0]; 
-				console.log("seller_membername  ="+doc.seller_membername);
 			}
 		} else {
-			console.log("here "+doc.seller_details.contactPoint);
 			doc.seller_details.member_name	= ""; 
 		}
 
@@ -305,10 +309,8 @@ function  Traceability_class () {
 			if( doc.buyer_details.contactPoint.indexOf("@") !== -1) {
 				wk = doc.buyer_details.contactPoint.split("@"); 
 				doc.buyer_membername	= wk[0]; 
-				console.log("buyer_membername  ="+doc.buyer_membername);
 			}
 		} else {
-			console.log("here doc.buyer_details.member_name:"+doc.buyer_details.contactPoint);
 			doc.buyer_details.member_name	= "";
 		}
 
@@ -383,6 +385,8 @@ function  Traceability_class () {
 		seller.address.addressLocality = details.organization_building||"";
 
 		seller.contactPoint = details.contactPoint 
+
+		seller.id = details.member_uuid;
 	}
 
 	function get_seller () {
@@ -402,6 +406,8 @@ function  Traceability_class () {
 		obj.organization_building = seller.address.addressLocality;
 
 		obj.contactPoint = seller.contactPoint;
+
+		obj.member_uuid = seller.id ;
 
 		return obj;
 
@@ -425,6 +431,8 @@ function  Traceability_class () {
 		buyer.address.addressLocality = details.organization_building||"";
 
 		buyer.contactPoint = details.contactPoint 
+
+		buyer.id = details.member_uuid;
 	}
 
 	function get_buyer () {
@@ -444,6 +452,8 @@ function  Traceability_class () {
 		obj.organization_building = buyer.address.addressLocality;
 
 		obj.contactPoint = buyer.contactPoint;
+
+		obj.member_uuid = buyer.id ;
 
 		return obj;
 

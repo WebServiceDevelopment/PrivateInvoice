@@ -54,7 +54,7 @@ const SessionWidget = (function() {
 
 	function init() {
 
-		console.log("v 104");
+		//console.log("v 104");
 
 		// Init Events
 

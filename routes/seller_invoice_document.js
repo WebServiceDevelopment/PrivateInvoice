@@ -441,7 +441,45 @@ router.post('/create', async function(req, res) {
 
 
 	// 3.
+    // credential_object ()
+    // credentialSubject_object ()
+    // itemsShipped_object ()
 	//
+
+    function credential_object () {
+        return {
+			"@context": [
+				"https://www.w3.org/2018/credentials/v1",
+				"https://w3id.org/traceability/v1"
+			],
+			"id": "did:key:",
+			"type": [
+				"VerifiableCredential",
+				"CommercialInvoiceCertificate"
+			],
+			"name": "Commercial Invoice Certificate",
+			"issuanceDate": "",
+			"issuer": {
+				"type": "Entity",
+				"id": "did:key:",
+				"entityType": "Organization",
+				"name": "",
+				"address": {
+					"type": [
+						"PostalAddress"
+					],
+					"organizationName": "",
+					"streetAddress": "",
+					"addressLocality": "",
+					"addressRegion": "",
+					"postalCode": "",
+					"addressCountry": ""
+				}
+			},
+
+			"credentialSubject": {}
+        }
+    }
 
     function credentialSubject_object () {
         return {
@@ -454,6 +492,7 @@ router.post('/create', async function(req, res) {
 
             "seller":{
                 "type"              : "Organization",
+				"id"				: "",
                 "name"              : "",
                 "taxId"             : "",
                 "description"       : "",
@@ -467,6 +506,7 @@ router.post('/create', async function(req, res) {
 
             "buyer":{
                 "type"              : "Organization",
+				"id"				: "",
                 "name"              : "",
                 "taxId"             : "",
                 "description"       : "",
@@ -531,16 +571,16 @@ router.post('/create', async function(req, res) {
 
 	// 4.
 	//
-	let document_json = new credentialSubject_object (); 
+	let credentialSubject = new credentialSubject_object (); 
 
-	document_json.customerReferenceNumber = "";
-	document_json.identifier = document_uuid;
-	document_json.invoiceNumber = document_number;
-	document_json.invoiceDate = invoiceDate;
-	document_json.purchaseDate = due_by;
-	document_json.itemsShipped = [];
+	credentialSubject.customerReferenceNumber = "";
+	credentialSubject.identifier = document_uuid;
+	credentialSubject.invoiceNumber = document_number;
+	credentialSubject.invoiceDate = invoiceDate;
+	credentialSubject.purchaseDate = due_by;
+	credentialSubject.itemsShipped = [];
 	for( let i=0; i< MAX_ROWS; i++) {
-		document_json.itemsShipped[i] = new itemsShipped_object ();
+		credentialSubject.itemsShipped[i] = new itemsShipped_object ();
 	}
 
 
@@ -580,8 +620,9 @@ router.post('/create', async function(req, res) {
 
 	// 6.
 	//
-	let seller = document_json.seller;
+	let seller = credentialSubject.seller;
 
+	seller.id = row.member_uuid;
 	seller.name = row.organization_name;
 	seller.taxId = row.organization_tax_id;
 	seller.description = row.organization_department;
@@ -598,18 +639,24 @@ router.post('/create', async function(req, res) {
 	}
 
 	const contactPoint = row.membername+"@"+ip_address +":"+port
-	document_json.seller.contactPoint = contactPoint;
-	document_json.seller.taxId = row.organization_tax_id;
+	credentialSubject.seller.contactPoint = contactPoint;
+	credentialSubject.seller.taxId = row.organization_tax_id;
 
 	console.log("contactPoint="+contactPoint);
 
-    // 7.
+	// 7.
+	let document_json = new credential_object ();
+
+	document_json.credentialSubject = credentialSubject;
+
+
+    // 8.
     // begin Transaction
     //
-    const [ conn , _7 ] = await tran.connection ();
+    const [ conn , _8 ] = await tran.connection ();
     await tran.beginTransaction(conn);
 
-	// 8.
+	// 9.
 	//
 	sql = `
 		INSERT INTO ${SELLER_DRAFT_STATUS} (
@@ -651,27 +698,27 @@ router.post('/create', async function(req, res) {
 		currency(0, config.CURRENCY).format(true)
 	];
 
-	const [result8 , err8 ] = await tran.insert(conn, sql, args);
+	const [result9 , err9 ] = await tran.insert(conn, sql, args);
 
-	if (err8) {
+	if (err9) {
 		console.log(err8);
-		errno = 8;
-		code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err8.sqlMessage, errno);
-		return res.status(400).json({ err : 8, msg : msg });
-	}
-
-	// 9.
-	//
-	if(result8.affectedRows != 1) {
 		errno = 9;
 		code = 400;
-		const err9 = MESSAGE_AFFECTED_ROWS;
-	    let msg = tran.rollbackAndReturn(conn, code, err9, errno);
-		return res.status(400).json({ err : errno, msg : msg });
+	    let msg = tran.rollbackAndReturn(conn, code, err9.sqlMessage, errno);
+		return res.status(400).json({ err : 9, msg : msg });
 	}
 
 	// 10.
+	//
+	if(result9.affectedRows != 1) {
+		errno = 10;
+		code = 400;
+		const err10 = MESSAGE_AFFECTED_ROWS;
+	    let msg = tran.rollbackAndReturn(conn, code, err10, errno);
+		return res.status(400).json({ err : errno, msg : msg });
+	}
+
+	// 11.
 	//
 
 	sql = `
@@ -707,7 +754,7 @@ router.post('/create', async function(req, res) {
 	const document_meta = {
 		document_number : document_number,
 		created_on : moment().format("YYYY-MM-DD"),
-		tax_id : member_data.organization_tax_id,
+		taxId : member_data.organization_tax_id,
 		due_by : due_by
 	};
 
@@ -748,38 +795,38 @@ router.post('/create', async function(req, res) {
 	//console.log("Insert into Document (execute)");
 	//console.log(Date.now());
 
-	const [ result10, err10 ] = await tran.insert(conn, sql, args);
+	const [ result11, err11 ] = await tran.insert(conn, sql, args);
 
-	if (err10) {
-		errno = 10;
-		code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err10, errno);
-		return res.status(400).json({ err : errno, msg : msg });
-	}
-
-	// 11.
-	//	
-	if(result10.affectedRows != 1) {
+	if (err11) {
 		errno = 11;
 		code = 400;
-		const err11 = MESSAGE_AFFECTED_ROWS;
 	    let msg = tran.rollbackAndReturn(conn, code, err11, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
 
-    // 11.
+	// 12.
+	//	
+	if(result11.affectedRows != 1) {
+		errno = 12;
+		code = 400;
+		const err11 = MESSAGE_AFFECTED_ROWS;
+	    let msg = tran.rollbackAndReturn(conn, code, err12, errno);
+		return res.status(400).json({ err : errno, msg : msg });
+	}
+
+    // 13.
     // commit
     //
-    const [ _12, err12 ] = await tran.commit(conn);
+    const [ _13, err13 ] = await tran.commit(conn);
 
-    if (err12 ) {
-        errno = 12;
+    if (err13 ) {
+        errno = 13;
         code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err12, errno);
+	    let msg = tran.rollbackAndReturn(conn, code, err13, errno);
 		return res.status(400).json({ err : errno, msg : msg });
     }
 
-    // 13.
+    // 14.
     //
     conn.end();
 
