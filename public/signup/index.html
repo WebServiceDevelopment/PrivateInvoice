@@ -19,6 +19,7 @@
 
 **/
 -->
+
 <!doctype html>
 <html>
 
@@ -45,9 +46,16 @@
 				
 				<h2>Get Started with Private Invoice</h2>
 
+				<p>
+					<b class='warning'>WARNING:</b>
+					This application is <u>under development</u>. 
+					<b>No</b> <em><a target='_blank' href='https://en.wikipedia.org/wiki/Personal_data'>Personally Identifiable Information</a></em> 
+					should be used.
+				</p>
+
 				<!-- END ACCOUNT INFORMATION -->
 
-				<h3>Company Information</h3>
+				<h3>Company Information <button id='Randomize.company'>Randomize</button> </h3>
 
 				<!-- START COMPANY INFORMATION -->
 
@@ -59,29 +67,45 @@
 							<label class="placeholder required">Company Name</label>
 							<input type="text" id="SignupForm.company.name" autocomplete="off"/>
 							<div class="underline"></div>
+							<div class='helper'>The name of your company as it should appear on an Invoice</div>
+						</div>
+
+						<div class="field">
+							<label class="placeholder required">Company Tax Id</label>
+							<input type="text" id="SignupForm.company.taxId" autocomplete="off"/>
+							<div class="underline"></div>
+							<div class='helper'>Ex. In the United States of America this should be your EIN</div>
+						</div>
+
+						<h4>Address</h4>
+
+						<div class="field">
+							<label class="placeholder required">Company Country</label>
+							<input type="text" id="SignupForm.address.company" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+						<div class="field">
+							<label class="placeholder required">Company State or Region</label>
+							<input type="text" id="SignupForm.address.region" autocomplete="off"/>
+							<div class="underline"></div>
 						</div>
 
 						<div class="field">
 							<label class="placeholder required">Company Postcode</label>
-							<input type="text" id="SignupForm.company.postcode" autocomplete="off"/>
+							<input type="text" id="SignupForm.address.postcode" autocomplete="off"/>
 							<div class="underline"></div>
 						</div>
 
 						<div class="field">
-							<label class="placeholder required">Company Address</label>
-							<input type="text" id="SignupForm.company.address" autocomplete="off"/>
+							<label class="placeholder required">Company Address Line 1</label>
+							<input type="text" id="SignupForm.address.line1" autocomplete="off"/>
 							<div class="underline"></div>
 						</div>
 
 						<div class="field">
-							<label class="placeholder required">Company Building</label>
-							<input type="text" id="SignupForm.company.building" autocomplete="off"/>
-							<div class="underline"></div>
-						</div>
-
-						<div class="field">
-							<label class="placeholder required">Company Department</label>
-							<input type="text" id="SignupForm.company.department" autocomplete="off"/>
+							<label class="placeholder required">Company Address Line 2</label>
+							<input type="text" id="SignupForm.address.line2" autocomplete="off"/>
 							<div class="underline"></div>
 						</div>
 
@@ -90,7 +114,7 @@
 					<div class="aside">
 
 						<p>
-						Upload Company Logo
+						Upload Company Logo <a href='https://github.com/WebServiceDevelopment/PrivateInvoice/issues/4'>Note</a>
 						</p>
 						
 						<li>Company Logo</li>
@@ -101,7 +125,7 @@
 
 				<!-- END COMPANY INFORMATION -->
 				
-				<h3>Account Information</h3>
+				<h3>Member Information <button id='Randomize.member'>Randomize</button> </h3>
 
 				<!-- START ACCOUNT INFORMATION -->
 
@@ -110,27 +134,41 @@
 					<div class="main">
 
 						<div class="field">
-							<label class="placeholder required">Username</label>
-							<input type="text" id="SignupForm.account.membername" autocomplete="off"/>
+							<label class="placeholder required">Member name</label>
+							<input type="text" id="SignupForm.member.membername" autocomplete="off"/>
 							<div class="underline"></div>
+							<div class='helper'>This is your username used to login (no spaces)</div>
+						</div>
+
+						<div class="field">
+							<label class="placeholder required">Job Title</label>
+							<input type="text" id="SignupForm.member.job_title" autocomplete="off"/>
+							<div class="underline"></div>
+							<div class='helper'>What is your job title at the company above?</div>
 						</div>
 
 						<div class="field">
 							<label class="placeholder required">Contact Email</label>
-							<input type="text" id="SignupForm.account.work_email" autocomplete="off"/>
+							<input type="text" id="SignupForm.member.contact_email" autocomplete="off"/>
 							<div class="underline"></div>
+							<div class='helper'>This is used if you forgot your password</div>
 						</div>
 
 						<div class="field">
 							<label class="placeholder required">Password</label>
-							<input type="password" id="SignupForm.account.password" autocomplete="off"/>
+							<input type="password" id="SignupForm.member.password" autocomplete="off"/>
 							<div class="underline"></div>
+							<div class='helper'>Minimum 8 characters in length, must contain a letter and number</div>
+							<div class='icon'>
+								<img src='img/visibility.png'/>
+							</div>
 						</div>
 
 						<div class="field">
 							<label class="placeholder required">Confirm Password</label>
-							<input type="password" id="SignupForm.account.confirm_password" autocomplete="off"/>
+							<input type="password" id="SignupForm.member.confirmPassword" autocomplete="off"/>
 							<div class="underline"></div>
+							<div class='helper'>Please re-enter your password to make sure you remember it</div>
 						</div>
 
 					</div>
@@ -138,7 +176,7 @@
 					<div class="aside">
 
 						<p>
-						Profile Image
+						Profile Image <a href='https://github.com/WebServiceDevelopment/PrivateInvoice/issues/4'>Note</a>
 						</p>
 						
 						<li>Upload Profile Image</li>
@@ -166,11 +204,12 @@
 
 			<div class="copyright">
 				Already have an account? <a href="/login/">Login</a><br>
-				Copyright &copy 2016 - 2021 Web Service Development
+				Copyright &copy 2016 - 2022 Web Service Development
 			</div>
 
 		</main>
 
+		<script type="text/javascript" src="js/Randomize.js"></script>
 		<script type="text/javascript" src="js/SignupForm.js"></script>
 
 	</body>
