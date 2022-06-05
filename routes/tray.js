@@ -21,18 +21,18 @@
 "use strict";
 
 // Inport
-const sub				= require("./tray_sub.js");
+const sub					= require("./tray_sub.js");
 
 // Import Router
 
-const express			= require('express');
-const router			= express.Router();
-module.exports			= router;
+const express				= require('express');
+const router				= express.Router();
+module.exports				= router;
 
 // Database
 
-const BUYER_STATUS		= "buyer_status";
-const SELLER_STATUS		= "seller_status";
+const BUYER_STATUS			= "buyer_status";
+const SELLER_STATUS			= "seller_status";
 
 // ------------------------------- End Points -------------------------------
 

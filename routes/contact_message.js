@@ -36,8 +36,9 @@ const uuidv1				= require('uuid').v1
 const db					= require('../database.js');
 
 
-// Helper functions
-
+/*
+ * Helper functions
+ */
 const checkInviteCodeValid = async(local_uuid, invite_code) => {
 
 	const sql = `
@@ -72,19 +73,13 @@ const checkInviteCodeValid = async(local_uuid, invite_code) => {
 		return [ null, new Error('Invite Code has been redeemed')];
 	}
 	
-	/*
-	// Remove Check for now
-	const { expires_on } = row;
-	const timeLimit = moment(expires_on)
-	if(moment().isAfter(timeLimit)) {
-		return [ null, new Error('Invite Code has expired')];
-	}
-	*/
-
 	return [ row, null ];
 
 }
 
+/*
+ * checkForExistingContact
+ */
 const checkForExistingContact = async (local_uuid, remote_uuid) => {
 
 	const sql = `
@@ -111,6 +106,9 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 
 }
 
+/*
+ * insertNewContact
+ */
 const insertNewContact = async (invite, localUser, remote_member, remote_organization) => {
 
 	// TODO update use_count on invite table
@@ -174,6 +172,9 @@ const insertNewContact = async (invite, localUser, remote_member, remote_organiz
 //------------------------------ define endpoints ------------------------------
 
 
+/*
+ * contactRequest
+ */
 router.all('/contactRequest', async(req, res) => {
 
 	console.log('--- Got Contact Request ---');

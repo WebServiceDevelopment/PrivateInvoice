@@ -145,7 +145,6 @@ const ContactWidget = (function() {
 			TrayWidget.API.updateCompany(memberData.organization_name);
 
 			memberData.contactPoint = _contactPoint(membername, memberData.remote_origin);
-			//memberData.taxId = memberData.organization_tax_id;
 
 		}
 		//console.log("memberData.contactPoint ="+memberData.contactPoint);

@@ -170,6 +170,15 @@ function  Traceability_class () {
 
 	function api_initCredentialSubject() {
 
+		let bool;
+		for(let key in this.credentialSubject) {
+			bool = delete this.credentialSubject[key];
+
+			if(!bool) {
+				console.log("This delete is failed.")
+			}
+		}
+		
 		this.credentialSubject = new credentialSubject_object();
 
 	}
@@ -381,8 +390,11 @@ function  Traceability_class () {
 
 		seller.description = details.organization_department;
 
-		seller.address.streetAddress = details.organization_address||"";
-		seller.address.addressLocality = details.organization_building||"";
+		seller.address.streetAddress = details.organization_building||"";
+		seller.address.addressLocality = details.organization_address||"";
+
+		seller.address.addressCountry = details.addressCountry||"";
+		seller.address.addressRegion = details.addressRegion||"";
 
 		seller.contactPoint = details.contactPoint 
 
@@ -401,9 +413,11 @@ function  Traceability_class () {
 
 		obj.organization_department = seller.description;
 
-		obj.organization_address = seller.address.streetAddress;
+		obj.organization_address = seller.address.addressLocality;
+		obj.organization_building = seller.address.streetAddress;
 
-		obj.organization_building = seller.address.addressLocality;
+		obj.addressCountry = seller.address.addressCountry;
+		obj.addressRegion = seller.address.addressRegion;
 
 		obj.contactPoint = seller.contactPoint;
 
@@ -427,8 +441,11 @@ function  Traceability_class () {
 
 		buyer.description = details.organization_department;
 
-		buyer.address.streetAddress = details.organization_address||"";
-		buyer.address.addressLocality = details.organization_building||"";
+		buyer.address.streetAddress = details.organization_building||"";
+		buyer.address.addressLocality = details.organization_address||"";
+
+		buyer.address.addressCountry = details.addressCountry||"";
+		buyer.address.addressRegion = details.addressRegion||"";
 
 		buyer.contactPoint = details.contactPoint 
 
@@ -447,9 +464,11 @@ function  Traceability_class () {
 
 		obj.organization_department = buyer.description;
 
-		obj.organization_address = buyer.address.streetAddress;
+		obj.organization_address = buyer.address.addressLocality;
+		obj.organization_building = buyer.address.streetAddress;
 
-		obj.organization_building = buyer.address.addressLocality;
+		obj.addressCountry = buyer.address.addressCountry;
+		obj.addressRegion = buyer.address.addressRegion;
 
 		obj.contactPoint = buyer.contactPoint;
 

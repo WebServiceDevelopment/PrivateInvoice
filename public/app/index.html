@@ -2166,95 +2166,99 @@
 							</div>
 
 							<div class="wallet-summary">
-								<div class="card">
-
-									<li>
-										<table>
-											<tr>
-												<td class="icon">
-													<div class="circle c-card">
-														<i class="far fa-credit-card"></i>
-													</div>
-												</td>
-												<td>
-													<h4>Add a payment method</h4>
-													<a>Link a card to charge credits</a>
-												</td>
-												<td class="conf">
-													<div class="check"/>
-														<i class="fas fa-check"></i>
-													</div>
-												</td>
-											</tr>
-										</table>
-									</li>
-
-									<li>
-										<table>
-											<tr>
-												<td class="icon">
-													<div class="circle b-bank">
-														<i class="fas fa-university"></i>
-													</div>
-												</td>
-												<td>
-													<h4>Add a bank account</h4>
-													<a>Set withdraw account info</a>
-												</td>
-												<td class="conf">
-													<div class="check"/>
-														<i class="fas fa-check"></i>
-													</div>
-												</td>
-											</tr>
-										</table>
-									</li>
-									
-
-								</div>
-
-								<div class="card">
-									
-									<label>Pending Income</label>
-
-									<div class="balance light">
-										<h4>+$400.00 USD</h4>
-									</div>
-									
-									<label>Pending Costs</label>
-
-									<div class="balance light">
-										<h4>-$600.00 USD</h4>
-									</div>
-
-								</div>
-
-								<div class="card">
+								<div class="card_1 card">
 
 									<label>Balance</label>
 
-									<div class="balance light">
-										<h4>$3,120.40 USD</h4>
+									<div class="balance light" >
+										<span id ="SettingsWallet.balance.balanceGwei"></span>
+										<span> Gwei</span>
+									</div>
+									<div class="balance strong_light" >
+										<span id ="SettingsWallet.balance.balanceWei"></span>
+										<span> Gwei</span>
 									</div>
 
-									<div class="buttons">
-										<button>Charge with Paypal</button>
-										<button>Charge with Credit Card</button>
-									</div>
+								</div>
+								<div class="card_2 card">
 
-									<div class="takeout">
-										<span>Withdraw</span>
-									</div>
+									<label>Deposit</label>
+
+									<table>
+									<tr>
+									<td colspan=4 >
+										Account Address:
+									</td>
+									</tr>
+									<tr>
+									<td colspan=4 class="account_address" id="SettingsWallet.deposit.accountAddress">
+										
+									</td>
+									</tr>
+									<tr>
+									<td>
+										Network:
+									</td>
+									<td id="SettingsWallet.deposit.networkType">
+									</td>
+									<td>
+										　 
+									</td>
+									<td>
+										　 
+									</td>
+									</tr>
+									<tr>
+									<td>
+										Chain id:
+									</td>
+									<td id="SettingsWallet.deposit.chainId">
+									</td>
+									<td>
+										　 
+									</td>
+									<td>
+										　 
+									</td>
+									</tr>
+									</table>
 									
 								</div>
+								<div class="card_3 card">
+
+									<label>Withdraw</label>
+									<table>
+									<tr>
+									<td>
+										Send To:
+									</td>
+									</tr>
+									<tr>
+									<td>
+										<input type="text" class="sendTo" id="Wallet.withdraw.sendTo" />
+									</td>
+									</tr>
+									<tr>
+									<td>
+										Send Amount:
+									</td>
+									</tr>
+									<tr>
+									<td>
+										<input type="text" class="sendAmount" id="Wallet.withdraw.sendAmount" />
+										Gwei
+									</td>
+									</tr>
+									</table>
+									<div class="buttons">
+										<button>Send</button>
+									</div>
+								</div>
+
 							</div>
 
 							<div class="wallet-graph">
 								
-								<h3>Finances</h3>
-
-								<img src="img/jl0inzi8zz401.png"/>
-
 								<h3>Recent Activity</h3>
 
 								<ul>
@@ -2266,200 +2270,35 @@
 												<th class="date">
 													Date
 												</th>
-												<th class="membername">	
-													Member name
+												<th class="type">	
+													Type
 												</th>
-												<th class="subject">
-													Subject
+												<th class="transaction_hash">
+													Transaction Hash
 												</th>
-												<th class="status">
-													Status
+												<th class="receipt">
+													Receipt
+												</th>
+												<th class="invoice">
+													Invoice
 												</th>
 												<th class="amount">
 													Amount
 												</th>
 											</tr>
 											</thead>
-											<tbody>
-											<tr>
-												<td class="date">
-													02 Mar 2019
-												</td>
-												<td class="membername">	
-													membername@instance
-												</td>
-												<td class="subject">
-													Payment to Emo Doe
-												</td>
-												<td class="status">
-													<span class="complete">Completed</span>
-												</td>
-												<td class="amount">
-													-$400.00
-												</td>
-											</tr>
-											<tr>
-												<td class="date">
-													02 Mar 2019
-												</td>
-												<td class="membername">	
-													membername@instance
-												</td>
-												<td class="subject">
-													Payment to Emo Doe
-												</td>
-												<td class="status">
-													<span class="complete">Completed</span>
-												</td>
-												<td class="amount">
-													-$400.00
-												</td>
-											</tr>
-											<tr>
-												<td class="date">
-													02 Mar 2019
-												</td>
-												<td class="membername">	
-													membername@instance
-												</td>
-												<td class="subject">
-													Payment to Emo Doe
-												</td>
-												<td class="status">
-													<span class="complete">Completed</span>
-												</td>
-												<td class="amount">
-													-$400.00
-												</td>
-											</tr>
-											<tr>
-												<td class="date">
-													02 Mar 2019
-												</td>
-												<td class="membername">	
-													membername@instance
-												</td>
-												<td class="subject">
-													Payment to Emo Doe
-												</td>
-												<td class="status">
-													<span class="complete">Completed</span>
-												</td>
-												<td class="amount">
-													-$400.00
-												</td>
-											</tr>
-											<tr>
-												<td class="date">
-													02 Mar 2019
-												</td>
-												<td class="membername">	
-													membername@instance
-												</td>
-												<td class="subject">
-													Payment to Emo Doe
-												</td>
-												<td class="status">
-													<span class="cancel">Cancelled</span>
-												</td>
-												<td class="amount">
-													-$400.00
-												</td>
-											</tr>
-											<tr>
-												<td class="date">
-													02 Mar 2019
-												</td>
-												<td class="membername">	
-													membername@instance
-												</td>
-												<td class="subject">
-													Payment to Emo Doe
-												</td>
-												<td class="status">
-													<span class="complete">Completed</span>
-												</td>
-												<td class="amount">
-													-$400.00
-												</td>
-											</tr>
-											<tr>
-												<td class="date">
-													02 Mar 2019
-												</td>
-												<td class="membername">	
-													membername@instance
-												</td>
-												<td class="subject">
-													Payment to Emo Doe
-												</td>
-												<td class="status">
-													<span class="complete">Completed</span>
-												</td>
-												<td class="amount">
-													-$400.00
-												</td>
-											</tr>
-											<tr>
-												<td class="date">
-													02 Mar 2019
-												</td>
-												<td class="membername">	
-													membername@instance
-												</td>
-												<td class="subject">
-													Payment to Emo Doe
-												</td>
-												<td class="status">
-													<span class="complete">Completed</span>
-												</td>
-												<td class="amount">
-													-$400.00
-												</td>
-											</tr>
-											<tr>
-												<td class="date">
-													02 Mar 2019
-												</td>
-												<td class="membername">	
-													membername@instance
-												</td>
-												<td class="subject">
-													Payment to Emo Doe
-												</td>
-												<td class="status">
-													<span class="complete">Completed</span>
-												</td>
-												<td class="amount">
-													-$400.00
-												</td>
-											</tr>
-											<tr>
-												<td class="date">
-													02 Mar 2019
-												</td>
-												<td class="membername">	
-													membername@instance
-												</td>
-												<td class="subject">
-													Payment from Jimmy Boo
-												</td>
-												<td class="status">
-													<span class="complete">Completed</span>
-												</td>
-												<td class="amount">
-													+$400.00
-												</td>
-											</tr>
+											<tbody id="SettingsWallet.RecentActivity.tbody">
 											</tbody>
 										</table>
 									</li>
 
+<!--
 									<div class="button">
 										
 										<button>View More</button>
 
 									</div>
+-->
 
 								</ul>
 
@@ -2952,54 +2791,120 @@
 												<span id='SettingsProfile.organization.edit'>Edit</span>
 											</h4>
 
-											<li>
-												<label>Organization Name</label>
+											<table class="organization-details">
+											<tr>
+												<td>
+													<label>Organization Name :</label>
+												</td>
+												<td>
 												<div class="input">
 													<input type="text" placeholder="My Awesome Organization" id="SettingsProfile.organization.organization_name"/>
-												<p>This is your legal organization or personal name</p>
 												</div>
-											</li>
+												</td>
+												<td>
+												This is your legal organization or personal name.
+												</td>
+											</tr>
 
-											<li>
-												<label>Postcode</label>
+											<tr>
+												<td>
+												<label>Postcode :</label>
+												</td>
+												<td>
 												<div class="input">
 													<input type="text" placeholder="Postcode" id="SettingsProfile.organization.organization_postcode"/>
-												<p>This is the postcode of where you live</p>
 												</div>
-											</li>
+												</td>
+												<td>
+												This is the postcode of where you live.
+												</td>
+											</tr>
 
-											<li>
-												<label>Address</label>
+											<tr>
+												<td>
+												<label>Address :</label>
+												</td>
+												<td>
 												<div class="input">
 													<input type="text" placeholder="Address Line 1" id="SettingsProfile.organization.organization_address"/>
-												<p>This is first line of your address</p>
 												</div>
-											</li>
+												</td>
+												<td>
+												This is first line of your address.
+												</td>
+											</tr>
 
-											<li>
-												<label>Building Name</label>
+											<tr>
+												<td>
+												<label>Building Name :</label>
+												</td>
+												<td>
 												<div class="input">
 													<input type="text" placeholder="Address Line 2" id="SettingsProfile.organization.organization_building"/>
-												<p>This is second line of your address</p>
 												</div>
-											</li>
+												</td>
+												<td>
+												This is second line of your address.
+												</td>
+											</tr>
 
-											<li>
-												<label>Department</label>
+											<tr>
+												<td>
+												<label>Department :</label>
+												</td>
+												<td>
 												<div class="input">
 													<input type="text" placeholder="Your Role Here" id="SettingsProfile.organization.organization_department"/>
-												<p>This is the name of the department (if it exists)</p>
 												</div>
-											</li>
+												</td>
+												<td>
+												This is the name of the department (if it exists).
+												</td>
+											</tr>
 											
 
-											<li>
-												<label>Organization Tax Id</label>
+											<tr>
+												<td>
+												<label>Organization Tax Id :</label>
+												</td>
+												<td>
 												<div class="input">
 													<input type="text" placeholder="1234567890123" id="SettingsProfile.organization.organization_tax_id"/>
-													<p>This is the tax identification number (TIN) of your legal entity</p>
 												</div>
-											</li>
+												</td>
+												<td>
+													This is the tax identification number (TIN) of your legal entity.
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+												<label>Country :</label>
+												</td>
+												<td>
+												<div class="input">
+													<input type="text" placeholder="Country" id="SettingsProfile.organization.addressCountry"/>
+												</div>
+												</td>
+												<td>
+													<p></p>
+												</td>
+											</tr>
+											
+											<tr>
+												<td>
+												<label>Region :</label>
+												</td>
+												<td>
+												<div class="input">
+													<input type="text" placeholder="1234567890123" id="SettingsProfile.organization.addressRegion"/>
+												</div>
+												</td>
+												<td>
+													<p></p>
+												</td>
+											</tr>
+											</table>
 											
 
 											<div class="form-edit">
@@ -3060,29 +2965,49 @@
 												<span id='SettingsProfile.profile.edit'>Edit</span>
 											</h4>
 
-											<li>
-												<label>Member name</label>
+											<table class="profile-details">
+											<tr>
+												<td>
+												<label>Member name :</label>
+												</td>
+												<td>
 												<div class="input">
 													<input type="text" placeholder="membername@instance" id="SettingsProfile.profile.membername" readonly="readonly"/>
 												</div>
-												<p>This is the membername used to address documents</p>
-											</li>
+												</td>
+												<td>
+												This is the membername used to address documents.
+												</td>
+											</tr>
 
-											<li>
-												<label>User UUID</label>
+											<tr>
+												<td>
+												<label>User UUID :</label>
+												</td>
+												<td>
 												<div class="input">
 													<input type="text" placeholder="xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx" id="SettingsProfile.profile.member_uuid" readonly="readonly"/>
 												</div>
-												<p>This is your member uuid for reference</p>
-											</li>
+												</td>
+												<td>
+												This is your member uuid for reference.
+												</td>
+											</tr>
 
-											<li>
-												<label>Email Address</label>
+											<tr>
+												<td>
+												<label>Email Address :</label>
+												</td>
+												<td>
 												<div class="input">
 													<input type="text" placeholder="membername@email.com" id="SettingsProfile.profile.work_email" readonly="readonly"/>
 												</div>
-												<p>Notifications will be sent to this email address</p>
-											</li>
+												</td>
+												<td>
+												Notifications will be sent to this email address.
+												</td>
+											</tr>
+											</table>
 
 											<p class="notice">
 											Currently this form does not allow for you to 
@@ -3494,9 +3419,9 @@
 								</td>
 -->
 								<td class="dl">
-									<span>
+									<span id="Toolset.DownloadJSON" >
 										<i class="far fa-file-code"></i> 
-										Download JSON
+										<span>Download JSON</span>
 									</span>
 								</td>
 							</tr>
@@ -3675,16 +3600,24 @@
 												<ul>
 													<li class="label">To</li>
 													<li class="text">
-								<input type="text" class="top" id="DocumentWidget.to.organization_name" value="Internet Foundation" placeholder="Organization Name"/>
+								<input type="text" class="top" id="DocumentWidget.to.organization_name" value="" placeholder="Organization Name"/>
 													</li>
 													<li class="text">
-								<input type="text" id="DocumentWidget.to.organization_address" value="6627 Fisher ave." placeholder="Organization Address"/>
+								<input type="text" id="DocumentWidget.to.organization_address" value="" placeholder="Organization Address"/>
 													</li>
 													<li class="text">
-								<input type="text" id="DocumentWidget.to.organization_building" value="Falls Church VA 22046" placeholder="Organization Building"/>
+								<input type="text" id="DocumentWidget.to.organization_building" value="" placeholder="Organization Building"/>
 													</li>
 													<li class="text">
-								<input type="text" id="DocumentWidget.to.organization_department" value="Richard Collins" placeholder="Organization Department"/>
+								<input type="text" id="DocumentWidget.to.organization_department" value="" placeholder="Organization Department"/>
+													</li>
+													<li class="text">
+													<span>
+								<input type="text" class="region" id="DocumentWidget.to.addressRegion" value="" placeholder="Region"/>
+													</span>
+													<span>
+								<input type="text" class="country" id="DocumentWidget.to.addressCountry" value="" placeholder="Country"/>
+													</span>
 													</li>
 												</ul>
 											</td>
@@ -3696,16 +3629,24 @@
 												<ul>
 													<li class="label">From</li>
 													<li class="text">
-								<input id="DocumentWidget.from.organization_name" type="text" class="top" value="DashGL Project" placeholder="Organization Name"/>
+								<input type="text" id="DocumentWidget.from.organization_name" class="top" value="" placeholder="Organization Name"/>
 													</li>
 													<li class="text">
-								<input id="DocumentWidget.from.organization_address" type="text" value="6627 Fisher ave." placeholder="Organization Address"/>
+								<input type="text" id="DocumentWidget.from.organization_address" value="" placeholder="Organization Address"/>
 													</li>
 													<li class="text">
-								<input id="DocumentWidget.from.organization_building" type="text" value="Falls Church VA 22046" placeholder="Organization Building"/>
+								<input type="text" id="DocumentWidget.from.organization_building" value="" placeholder="Organization Building"/>
 													</li>
 													<li class="text">
-								<input id="DocumentWidget.from.organization_department" type="text" value="Benjamin Collins" placeholder="Organization Department"/>
+								<input type="text" id="DocumentWidget.from.organization_department" value="" placeholder="Organization Department"/>
+													</li>
+													<li class="text">
+													<span>
+								<input type="text" class="region" id="DocumentWidget.from.addressRegion" value="" placeholder="Region"/>
+													</span>
+													<span>
+								<input type="text" class="country" id="DocumentWidget.from.addressCountry" value="" placeholder="Country"/>
+													</span>
 													</li>
 												</ul>
 											</td>
@@ -4118,6 +4059,9 @@
 
 
 					</div>
+						<div class="invoice-sender-wrap" id='ActionWidget.invoice.sender-wrap'>
+							<div class="loader" id='ActionWidget.invoice.sending'>sending...</div>
+						</div>
 
 					<!-- END DOCUMENT -->
 
@@ -4157,13 +4101,11 @@
 		<script type="text/javascript" src="js/SettingsMenu.js"></script>
 		
 		<script type="text/javascript" src="js/SessionWidget.js"></script>
+		<script type="text/javascript" src="js/ToolsetWidget.js"></script>
 		<script type="text/javascript" src="js/SettingsInvite.js"></script>
 		<script type="text/javascript" src="js/SettingsProfile.js"></script>
 		<script type="text/javascript" src="js/SettingsContacts.js"></script>
-
-<!--
-		<script type="text/javascript" src="lib/xlsx.full.min.js"></script>
--->
+		<script type="text/javascript" src="js/SettingsWallet.js"></script>
 
 		<!-- END SCRIPTS -->
 
