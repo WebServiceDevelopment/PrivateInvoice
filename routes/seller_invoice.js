@@ -15,7 +15,7 @@
  limitations under the License.
 
  Author: Ogawa Kousei (kogawa@wsd.co.jp)
-    
+	
 **/
 
 "use strict";
@@ -24,7 +24,6 @@
 const sub						= require("./invoice_sub.js");
 const to_buyer					= require("./seller_to_buyer.js");
 const tran						= require("./invoice_sub_transaction.js");
-
 
 
 // Import Router
@@ -38,6 +37,9 @@ const uuidv1					= require('uuid').v1;
 const uniqid					= require('uniqid');
 const moment					= require('moment');
 
+// import Sign
+const sign_your_credentials           = require("./sign_your_credentials.js");
+
 // Database 
 
 // Table Name
@@ -50,7 +52,7 @@ const SELLER_STATUS				= "seller_status";
 const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
 const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
 
-const CONTACTS      			= "contacts"
+const CONTACTS	  				= "contacts"
 
 
 // ------------------------------- End Points -------------------------------
@@ -64,50 +66,50 @@ router.post('/send', async function(req, res) {
 
 	let start = Date.now();
 
-    const { document_uuid } = req.body;
-    const { member_uuid } = req.session.data;
+	const { document_uuid } = req.body;
+	const { member_uuid } = req.session.data;
 
 	let code , errno;
 
 	// 1.
 	const [ buyer_uuid, err1 ] = await sub.getBuyerUuidForDraft(SELLER_DRAFT_STATUS, document_uuid, member_uuid);
-    if(err1) {
+	if(err1) {
 		console.log("Error 1.1 status = 400 err="+err1+":"+document_uuid +":"+ member_uuid);
 
-        return res.status(400).json(err1);
-    }
+		return res.status(400).json(err1);
+	}
 	if( buyer_uuid == null) {
 		console.log("Error 1.2 :"+document_uuid +":"+ member_uuid);
-        return res.status(400).json({err:1,msg:'buyer_uuid is not found'});
+		return res.status(400).json({err:1,msg:'buyer_uuid is not found'});
 	}
 
 	// 2.
 	const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_uuid, buyer_uuid);
-    if(err2) {
+	if(err2) {
 		console.log("Error 2 status = 400 err="+err2+":"+member_uuid +":"+ buyer_uuid);
-        return res.status(400).json(err2);
-    }
+		return res.status(400).json(err2);
+	}
 
 	//3. buyer connect check
-    const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
+	const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
 
-    if(code3 !== 200) {
+	if(code3 !== 200) {
 		console.log("Error 3 code="+code3+":err="+err3);
 		let msg;
 		if(code == 500) {
-        	msg = {"err":"buyer connect check:ECONNRESET"};
+			msg = {"err":"buyer connect check:ECONNRESET"};
 		} else {
-            switch(err3) {
-            case "Not found.":
-                msg = {"err":"The destination node cannot be found."};
-            break;
-            default:
-                msg = {"err":err3};
-            break;
-            }
+			switch(err3) {
+			case "Not found.":
+				msg = {"err":"The destination node cannot be found."};
+			break;
+			default:
+				msg = {"err":err3};
+			break;
+			}
 		}
-        return res.status(400).json(msg);
-    }
+		return res.status(400).json(msg);
+	}
 
 	// 4. 
 	// DRAFT_STATUS
@@ -130,41 +132,6 @@ router.post('/send', async function(req, res) {
 	status.document_folder	= 'sent';
 
 
-/*
-*	// 6.
-*	// Second we go ahead and get the draft document
-*	//
-*	const [ document , _6 ] = await sub.getDraftDocument( SELLER_DRAFT_DOCUMENT, document_uuid) ;
-*
-*	if(document.document_uuid == null) {
-*		console.log("document_uuid is null")
-*
-*		res.json({ err : 6, msg : 'document_uuid is null' });
-*		return;
-*	}
-*
-*	// 7.
-*	// Creating Send data.
-*	//
-*	
-*    document.currency_options = JSON.parse(document.currency_options);
-*    document.seller_details = JSON.parse(document.seller_details);
-*    document.buyer_details = JSON.parse(document.buyer_details);
-*    document.document_meta = JSON.parse(document.document_meta);
-*    document.document_body = JSON.parse(document.document_body);
-*    document.document_totals = JSON.parse(document.document_totals);
-*
-*	let document_json;
-*	try {
-*		document_json = JSON.stringify( document );
-*	} catch(err7) {
-*		console.log("JSON.stringify err")
-*
-*        res.json({ err : 7, msg : 'JSON.stringify err' });
-*        return;
-*	}
-*	//console.log(document_json)
-*/
 	// 6.
 	// Second we go ahead and get the draft document
 	//
@@ -181,37 +148,40 @@ router.post('/send', async function(req, res) {
 	document.buyer_uuid		= buyer_uuid;
 
 	// 7.
-	// Creating Send data.
+	// signInvoice
 	//
+	
+	const signedCredential = await sign_your_credentials.signInvoice(document.document_uuid, document.document_json);
+	const document_json = JSON.stringify(signedCredential); 
+
+	document.document_json = document_json;
 
 	if( document.document_json == null) {
 		console.log("document_json == null");
 
-        res.json({ err : 7, msg : 'document_json is null'});
-        return;
+		res.json({ err : 7, msg : 'document_json is null'});
+		return;
 	}
-	
-	const document_json = document.document_json;
 
 	// 8.
 	// Does document_uuid already notexist in the status table?
 	//
 	const [ _8 , err8 ] = await sub.notexist_check( SELLER_STATUS, document_uuid)
-    if ( err8 ) {
-        errno = 8;
-        console.log("Error: "+errno);
-        return res.status(400).json({ err : errno, msg : err8 });
-    }
+	if ( err8 ) {
+		errno = 8;
+		console.log("Error: "+errno);
+		return res.status(400).json({ err : errno, msg : err8 });
+	}
 
 	// 9.
 	// Does document_uuid already notexist in the document table?
 	//
 	const [ _9 , err9 ] = await sub.notexist_check( SELLER_DOCUMENT, document_uuid)
-    if ( err9 ) {
-        errno = 9;
-        console.log("Error: "+errno);
-        return res.status(400).json({ err : errno, msg : err9 });
-    }
+	if ( err9 ) {
+		errno = 9;
+		console.log("Error: "+errno);
+		return res.status(400).json({ err : errno, msg : err9 });
+	}
 
 	// 10.
 	// begin Transaction
@@ -226,8 +196,8 @@ router.post('/send', async function(req, res) {
 
 	if ( err11 ) {
 		errno = 11;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err11, errno));
+		code = 400;
+		return res.status(400).json(tran.rollbackAndReturn(conn, code, err11, errno));
 	}
 
 
@@ -237,42 +207,42 @@ router.post('/send', async function(req, res) {
 	const [ _12, err12 ] = await tran.insertDocument(conn, SELLER_DOCUMENT, status, document_json);
 	if (err12 ) {
 		errno = 12;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err12, errno));
+		code = 400;
+		return res.status(400).json(tran.rollbackAndReturn(conn, code, err12, errno));
 	}
 
 	// 13.
 	// Remove from SELLER_DRAFT_STATUS with docunent_uuid key
 	//
 	const [ _13, err13 ] = await tran.deleteStatus(conn, SELLER_DRAFT_STATUS, status) ;
-    if ( err13 ) {
+	if ( err13 ) {
 		errno = 13;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err13, errno));
-    }
+		code = 400;
+		return res.status(400).json(tran.rollbackAndReturn(conn, code, err13, errno));
+	}
 
 	// 14.
 	// Remove from SELLER_DRAFT_DOCUMENT with docunent_uuid key
 	//
 	const [ _14, err14 ] = await tran.deleteDocument(conn, SELLER_DRAFT_DOCUMENT, status) ;
-    if (err14 ) {
+	if (err14 ) {
 		errno = 14;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err14, errno));
-    }
+		code = 400;
+		return res.status(400).json(tran.rollbackAndReturn(conn, code, err14, errno));
+	}
 
 
 	// 15.
 	// Send 'send' message to buyer.
 	//
-    const [ code15, err15 ] = await to_buyer.sendInvoice(buyer_host, document, status);
-    //console.log(code);
-    //console.log(err);
+	const [ code15, err15 ] = await to_buyer.sendInvoice(buyer_host, document, status);
+	//console.log(code);
+	//console.log(err);
 
-    if(parseInt(code15) !== 200) {
-        errno = 15;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code15, err15, errno));
-    }
+	if(parseInt(code15) !== 200) {
+		errno = 15;
+		return res.status(400).json(tran.rollbackAndReturn(conn, code15, err15, errno));
+	}
 
 	// 16.
 	// commit
@@ -280,9 +250,9 @@ router.post('/send', async function(req, res) {
 	const [ _16, err16 ] = await tran.commit(conn);
 
 	if (err16) {
-        errno = 16;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err16, errno));
+		errno = 16;
+		code = 400;
+		return res.status(400).json(tran.rollbackAndReturn(conn, code, err16, errno));
 	}
 
 	// 17.
@@ -298,7 +268,7 @@ router.post('/send', async function(req, res) {
 	});
 
 	let end = Date.now();
-    console.log("/send Time: %d ms", end - start);
+	console.log("/send Time: %d ms", end - start);
 
 });
 
@@ -312,8 +282,8 @@ router.post('/recreate', async function(req, res) {
 
 	let start = Date.now();
 
-    const { document_uuid } = req.body;
-    const { member_uuid } = req.session.data;
+	const { document_uuid } = req.body;
+	const { member_uuid } = req.session.data;
 
 	let errno , code;
 
@@ -322,108 +292,91 @@ router.post('/recreate', async function(req, res) {
 	// 1.
 	//
 	const [ buyer_uuid, err1 ] = await sub.getBuyerUuid(SELLER_STATUS, document_uuid, member_uuid);
-    if(err1) {
+	if(err1) {
 		console.log("Error 1.1 status = 400 err="+err1);
 
-        return res.status(400).json(err1);
-    }
+		return res.status(400).json(err1);
+	}
 
 	// 2.
 	//
 	const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_uuid, buyer_uuid);
-    if(err2) {
+	if(err2) {
 		console.log("Error 1.2 status = 400 err="+err2);
-        return res.status(400).json(err2);
-    }
+		return res.status(400).json(err2);
+	}
 
 	//3. buyer connect check
 	//
-    const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
+	const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
 
-    if( code3 !== 200) {
+	if( code3 !== 200) {
 		console.log("Error 3.1 status = 400 code="+code3);
 		let msg;
 		if(code == 500) {
-        	msg = {"err":"buyer connect check:ECONNRESET"};
+			msg = {"err":"buyer connect check:ECONNRESET"};
 		} else {
-            switch(err3) {
-            case "Not found.":
-                msg = {"err":"The destination node cannot be found."};
-            break;
-            default:
-                msg = {"err":err3};
-            break;
-            }
+			switch(err3) {
+			case "Not found.":
+				msg = {"err":"The destination node cannot be found."};
+			break;
+			default:
+				msg = {"err":err3};
+			break;
+			}
 		}
-        return res.status(400).json(msg);
-    }
+		return res.status(400).json(msg);
+	}
 
 	// 4
 	// STATUS
-    // First we go ahead and get the status.
-    //
-    const [ old_status , _4 ] = await sub.getStatus( SELLER_STATUS, document_uuid) ;
+	// First we go ahead and get the status.
+	//
+	const [ old_status , _4 ] = await sub.getStatus( SELLER_STATUS, document_uuid) ;
 
 	if(old_status.document_uuid == null) {
 		console.log("document_uuid is null")
 
 		res.json({
 			err : 32,
-            msg : 'document_uuid is null'
+			msg : 'document_uuid is null'
 		});
-        return;
+		return;
 	}
 
-    // 5.
-    // Creating Draft data.
-    //
+	// 5.
+	// Creating Draft data.
+	//
 	let prefix = "inv-";
 
-    status = JSON.parse(JSON.stringify(old_status));
+	status = JSON.parse(JSON.stringify(old_status));
 	status.document_uuid	= uuidv1();
-    status.document_type    = 'invoice';
-    status.document_folder  = 'draft';
+	status.document_type	= 'invoice';
+	status.document_folder  = 'draft';
 
 	status.document_number = prefix + uniqid.time();
 	let d = new Date();
 	status.create_on = d.toISOString()
 	status.due_by = moment().add(30, 'days').format('YYYY-MM-DD');
 
-    // 6.
-    // Second we go ahead and get the document
-    //
+	// 6.
+	// Second we go ahead and get the document
+	//
 	const [ old_document , _6 ] = await sub.getDocument( SELLER_DOCUMENT, document_uuid) ;
 
-    if(old_document.document_uuid == null) {
-        console.log("document_uuid is null")
+	if(old_document.document_uuid == null) {
+		console.log("document_uuid is null")
 
-        res.json({
-            err : 42,
-            msg : 'document_uuid is null'
-        });
-        return;
-    }
+		res.json({
+			err : 42,
+			msg : 'document_uuid is null'
+		});
+		return;
+	}
 
-    // 7.
-    // Creating Send data.
-    //
-/*
-    document = JSON.parse(old_document.document_json);
-
-	document.document_uuid = status.document_uuid;
-    document.document_type = status.document_type;
-
-	document.document_meta.document_number = status.document_number;
-	document.document_meta.due_by = status.due_by;
-	document.document_meta.created_on = moment().format("YYYY-MM-DD");
-
-    document.currency_options = JSON.stringify(document.currency_options);
-    document.seller_details = JSON.stringify(document.seller_details);
-    document.buyer_details = JSON.stringify(document.buyer_details);
-    document.document_meta = JSON.stringify(document.document_meta);
-    document.document_body = JSON.stringify(document.document_body);
-    document.document_totals = JSON.stringify(document.document_totals);
-*/
+	// 7.
+	// Creating Send data.
+	//
 
 	document = {};
 
@@ -433,7 +386,7 @@ router.post('/recreate', async function(req, res) {
 
 // 7.2 document_json
 //
-    let document_json = JSON.parse(old_document.document_json);
+	let document_json = JSON.parse(old_document.document_json);
 
 	document_json.credentialSubject.type = 'Invoice';
 
@@ -450,16 +403,16 @@ router.post('/recreate', async function(req, res) {
 
 // 7.3 document_type
 //
-    document.document_type = status.document_type;
+	document.document_type = status.document_type;
 
 // 7.4 subject_line
 //
-    document.subject_line = old_status.subject_line;
+	document.subject_line = old_status.subject_line;
 
 // 7.5 currency_options
 //
-    const currency_options = {"formatWithSymbol":true,"symbol":"Gwei","separator":",","decimal":".","precision":0,"pattern":"# !"}
-    document.currency_options = JSON.stringify(currency_options);
+	const currency_options = {"formatWithSymbol":true,"symbol":"Gwei","separator":",","decimal":".","precision":0,"pattern":"# !"}
+	document.currency_options = JSON.stringify(currency_options);
 
 // 7.6 seller_uuid
 //
@@ -467,15 +420,17 @@ router.post('/recreate', async function(req, res) {
 
 // 7.7 seller_details
 //
-    let seller = document_json.credentialSubject.seller;
-    let seller_details = {}
-    seller_details.organization_name = seller.name;
-    seller_details.organization_tax_id = seller.taxId;
-    seller_details.organization_department = seller.description;
-    seller_details.organization_building = seller.address.streetAddress;
-    seller_details.building = seller.address.addressLocality;
+	let seller = document_json.credentialSubject.seller;
+	let seller_details = {}
+	seller_details.organization_name = seller.name;
+	seller_details.organization_tax_id = seller.taxId;
+	seller_details.organization_department = seller.description;
+	seller_details.organization_building = seller.address.streetAddress;
+	seller_details.building = seller.address.addressLocality;
+	seller_details.addressCountry = seller.address.addressCountry;
+	seller_details.addressRegion = seller.address.addressRegion;
 
-    document.seller_details = JSON.stringify(seller_details);
+	document.seller_details = JSON.stringify(seller_details);
 
 // 7.8 seller_membername
 //
@@ -488,15 +443,17 @@ router.post('/recreate', async function(req, res) {
 
 // 7.10 buyer_details
 //
-    let buyer = document_json.credentialSubject.buyer;
-    let buyer_details = {}
-    buyer_details.organization_name = buyer.name;
-    buyer_details.organization_tax_id = buyer.taxId;
-    buyer_details.organization_department = buyer.description;
-    buyer_details.organization_building = buyer.address.streetAddress;
-    buyer_details.building = buyer.address.addressLocality;
+	let buyer = document_json.credentialSubject.buyer;
+	let buyer_details = {}
+	buyer_details.organization_name = buyer.name;
+	buyer_details.organization_tax_id = buyer.taxId;
+	buyer_details.organization_department = buyer.description;
+	buyer_details.organization_building = buyer.address.streetAddress;
+	buyer_details.building = buyer.address.addressLocality;
+	buyer_details.addressCountry = buyer.addressCountry;
+	buyer_details.addressRegion = buyer.addressRegion;
 
-    document.buyer_details = JSON.stringify(buyer_details);
+	document.buyer_details = JSON.stringify(buyer_details);
 
 // 7.11 buyer_membername
 //
@@ -517,12 +474,12 @@ router.post('/recreate', async function(req, res) {
 	document_meta.taxId = document_json.credentialSubject.seller.taxId;
 	document_meta.due_by = status.due_by;
 
-    document.document_meta = JSON.stringify(document_meta);
+	document.document_meta = JSON.stringify(document_meta);
 
 // 7.14 document_body
 //
-    let document_body = [];
-    let iS = document_json.credentialSubject.itemsShipped;
+	let document_body = [];
+	let iS = document_json.credentialSubject.itemsShipped;
 	let max_rows = iS.length;
 	for ( let i = 0; i< max_rows; i++) {
 		document_body[i] = {};
@@ -535,14 +492,14 @@ router.post('/recreate', async function(req, res) {
 		document_body[i].subtotal= iS[i].lineItemTotalPrice.price +" "+iS[i].lineItemTotalPrice.priceCurrency;
 		
 	}
-    document.document_body = JSON.stringify(document_body);
+	document.document_body = JSON.stringify(document_body);
 
 
 // 7.15 document_totals
 //
 	let document_totals = {}
-    document_totals.subtotal = document_json.credentialSubject.invoiceSubtotal.price +" "+document_json.credentialSubject.invoiceSubtotal.priceCurrency;
-    document_totals.total = document_json.credentialSubject.totalPaymentDue.price +" "+document_json.credentialSubject.totalPaymentDue.priceCurrency;
+	document_totals.subtotal = document_json.credentialSubject.invoiceSubtotal.price +" "+document_json.credentialSubject.invoiceSubtotal.priceCurrency;
+	document_totals.total = document_json.credentialSubject.totalPaymentDue.price +" "+document_json.credentialSubject.totalPaymentDue.priceCurrency;
 
 	document.document_totals = JSON.stringify(document_totals);
 
@@ -551,27 +508,27 @@ router.post('/recreate', async function(req, res) {
 	// Does document_uuid already notexist in the default status table?
 	//
 	const [ _8, err8 ] = await sub.notexist_check( SELLER_DRAFT_STATUS, document_uuid)
-    if (err8 ) {
-        errno = 8;
-        console.log("Error: "+errno);
-        return res.status(400).json({ err : errno, msg : err8 });
-    }
+	if (err8 ) {
+		errno = 8;
+		console.log("Error: "+errno);
+		return res.status(400).json({ err : errno, msg : err8 });
+	}
 
 	// 9.
 	// Does document_uuid already notexist in the default document table?
 	//
 	const [ _9, err9 ] = await sub.notexist_check( SELLER_DRAFT_DOCUMENT, document_uuid)
-    if (err9 ) {
-        errno = 9;
-        console.log("Error: "+errno);
-        return res.status(400).json({ err : errno, msg : err9 });
-    }
+	if (err9 ) {
+		errno = 9;
+		console.log("Error: "+errno);
+		return res.status(400).json({ err : errno, msg : err9 });
+	}
 
-    // 10. 
-    // begin Transaction
-    //
-    const [ conn , _10 ] = await tran.connection ();
-    await tran.beginTransaction(conn);
+	// 10. 
+	// begin Transaction
+	//
+	const [ conn , _10 ] = await tran.connection ();
+	await tran.beginTransaction(conn);
 
 	// 11.
 	// Then we go ahead and insert into the draft status
@@ -612,24 +569,24 @@ router.post('/recreate', async function(req, res) {
 	// Remove from SELLER_DOCUMENT with docunent_uuid key
 	//
 	const [ _14 , err14 ] = await tran.deleteDocument(conn, SELLER_DOCUMENT, old_status) ;
-    if(err14) {
+	if(err14) {
 		errno = 14;
 		code = 400;
 		return res.status(400).json(tran.rollbackAndReturn(conn, code, err14, errno));
-    }
+	}
 
 	// 15.
 	// Then we go ahead and insert into the archive status
 	//
 
-    old_status.document_folder  = 'trash';
+	old_status.document_folder  = 'trash';
 	const [ _15, err15] = await tran.insertStatus(conn, SELLER_ARCHIVE_STATUS, old_status);
 
-    if(err15) {
+	if(err15) {
 		errno = 15;
 		code = 400;
 		return res.status(400).json(tran.rollbackAndReturn(conn, code, err15, errno));
-    }
+	}
 
 	// 16.
 	// And then we need to insert into the archive document 
@@ -640,34 +597,34 @@ router.post('/recreate', async function(req, res) {
 		errno = 16;
 		code = 400;
 		return res.status(400).json(tran.rollbackAndReturn(conn, code, err16, errno));
-    }
+	}
 
 	// 17.
 	// Send 'recreate' message to buyer.
 	//
 
-    const [ code17, err17 ] = await to_buyer.recreate(buyer_host, old_status.document_uuid, old_status.seller_uuid);
+	const [ code17, err17 ] = await to_buyer.recreate(buyer_host, old_status.document_uuid, old_status.seller_uuid);
 
-    if(parseInt(code17) !== 200) {
+	if(parseInt(code17) !== 200) {
 		errno = 17;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code17, err17, errno));
-    }
+		return res.status(400).json(tran.rollbackAndReturn(conn, code17, err17, errno));
+	}
 
-    // 18.
-    // commit
-    //
-    const [ _18, err18 ] = await tran.commit(conn);
+	// 18.
+	// commit
+	//
+	const [ _18, err18 ] = await tran.commit(conn);
 
 	if (err18) {
-        errno = 18;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err18, errno));
+		errno = 18;
+		code = 400;
+		return res.status(400).json(tran.rollbackAndReturn(conn, code, err18, errno));
 
 	}
 
 	// 19.
 	//
-    conn.end();
+	conn.end();
 
 	//console.log("recreate accepted");
 
@@ -677,7 +634,7 @@ router.post('/recreate', async function(req, res) {
 	});
 
 	let end = Date.now();
-    console.log("/recreate Time: %d ms", end - start);
+	console.log("/recreate Time: %d ms", end - start);
 
 });
 
@@ -689,8 +646,8 @@ router.post('/withdraw', async function(req, res) {
 
 	let start = Date.now();
 
-    const { document_uuid , document_folder } = req.body;
-    const { member_uuid } = req.session.data;
+	const { document_uuid , document_folder } = req.body;
+	const { member_uuid } = req.session.data;
 
 
 	let errno , code;
@@ -699,58 +656,58 @@ router.post('/withdraw', async function(req, res) {
 	//
 	const [ buyer_uuid, err1 ] = await sub.getBuyerUuid(SELLER_STATUS, document_uuid, member_uuid);
 
-    if(err1) {
+	if(err1) {
 		console.log("Error 1 status = 400 err="+err1);
 
-        return res.status(400).json(err1);
-    }
+		return res.status(400).json(err1);
+	}
 
 
 	// 2.
 	const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_uuid, buyer_uuid);
 
-    if(err2) {
+	if(err2) {
 		console.log("Error 2 status = 400 err="+err2);
-        return res.status(400).json(err2);
-    }
+		return res.status(400).json(err2);
+	}
 
 
 	//3. buyer connect check
-    const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
+	const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
 
-    if(code3 !== 200) {
+	if(code3 !== 200) {
 		console.log("Error 3 status = 400 code="+code3);
 		let msg;
 		if(code3 == 500) {
-        	msg = {"err":"buyer connect check:ECONNRESET"};
+			msg = {"err":"buyer connect check:ECONNRESET"};
 		} else {
-            switch(err3) {
-            case "Not found.":
-                msg = {"err":"The destination node cannot be found."};
-            break;
-            default:
-                msg = {"err":err3};
-            break;
-            }
+			switch(err3) {
+			case "Not found.":
+				msg = {"err":"The destination node cannot be found."};
+			break;
+			default:
+				msg = {"err":err3};
+			break;
+			}
 		}
-        return res.status(400).json(msg);
-    }
+		return res.status(400).json(msg);
+	}
 
 
 	// 4 
 	// STATUS
-    // First we go ahead and get the status.
-    //
-    const [ old_status , _4 ] = await sub.getStatus( SELLER_STATUS, document_uuid) ;
+	// First we go ahead and get the status.
+	//
+	const [ old_status , _4 ] = await sub.getStatus( SELLER_STATUS, document_uuid) ;
 
-    // Does record exist?
+	// Does record exist?
 	if(old_status.document_uuid == null) {
 		console.log("document_uuid is null")
 		errno = 4;
 
 		let msg = { err : errno, msg : document_uuid };
 
-        return res.status(400).json(msg);
+		return res.status(400).json(msg);
 	}
 
 
@@ -759,11 +716,11 @@ router.post('/withdraw', async function(req, res) {
 	//
 	const [ _5, err5] = await sub.exist_check( SELLER_STATUS, document_uuid)
 
-    if (err5 ) {
+	if (err5 ) {
 		console.log("Error 5 status = 400 code="+err5);
-        errno = 5;
-        return res.status(400).json({ err : err5, code :errno  });
-    }
+		errno = 5;
+		return res.status(400).json({ err : err5, code :errno  });
+	}
 
 
 	// 6.
@@ -771,17 +728,17 @@ router.post('/withdraw', async function(req, res) {
 	//
 	const [ _6, err6] = await sub.exist_check( SELLER_DOCUMENT, document_uuid)
 
-    if (err6 ) {
+	if (err6 ) {
 		console.log("Error 6 status = 400 code="+err6);
-        errno = 6;
-        return res.status(400).json({ err : err6, code :errno  });
-    }
+		errno = 6;
+		return res.status(400).json({ err : err6, code :errno  });
+	}
 
-    // 7.
-    // begin Transaction
-    //
-    const [ conn , _7 ] = await tran.connection ();
-    await tran.beginTransaction(conn);
+	// 7.
+	// begin Transaction
+	//
+	const [ conn , _7 ] = await tran.connection ();
+	await tran.beginTransaction(conn);
 
 
 	// 8.  
@@ -790,37 +747,37 @@ router.post('/withdraw', async function(req, res) {
 
 	const [ _8, err8] = await tran.setWithdrawSeller(conn, SELLER_STATUS, document_uuid ,  member_uuid, document_folder);
 
-    if (err8 ) {
+	if (err8 ) {
 		console.log("Error 8 status = 400 code="+err8.msg);
-        errno = 8;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err8, errno));
-    }
+		errno = 8;
+		code = 400;
+		return res.status(400).json(tran.rollbackAndReturn(conn, code, err8, errno));
+	}
 
 
 	// 9. 
 	// Send 'withdraw" message to buyer.
 	//
 
-    const [ code9, err9 ] = await to_buyer.withdraw(buyer_host, old_status.document_uuid, old_status.buyer_uuid, document_folder);
+	const [ code9, err9 ] = await to_buyer.withdraw(buyer_host, old_status.document_uuid, old_status.buyer_uuid, document_folder);
 
-    if(code9 !== 200) {
+	if(code9 !== 200) {
 		console.log("Error 9 status = 400 code="+err9);
-        errno = 9;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code9, err9, errno));
-    }
+		errno = 9;
+		return res.status(400).json(tran.rollbackAndReturn(conn, code9, err9, errno));
+	}
 
 
-    // 10
-    // commit
-    //
-    const [ _10, err10 ] =	await tran.commit(conn);
+	// 10
+	// commit
+	//
+	const [ _10, err10 ] =	await tran.commit(conn);
 
 	if (err10) {
 		console.log("Error 10 status = 400 code="+err10);
 		errno = 10;
-        code = 400;
-        let msg = tran.rollbackAndReturn(conn, code, err10, errno);
+		code = 400;
+		let msg = tran.rollbackAndReturn(conn, code, err10, errno);
 
 	// 11.
 	//
@@ -832,20 +789,20 @@ router.post('/withdraw', async function(req, res) {
 		}
 
 
-    // 12.
-    //
-        const [ code12, err12 ] = await to_buyer.rollbackReturnToSent(seller_host, buyer_uuid, member_uuid);
+	// 12.
+	//
+		const [ code12, err12 ] = await to_buyer.rollbackReturnToSent(seller_host, buyer_uuid, member_uuid);
 
-        if(code12 !== 200) {
-            console.log("Error 12 code="+code12+":err="+err12);
-            if(code12 == 500) {
-                msg = {"err":"seller connect check:ECONNRESET"};
-            } else {
-                msg = {"err":err12};
-            }
-        }
+		if(code12 !== 200) {
+			console.log("Error 12 code="+code12+":err="+err12);
+			if(code12 == 500) {
+				msg = {"err":"seller connect check:ECONNRESET"};
+			} else {
+				msg = {"err":err12};
+			}
+		}
 
-        return res.status(400).json(msg);
+		return res.status(400).json(msg);
 	}
 
 
@@ -853,14 +810,14 @@ router.post('/withdraw', async function(req, res) {
 	//
    	conn.end();
 
-    //console.log("/withdraw accepted");
+	//console.log("/withdraw accepted");
 
 	res.json({
 		err : 0,
 		msg : document_uuid
 	});
 
-    let end = Date.now();
-    console.log("/withdraw Time: %d ms", end - start);
+	let end = Date.now();
+	console.log("/withdraw Time: %d ms", end - start);
 
 });
