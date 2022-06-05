@@ -15,7 +15,7 @@
  limitations under the License.
 
  Author: Ogawa Kousei (kogawa@wsd.co.jp)
-    
+	
 **/
 
 "use strict";
@@ -35,6 +35,51 @@ const bip39					= require('bip39')
 
 const db					= require('../database.js');
 const MEMBERS_TABLE			= "members";
+
+// Module Functions
+
+const axios				 = require('axios')
+const wallet				= require('@sidetree/wallet')
+
+const createDid = async ( mnemonic ) => {
+
+	const keyType = 'Ed25519';
+
+	const publicKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/0/0");
+	const recoveryKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/0/1");
+	const updateKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/0/2");
+
+	const createOperation = await wallet.operations.create({
+		document : {
+			publicKeys: [
+				{
+					id: publicKey.id.split('#').pop(),
+					type: publicKey.type,
+					publicKeyJwk: publicKey.publicKeyJwk,
+					purposes: ['authentication', 'assertionMethod']
+				}
+			],
+			services: []
+		},
+		recoveryKey : recoveryKey.publicKeyJwk,
+		updateKey : updateKey.publicKeyJwk
+	});
+
+	const didUniqueSuffix = wallet.computeDidUniqueSuffix(createOperation.suffixData);
+
+	const host = 'https://ganache.privateinvoice.io/';
+	const url = `${host}/api/1.0/operations`;
+	const { status, data } = await axios.post(url, createOperation);
+
+	console.log(status);
+	console.log(data);
+	console.log(didUniqueSuffix);
+
+	return `did:elem:ganache${didUniqueSuffix}`;
+
+}
+
+
 
 // End Points
 
@@ -151,13 +196,13 @@ router.post('/updateProfile', async function(req, res) {
 		result = await db.update(sql, args);
 	} catch(err) {
 		//throw err;
-        return res.status(400).end(err);
+		return res.status(400).end(err);
 	}
 
-    if(result.affectedRows != 1) {
+	if(result.affectedRows != 1) {
 		err = {err: 9, msg :"result.affectedRows != 1"}
-        return res.status(406).end(err);
-    }
+		return res.status(406).end(err);
+	}
 
 	// Step 3 : Update Current Reddis Session
 
@@ -245,14 +290,25 @@ router.post('/login', async function(req, res) {
 /*
  * signup
  */
+
 router.post('/signup', async function(req, res) {
+
+	const mnemonic = bip39.generateMnemonic();
+	const did = await createDid(mnemonic);
+
+	res.json({
+		err : 1,
+		msg : 'Debug'
+	});
+
+	/*
 
 	// First we insert into the database
 
 	const member_uuid = uuidv1();
 
 	let sql = `
-		INSERT INTO ${MEMBERS_TABLE} (
+		INSERT INTO members (
 			member_uuid,
 			membername,
 			work_email,
@@ -299,7 +355,6 @@ router.post('/signup', async function(req, res) {
 
 	console.log('after hash');
 
-	const mnemonic = bip39.generateMnemonic()
 	console.log(mnemonic);
 
 
@@ -366,6 +421,8 @@ router.post('/signup', async function(req, res) {
 		err : 0,
 		msg : "okay"
 	});
+
+	*/
 
 });
 
