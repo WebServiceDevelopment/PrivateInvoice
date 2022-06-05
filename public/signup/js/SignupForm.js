@@ -30,7 +30,7 @@ const SignupForm = (function() {
 	this.DOM = {
 		company : {
 			name : document.getElementById('SignupForm.company.name'),
-			taxId : document.getElementById('SignupForm.company.taxId'),
+			tax_id : document.getElementById('SignupForm.company.tax_id'),
 		},
 		address : {
 			country : document.getElementById('SignupForm.address.country'), 
@@ -125,7 +125,7 @@ const SignupForm = (function() {
 
 	function api_setCompanyData(data) {
 		
-		this.DOM.company.taxId.value = data.company_tax_id;
+		this.DOM.company.tax_id.value = data.company_tax_id;
 		this.DOM.company.name.value = data.company_name;
 
 		this.DOM.address.country.value = data.country;
@@ -210,21 +210,26 @@ const SignupForm = (function() {
 		}
 
 		const args = {
-			account : {
-				membername : this.DOM.account.membername.value,
-				work_email : this.DOM.account.work_email.value,
-				password : this.DOM.account.password.value,
-				confirm_password : this.DOM.account.confirm_password.value
+			member : {
+				membername : this.DOM.member.membername.value,
+				job_title : this.DOM.member.job_title.value,
+				contact_email : this.DOM.member.contact_email.value,
+				password : this.DOM.member.password.value,
 			},
 			company : {
 				name : this.DOM.company.name.value,
-				postcode : this.DOM.company.postcode.value,
-				address : this.DOM.company.address.value,
-				building : this.DOM.company.building.value,
-				department : this.DOM.company.department.value
+				tax_id : this.DOM.company.tax_id.value
+			},
+			address : {
+				country : this.DOM.address.country.value,
+				region : this.DOM.address.region.value,
+				postcode : this.DOM.address.postcode.value,
+				city : this.DOM.address.city.value,
+				line1 : this.DOM.address.line1.value,
+				line2 : this.DOM.address.line2.value
 			}
 		};
-
+		
 		const ajax = new XMLHttpRequest();
 		ajax.open('POST', '/api/session/signup');
 		ajax.setRequestHeader('Content-Type', 'application/json');
@@ -239,12 +244,6 @@ const SignupForm = (function() {
 				throw res.msg;
 			}
 
-			let query = this.API.getJsonFromUrl();
-			if(query.code) {
-				window.location.href = "/invite/?code=" + query.code;
-				return;
-			}
-			
 			window.location.href = "/app/";
 
 		}
