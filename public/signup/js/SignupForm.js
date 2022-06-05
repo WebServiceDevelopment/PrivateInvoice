@@ -27,21 +27,23 @@ const SignupForm = (function() {
 	}
 
 	this.DOM = {
-		account : {
-			membername : document.getElementById('SignupForm.account.membername'),
-			work_email : document.getElementById('SignupForm.account.work_email'),
+		company : {
+			name : document.getElementById('SignupForm.company.name'),
+			taxId : document.getElementById('SignupForm.company.taxId'),
+		},
+		address : {
+			country : document.getElementById('SignupForm.address.country'), 
+			region : document.getElementById('SignupForm.address.region'), 
+			postcode : document.getElementById('SignupForm.address.postcode'), 
+			line1 : document.getElementById('SignupForm.address.line1'),
+			line2 : document.getElementById('SignupForm.address.line2'),
+		},
+		member : {
+			membername : document.getElementById('SignupForm.member.membername'),
+			job_title : document.getElementById('SignupForm.member.job_title'),
+			contact_email : document.getElementById('SignupForm.member.contact_email'),
 			password : document.getElementById('SignupForm.account.password'), 
 			confirm_password : document.getElementById('SignupForm.account.confirm_password')
-		},
-		company : {
-			name : document.getElementById('SignupForm.company.name'), 
-			postcode : document.getElementById('SignupForm.company.postcode'), 
-			address : document.getElementById('SignupForm.company.address'),
-			building : document.getElementById('SignupForm.company.building'),
-			department : document.getElementById('SignupForm.company.department')
-		},
-		wallet : {
-			address : document.getElementById('SignupForm.wallet.address')
 		},
 		submit : document.getElementById('SignupForm.submit')
 	}
@@ -56,7 +58,8 @@ const SignupForm = (function() {
 	this.API = {
 		checkForInput: api_checkForInput.bind(this),
 		validateForm : api_validateForm.bind(this),
-		getJsonFromUrl : api_getJsonFromUrl.bind(this)
+		getJsonFromUrl : api_getJsonFromUrl.bind(this),
+		setCompanyData : api_setCompanyData.bind(this)
 	}
 
 	init.apply(this);
@@ -75,6 +78,15 @@ const SignupForm = (function() {
 
 		// Check and account for autofill from browsers
 		this.API.checkForInput()
+	}
+
+	function api_setCompanyData(data) {
+		
+		this.DOM.company.taxId.value = data.company_tax_id;
+		this.DOM.company.name.value = data.company_name;
+
+		this.API.checkForInput()
+
 	}
 
 	function api_checkForInput() {
