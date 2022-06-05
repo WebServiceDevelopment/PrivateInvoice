@@ -40,7 +40,9 @@ const db					= require('../database.js');
 
 const INVITE_TABLE			= 'invite';
 
-// Helper functions
+/*
+ * Helper functions
+ */
 
 const checkForExistingContact = async (local_uuid, remote_uuid) => {
 
@@ -68,6 +70,9 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 
 }
 
+/*
+ * insertNewContact
+ */
 const insertNewContact = async (invite, localUser, remote_member, remote_organization) => {
 
 	const sql = `
@@ -126,6 +131,9 @@ const insertNewContact = async (invite, localUser, remote_member, remote_organiz
 
 }
 
+/*
+ * getContacts
+ */
 const getContacts = async (member_uuid) => {
 
 	const sql = `

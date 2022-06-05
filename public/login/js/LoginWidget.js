@@ -49,7 +49,6 @@ const LoginWidget = (function() {
 
 	function init() {
 
-		console.log("a bebe");
 		
 		setTimeout( () => {
 			this.API.checkInputs();
@@ -81,8 +80,6 @@ const LoginWidget = (function() {
 
 		ajax.onload = () => {
 			
-			console.log();
-
 			let res = ajax.response;
 
 			if(res.err) {

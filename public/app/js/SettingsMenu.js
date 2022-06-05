@@ -168,13 +168,17 @@ const SettingsMenu = (function() {
 
 		const leaf = id.split(".").pop();
 
-		if(leaf === "back") {
+		switch(leaf) {
+		case "back":
 			TabWidget.API.openSection("supplier");
-			return;
+		return;
+		case "wallet":
+			SettingsWallet.API.loadResentActivity();
+		break;
 		}
+
 		this.API.openPage(leaf);
 
 	}
-
 
 }).apply({});

@@ -1699,7 +1699,13 @@ main.app section article div.toolset table td.dl {
 	width: 180px;
 	text-align: right;
 	padding-right: 10px;
+	cursor : default;
 
+}
+
+main.app section article div.toolset table td.dl span:hover {
+
+	color : #777;
 }
 
 main.app section article div.document {
@@ -2346,7 +2352,7 @@ main.app section article div.document div.body div.my-organization input[type="t
 
 main.app section article div.document div.paper {
 
-	width: 1200px;
+	width: 1280px;
 	display: block;
 	margin: auto;
 	min-height: 400px;
@@ -2360,7 +2366,11 @@ main.app section article div.document div.paper {
 
 main.app section article div.document div.paper div.content {
 
-	padding: 20px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 20px;
+	padding-right: 20px;
+
 	min-height: 200px;
 
 }
@@ -2395,7 +2405,7 @@ main.app section article div.document div.paper div.content div.pmeta div.pdata 
 main.app section article div.document div.paper div.content div.paddr {
 
 	padding-top: 20px;
-	height: 120px;
+	height: 135px;
 
 }
 
@@ -2744,6 +2754,15 @@ main.app section article div.document div.paper div.content div.paddr ul li.text
 
 }
 
+main.app section article div.document div.paper div.content div.paddr ul li.text input.country  ,
+main.app section article div.document div.paper div.content div.paddr ul li.text input.region  {
+
+	border: none;
+	background-color: transparent;
+	width: 120px;
+
+}
+
 main.app section article div.document div.paper div.content div.paddr table {
 
 	width: 100%;
@@ -2912,6 +2931,7 @@ main.app section article div.document div.paper div.summary {
 
 	width: 100%;
 	padding: 20px;
+
 	width: calc(100% - 40px);
 	position: relative;
 	border-bottom: 1px solid #dddddd;
@@ -3469,7 +3489,7 @@ main.app section article div.document div.body {
 	display: none;
 	margin: 20px auto;
 	background-color: #fff;
-	width: 1200px;
+	width: 1280px;
 	border-radius: 4px;
 	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 
@@ -4746,7 +4766,7 @@ main.app section article div.settings-content {
 main.app section article div.settings-content div.page {
 
 	width: 100%;
-	max-width: 1200px;
+	max-width: 1360px;
 	display: block;
 	margin: auto;
 	min-height: 90px;
@@ -5132,15 +5152,34 @@ main.app section article div.settings-content div.page div.profile-data {
 
 main.app section article div.settings-content div.page div.profile-data table {
 
-	width: 100%;
+	width: 94%;
 	table-layout: fixed;
 	border-collapse: collapse;
 
 }
 
+main.app section article div.settings-content div.page div.profile-data table table.profile-details tr td:nth-of-type(1){
+
+	width: 13%;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table table.profile-details tr td:nth-of-type(2){
+
+	width: 47%;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table table.profile-details tr td:nth-of-type(3){
+
+	width: 33%;
+	font-size : 12px;
+	color : #aaa;
+
+}
+
 main.app section article div.settings-content div.page div.profile-data table div.form-edit {
 
-	width: 470px;
 	padding: 30px 0;
 	border-top: 1px solid #e2e2e2;
 	margin-top: 20px;
@@ -5162,7 +5201,7 @@ main.app section article div.settings-content div.page div.profile-data table di
 	border-radius: 5px;
 	font-size: 14px;
 	padding: 6px 0;
-	width: 90%;
+	width: 50%;
 	display: block;
 	margin: auto;
 
@@ -5184,7 +5223,7 @@ main.app section article div.settings-content div.page div.profile-data table di
 	border-radius: 5px;
 	font-size: 14px;
 	padding: 6px 0;
-	width: 90%;
+	width: 50%;
 	display: block;
 	margin: auto;
 
@@ -5223,7 +5262,6 @@ main.app section article div.settings-content div.page div.profile-data table di
 main.app section article div.settings-content div.page div.profile-data table h4 {
 
 	font-size: 20px;
-	width: 470px;
 	border-bottom: 1px solid #ccc;
 	font-family: 'Montserrat', sans-serif;
 	position: relative;
@@ -5248,9 +5286,34 @@ main.app section article div.settings-content div.page div.profile-data table h4
 
 }
 
+main.app section article div.settings-content div.page div.profile-data table table.organization-details {
+	
+}
+
+main.app section article div.settings-content div.page div.profile-data table table.organization-details tr td:nth-of-type(1){
+	
+width: 15%;
+font-size: 14px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table table.organization-details tr td:nth-of-type(2){
+	
+width: 46%;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table table.organization-details tr td:nth-of-type(3){
+	
+width: 30%;
+font-size: 12px;
+color : #aaa;
+
+}
+
 main.app section article div.settings-content div.page div.profile-data table div.verification-status {
 
-	width: 470px;
+	width: 80%;
 	height: 90px;
 
 }
@@ -5326,7 +5389,7 @@ main.app section article div.settings-content div.page div.profile-data table di
 
 main.app section article div.settings-content div.page div.profile-data table td.label {
 
-	width: 280px;
+	width: 240px;
 	vertical-align: top;
 
 }
@@ -5403,7 +5466,7 @@ main.app section article div.settings-content div.page div.profile-data table td
 	padding: 8px 5px;
 	text-indent: 4px;
 	color: #222;
-	font-size: 15px;
+	font-size: 16px;
 
 }
 
@@ -6286,9 +6349,40 @@ main.app section article div.settings-content div.page div.wallet-summary {
 
 }
 
+main.app section article div.settings-content div.page div.wallet-summary div.card_1 {
+	width: calc(24% - 20px);
+	border-width : 1px;
+	border-color : #777;
+}
+main.app section article div.settings-content div.page div.wallet-summary div.card_1 span {
+	font-size : 24px;
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card_2 {
+	width: calc(37% - 20px);
+	border-width : 1px;
+	border-color : #777;
+	font-size: 16px;
+	
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card_2 td.account_address {
+
+	text-align : center;
+
+}
+
+
+main.app section article div.settings-content div.page div.wallet-summary div.card_3 {
+	width: calc(37% - 20px);
+	border-width : 1px;
+	border-color : #777;
+	font-size: 16px;
+	
+}
+
 main.app section article div.settings-content div.page div.wallet-summary div.card {
 
-	width: calc(100% / 3 - 40px);
 	height: calc(100% - 20px);
 	padding: 10px;
 	background-color: #fff;
@@ -6310,7 +6404,7 @@ main.app section article div.settings-content div.page div.wallet-summary div.ca
 
 main.app section article div.settings-content div.page div.wallet-summary div.card div.balance {
 
-	width: calc(100% - 20px);
+	width: calc(100% - 10px);
 	padding: 10px;
 	display: flex;
 	height: 40px;
@@ -6320,9 +6414,32 @@ main.app section article div.settings-content div.page div.wallet-summary div.ca
 
 }
 
+main.app section article div.settings-content div.page div.wallet-summary div.card table {
+
+	width: 100%;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card input.sendTo {
+
+	width: 100%;
+	font-size: 15px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card input.sendAmount {
+
+}
+
 main.app section article div.settings-content div.page div.wallet-summary div.card div.balance.light {
 
 	color: #888;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card div.balance.strong_light {
+
+	color: #ddd;
 
 }
 
@@ -6455,8 +6572,11 @@ main.app section article div.settings-content div.page div.wallet-summary div.ca
 
 main.app section article div.settings-content div.page div.wallet-summary div.card div.buttons button {
 
+	position : relative;
+	left: 320px;
+	top: -20px;
 	color: #fff;
-	background-color: #717075;
+	background-color: #919095;
 	outline: none;
 	border-radius: 8px;
 	width: 170px;
@@ -6532,8 +6652,15 @@ main.app section article div.settings-content div.page div.wallet-graph ul li ta
 
 }
 
-main.app section article div.settings-content div.page div.wallet-graph ul li table thead tr {
+main.app section article div.settings-content div.page div.wallet-graph ul li table thead tr th.amount {
 
+	text-align : center;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table thead tr td.amount {
+
+	text-align : right;
 
 }
 
@@ -6557,19 +6684,13 @@ main.app section article div.settings-content div.page div.wallet-graph ul li ta
 
 main.app section article div.settings-content div.page div.wallet-graph ul li table th.amount {
 
-	width: 180px;
+	width: 240px;
 
 }
 
 main.app section article div.settings-content div.page div.wallet-graph ul li table th.status {
 
 	width: 180px;
-
-}
-
-main.app section article div.settings-content div.page div.wallet-graph ul li table th.date {
-
-	width: 140px;
 
 }
 
@@ -6580,10 +6701,50 @@ main.app section article div.settings-content div.page div.wallet-graph ul li ta
 
 }
 
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.date {
+
+	width: 210px;
+
+}
+
 main.app section article div.settings-content div.page div.wallet-graph ul li table td.date {
 
 	padding-left: 4px;
 
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.type {
+
+	width: 80px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.transaction_hash {
+
+	width: calc(100% - 650px);
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.receipt ,
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.invoice {
+
+	width: 100px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.receipt span.link,
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.invoice span.link{
+
+	color: blue;
+	text-decoration: underline;
+	cursor : default ;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.receipt span.link:hover,
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.invoice span.link:hover{
+
+	text-decoration: none;
 }
 
 main.app section article div.settings-content div.page div.wallet-graph ul li table td.amount {

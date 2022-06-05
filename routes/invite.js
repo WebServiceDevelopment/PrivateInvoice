@@ -22,17 +22,17 @@
 
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express				= require('express');
+const router				= express.Router();
+module.exports				= router;
 
 // Libraries
 
-const uuidv1 = require('uuid').v1;
+const uuidv1				= require('uuid').v1;
 
 // Database
 
-const db = require('../database.js');
+const db					= require('../database.js');
 
 //------------------------------- export modules -------------------------------
 
@@ -362,6 +362,8 @@ router.post('/contacts', async function(req, res) {
 			organization_building,
 			organization_department,
 			organization_tax_id,
+			addressCountry,
+			addressRegion,
 			wallet_address
 		FROM
 			members

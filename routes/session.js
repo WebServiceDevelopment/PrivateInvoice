@@ -22,22 +22,25 @@
 
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express				= require('express');
+const router				= express.Router();
+module.exports				= router;
 
 // Import Libraries
 
-const uuidv1 = require('uuid').v1
-const bip39 = require('bip39')
+const uuidv1				= require('uuid').v1
+const bip39					= require('bip39')
 
 // Database
 
-const db = require('../database.js');
-const MEMBERS_TABLE = "members";
+const db					= require('../database.js');
+const MEMBERS_TABLE			= "members";
 
 // End Points
 
+/*
+ * logout
+ */
 router.get("/logout", function(req, res) {
 
 	req.session.destroy();
@@ -46,13 +49,18 @@ router.get("/logout", function(req, res) {
 
 });
 
+/*
+ * check
+ */
 router.all('/check', async function(req, res) {
 
 	res.json(req.session.data);
 
 });
 
-// Should be in settings (profile)
+/*
+ * Should be in settings (profile)
+ */
 router.post('/updateCompany', async function(req, res) {
 
 	// Step 1 : Update members table
@@ -66,7 +74,9 @@ router.post('/updateCompany', async function(req, res) {
 			organization_address = ?,
 			organization_building = ?,
 			organization_department = ?,
-			organization_tax_id = ?
+			organization_tax_id = ?,
+			addressCountry = ?,
+			addressRegion = ?
 		WHERE
 			member_uuid = ?
 	`;
@@ -78,6 +88,8 @@ router.post('/updateCompany', async function(req, res) {
 		req.body.organization_building,
 		req.body.organization_department,
 		req.body.organization_tax_id,
+		req.body.addressCountry,
+		req.body.addressRegion,
 		req.session.data.member_uuid
 	];
 
@@ -97,6 +109,8 @@ router.post('/updateCompany', async function(req, res) {
 	req.session.data.organization_building = req.body.organization_building;
 	req.session.data.organization_department = req.body.organization_department;
 	req.session.data.organization_tax_id = req.body.organization_tax_id;
+	req.session.data.addressCountry = req.body.addressCountry;
+	req.session.data.addressRegion = req.body.addressRegion;
 
 	res.json({
 		err : 0,
@@ -105,7 +119,9 @@ router.post('/updateCompany', async function(req, res) {
 
 });
 
-// Should be in settings
+/*
+ * Should be in settings
+ */
 router.post('/updateProfile', async function(req, res) {
 
 	// Step 1 : Update members table
@@ -156,7 +172,9 @@ router.post('/updateProfile', async function(req, res) {
 
 });
 
-
+/*
+ * login
+ */
 router.post('/login', async function(req, res) {
 
 	const sql = `
@@ -171,6 +189,8 @@ router.post('/login', async function(req, res) {
 			organization_building,
 			organization_department,
 			organization_tax_id,
+			addressCountry,
+			addressRegion,
 			created_on,
 			wallet_address,
 			avatar_uuid
@@ -222,6 +242,9 @@ router.post('/login', async function(req, res) {
 
 });
 
+/*
+ * signup
+ */
 router.post('/signup', async function(req, res) {
 
 	// First we insert into the database
@@ -239,10 +262,16 @@ router.post('/signup', async function(req, res) {
 			organization_address,
 			organization_building,
 			organization_department,
+			organization_tax_id,
+			addressCountry,
+			addressRegion,
 			wallet_address,
 			avatar_uuid,
 			logo_uuid
 		) VALUES (
+			?,
+			?,
+			?,
 			?,
 			?,
 			?,
@@ -284,6 +313,9 @@ router.post('/signup', async function(req, res) {
 		req.body.organization.address,
 		req.body.organization.building,
 		req.body.organization.department,
+		req.body.organization.organization_tax_id,
+		req.body.organization.addressCountry,
+		req.body.organization.addressRegion,
 		mnemonic
 	];
 
@@ -307,6 +339,9 @@ router.post('/signup', async function(req, res) {
 			organization_address,
 			organization_building,
 			organization_department,
+			organization_tax_id,
+			addressCountry,
+			addressRegion,
 			created_on,
 			avatar_uuid
 		FROM
