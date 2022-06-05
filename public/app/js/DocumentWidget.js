@@ -70,14 +70,18 @@ const DocumentWidget = (function() {
 			organization_name : document.getElementById('DocumentWidget.from.organization_name'),
 			organization_address : document.getElementById('DocumentWidget.from.organization_address'),
 			organization_building : document.getElementById('DocumentWidget.from.organization_building'),
-			organization_department : document.getElementById('DocumentWidget.from.organization_department')
+			organization_department : document.getElementById('DocumentWidget.from.organization_department'),
+			addressRegion : document.getElementById('DocumentWidget.from.addressRegion'),
+			addressCountry : document.getElementById('DocumentWidget.from.addressCountry')
 		},
 
 		to : {
 			organization_name : document.getElementById('DocumentWidget.to.organization_name'),
 			organization_address : document.getElementById('DocumentWidget.to.organization_address'),
 			organization_building : document.getElementById('DocumentWidget.to.organization_building'),
-			organization_department : document.getElementById('DocumentWidget.to.organization_department')
+			organization_department : document.getElementById('DocumentWidget.to.organization_department'),
+			addressRegion : document.getElementById('DocumentWidget.to.addressRegion'),
+			addressCountry : document.getElementById('DocumentWidget.to.addressCountry')
 		},
 
 		inputs : {
@@ -306,11 +310,15 @@ const DocumentWidget = (function() {
 		f( this.DOM.from.organization_address );
 		f( this.DOM.from.organization_building );
 		f( this.DOM.from.organization_department );
+		f( this.DOM.from.addressRegion );
+		f( this.DOM.from.addressCountry );
 
 		f( this.DOM.to.organization_name );
 		f( this.DOM.to.organization_address );
 		f( this.DOM.to.organization_building );
 		f( this.DOM.to.organization_department );
+		f( this.DOM.to.addressRegion );
+		f( this.DOM.to.addressCountry );
 	}
 
 	function api_updateToInfo(memberData) {
@@ -322,12 +330,16 @@ const DocumentWidget = (function() {
 			this.DOM.to.organization_address.value = memberData.organization_address || "";
 			this.DOM.to.organization_building.value = memberData.organization_building || "";
 			this.DOM.to.organization_department.value = memberData.organization_department || "";
+			this.DOM.to.addressRegion.value = memberData.addressRegion || "";
+			this.DOM.to.addressCountry.value = memberData.addressCountry || "";
 		} else {
 			this.MEM.document.buyer_uuid = null;
 			this.DOM.to.organization_name.value = "";
 			this.DOM.to.organization_address.value = "";
 			this.DOM.to.organization_building.value = "";
 			this.DOM.to.organization_department.value = "";
+			this.DOM.to.addressRegion.value = "";
+			this.DOM.to.addressCountry.value = "";
 		}
 
 		//this.MEM.document.buyer_details = memberData;
@@ -1325,12 +1337,16 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			this.DOM.to.organization_address.value = sd.organization_address;
 			this.DOM.to.organization_building.value = sd.organization_building;
 			this.DOM.to.organization_department.value = sd.organization_department;
+			this.DOM.to.addressRegion.value = sd.addressRegion;
+			this.DOM.to.addressCountry.value = sd.addressCountry;
 				
 			let cd = this.MEM.document.buyer_details;
 			this.DOM.from.organization_name.value = cd.organization_name || "";
 			this.DOM.from.organization_address.value = cd.organization_address || "";
 			this.DOM.from.organization_building.value = cd.organization_building || "";
 			this.DOM.from.organization_department.value = cd.organization_department || "";
+			this.DOM.from.addressRegion.value = cd.addressRegion || "";
+			this.DOM.from.addressCountry.value = cd.addressCountry || "";
 
 		} else {
 
@@ -1341,6 +1357,8 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 				this.DOM.from.organization_address.value = sd.organization_address;
 				this.DOM.from.organization_building.value = sd.organization_building;
 				this.DOM.from.organization_department.value = sd.organization_department;
+				this.DOM.from.addressRegion.value = sd.addressRegion;
+				this.DOM.from.addressCountry.value = sd.addressCountry;
 
 			} else {
 
@@ -1348,6 +1366,8 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 				this.DOM.from.organization_address.value = "";
 				this.DOM.from.organization_building.value = "";
 				this.DOM.from.organization_department.value = "";
+				this.DOM.from.addressRegion.value = "";
+				this.DOM.from.addressCountry.value = "";
 
 			}
 	
@@ -1358,6 +1378,8 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 				this.DOM.to.organization_address.value = cd.organization_address || "";
 				this.DOM.to.organization_building.value = cd.organization_building || "";
 				this.DOM.to.organization_department.value = cd.organization_department || "";
+				this.DOM.to.addressRegion.value = cd.addressRegion || "";
+				this.DOM.to.addressCountry.value = cd.addressCountry || "";
 
 			} else {
 
@@ -1365,6 +1387,8 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 				this.DOM.to.organization_address.value = "";
 				this.DOM.to.organization_building.value = "";
 				this.DOM.to.organization_department.value = "";
+				this.DOM.to.addressRegion.value = "";
+				this.DOM.to.addressCountry.value = "";
 
 			}
 
@@ -1396,11 +1420,15 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			f( this.DOM.from.organization_address );
 			f( this.DOM.from.organization_building );
 			f( this.DOM.from.organization_department );
+			f( this.DOM.from.addressRegion );
+			f( this.DOM.from.addressCountry );
 
 			f( this.DOM.to.organization_name );
 			f( this.DOM.to.organization_address );
 			f( this.DOM.to.organization_building );
 			f( this.DOM.to.organization_department );
+			f( this.DOM.to.addressRegion );
+			f( this.DOM.to.addressCountry );
 
 		}
 

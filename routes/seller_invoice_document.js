@@ -155,25 +155,6 @@ router.post('/update', async function(req, res) {
 		req.body.document_totals.total,
 		req.body.document_meta.due_by
 	];
-/*
-	sql = `
-		UPDATE
-			${SELLER_DRAFT_STATUS}
-		SET
-			subject_line = ?,
-			amount_due = ?,
-			buyer_uuid = ?,
-			buyer_membername = ?,
-			buyer_organization = ?
-		WHERE
-			document_uuid = ?
-	`;
-
-	args = [
-		req.body.subject_line,
-		req.body.document_totals.total,
-	];
-*/
 
 	if(req.body.buyer_details) {
 		args.push(req.body.buyer_details.member_uuid);
@@ -423,7 +404,9 @@ router.post('/create', async function(req, res) {
 		organization_address : req.session.data.organization_address,
 		organization_building :req.session.data.organization_building,
 		organization_department : req.session.data.organization_department,
-		organization_tax_id : req.session.data.organization_tax_id
+		organization_tax_id : req.session.data.organization_tax_id,
+		addressCountry : req.session.data.addressCountry,
+		addressRegion : req.session.data.addressRegion
 	}
 
 	// 2.
@@ -460,20 +443,21 @@ router.post('/create', async function(req, res) {
 			"name": "Commercial Invoice Certificate",
 			"issuanceDate": "",
 			"issuer": {
-				"type": "Entity",
-				"id": "did:key:",
-				"entityType": "Organization",
-				"name": "",
+				"type"					: "Entity",
+				"id"					: "did:key:",
+				"entityType"			: "Organization",
+				"name"					: "",
 				"address": {
 					"type": [
 						"PostalAddress"
 					],
-					"organizationName": "",
-					"streetAddress": "",
-					"addressLocality": "",
-					"addressRegion": "",
-					"postalCode": "",
-					"addressCountry": ""
+					"organizationName"	: "",
+					"streetAddress"		: "",
+					"addressLocality"	: "",
+					"addressRegion"		: "",
+					"postalCode"		: "",
+					"addressCountry"	: "",
+                    "addressRegion"		: ""
 				}
 			},
 
@@ -483,56 +467,60 @@ router.post('/create', async function(req, res) {
 
     function credentialSubject_object () {
         return {
-            "type"                  : "Invoice",
-            "customerReferenceNumber": "",
-            "identifier"            : "",
-            "invoiceNumber"         : "",
-            "invoiceDate"           : "",
-            "purchaseDate"          : "",
+            "type"                  	: "Invoice",
+            "customerReferenceNumber"	: "",
+            "identifier"            	: "",
+            "invoiceNumber"         	: "",
+            "invoiceDate"           	: "",
+            "purchaseDate"          	: "",
 
-            "seller":{
-                "type"              : "Organization",
-				"id"				: "",
-                "name"              : "",
-                "taxId"             : "",
-                "description"       : "",
-                "contactPoint"      : "",
-                "address":{
-                    "type"          : "PostalAddress",
-                    "streetAddress" : "",
-                    "addressLocality": ""
+            "seller" : {
+                "type"              	: "Organization",
+				"id"					: "",
+                "name"              	: "",
+                "taxId"             	: "",
+                "description"       	: "",
+                "contactPoint"      	: "",
+                "address" : {
+                    "type"          	: "PostalAddress",
+                    "streetAddress" 	: "",
+                    "addressLocality"	: "",
+                    "addressCountry"	: "",
+                    "addressRegion"		: ""
                 }
             },
 
             "buyer":{
-                "type"              : "Organization",
-				"id"				: "",
-                "name"              : "",
-                "taxId"             : "",
-                "description"       : "",
-                "contactPoint"      : "",
+                "type"              	: "Organization",
+				"id"					: "",
+                "name"             		: "",
+                "taxId"             	: "",
+                "description"       	: "",
+                "contactPoint"      	: "",
                 "address" : {
-                "type"              : "PostalAddress",
-                    "streetAddress" : "",
-                    "addressLocality": ""
+                	"type"          	: "PostalAddress",
+                    "streetAddress" 	: "",
+                    "addressLocality"	: "",
+                    "addressCountry"	: "",
+                    "addressRegion"		: ""
                 }
             },
 
             "itemsShipped"  : [],
 
-            "invoiceSubtotal"       : {
-                "type"              : "PriceSpecification",
-                "price"             : 0,
-                "priceCurrency"     : "Gwei"
+            "invoiceSubtotal" : {
+                "type"					: "PriceSpecification",
+                "price"					: 0,
+                "priceCurrency"			: "Gwei"
             },
 
             "totalPaymentDue" : {
-                "type"              : "PriceSpecification",
-                "price"             : 0,
-                "priceCurrency"     : "Gwei"
+                "type"					: "PriceSpecification",
+                "price"					: 0,
+                "priceCurrency"			: "Gwei"
             },
 
-            "comments":[
+            "comments" : [
                 ""
             ]
         }
@@ -540,30 +528,30 @@ router.post('/create', async function(req, res) {
 
     function itemsShipped_object () {
         return {
-            "type":"TradeLineItem",
-            "description":"",
+            "type"						: "TradeLineItem",
+            "description"				: "",
 
             "product":{
-                "type":"Product",
-                "description":"",
+                "type"					: "Product",
+                "description"			: "",
 
                 "sizeOrAmount":{
-                    "type":"QuantitativeValue",
-                    "unitCode":"",
-                    "value":""
+                    "type"				: "QuantitativeValue",
+                    "unitCode"			: "",
+                    "value"				: ""
                 },
 
-                "productPrice":{
-                    "type":"PriceSpecification",
-                    "price":"",
-                    "priceCurrency":"Gwei"
+                "productPrice" : {
+                    "type" 				: "PriceSpecification",
+                    "price"				: "",
+                    "priceCurrency"		: "Gwei"
                 }
             },
 
             "lineItemTotalPrice" : {
-                "type" : "PriceSpecification",
-                "price" : "",
-                "priceCurrency" : "Gwei"
+                "type"					: "PriceSpecification",
+                "price"					: "",
+                "priceCurrency"			: "Gwei"
             }
         }
     }
@@ -597,6 +585,9 @@ router.post('/create', async function(req, res) {
             organization_building,
             organization_department,
             organization_tax_id,
+			organization_postcode,
+            addressCountry,
+            addressRegion,
             wallet_address
         FROM
             members
@@ -622,13 +613,16 @@ router.post('/create', async function(req, res) {
 	//
 	let seller = credentialSubject.seller;
 
-	seller.id = row.member_uuid;
-	seller.name = row.organization_name;
-	seller.taxId = row.organization_tax_id;
-	seller.description = row.organization_department;
+	seller.id						= row.member_uuid;
+	seller.name						= row.organization_name;
+	seller.taxId					= row.organization_tax_id;
+	seller.description				= row.organization_department;
 
-	seller.address.streetAddress = row.organization_address;
-	seller.address.addressLocality = row.organization_building;
+	seller.address.streetAddress	= row.organization_building;
+	seller.address.addressLocality	= row.organization_address;
+
+	seller.address.addressCountry	= row.addressCountry;
+	seller.address.addressRegion	= row.addressRegion;
 
 	let ip_address = process.env.SERVER_IP_ADDRESS;
 	let port = process.env.SERVER_PORT || DEFAULT_SERVER_PORT;
@@ -637,26 +631,38 @@ router.post('/create', async function(req, res) {
 
 		console.log("ip_address ="+ip_address);
 	}
-
 	const contactPoint = row.membername+"@"+ip_address +":"+port
-	credentialSubject.seller.contactPoint = contactPoint;
-	credentialSubject.seller.taxId = row.organization_tax_id;
 
-	console.log("contactPoint="+contactPoint);
+	seller.contactPoint				= contactPoint;
+
+	//console.log("contactPoint="+contactPoint);
 
 	// 7.
 	let document_json = new credential_object ();
-
 	document_json.credentialSubject = credentialSubject;
 
 
-    // 8.
+	// 8.
+	let issuer = document_json.issuer;
+	issuer.name						=  row.organization_name;
+
+	issuer.address.organizationName	= row.organization_name;
+
+	issuer.address.streetAddress	= row.organization_building;
+	issuer.address.addressLocality	= row.organization_address;
+
+	issuer.address.postalCode		= row.organization_postcode;
+
+	issuer.address.addressCountry	= row.addressCountry;
+	issuer.address.addressRegion	= row.addressRegion;
+
+    // 9.
     // begin Transaction
     //
     const [ conn , _8 ] = await tran.connection ();
     await tran.beginTransaction(conn);
 
-	// 9.
+	// 10.
 	//
 	sql = `
 		INSERT INTO ${SELLER_DRAFT_STATUS} (
@@ -698,27 +704,27 @@ router.post('/create', async function(req, res) {
 		currency(0, config.CURRENCY).format(true)
 	];
 
-	const [result9 , err9 ] = await tran.insert(conn, sql, args);
+	const [result10 , err10 ] = await tran.insert(conn, sql, args);
 
-	if (err9) {
+	if (err10) {
 		console.log(err8);
-		errno = 9;
+		errno = 10;
 		code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err9.sqlMessage, errno);
+	    let msg = tran.rollbackAndReturn(conn, code, err10.sqlMessage, errno);
 		return res.status(400).json({ err : 9, msg : msg });
 	}
 
-	// 10.
+	// 11.
 	//
-	if(result9.affectedRows != 1) {
-		errno = 10;
+	if(result10.affectedRows != 1) {
+		errno = 11;
 		code = 400;
-		const err10 = MESSAGE_AFFECTED_ROWS;
-	    let msg = tran.rollbackAndReturn(conn, code, err10, errno);
+		const err11 = MESSAGE_AFFECTED_ROWS;
+	    let msg = tran.rollbackAndReturn(conn, code, err11, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
 
-	// 11.
+	// 12.
 	//
 
 	sql = `
@@ -795,38 +801,38 @@ router.post('/create', async function(req, res) {
 	//console.log("Insert into Document (execute)");
 	//console.log(Date.now());
 
-	const [ result11, err11 ] = await tran.insert(conn, sql, args);
+	const [ result12, err12 ] = await tran.insert(conn, sql, args);
 
-	if (err11) {
-		errno = 11;
-		code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err11, errno);
-		return res.status(400).json({ err : errno, msg : msg });
-	}
-
-	// 12.
-	//	
-	if(result11.affectedRows != 1) {
+	if (err12) {
 		errno = 12;
 		code = 400;
-		const err11 = MESSAGE_AFFECTED_ROWS;
 	    let msg = tran.rollbackAndReturn(conn, code, err12, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
 
-    // 13.
+	// 13.
+	//	
+	if(result12.affectedRows != 1) {
+		errno = 13;
+		code = 400;
+		const err13 = MESSAGE_AFFECTED_ROWS;
+	    let msg = tran.rollbackAndReturn(conn, code, err13, errno);
+		return res.status(400).json({ err : errno, msg : msg });
+	}
+
+    // 14.
     // commit
     //
-    const [ _13, err13 ] = await tran.commit(conn);
+    const [ _14, err14 ] = await tran.commit(conn);
 
-    if (err13 ) {
-        errno = 13;
+    if (err14 ) {
+        errno = 14;
         code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err13, errno);
+	    let msg = tran.rollbackAndReturn(conn, code, err14, errno);
 		return res.status(400).json({ err : errno, msg : msg });
     }
 
-    // 14.
+    // 15.
     //
     conn.end();
 

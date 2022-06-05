@@ -18,44 +18,53 @@
     
 **/
 
-//
-const os					= require('os');
-const net					= os.networkInterfaces();
+"use strict";
 
+// Libraries
+const currency                  = require('currency.js');
 
-// Database Libraries
+// Database
 
-// Exports 
+const db 						= require('../database.js');
+
+// Exports
 module.exports = {
-	getLocalIp 				: _getLocalIp,
+	getRecentActivity			: api_getRecentActivity,
 }
-
-// Constant
-
-
 
 //------------------------------- export modules ------------------------------
 
 /*
- * _getLocalIp
- * Find ipv4 addres for own node.
+ * getRecentActivity
  */
+async function api_getRecentActivity(table, times) {
 
-function _getLocalIp (_mask) {
-	const mask = _mask || 24;
-	
-    for(let key in net) {
-        for(let key2 in net[key]) {
-            for(let key3 in net[key][key2]) {
-                if(key3 == "cidr") {
-                    if(net[key][key2][key3].indexOf("/") !==-1) {
-                        let ip = net[key][key2][key3].split("/");
-                        if(ip[1] == mask) {
-                            return ip[0];
-                        }
-                    }
-                }
-            }
-        }
-    }
+	let sql = `
+		SELECT
+			document_uuid,
+			document_json,
+			settlement_hash,
+			settlement_time
+		FROM
+			${table}
+		WHERE
+			settlement_time is not null
+		ORDER BY
+			settlement_time DESC
+		LIMIT
+			${times}
+	`;
+
+	let args = [
+	];
+
+	let rows;
+	try {
+		rows = await db.selectAll(sql, args);
+	} catch(err) {
+		console.log(err);
+		return [];
+	}
+
+	return rows;
 }

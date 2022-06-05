@@ -19,7 +19,7 @@
 **/
 
 // Database Libraries
-const db = require('../transaction.js');
+const db					= require('../transaction.js');
 
 // Exports 
 module.exports = {
@@ -334,6 +334,9 @@ async function _getDraftDocument(conn, table, uuid) {
 
 }
 
+/*
+ * getDocument
+ */
 async function _getDocument(conn, table, uuid) {
 
 	let result;

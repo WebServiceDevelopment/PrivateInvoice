@@ -98,6 +98,7 @@ const ActionWidget = (function() {
 				this.DOM.invoice.sendInvoice.removeAttribute("disabled")
 				this.DOM.invoice.sendInvoice.disabled = false;
 			},
+			sending : Elem('ActionWidget.invoice.sender-wrap'),
 
 		},
 		viewReport : {
@@ -194,6 +195,12 @@ const ActionWidget = (function() {
 		hidden : () => { this.DOM.modal.sending.style.visibility = "hidden"; },
 	}
 
+	this.SENDING_WRAP = {
+		visible : () => { this.DOM.invoice.sending.style.visibility = "visible"; },
+		hidden : () => { this.DOM.invoice.sending.style.visibility = "hidden"; },
+	}
+
+
 	init.apply(this);
 	return this;
 
@@ -254,6 +261,8 @@ const ActionWidget = (function() {
 		this.DOM.modal_transaction.ipfs_cid.addEventListener('click',this.EVT.handleIpfs.jsonDataClick);
 
 		this.DOM.modal_receipt.ipfs_cid.addEventListener('click',this.EVT.handleIpfs.jsonDataByTransactionClick);
+
+		this.SENDING_WRAP.hidden();
 	}
 
 	async function evt_handleIpfs_jsonDataByTransactionClick() {
@@ -1477,7 +1486,6 @@ const ActionWidget = (function() {
  * [ Make Paymant ]
  */
     async function evt_handleModalSubmitClick() {
-		//this.DOM.modal.sending.style.visibility = "visible";
 		this.SENDING.visible();
 
 		await this.API.handleModalSubmit();
@@ -1507,6 +1515,7 @@ const ActionWidget = (function() {
  * [ Send Transaction ]
  */
     async function api_handleModalSubmit() {
+
 
 		const url = '/api/invoice/makePayment';
 
@@ -1962,6 +1971,7 @@ const ActionWidget = (function() {
 		console.log("Contact="+ ContactWidget.API.checkSaveTimeout() +":"+
 			"Document="+DocumentWidget.API.checkSaveTimeout() ) ;
 */
+		this.SENDING_WRAP.visible();
 
 
 		if( ContactWidget.API.checkSaveTimeout() &&
@@ -2021,6 +2031,8 @@ const ActionWidget = (function() {
 			if(ajax.status != 200) {
 				alert("[ Send Invoice ]\n"+res.err);
 			}
+
+			this.SENDING_WRAP.hidden();
 		}
 
 	}

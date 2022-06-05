@@ -901,6 +901,7 @@ async function api_getInvoiceArchiveCount(count, role, folder , archive, exec) {
 
 async function evt_handleGroupClick(evt) {
 
+		Traceability.API.init();
 		DocumentWidget.API.clearDocument();
 
 		TrayWidget.API.nonselectTray();
