@@ -22,20 +22,23 @@
 
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express				= require('express');
+const router				= express.Router();
+module.exports				= router;
 
 // Libraries
 
-const uuidv1 = require('uuid').v1;
+const uuidv1				= require('uuid').v1;
 
 // Database
 
-const db = require('../database.js');
+const db					= require('../database.js');
 
 // End Points
 
+/*
+ * setProfileImage
+ */
 router.post('/setProfileImage', async function(req, res) {
 
 	const avatar_uuid = uuidv1();
@@ -63,20 +66,20 @@ router.post('/setProfileImage', async function(req, res) {
 		throw err;
 	}
 
-	// Set this in the user's table
+	// Set this in the member's table
 
 	sql = `
 		UPDATE
-			dat_users
+			members
 		SET
 			avatar_uuid = ?
 		WHERE
-			user_uuid = ?
+			member_uuid = ?
 	`;
 
 	args = [
 		avatar_uuid,
-		req.session.data.user_uuid,
+		req.session.data.member_uuid,
 	];
 
 	// Update the current changes in session object
@@ -90,6 +93,9 @@ router.post('/setProfileImage', async function(req, res) {
 
 });
 
+/*
+ * setCompanyLogo
+ */
 router.post('/setCompanyLogo', async function(req, res) {
 
 	const logo_uuid = uuidv1();
@@ -97,7 +103,7 @@ router.post('/setCompanyLogo', async function(req, res) {
 	// Insert Image Into Database
 
 	let sql = `
-		INSERT INTO dat_company_img (
+		INSERT INTO organization_img (
 			logo_uuid,
 			img_data
 		) VALUES (
@@ -117,20 +123,20 @@ router.post('/setCompanyLogo', async function(req, res) {
 		throw err;
 	}
 
-	// Set this in the user's table
+	// Set this in the member's table
 
 	sql = `
 		UPDATE
-			dat_users
+			members
 		SET
 			logo_uuid = ?
 		WHERE
-			user_uuid = ?
+			member_uuid = ?
 	`;
 
 	args = [
 		logo_uuid,
-		req.session.data.user_uuid,
+		req.session.data.member_uuid,
 	];
 
 	// Update the current changes in session object
@@ -144,6 +150,9 @@ router.post('/setCompanyLogo', async function(req, res) {
 
 });
 
+/*
+ * getProfileImage
+ */
 router.post('/getProfileImage', async function(req, res) {
 
 	let sql = `
@@ -179,13 +188,16 @@ router.post('/getProfileImage', async function(req, res) {
 
 });
 
+/*
+ * getCompanyLogo
+ */
 router.post('/getCompanyLogo', async function(req, res) {
 
 	let sql = `
 		SELECT
 			UNCOMPRESS(img_data) AS dataUrl
 		FROM
-			dat_company_img
+			organization_img
 		WHERE
 			logo_uuid = ?
 		LIMIT 1

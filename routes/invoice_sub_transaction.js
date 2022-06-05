@@ -19,54 +19,60 @@
 **/
 
 // Database Libraries
-const db = require('../transaction.js');
+const db					= require('../transaction.js');
 
 // Exports 
 module.exports = {
-	exist_check				: api_exist_check,
-	notexist_check			: api_notexist_check,
-	checkForExistingDocument : api_checkForExistingDocument,
-	checkForNotExistingDocument : api_checkForNotExistingDocument,
+	exist_check				: _exist_check,
+	notexist_check			: _notexist_check,
+	checkForExistingDocument : _checkForExistingDocument,
+	checkForNotExistingDocument : _checkForNotExistingDocument,
 
-	getDraftDocument 		: api_getDraftDocument,
-	getDocument				: api_getDocument,
-	getStatus				: api_getStatus,
+	getDraftDocument 		: _getDraftDocument,
+	getDocument				: _getDocument,
+	getStatus				: _getStatus,
 
-	getClientUuid 			: api_getClientUuid,
-	getClientUuidForDraft 	: api_getClientUuidForDraft,
-	getClientHost 			: api_getClientHost,
+	getBuyerUuid 			: _getBuyerUuid,
+	getBuyerUuidForDraft 	: _getBuyerUuidForDraft,
+	getBuyerHost 			: _getBuyerHost,
 
-	getSupplierUuid 		: api_getSupplierUuid,
-	getSupplierHost			: api_getSupplierHost,
+	getSellerUuid 			: _getSellerUuid,
+	getSellerHost			: _getSellerHost,
 
-	insertStatus			: api_insertStatus,
-	insertArchiveStatus		: api_insertArchiveStatus,
-	insertDocument			: api_insertDocument,
-	insertDraftDocument		: api_insertDraftDocument,
+	insertStatus			: _insertStatus,
+	insertArchiveStatus		: _insertArchiveStatus,
+	insertDocument			: _insertDocument,
+	insertArchiveDocument	: _insertArchiveDocument,
+	insertDraftDocument		: _insertDraftDocument,
 
-	deleteStatus			: api_deleteStatus,
-	deleteDocument			: api_deleteDocument,
+	deleteStatus			: _deleteStatus,
+	deleteDocument			: _deleteDocument,
 
-	setConfirm 				: api_setConfirm,
-	setUnconfirm 			: api_setUnconfirm,
-	setMakePayment 			: api_setMakePayment,
-	setReturn 				: api_setReturn,
-	setWithdrawClient		: api_setWithdrawClient,
-	setWithdrawSupplier		: api_setWithdrawSupplier,
+	setConfirm 				: _setConfirm,
+	setUnconfirm 			: _setUnconfirm,
+	setMakePayment_status 	: _setMakePayment_status,
+	setMakePayment_document	: _setMakePayment_document,
+	setReturn 				: _setReturn,
+	setWithdrawBuyer		: _setWithdrawBuyer,
+	setWithdrawSeller		: _setWithdrawSeller,
 
-	rollbackAndReturn		: api_rollbackAndReturn,
+	rollbackAndReturn		: _rollbackAndReturn,
 
-	beginTransaction		: api_beginTransaction,
-	commit					: api_commit,
-	connection				: api_connection,
-	insert					: api_insert,
-	update					: api_update,
-	rollback				: api_rollback,
-	quety					: api_query,
+	beginTransaction		: _beginTransaction,
+	commit					: _commit,
+	connection				: _connection,
+	insert					: _insert,
+	update					: _update,
+	rollback				: _rollback,
+	quety					: _query,
 }
 
-//api modules
-async function api_beginTransaction (conn) {
+//------------------------------- export modules ------------------------------
+
+/*
+ * beginTransaction
+ */
+async function _beginTransaction (conn) {
 
 	try  {
 		await db.beginTransaction(conn);
@@ -76,7 +82,10 @@ async function api_beginTransaction (conn) {
 	}
 }
 
-async function api_commit (conn) {
+/*
+ * commit
+ */
+async function _commit (conn) {
 
 	try  {
 		await db.commit(conn);
@@ -86,7 +95,10 @@ async function api_commit (conn) {
 	}
 }
 
-async function api_connection () {
+/*
+ * connection
+ */
+async function _connection () {
 
 	try  {
 		const conn = await db.connection();
@@ -96,7 +108,10 @@ async function api_connection () {
 	}
 }
 
-async function api_insert(conn, sql, args) {
+/*
+ * insert
+ */
+async function _insert(conn, sql, args) {
 
 	try {
     	const result = await db.insert(conn, sql, args);
@@ -106,7 +121,10 @@ async function api_insert(conn, sql, args) {
 	}
 }
 
-async function api_update(conn, sql, args) {
+/*
+ * update
+ */
+async function _update(conn, sql, args) {
 
 	try {
     	const result = await db.update(conn, sql, args);
@@ -116,7 +134,10 @@ async function api_update(conn, sql, args) {
 	}
 }
 
-async function api_rollback(conn, err) {
+/*
+ * rollback
+ */
+async function _rollback(conn, err) {
 
 	try {
     	await db.rollback(conn, err);
@@ -126,7 +147,10 @@ async function api_rollback(conn, err) {
 	}
 }
 
-async function api_query(conn, sql, args) {
+/*
+ * query
+ */
+async function _query(conn, sql, args) {
 
 	try {
     	const result = await db.query(conn, sql, args);
@@ -136,7 +160,10 @@ async function api_query(conn, sql, args) {
 	}
 }
 
-async function api_exist_check(conn, table, uuid) {
+/*
+ * exist_cehck
+ */
+async function _exist_check(conn, table, uuid) {
 
 	let result, err;
 
@@ -169,7 +196,10 @@ async function api_exist_check(conn, table, uuid) {
 
 }
 
-async function api_notexist_check(conn, table, uuid) {
+/*
+ * nonexist_cehck
+ */
+async function _notexist_check(conn, table, uuid) {
 
 	let result, err;
 
@@ -202,7 +232,10 @@ async function api_notexist_check(conn, table, uuid) {
 
 }
 
-async function api_checkForExistingDocument (conn, table, document_uuid ) {
+/*
+ * checkForExistingDocument
+ */
+async function _checkForExistingDocument (conn, table, document_uuid ) {
 
 	let result, err;
 
@@ -231,7 +264,10 @@ async function api_checkForExistingDocument (conn, table, document_uuid ) {
 	return [true, null];
 }
 
-async function api_checkForNotExistingDocument (conn, table, document_uuid ) {
+/*
+ * checkForNonexistingDocument
+ */
+async function _checkForNotExistingDocument (conn, table, document_uuid ) {
 
     const sql = `
         SELECT
@@ -253,8 +289,10 @@ async function api_checkForNotExistingDocument (conn, table, document_uuid ) {
     return null;
 }
 
-
-async function api_getDraftDocument(conn, table, uuid) {
+/*
+ * getDraftDocument
+ */
+async function _getDraftDocument(conn, table, uuid) {
 
 	let document;
 
@@ -264,12 +302,12 @@ async function api_getDraftDocument(conn, table, uuid) {
 			document_type,
 			subject_line,
 			currency_options,
-			supplier_uuid,
-			supplier_username,
-			supplier_details,
-			client_uuid,
-			client_username,
-			client_details,
+			seller_uuid,
+			seller_membername,
+			seller_details,
+			buyer_uuid,
+			buyer_membername,
+			buyer_details,
 			created_on,
 			document_meta,
 			document_body,
@@ -296,14 +334,20 @@ async function api_getDraftDocument(conn, table, uuid) {
 
 }
 
-async function api_getDocument(conn, table, uuid) {
+/*
+ * getDocument
+ */
+async function _getDocument(conn, table, uuid) {
 
-	let document;
+	let result;
 
 	const sql = `
 		SELECT 
 			document_uuid,
-			document_json
+			document_json,
+            settlement_currency,
+            settlement_hash,
+            settlement_time
 		FROM
 			${table}
 		WHERE
@@ -315,16 +359,19 @@ async function api_getDocument(conn, table, uuid) {
 	];
 
 	try {
-		document = await db.selectOne(conn, sql, args);
+		result = await db.selectOne(conn, sql, args);
 	} catch(err) {
 		return [null, err];
 	}
 
-	return [document, null];
+	return [result, null];
 
 }
 	
-async function api_getStatus(conn, table, uuid) {
+/*
+ * getStatus
+ */
+async function _getStatus(conn, table, uuid) {
 
 	let status;
 
@@ -333,16 +380,16 @@ async function api_getStatus(conn, table, uuid) {
 			document_uuid,
 			document_type,
 			document_number,
-			supplier_uuid,
-			supplier_username,
-			supplier_company,
-			supplier_archived,
-			supplier_last_action,
-			client_uuid,
-			client_username,
-			client_company,
-			client_archived,
-			client_last_action,
+			seller_uuid,
+			seller_membername,
+			seller_organization,
+			seller_archived,
+			seller_last_action,
+			buyer_uuid,
+			buyer_membername,
+			buyer_organization,
+			buyer_archived,
+			buyer_last_action,
 			created_from,
 			root_document,
 			created_on,
@@ -366,38 +413,40 @@ async function api_getStatus(conn, table, uuid) {
 	} catch(err) {
 		return [null , err];
 	}
-	//console.log(status)
 
 	return [status , null];
 }
 
-async function api_getClientUuid (conn,table, document_uuid, supplier_uuid) {
+/*
+ * getBuyerUuid
+ */
+async function _getBuyerUuid (conn, table, document_uuid, seller_uuid) {
 
 	let result;
 
     const sql = `
         SELECT
-            client_uuid
+            buyer_uuid
         FROM
             ${table}
         WHERE
             document_uuid = ?
         AND
-            supplier_uuid = ?
+            seller_uuid = ?
     `;
 
     const args = [
         document_uuid,
-        supplier_uuid
+        seller_uuid
     ];
 
     try {
         result = await db.selectOne(conn, sql, args);
         if(!result) {
-            return [ null, new Error('client_uuid not found for document_uuid') ];
+            return [ null, new Error('buyer_uuid not found for document_uuid') ];
         }
-        const { client_uuid } = result;
-        return [ client_uuid, null ];
+        const { buyer_uuid } = result;
+        return [ buyer_uuid, null ];
 
     } catch(err) {
         return [ null, err ];
@@ -405,34 +454,36 @@ async function api_getClientUuid (conn,table, document_uuid, supplier_uuid) {
 
 }
 
-
-async function api_getClientUuidForDraft (conn,table, document_uuid, supplier_uuid) {
+/*
+ * getBuyerUuidForDraft
+ */
+async function _getBuyerUuidForDraft (conn, table, document_uuid, seller_uuid) {
 
 	let result;
 
     const sql = `
         SELECT
-            client_uuid
+            buyer_uuid
         FROM
 			${table}
         WHERE
             document_uuid = ?
 		AND
-			supplier_uuid = ?
+			seller_uuid = ?
     `;
 
     const args = [
         document_uuid,
-		supplier_uuid
+		seller_uuid
     ];
 
     try {
         result = await db.selectOne(conn, sql, args);
         if(!result) {
-            return [ null, new Error('client_uuid not found for document_uuid') ];
+            return [ null, new Error('buyer_uuid not found for document_uuid') ];
         }
-        const { client_uuid } = result;
-        return [ client_uuid, null ];
+        const { buyer_uuid } = result;
+        return [ buyer_uuid, null ];
 
     } catch(err) {
         return [ null, err ];
@@ -440,25 +491,27 @@ async function api_getClientUuidForDraft (conn,table, document_uuid, supplier_uu
 
 }
 
-
-async function api_getSupplierUuid (conn,table, document_uuid, client_uuid) {
+/*
+ * getSellerUuid
+ */
+async function _getSellerUuid (conn, table, document_uuid, buyer_uuid) {
 
 	let result;
 
     const sql = `
         SELECT
-            supplier_uuid
+            seller_uuid
         FROM
             ${table}
         WHERE
             document_uuid = ?
         AND
-            client_uuid = ?
+            buyer_uuid = ?
     `;
 
     const args = [
         document_uuid,
-        client_uuid
+        buyer_uuid
     ];
 
     try {
@@ -468,31 +521,34 @@ async function api_getSupplierUuid (conn,table, document_uuid, client_uuid) {
     }
 
 	if(!result) {
-		return [ null, new Error('supplier_uuid not found for document_uuid') ];
+		return [ null, new Error('seller_uuid not found for document_uuid') ];
     }
-    const { supplier_uuid } = result;
-    return [ supplier_uuid, null ];
+    const { seller_uuid } = result;
+    return [ seller_uuid, null ];
 
 }
 
-async function api_getSupplierHost (conn,table,  supplier_uuid, client_uuid) {
+/*
+ * getSellerHost
+ */
+async function _getSellerHost (conn, table,  seller_uuid, buyer_uuid) {
 
 	let result, err;
 
     const sql = `
         SELECT
-            supplier_host
+            seller_host
         FROM
             ${table}
         WHERE
-            supplier_uuid = ?
+            seller_uuid = ?
         AND
-            client_uuid = ?
+            buyer_uuid = ?
     `;
 
     const args = [
-        supplier_uuid,
-        client_uuid
+        seller_uuid,
+        buyer_uuid
     ];
 
     try {
@@ -507,29 +563,32 @@ async function api_getSupplierHost (conn,table,  supplier_uuid, client_uuid) {
         return [ null, err ];
     }
 
-    const { supplier_host } = result;
-    return [ supplier_host, null ];
+    const { seller_host } = result;
+    return [ seller_host, null ];
 
 }
 
-async function api_getClientHost (conn,table,  supplier_uuid, client_uuid) {
+/*
+ * getBuyerHost
+ */
+async function _getBuyerHost (conn, table,  seller_uuid, buyer_uuid) {
 
 	let result, err;
 
     const sql = `
         SELECT
-            client_host
+            buyer_host
         FROM
             ${table}
         WHERE
-            supplier_uuid = ?
+            seller_uuid = ?
         AND
-            client_uuid = ?
+            buyer_uuid = ?
     `;
 
     const args = [
-        supplier_uuid,
-        client_uuid
+        seller_uuid,
+        buyer_uuid
     ];
 
 	try {
@@ -539,16 +598,19 @@ async function api_getClientHost (conn,table,  supplier_uuid, client_uuid) {
 		return [ null, err ];
 	}
 	if(!result) {
-     	err = {msg:'client_host not found for client_uuid'};
+     	err = {msg:'buyer_host not found for buyer_uuid'};
       	return [ null, err ];
    	}
 
-   	const { client_host } = result;
-   	return [ client_host, null ];
+   	const { buyer_host } = result;
+   	return [ buyer_host, null ];
 
 }
 
-async function api_insertDraftDocument(conn,table, document) {
+/*
+ * insertDraftDocument
+ */
+async function _insertDraftDocument(conn, table, document) {
 
 	let result, err;
 
@@ -556,24 +618,26 @@ async function api_insertDraftDocument(conn,table, document) {
 		INSERT INTO ${table} (
 
 			document_uuid,
+			document_json,
 			document_type,
 
 			subject_line,
 			currency_options,
 
-			supplier_uuid,
-			supplier_username,
-			supplier_details,
+			seller_uuid,
+			seller_membername,
+			seller_details,
 
 			document_meta,
 			document_body,
 			document_totals,
 
-			client_uuid,
-			client_username,
-			client_details
+			buyer_uuid,
+			buyer_membername,
+			buyer_details
 
 		) VALUES (
+			?,
 			?,
 			?,
 
@@ -596,22 +660,23 @@ async function api_insertDraftDocument(conn,table, document) {
 
 	const args = [
 		document.document_uuid,
+		document.document_json,
 		document.document_type,
 
 		document.subject_line,
 		document.currency_options,
 
-		document.supplier_uuid,
-		document.supplier_username,
-		document.supplier_details,
+		document.seller_uuid,
+		document.seller_membername,
+		document.seller_details,
 
 		document.document_meta,
 		document.document_body,
 		document.document_totals,
 
-		document.client_uuid,
-		document.client_username,
-		document.client_details
+		document.buyer_uuid,
+		document.buyer_membername,
+		document.buyer_details
 	];
 
 	try {
@@ -628,7 +693,10 @@ async function api_insertDraftDocument(conn,table, document) {
 	return [result, null];
 }
 
-async function api_insertDocument(conn,table, status, document_json) {
+/*
+ * insertDocument
+ */
+async function _insertDocument(conn, table, status, document_json) {
 
 	let result, err;
 
@@ -659,9 +727,55 @@ async function api_insertDocument(conn,table, status, document_json) {
 
 	return [result, null];
 }
+
+/*
+ * insertArchiveDocument
+ */
+async function _insertArchiveDocument(conn, table, document) {
+
+	let result, err;
+
+	const sql = `
+		INSERT INTO ${table} (
+			document_uuid,
+			document_json,
+			settlement_currency,
+            settlement_hash,
+            settlement_time
+		) VALUES (
+			?,
+			?,
+			?,
+			?,
+			?
+		)
+	`;
+
+	const args = [
+		document.document_uuid,
+		document.document_json,
+        document.settlement_currency,
+        document.settlement_hash,
+        document.settlement_time
+	];
+
+	try {
+		result = await db.insert(conn, sql, args);
+	} catch(err) {
+		return [false, err];
+	}
+	if(result.affectedRows != 1) {
+		err  = {msg:"result.affectedRows != 1"};
+		return [false, err];
+	}
+
+	return [result, null];
+}
 	
-	
-async function api_insertStatus(conn,table, status) {
+/*
+ * insertStatust
+ */
+async function _insertStatus(conn, table, status) {
 
 	let result, err;
 
@@ -672,14 +786,14 @@ async function api_insertStatus(conn,table, status) {
 			document_number,
 			document_folder,
 
-			supplier_uuid,
-			supplier_username,
-			supplier_company,
-			supplier_last_action,
+			seller_uuid,
+			seller_membername,
+			seller_organization,
+			seller_last_action,
 
-			client_uuid,
-			client_username,
-			client_company,
+			buyer_uuid,
+			buyer_membername,
+			buyer_organization,
 
 			subject_line,
 			due_by,
@@ -711,12 +825,12 @@ async function api_insertStatus(conn,table, status) {
 		status.document_type,
 		status.document_number,
 		status.document_folder,
-		status.supplier_uuid,
-		status.supplier_username,
-		status.supplier_company,
-		status.client_uuid,
-		status.client_username,
-		status.client_company,
+		status.seller_uuid,
+		status.seller_membername,
+		status.seller_organization,
+		status.buyer_uuid,
+		status.buyer_membername,
+		status.buyer_organization,
 		status.subject_line,
 		status.due_by,
 		status.amount_due,
@@ -740,7 +854,10 @@ async function api_insertStatus(conn,table, status) {
 	return [result, null];
 }
 
-async function api_insertArchiveStatus(conn,table, status) {
+/*
+ * insertArchiveStatus
+ */
+async function _insertArchiveStatus(conn, table, status) {
 
 	let result, err;
 
@@ -751,18 +868,18 @@ async function api_insertArchiveStatus(conn,table, status) {
 			document_number,
 			document_folder,
 
-			supplier_uuid,
-			supplier_username,
-			supplier_company,
+			seller_uuid,
+			seller_membername,
+			seller_organization,
 
-			supplier_archived,
-			supplier_last_action,
+			seller_archived,
+			seller_last_action,
 
-			client_uuid,
-			client_username,
-			client_company,
+			buyer_uuid,
+			buyer_membername,
+			buyer_organization,
 
-			client_archived,
+			buyer_archived,
 			subject_line,
 			due_by,
 			amount_due,
@@ -795,14 +912,14 @@ async function api_insertArchiveStatus(conn,table, status) {
 		status.document_type,
 		status.document_number,
 		status.document_folder,
-		status.supplier_uuid,
-		status.supplier_username,
-		status.supplier_company,
-		status.supplier_archived,
-		status.client_uuid,
-		status.client_username,
-		status.client_company,
-		status.client_archived,
+		status.seller_uuid,
+		status.seller_membername,
+		status.seller_organization,
+		status.seller_archived,
+		status.buyer_uuid,
+		status.buyer_membername,
+		status.buyer_organization,
+		status.buyer_archived,
 		status.subject_line,
 		status.due_by,
 		status.amount_due,
@@ -826,8 +943,10 @@ async function api_insertArchiveStatus(conn,table, status) {
 	return [result, null];
 }
 
-
-async function api_deleteStatus(conn,table, status) {
+/*
+ * deleteStatus
+ */
+async function _deleteStatus(conn, table, status) {
 
 	let result, err;
 
@@ -856,7 +975,10 @@ async function api_deleteStatus(conn,table, status) {
 	return [result, null];
 }
 
-async function api_deleteDocument(conn,table, status) {
+/*
+ * deleteDocument
+ */
+async function _deleteDocument(conn, table, status) {
 
 	let result, err;
 
@@ -885,9 +1007,10 @@ async function api_deleteDocument(conn,table, status) {
 	return [result, null];
 }
 
-
-
-async function api_setConfirm (conn,table, document_uuid , client_uuid) {
+/*
+ * setConfirm
+ */
+async function _setConfirm (conn, table, document_uuid , buyer_uuid) {
 
 	let err;
 
@@ -897,7 +1020,7 @@ async function api_setConfirm (conn,table, document_uuid , client_uuid) {
         SET
             document_folder = 'confirmed'
         WHERE
-            client_uuid = ?
+            buyer_uuid = ?
         AND
             document_uuid = ?
         AND
@@ -907,7 +1030,7 @@ async function api_setConfirm (conn,table, document_uuid , client_uuid) {
     `;
 
     let args = [
-        client_uuid,
+        buyer_uuid,
         document_uuid
     ];
 
@@ -927,7 +1050,10 @@ async function api_setConfirm (conn,table, document_uuid , client_uuid) {
     return [result, null];
 }
 
-async function api_setUnconfirm (conn,table, document_uuid , client_uuid) {
+/*
+ * setUnconfirm
+ */
+async function _setUnconfirm (conn, table, document_uuid , buyer_uuid) {
 
 	let err;
 
@@ -937,7 +1063,7 @@ async function api_setUnconfirm (conn,table, document_uuid , client_uuid) {
         SET
             document_folder = 'sent'
         WHERE
-            client_uuid = ?
+            buyer_uuid = ?
         AND
             document_uuid = ?
         AND
@@ -947,7 +1073,7 @@ async function api_setUnconfirm (conn,table, document_uuid , client_uuid) {
     `;
 
     let args = [
-        client_uuid,
+        buyer_uuid,
         document_uuid
     ];
 
@@ -967,7 +1093,12 @@ async function api_setUnconfirm (conn,table, document_uuid , client_uuid) {
 	return [result, null];
 }
 
-async function api_setMakePayment (conn,table, document_uuid , client_uuid) {
+/*
+ * setMakePayment_status
+ */
+async function _setMakePayment_status (conn, table, document_uuid , buyer_uuid) {
+
+	const RESERVATION = 0;
 
 	let err;
 
@@ -975,9 +1106,10 @@ async function api_setMakePayment (conn,table, document_uuid , client_uuid) {
         UPDATE
             ${table}
         SET
-            document_folder = 'paid'
+            document_folder = 'paid',
+			opened = ${RESERVATION}
         WHERE
-            client_uuid = ?
+            buyer_uuid = ?
         AND
             document_uuid = ?
         AND
@@ -987,7 +1119,7 @@ async function api_setMakePayment (conn,table, document_uuid , client_uuid) {
     `;
 
     let args = [
-        client_uuid,
+        buyer_uuid,
         document_uuid
     ];
 
@@ -1007,7 +1139,48 @@ async function api_setMakePayment (conn,table, document_uuid , client_uuid) {
     return [result, null];
 }
 
-async function api_setWithdrawSupplier (conn,table, document_uuid , supplier_uuid, document_folder) {
+/*
+ * setMakePayment_document
+ */
+async function _setMakePayment_document (conn, table, document_uuid , hash) {
+
+	let err;
+
+    let sql = `
+        UPDATE
+            ${table}
+        SET
+			settlement_hash = ?,
+			settlement_time = NOW()
+        WHERE
+            document_uuid = ?
+    `;
+
+    let args = [
+        hash,
+        document_uuid
+    ];
+
+    let result;
+
+    try {
+        result = await db.update(conn, sql, args);
+    } catch(err) {
+        return [false, err];
+    }
+
+	if(result.affectedRows != 1) {
+		err  = {msg:"result.affectedRows != 1"};
+		return [false, err];
+	}
+
+    return [result, null];
+}
+
+/*
+ * setWithdrawSeller
+ */
+async function _setWithdrawSeller (conn, table, document_uuid , seller_uuid, document_folder) {
 
 	let err;
 
@@ -1017,7 +1190,7 @@ async function api_setWithdrawSupplier (conn,table, document_uuid , supplier_uui
         SET
             document_folder = 'returned'
         WHERE
-            supplier_uuid = ?
+            seller_uuid = ?
         AND
             document_uuid = ?
         AND
@@ -1027,7 +1200,7 @@ async function api_setWithdrawSupplier (conn,table, document_uuid , supplier_uui
     `;
 
     let args = [
-        supplier_uuid,
+        seller_uuid,
         document_uuid,
         document_folder
     ];
@@ -1049,7 +1222,10 @@ async function api_setWithdrawSupplier (conn,table, document_uuid , supplier_uui
 	return [result, null];
 }
 
-async function api_setWithdrawClient (conn,table, document_uuid , client_uuid, document_folder) {
+/*
+ * setWithdrawBuyer
+ */
+async function _setWithdrawBuyer (conn, table, document_uuid , buyer_uuid, document_folder) {
 
 	let err;
 
@@ -1059,7 +1235,7 @@ async function api_setWithdrawClient (conn,table, document_uuid , client_uuid, d
         SET
             document_folder = 'returned'
         WHERE
-            client_uuid = ?
+            buyer_uuid = ?
         AND
             document_uuid = ?
         AND
@@ -1069,7 +1245,7 @@ async function api_setWithdrawClient (conn,table, document_uuid , client_uuid, d
     `;
 
     let args = [
-        client_uuid,
+        buyer_uuid,
         document_uuid,
         document_folder
     ];
@@ -1090,7 +1266,10 @@ async function api_setWithdrawClient (conn,table, document_uuid , client_uuid, d
 	return [result, null];
 }
 
-async function api_setReturn (conn,table, document_uuid , client_uuid) {
+/*
+ * setReturn
+ */
+async function _setReturn (conn, table, document_uuid , buyer_uuid) {
 
     let sql = `
         UPDATE
@@ -1098,7 +1277,7 @@ async function api_setReturn (conn,table, document_uuid , client_uuid) {
         SET
             document_folder = 'returned'
         WHERE
-            client_uuid = ?
+            buyer_uuid = ?
         AND
             document_uuid = ?
         AND
@@ -1108,7 +1287,7 @@ async function api_setReturn (conn,table, document_uuid , client_uuid) {
     `;
 
     let args = [
-        client_uuid,
+        buyer_uuid,
         document_uuid
     ];
 
@@ -1128,7 +1307,10 @@ async function api_setReturn (conn,table, document_uuid , client_uuid) {
 	return [result, null];
 }
 
-async function api_rollbackAndReturn(conn, code, err, errno) {
+/*
+ * rollbackAndReturn
+ */
+async function _rollbackAndReturn(conn, code, err, errno) {
 
 	try {
     	await db.rollback(conn, err);
@@ -1142,7 +1324,7 @@ async function api_rollbackAndReturn(conn, code, err, errno) {
 
     let msg;
     if(code == 500) {
-        msg = {"err":"client connect check:ECONNRESET"};
+        msg = {"err":"buyer connect check:ECONNRESET"};
     } else {
         msg = {"err":err};
     }

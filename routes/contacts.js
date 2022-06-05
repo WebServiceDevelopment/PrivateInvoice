@@ -22,25 +22,27 @@
 
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express				= require('express');
+const router				= express.Router();
+module.exports				= router;
 
 // Import Libraries
 
-const uniqid = require('uniqid')
-const uuidv1 = require('uuid').v1;
-const axios = require('axios');
+const uniqid				= require('uniqid')
+const uuidv1				= require('uuid').v1;
+const axios					= require('axios');
 
 // Database
 
-const db = require('../database.js');
+const db					= require('../database.js');
 
 // Constants
 
-const INVITE_TABLE = 'dat_invite';
+const INVITE_TABLE			= 'invite';
 
-// Helper functions
+/*
+ * Helper functions
+ */
 
 const checkForExistingContact = async (local_uuid, remote_uuid) => {
 
@@ -50,9 +52,9 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 		FROM 
 			contacts 
 		WHERE
-			local_user_uuid = ?
+			local_member_uuid = ?
 		AND
-			remote_user_uuid = ?
+			remote_member_uuid = ?
 		AND
 			removed_on IS NULL
 	`;
@@ -68,18 +70,21 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 
 }
 
-const insertNewContact = async (invite, localUser, remote_user, remote_company) => {
+/*
+ * insertNewContact
+ */
+const insertNewContact = async (invite, localUser, remote_member, remote_organization) => {
 
 	const sql = `
 		INSERT INTO contacts (
 			_id,
 			invite_code,
-			local_user_uuid,
-			local_username,
+			local_member_uuid,
+			local_membername,
 			remote_origin,
-			remote_user_uuid,
-			remote_username,
-			remote_company,
+			remote_member_uuid,
+			remote_membername,
+			remote_organization,
 			local_to_remote,
 			remote_to_local
 		) VALUES (
@@ -96,23 +101,23 @@ const insertNewContact = async (invite, localUser, remote_user, remote_company) 
 		)
 	`;
 
-	console.log(remote_user);
-	console.log(remote_company);
-	console.log(JSON.stringify(remote_company));
+	console.log(remote_member);
+	console.log(remote_organization);
+	console.log(JSON.stringify(remote_organization));
 
 	const _id = uuidv1();
 
 	const args = [
 		_id,
 		invite.invite_code,
-		localUser.user_uuid,
-		localUser.username,
-		remote_user.origin,
-		remote_user.user_uuid,
-		remote_user.username,
-		JSON.stringify(remote_company),
-		invite.rel_client,
-		invite.rel_supplier
+		localUser.member_uuid,
+		localUser.membername,
+		remote_member.origin,
+		remote_member.member_uuid,
+		remote_member.membername,
+		JSON.stringify(remote_organization),
+		invite.rel_buyer,
+		invite.rel_seller
 	];
 
 
@@ -126,34 +131,37 @@ const insertNewContact = async (invite, localUser, remote_user, remote_company) 
 
 }
 
-const getContacts = async (user_uuid) => {
+/*
+ * getContacts
+ */
+const getContacts = async (member_uuid) => {
 
 	const sql = `
 		SELECT
 			remote_origin,
-			remote_user_uuid,
-			remote_username,
-			remote_company,
+			remote_member_uuid,
+			remote_membername,
+			remote_organization,
 			local_to_remote,
 			remote_to_local,
 			created_on
 		FROM
 			contacts
 		WHERE
-			local_user_uuid = ?
+			local_member_uuid = ?
 	`;
 
 	const args = [
-		user_uuid
+		member_uuid
 	];
 
 	const rows = await db.selectAll(sql, args);
 
 	const contacts = rows.map( row => {
 		try {
-			row.remote_company = JSON.parse(row.remote_company);
+			row.remote_organization = JSON.parse(row.remote_organization);
 		} catch (e) {
-			row.remote_company = "";
+			row.remote_organization = "";
 		}
 		return row;
 	});
@@ -164,8 +172,11 @@ const getContacts = async (user_uuid) => {
 
 
 
-// End Points
+//----------------------------- define endpoints -----------------------------
 
+/*
+ * generate
+ */
 router.post('/generate', async function(req, res) {
 
 	const { body } = req;
@@ -173,9 +184,9 @@ router.post('/generate', async function(req, res) {
 	const sql = `
 		INSERT INTO ${INVITE_TABLE} (
 			invite_code,
-			host_user_uuid,
-			rel_client,
-			rel_supplier,
+			local_member_uuid,
+			rel_buyer,
+			rel_seller,
 			max_count,
 			expires_on
 		) VALUES (
@@ -192,9 +203,9 @@ router.post('/generate', async function(req, res) {
 
 	const args = [
 		invite_code,
-		req.session.data.user_uuid,
-		req.body.client,
-		req.body.supplier,
+		req.session.data.member_uuid,
+		req.body.buyer,
+		req.body.seller,
 		req.body.uses,
 		req.body.expire
 	];
@@ -209,42 +220,45 @@ router.post('/generate', async function(req, res) {
 		host: {
 			invite_code: invite_code,
 			origin: req.headers.origin,
-			isClient : req.body.client,
-			isClientDescription : 'Inviter can send invoices to invitee',
-			isSupplier : req.body.supplier,
-			isSupplierDescription : 'Invitee can send invoices to inviter',
+			isBuyer : req.body.buyer,
+			isBuyerDescription : 'Inviter can send invoices to invitee',
+			isSeller : req.body.seller,
+			isSellerDescription : 'Invitee can send invoices to inviter',
 			orientation: 'The entity described in this JSON is the inviter'
 		},
-		company : {
-			name: req.session.data.company_name,
-			postcode: req.session.data.company_postcode,
-			address: req.session.data.company_address,
-			building: req.session.data.company_building,
-			department: req.session.data.company_department,
+		organization : {
+			name: req.session.data.organization_name,
+			postcode: req.session.data.organization_postcode,
+			address: req.session.data.organization_address,
+			building: req.session.data.organization_building,
+			department: req.session.data.organization_department,
 		},
-		user : {
-			user_uuid: req.session.data.user_uuid,
-			username: req.session.data.username,
+		member : {
+			member_uuid: req.session.data.member_uuid,
+			membername: req.session.data.membername,
 			work_email: req.session.data.work_email
 		}
 	});
 
 });
 
+/*
+ * add
+ */
 router.post('/add', async function(req, res) {
 
 	const { body } = req;
 
 	console.log(body);
-	console.log(body.user);
+	console.log(body.member);
 
 	// 1.1 
 	// First we need to check if the contact already exists
 
-	const local_user_uuid = req.session.data.user_uuid;
-	const remote_user_uuid = body.user.user_uuid;
+	const local_member_uuid = req.session.data.member_uuid;
+	const remote_member_uuid = body.member.member_uuid;
 
-	const exists = await checkForExistingContact(local_user_uuid, remote_user_uuid)
+	const exists = await checkForExistingContact(local_member_uuid, remote_member_uuid)
 	if(exists) {
 		return res.status(400).end('Contact already exists')
 	}
@@ -253,29 +267,29 @@ router.post('/add', async function(req, res) {
 	// Then we need to try and contact the remote host
 	// When we do, we need to tell the remote host who we are
 	
-	const { origin, invite_code, isClient, isSupplier } = body.host;
-	const { user_uuid, username, work_email } = body.user;
+	const { origin, invite_code, isBuyer, isSeller } = body.host;
+	const { member_uuid, membername, work_email } = body.member;
 	const url = `${origin}/api/message/contactRequest`;
 	
 	// Create a request from the remote perspective
 	const contactRequest = {
 		invite_code: invite_code,
-		local_user : {
-			user_uuid : user_uuid,
-			username : username,
+		local_member : {
+			member_uuid : member_uuid,
+			membername : membername,
 			work_email : work_email
 		},
-		remote_company : {
-			name: req.session.data.company_name,
-			postcode: req.session.data.company_postcode,
-			address: req.session.data.company_address,
-			building: req.session.data.company_building,
-			department: req.session.data.company_department,
+		remote_organization : {
+			name: req.session.data.organization_name,
+			postcode: req.session.data.organization_postcode,
+			address: req.session.data.organization_address,
+			building: req.session.data.organization_building,
+			department: req.session.data.organization_department,
 		},
-		remote_user : {
+		remote_member : {
 			origin: req.headers.origin,
-			user_uuid: req.session.data.user_uuid,
-			username: req.session.data.username,
+			member_uuid: req.session.data.member_uuid,
+			membername: req.session.data.membername,
 			work_email: req.session.data.work_email
 		}
 	}
@@ -317,25 +331,25 @@ router.post('/add', async function(req, res) {
 
 	const invite = {
 		invite_code,
-		rel_client : req.body.host.isSupplier,
-		rel_supplier : req.body.host.isClient,
+		rel_buyer : req.body.host.isSeller,
+		rel_seller : req.body.host.isBuyer,
 	}
 
-	const local_user = {
-		user_uuid: req.session.data.user_uuid,
-		username: req.session.data.username,
+	const local_member = {
+		member_uuid: req.session.data.member_uuid,
+		membername: req.session.data.membername,
 		work_email: req.session.data.work_email
 	}
 
-	const remote_user = {
+	const remote_member = {
 		origin : req.body.host.origin,
-		user_uuid : user_uuid,
-		username : username,
+		member_uuid : member_uuid,
+		membername : membername,
 		work_email : work_email
 	}
 
-	const remote_company = req.body.company;
-	const [ created, creatErr ] = await insertNewContact(invite, local_user, remote_user, remote_company);
+	const remote_organization = req.body.organization;
+	const [ created, creatErr ] = await insertNewContact(invite, local_member, remote_member, remote_organization);
 	if(creatErr) {
 		return res.status(400).end(creatErr.toString());
 	}
@@ -346,10 +360,13 @@ router.post('/add', async function(req, res) {
 
 });
 
-router.get('/get', async function(req, res) {
+/*
+ * getContactList
+ */
+router.get('/getContactList', async function(req, res) {
 
-	const { user_uuid } = req.session.data;
-	const contacts = await getContacts(user_uuid);
+	const { member_uuid } = req.session.data;
+	const contacts = await getContacts(member_uuid);
 	console.log('--- Getting contacts ---');
 	console.log(contacts);
 	res.json(contacts);

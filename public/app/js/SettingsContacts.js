@@ -24,19 +24,19 @@ const TEST_DATA = {
   "host": {
     "invite_code": "l2ct23ja",
     "origin": "http://192.168.1.126:30003",
-	"isClient" : 1,
-	"isSupplier" : 1
+	"isBuyer" : 1,
+	"isSeller" : 1
   },
-  "company": {
+  "organization": {
     "name": "Company Name",
     "postcode": "Postcode",
     "address": "Company Address",
     "building": "Company Building",
     "department": "Company Department"
   },
-  "user": {
-    "user_uuid": "7738b330-c374-11ec-9a98-e1e3cbe42378",
-    "username": "sonny",
+  "member": {
+    "member_uuid": "7738b330-c374-11ec-9a98-e1e3cbe42378",
+    "membername": "sonny",
     "work_email": "sonny@example.com"
   }
 }
@@ -54,8 +54,8 @@ const SettingsContacts = (function() {
 		exportDetails : {
 			uses : document.getElementById('SettingsContacts.exportDetails.uses'),
 			partner : document.getElementById('SettingsContacts.exportDetails.partner'),
-			supplier : document.getElementById('SettingsContacts.exportDetails.supplier'),
-			client : document.getElementById('SettingsContacts.exportDetails.client'),
+			seller : document.getElementById('SettingsContacts.exportDetails.seller'),
+			buyer : document.getElementById('SettingsContacts.exportDetails.buyer'),
 			expire : document.getElementById('SettingsContacts.exportDetails.expire'),
 			submit : document.getElementById('SettingsContacts.exportDetails.submit')
 		},
@@ -72,13 +72,13 @@ const SettingsContacts = (function() {
 		},
 		form : {
 			origin : document.getElementById('SettingsContacts.form.origin'),
-			username : document.getElementById('SettingsContacts.form.username'),
+			membername : document.getElementById('SettingsContacts.form.membername'),
 			work_email : document.getElementById('SettingsContacts.form.work_email'),
-			company_name : document.getElementById('SettingsContacts.form.company_name'),
-			company_postcode : document.getElementById('SettingsContacts.form.company_postcode'),
-			company_address : document.getElementById('SettingsContacts.form.company_address'),
-			company_building : document.getElementById('SettingsContacts.form.company_building'),
-			company_department : document.getElementById('SettingsContacts.form.company_department')
+			organization_name : document.getElementById('SettingsContacts.form.organization_name'),
+			organization_postcode : document.getElementById('SettingsContacts.form.organization_postcode'),
+			organization_address : document.getElementById('SettingsContacts.form.organization_address'),
+			organization_building : document.getElementById('SettingsContacts.form.organization_building'),
+			organization_department : document.getElementById('SettingsContacts.form.organization_department')
 		}
 	}
 
@@ -141,7 +141,7 @@ const SettingsContacts = (function() {
 
 	async function api_renderContacts() {
 
-		const req = await fetch('/api/contacts/get');
+		const req = await fetch('/api/contacts/getContactList');
 		const contacts = await req.json();
 		
 		const { page } = this.DOM.table;
@@ -149,14 +149,14 @@ const SettingsContacts = (function() {
 
 		contacts.forEach ( contact => {
 
-			console.log(contact);
+			//console.log(contact);
 
 			const li = document.createElement('li');
 			const table = document.createElement('table');
 			const row = table.insertRow();
 
 			const checkCell = row.insertCell();
-			const usernameCell = row.insertCell();
+			const membernameCell = row.insertCell();
 			const sendCell = row.insertCell();
 			const receiveCell = row.insertCell();
 			const countCell = row.insertCell();
@@ -164,7 +164,7 @@ const SettingsContacts = (function() {
 			const removeCell = row.insertCell();
 
 			checkCell.setAttribute('class', 'check');
-			usernameCell.setAttribute('class', 'username');
+			membernameCell.setAttribute('class', 'membername');
 			sendCell.setAttribute('class', 'icon');
 			receiveCell.setAttribute('class', 'icon');
 			countCell.setAttribute('class', 'count');
@@ -175,19 +175,23 @@ const SettingsContacts = (function() {
 			
 			const nameSpan = document.createElement('span');
 			const compSpan = document.createElement('span');
+			const spaceSpan = document.createElement('span');
 			const deptSpan = document.createElement('span');
 			const breakPoint = document.createElement('br');
 			
-			const { remote_origin, remote_username } = contact;
-			nameSpan.textContent = `${remote_username}@${remote_origin}`;
-			usernameCell.appendChild(nameSpan);
-			usernameCell.appendChild(breakPoint);
+			const { remote_origin, remote_membername } = contact;
+			nameSpan.textContent = `${remote_membername}@${remote_origin}`;
+			membernameCell.appendChild(nameSpan);
+			membernameCell.appendChild(breakPoint);
 
-			const { name, department } = contact.remote_company;
+			const { name, department } = contact.remote_organization;
 			compSpan.textContent = name;
+			spaceSpan.textContent = ' ';
 			deptSpan.textContent = department;
-			usernameCell.appendChild(compSpan);
-			usernameCell.appendChild(deptSpan);
+
+			membernameCell.appendChild(compSpan);
+			membernameCell.appendChild(spaceSpan);
+			membernameCell.appendChild(deptSpan);
 			
 			li.appendChild(table);
 			page.appendChild(li);
@@ -223,7 +227,7 @@ const SettingsContacts = (function() {
 			const label = document.createElement('a');
 			const sinceSpan = document.createElement('span');
 			label.textContent = 'Addon On';
-			console.log(contact.created_on);
+			//console.log(contact.created_on);
 			const since = moment(contact.created_on);
 			sinceSpan.textContent = since.fromNow();
 
@@ -284,14 +288,14 @@ const SettingsContacts = (function() {
 		setTimeout( () => {
 			const { form } = this.DOM;
 			form.origin.textContent = '';
-			form.username.textContent = '';
+			form.membername.textContent = '';
 			form.work_email.textContent = '';
 		
-			form.company_name.textContent = '';
-			form.company_postcode.textContent = '';
-			form.company_address.textContent = '';
-			form.company_building.textContent = '';
-			form.company_department.textContent = '';
+			form.organization_name.textContent = '';
+			form.organization_postcode.textContent = '';
+			form.organization_address.textContent = '';
+			form.organization_building.textContent = '';
+			form.organization_department.textContent = '';
 		}, 1000);
 
 	}
@@ -367,8 +371,8 @@ const SettingsContacts = (function() {
 		
 		const params = {
 			uses: parseInt(this.DOM.exportDetails.uses.value),
-			client: 1,
-			supplier: 1,
+			buyer: 1,
+			seller: 1,
 			expire: this.DOM.exportDetails.expire.value
 		};
 
@@ -427,17 +431,17 @@ const SettingsContacts = (function() {
 		this.DOM.modal.body.classList.add('open')
 		const { form } = this.DOM;
 
-		const { host, company, user } = details;
+		const { host, organization, member } = details;
 
 		form.origin.textContent = host.origin;
-		form.username.textContent = user.username;
-		form.work_email.textContent = user.work_email;
+		form.membername.textContent = member.membername;
+		form.work_email.textContent = member.work_email;
 		
-		form.company_name.textContent = company.name;
-		form.company_postcode.textContent = company.postcode;
-		form.company_address.textContent = company.address;
-		form.company_building.textContent = company.building;
-		form.company_department.textContent = company.department;
+		form.organization_name.textContent = organization.name;
+		form.organization_postcode.textContent = organization.postcode;
+		form.organization_address.textContent = organization.address;
+		form.organization_building.textContent = organization.building;
+		form.organization_department.textContent = organization.department;
 
 	}
 

@@ -26,7 +26,7 @@ const LoginWidget = (function() {
 
 	this.DOM = {
 		input : {
-			username : document.getElementById('LoginWidget.input.username'),
+			membername : document.getElementById('LoginWidget.input.membername'),
 			password : document.getElementById('LoginWidget.input.password')
 		},
 		submit : document.getElementById('LoginWidget.submit')
@@ -49,7 +49,6 @@ const LoginWidget = (function() {
 
 	function init() {
 
-		console.log("a bebe");
 		
 		setTimeout( () => {
 			this.API.checkInputs();
@@ -69,7 +68,7 @@ const LoginWidget = (function() {
 		console.log("submit click!!");
 
 		let args = {
-			username : this.DOM.input.username.value,
+			membername : this.DOM.input.membername.value,
 			password : this.DOM.input.password.value
 		};
 
@@ -81,8 +80,6 @@ const LoginWidget = (function() {
 
 		ajax.onload = () => {
 			
-			console.log();
-
 			let res = ajax.response;
 
 			if(res.err) {
@@ -138,7 +135,7 @@ const LoginWidget = (function() {
 
 	function api_clearForm() {
 
-		this.DOM.input.username.value = "";
+		this.DOM.input.membername.value = "";
 		this.DOM.input.password.value = "";
 
 	}

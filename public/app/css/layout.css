@@ -27,7 +27,7 @@ main.app {
 	--tray-width: 390px;
 	--chat-width: 360px;
 
-	--stamp-width: 120px;
+	--stamp-width: 100px;
 	--input-placeholder-color: #bababa;
 }
 
@@ -74,9 +74,9 @@ aside.open {
 
 aside div.modal {
 
-	width: 500px;
+	width: 680px;
 	background-color: #fff;
-	border-radius: 5px;
+	border-radius: 10px;
 	border: 1px solid rgba(0,0,0,.2);
 	display: block;
 	margin: auto;
@@ -228,10 +228,11 @@ aside div.modal div.body li.label {
 
 aside div.modal div.body .balance {
 
-	font-size: 20px;
+	font-size: 14px;
 	color: #26173a;
 	text-align: right;
 	padding-bottom: 6px;
+	word-break:break-all;
 
 }
 
@@ -410,7 +411,6 @@ main.app section {
 	top: var(--header-height);
 	width: 100%;
 	height: calc(100% - var(--header-height));
-	x-index: 0;
 	
 }
 
@@ -1137,7 +1137,7 @@ main.app section article div.tray div.pages div.row table {
 
 main.app section article div.tray div.pages div.row table td.show {
 
-	width: 58%;
+	width: 48%;
 	text-indent: 4px;
 
 }
@@ -1699,17 +1699,21 @@ main.app section article div.toolset table td.dl {
 	width: 180px;
 	text-align: right;
 	padding-right: 10px;
+	cursor : default;
 
+}
+
+main.app section article div.toolset table td.dl span:hover {
+
+	color : #777;
 }
 
 main.app section article div.document {
 
 	width: calc(100% - var(--folder-width) - var(--tray-width));
-	// height: calc(100% - 39px);
-	height: 100%;
+	height: calc(100% - 39px);
 	right: 0;
-	// top: 39px;
-	top: 0px;
+	top: 39px;
 	position: absolute;
 	overflow-y: scroll;
 	background-color: #e2e2e2;
@@ -1721,6 +1725,13 @@ main.app section article div.document input::placeholder ,
 main.app section article div.document textarea::placeholder {
 
 	color : var(--input-placeholder-color);
+
+}
+
+main.app section article div.document input:disabled ,
+main.app section article div.document textarea:disabled {
+
+	color: inherit;
 
 }
 
@@ -2101,13 +2112,13 @@ main.app section article div.document div.paper div.summary div.wrapper li.row t
 
 }
 
-main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li table td.username {
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li table td.membername {
 
 	font-size: 10px;
 
 }
 
-main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li table td.company {
+main.app section article div.document div.paper div.summary div.wrapper li.row table td.input div.overflow ul li table td.organization {
 
 	font-size: 13px;
 
@@ -2276,8 +2287,8 @@ main.app section article div.document div.body div.invoice-data table input.amou
 
 }
 
-main.app section article div.document div.body div.their-company:before,
-main.app section article div.document div.body div.my-company:before {
+main.app section article div.document div.body div.their-organization:before,
+main.app section article div.document div.body div.my-organization:before {
 
 	color: #fff;
 	text-indent: 10px;
@@ -2295,8 +2306,8 @@ main.app section article div.document div.body div.my-company:before {
 }
 
 
-main.app section article div.document div.body div.my-company,
-main.app section article div.document div.body div.their-company {
+main.app section article div.document div.body div.my-organization,
+main.app section article div.document div.body div.their-organization {
 
 	top: 194px;
 	min-width: 300px;
@@ -2307,20 +2318,20 @@ main.app section article div.document div.body div.their-company {
 }
 
 
-main.app section article div.document div.body div.my-company {
+main.app section article div.document div.body div.my-organization {
 
 	right: 8px;
 
 }
 
-main.app section article div.document div.body div.their-company {
+main.app section article div.document div.body div.their-organization {
 
 	left: 8px;
 
 }
 
-main.app section article div.document div.body div.their-company input[type="text"],
-main.app section article div.document div.body div.my-company input[type="text"] {
+main.app section article div.document div.body div.their-organization input[type="text"],
+main.app section article div.document div.body div.my-organization input[type="text"] {
 
 	padding: 2px 0;
 	margin: 0;
@@ -2332,8 +2343,8 @@ main.app section article div.document div.body div.my-company input[type="text"]
 
 }
 
-main.app section article div.document div.body div.their-company input[type="text"].top,
-main.app section article div.document div.body div.my-company input[type="text"].top {
+main.app section article div.document div.body div.their-organization input[type="text"].top,
+main.app section article div.document div.body div.my-organization input[type="text"].top {
 
 	font-size: 16px;
 
@@ -2341,7 +2352,7 @@ main.app section article div.document div.body div.my-company input[type="text"]
 
 main.app section article div.document div.paper {
 
-	width: 1200px;
+	width: 1280px;
 	display: block;
 	margin: auto;
 	min-height: 400px;
@@ -2355,7 +2366,11 @@ main.app section article div.document div.paper {
 
 main.app section article div.document div.paper div.content {
 
-	padding: 20px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	padding-left: 20px;
+	padding-right: 20px;
+
 	min-height: 200px;
 
 }
@@ -2373,7 +2388,7 @@ main.app section article div.document div.paper div.content div.pmeta div.plogo 
 	position: absolute;
 	left: 0;
 	top: 10px;
-	background-image: url('../img/placeholder_logo.png');
+	background-image: url('../img/dashgl_logo.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 
@@ -2390,7 +2405,7 @@ main.app section article div.document div.paper div.content div.pmeta div.pdata 
 main.app section article div.document div.paper div.content div.paddr {
 
 	padding-top: 20px;
-	height: 120px;
+	height: 135px;
 
 }
 
@@ -2507,19 +2522,19 @@ main.app section article div.document div.paper div.content div.ptable td.tax in
 
 main.app section article div.document div.paper div.content div.ptable td.price {
 
-	width: 90px;
+	width: 140px;
 
 }
 
 main.app section article div.document div.paper div.content div.ptable td.quan {
 
-	width: 90px;
+	width: 60px;
 
 }
 
 main.app section article div.document div.paper div.content div.ptable td.unit {
 
-	width: 90px;
+	width: 50px;
 
 }
 
@@ -2574,7 +2589,7 @@ main.app section article div.document div.paper div.content div.ptable td.sub in
 main.app section article div.document div.paper div.content div.ptable td.sub,
 main.app section article div.document div.paper div.content div.ptable td.subtotal {
 
-	width: 110px;
+	width: 150px;
 
 }
 
@@ -2631,9 +2646,9 @@ main.app section article div.document div.paper div.content div.paddr ul li.labe
 
 main.app section article div.document div.paper div.content div.ptotals {
 
-	width: 391px;
+	width: 411px;
 	background-color: #fff;
-	margin-left: calc(100% - 393px);
+	margin-left: calc(100% - 413px);
 	border-left: 1px solid #444;
 	border-right: 1px solid #444;
 	border-bottom: 1px solid #444;
@@ -2695,7 +2710,7 @@ main.app section article div.document div.paper div.content div.ptotals table {
 
 main.app section article div.document div.paper div.content div.ptotals table td.label {
 
-	width: 185px;
+	width: 205px;
 	text-indent: 10px;
 	border-right: 1px solid #444;
 
@@ -2736,6 +2751,15 @@ main.app section article div.document div.paper div.content div.paddr ul li.text
 	border: none;
 	background-color: transparent;
 	width: calc(100% - 10px);
+
+}
+
+main.app section article div.document div.paper div.content div.paddr ul li.text input.country  ,
+main.app section article div.document div.paper div.content div.paddr ul li.text input.region  {
+
+	border: none;
+	background-color: transparent;
+	width: 120px;
 
 }
 
@@ -2907,6 +2931,7 @@ main.app section article div.document div.paper div.summary {
 
 	width: 100%;
 	padding: 20px;
+
 	width: calc(100% - 40px);
 	position: relative;
 	border-bottom: 1px solid #dddddd;
@@ -3338,6 +3363,24 @@ main.app section article div.document div.body div.terms table td {
 
 }
 
+main.app section article div.document div.body div.stamp {
+
+	width: 80px;
+	height: 80px;
+	position: absolute;
+	right: 10px;
+	top: 105px;
+	border-radius: 4px;
+	border: 1px dashed #ccc;
+	
+	background-position: center;
+	background-size: 80%;
+	background-repeat: no-repeat;
+	background-image: url(../img/100789_rgb.png);
+	opacity: 0.7;
+
+}
+
 main.app section article div.document div.body ul.meta-data {
 
 	position: absolute;
@@ -3411,7 +3454,7 @@ main.app section article div.document div.body ul.meta-data table td.value input
 
 }
 
-main.app section article div.document div.body ul.from-company {
+main.app section article div.document div.body ul.from-organization {
 
 	position: absolute;
 	left: calc(50% + 10px);
@@ -3422,7 +3465,7 @@ main.app section article div.document div.body ul.from-company {
 
 }
 
-main.app section article div.document div.body ul.from-company table {
+main.app section article div.document div.body ul.from-organization table {
 
 	width: 100%;
 	height: 100%;
@@ -3431,7 +3474,7 @@ main.app section article div.document div.body ul.from-company table {
 
 }
 
-main.app section article div.document div.body ul.from-company table td {
+main.app section article div.document div.body ul.from-organization table td {
 
 	font-size: 13px;
 	font-family: 'Muli', sans-serif;
@@ -3446,7 +3489,7 @@ main.app section article div.document div.body {
 	display: none;
 	margin: 20px auto;
 	background-color: #fff;
-	width: 1200px;
+	width: 1280px;
 	border-radius: 4px;
 	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 
@@ -3753,7 +3796,7 @@ main.app section article div.document div.body div.to-widget div.container {
 
 }
 
-main.app section article div.document div.body ul.to-company {
+main.app section article div.document div.body ul.to-organization {
 
 	position: absolute;
 	top: 100px;
@@ -3764,7 +3807,7 @@ main.app section article div.document div.body ul.to-company {
 
 }
 
-main.app section article div.document div.body ul.ship-company {
+main.app section article div.document div.body ul.ship-organization {
 
 	position: absolute;
 	top: 170px;
@@ -3775,7 +3818,7 @@ main.app section article div.document div.body ul.ship-company {
 
 }
 
-main.app section article div.document div.body ul.to-company table {
+main.app section article div.document div.body ul.to-organization table {
 
 	width: 100%;
 	height: 100%;
@@ -3784,7 +3827,7 @@ main.app section article div.document div.body ul.to-company table {
 
 }
 
-main.app section article div.document div.body ul.to-company table td {
+main.app section article div.document div.body ul.to-organization table td {
 
 	font-size: 13px;
 	font-family: 'Muli', sans-serif;
@@ -4401,6 +4444,23 @@ main.app section article div.chat div.log div.comment div.line.right div.profile
 
 }
 
+main.app section article div.chat div.log div.comment div.line div.profile.kion {
+
+	background-image: url(../img/dashie.jpg);
+	background-size: 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+
+}
+
+main.app section article div.chat div.log div.comment div.line div.profile.abso {
+
+	background-image: url(../img/piNVIyAg_200x200.jpg);
+	background-size: 100%;
+	background-position: center;
+	background-repeat: no-repeat;
+
+}
 
 main.app section article div.chat div.log div.comment div.line div.quote {
 
@@ -4595,7 +4655,7 @@ main.app section article div.chat div.log div.msg.you:after {
 
 }
 
-main.app section article div.chat div.log div.msg span.username {
+main.app section article div.chat div.log div.msg span.membername {
 
 	font-size: 14px;
 	color: #444;
@@ -4646,6 +4706,18 @@ main.app section article div.settings-menu div.banner table td.icon {
 }
 
 
+main.app section article div.settings-menu div.banner table td.icon div.gravatar {
+
+	width: 90px;
+	height: 90px;
+	display: block;
+	margin: auto;
+	border-radius: 100%;
+	background-image: url(../img/dashie.jpg);
+	background-size: cover;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
+}
 
 main.app section article div.settings-menu div.banner h3 {
 
@@ -4694,7 +4766,7 @@ main.app section article div.settings-content {
 main.app section article div.settings-content div.page {
 
 	width: 100%;
-	max-width: 1200px;
+	max-width: 1360px;
 	display: block;
 	margin: auto;
 	min-height: 90px;
@@ -4986,7 +5058,7 @@ main.app section article div.settings-content div.page div.invite-gen ul li tabl
 
 main.app section article div.settings-content div.page div.invite-gen p {
 
-	font-weight: 14px;
+	font-weight: 700;
 	font-family: 'Muli', sans-serif;
 	padding: 20px 0;
 	margin: 0;
@@ -5080,15 +5152,34 @@ main.app section article div.settings-content div.page div.profile-data {
 
 main.app section article div.settings-content div.page div.profile-data table {
 
-	width: 100%;
+	width: 94%;
 	table-layout: fixed;
 	border-collapse: collapse;
 
 }
 
+main.app section article div.settings-content div.page div.profile-data table table.profile-details tr td:nth-of-type(1){
+
+	width: 13%;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table table.profile-details tr td:nth-of-type(2){
+
+	width: 47%;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table table.profile-details tr td:nth-of-type(3){
+
+	width: 33%;
+	font-size : 12px;
+	color : #aaa;
+
+}
+
 main.app section article div.settings-content div.page div.profile-data table div.form-edit {
 
-	width: 470px;
 	padding: 30px 0;
 	border-top: 1px solid #e2e2e2;
 	margin-top: 20px;
@@ -5110,7 +5201,7 @@ main.app section article div.settings-content div.page div.profile-data table di
 	border-radius: 5px;
 	font-size: 14px;
 	padding: 6px 0;
-	width: 90%;
+	width: 50%;
 	display: block;
 	margin: auto;
 
@@ -5132,7 +5223,7 @@ main.app section article div.settings-content div.page div.profile-data table di
 	border-radius: 5px;
 	font-size: 14px;
 	padding: 6px 0;
-	width: 90%;
+	width: 50%;
 	display: block;
 	margin: auto;
 
@@ -5171,7 +5262,6 @@ main.app section article div.settings-content div.page div.profile-data table di
 main.app section article div.settings-content div.page div.profile-data table h4 {
 
 	font-size: 20px;
-	width: 470px;
 	border-bottom: 1px solid #ccc;
 	font-family: 'Montserrat', sans-serif;
 	position: relative;
@@ -5196,9 +5286,34 @@ main.app section article div.settings-content div.page div.profile-data table h4
 
 }
 
+main.app section article div.settings-content div.page div.profile-data table table.organization-details {
+	
+}
+
+main.app section article div.settings-content div.page div.profile-data table table.organization-details tr td:nth-of-type(1){
+	
+width: 15%;
+font-size: 14px;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table table.organization-details tr td:nth-of-type(2){
+	
+width: 46%;
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table table.organization-details tr td:nth-of-type(3){
+	
+width: 30%;
+font-size: 12px;
+color : #aaa;
+
+}
+
 main.app section article div.settings-content div.page div.profile-data table div.verification-status {
 
-	width: 470px;
+	width: 80%;
 	height: 90px;
 
 }
@@ -5274,7 +5389,7 @@ main.app section article div.settings-content div.page div.profile-data table di
 
 main.app section article div.settings-content div.page div.profile-data table td.label {
 
-	width: 280px;
+	width: 240px;
 	vertical-align: top;
 
 }
@@ -5351,7 +5466,7 @@ main.app section article div.settings-content div.page div.profile-data table td
 	padding: 8px 5px;
 	text-indent: 4px;
 	color: #222;
-	font-size: 15px;
+	font-size: 16px;
 
 }
 
@@ -5461,7 +5576,14 @@ main.app section article div.settings-content div.page div.profile-data table td
 
 main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline table td.icon div.preview.dgl {
 
-	background-image: url(../img/placeholder.png);
+	background-image: url(../img/dashgl.png);
+
+}
+
+main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline table td.icon div.preview.dash {
+
+	background-image: url(../img/dashie.jpg);
+	background-size: cover;
 
 }
 
@@ -6001,8 +6123,25 @@ main.app section article div.settings-content div.page div.contact-list li table
 
 }
 
+main.app section article div.settings-content div.page div.contact-list li table td.avatar div.avatar.ben {
+	
+	background-image: url(../img/ben.png);
 
-main.app section article div.settings-content div.page div.contact-list li table td.username {
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.avatar div.avatar.bingbing {
+	
+	background-image: url(../img/bingbing.png);
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.avatar div.avatar.jessica {
+	
+	background-image: url(../img/jessica.png);
+
+}
+
+main.app section article div.settings-content div.page div.contact-list li table td.membername {
 
 	padding-left: 8px;
 	font-size: 14px;
@@ -6011,12 +6150,12 @@ main.app section article div.settings-content div.page div.contact-list li table
 
 }
 
-main.app section article div.settings-content div.page div.contact-list li table td.username span.name {
+main.app section article div.settings-content div.page div.contact-list li table td.membername span.name {
 
 }
 
-main.app section article div.settings-content div.page div.contact-list li table td.username span.comp,
-main.app section article div.settings-content div.page div.contact-list li table td.username span.dept {
+main.app section article div.settings-content div.page div.contact-list li table td.membername span.comp,
+main.app section article div.settings-content div.page div.contact-list li table td.membername span.dept {
 
 	color: #4a4a4a;
 
@@ -6076,7 +6215,7 @@ main.app section article div.settings-content div.page div.contact-list li table
 main.app section article div.settings-content div.page div.contact-list li table td.count span {
 
 	display: block;
-	margin: block;
+	margin: 0;
 	text-align: center;
 	font-size: 10px;
 	text-transform: uppercase;
@@ -6210,9 +6349,40 @@ main.app section article div.settings-content div.page div.wallet-summary {
 
 }
 
+main.app section article div.settings-content div.page div.wallet-summary div.card_1 {
+	width: calc(24% - 20px);
+	border-width : 1px;
+	border-color : #777;
+}
+main.app section article div.settings-content div.page div.wallet-summary div.card_1 span {
+	font-size : 24px;
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card_2 {
+	width: calc(37% - 20px);
+	border-width : 1px;
+	border-color : #777;
+	font-size: 16px;
+	
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card_2 td.account_address {
+
+	text-align : center;
+
+}
+
+
+main.app section article div.settings-content div.page div.wallet-summary div.card_3 {
+	width: calc(37% - 20px);
+	border-width : 1px;
+	border-color : #777;
+	font-size: 16px;
+	
+}
+
 main.app section article div.settings-content div.page div.wallet-summary div.card {
 
-	width: calc(100% / 3 - 40px);
 	height: calc(100% - 20px);
 	padding: 10px;
 	background-color: #fff;
@@ -6234,7 +6404,7 @@ main.app section article div.settings-content div.page div.wallet-summary div.ca
 
 main.app section article div.settings-content div.page div.wallet-summary div.card div.balance {
 
-	width: calc(100% - 20px);
+	width: calc(100% - 10px);
 	padding: 10px;
 	display: flex;
 	height: 40px;
@@ -6244,9 +6414,32 @@ main.app section article div.settings-content div.page div.wallet-summary div.ca
 
 }
 
+main.app section article div.settings-content div.page div.wallet-summary div.card table {
+
+	width: 100%;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card input.sendTo {
+
+	width: 100%;
+	font-size: 15px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card input.sendAmount {
+
+}
+
 main.app section article div.settings-content div.page div.wallet-summary div.card div.balance.light {
 
 	color: #888;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-summary div.card div.balance.strong_light {
+
+	color: #ddd;
 
 }
 
@@ -6379,8 +6572,11 @@ main.app section article div.settings-content div.page div.wallet-summary div.ca
 
 main.app section article div.settings-content div.page div.wallet-summary div.card div.buttons button {
 
+	position : relative;
+	left: 320px;
+	top: -20px;
 	color: #fff;
-	background-color: #717075;
+	background-color: #919095;
 	outline: none;
 	border-radius: 8px;
 	width: 170px;
@@ -6456,8 +6652,15 @@ main.app section article div.settings-content div.page div.wallet-graph ul li ta
 
 }
 
-main.app section article div.settings-content div.page div.wallet-graph ul li table thead tr {
+main.app section article div.settings-content div.page div.wallet-graph ul li table thead tr th.amount {
 
+	text-align : center;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table thead tr td.amount {
+
+	text-align : right;
 
 }
 
@@ -6473,7 +6676,7 @@ main.app section article div.settings-content div.page div.wallet-graph ul li ta
 
 }
 
-main.app section article div.settings-content div.page div.wallet-graph ul li table th.username {
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.membername {
 
 	width: 240px;
 
@@ -6481,19 +6684,13 @@ main.app section article div.settings-content div.page div.wallet-graph ul li ta
 
 main.app section article div.settings-content div.page div.wallet-graph ul li table th.amount {
 
-	width: 180px;
+	width: 240px;
 
 }
 
 main.app section article div.settings-content div.page div.wallet-graph ul li table th.status {
 
 	width: 180px;
-
-}
-
-main.app section article div.settings-content div.page div.wallet-graph ul li table th.date {
-
-	width: 140px;
 
 }
 
@@ -6504,10 +6701,50 @@ main.app section article div.settings-content div.page div.wallet-graph ul li ta
 
 }
 
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.date {
+
+	width: 210px;
+
+}
+
 main.app section article div.settings-content div.page div.wallet-graph ul li table td.date {
 
 	padding-left: 4px;
 
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.type {
+
+	width: 80px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.transaction_hash {
+
+	width: calc(100% - 650px);
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.receipt ,
+main.app section article div.settings-content div.page div.wallet-graph ul li table th.invoice {
+
+	width: 100px;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.receipt span.link,
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.invoice span.link{
+
+	color: blue;
+	text-decoration: underline;
+	cursor : default ;
+
+}
+
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.receipt span.link:hover,
+main.app section article div.settings-content div.page div.wallet-graph ul li table td.invoice span.link:hover{
+
+	text-decoration: none;
 }
 
 main.app section article div.settings-content div.page div.wallet-graph ul li table td.amount {
@@ -6593,6 +6830,22 @@ main.app section article div.settings-content div.page div.profile-status {
 
 }
 
+main.app section article div.settings-content div.page div.profile-status div.profile-pic {
+
+	width: 120px;
+	height: 120px;
+	border: 1px solid #ccc;
+	box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+	border-radius: 100%;
+	display: block;
+	margin: 30px auto;
+
+	background-image: url(../img/dashie.jpg);
+	background-position: center;
+	background-size: cover;
+	background-repeat: no-repeat;
+
+}
 
 main.app section article div.settings-content div.page div.profile-status h3 {
 	
@@ -7090,7 +7343,7 @@ main.app section article div.settings-content div.page div.directory-filter tabl
 
 }
 
-main.app section article div.settings-content div.page div.directory-list h3.username {
+main.app section article div.settings-content div.page div.directory-list h3.membername {
 
 	padding: 10px;
 	margin: 0;
@@ -7156,6 +7409,78 @@ main.app section article div.settings-content div.page div.directory-list div.ro
 
 }
 
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.wsd {
+
+	background-image: url(../img/wsd_logo.png);
+	background-position: center;
+	background-size: 80%;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.writeup {
+
+	background-image: url(../img/3071-1533019032.jpg);
+	background-position: center top;
+	background-size: 140%;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.yamaji {
+
+	background-image: url(../img/yamaji.png);
+	background-position: center;
+	background-size: 130%;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.digi {
+
+	background-image: url(../img/digibase.png);
+	background-position: center;
+	background-size: 90%;
+	background-color: #000;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.dashie {
+
+	background-image: url(../img/dashie.jpg);
+	background-position: center;
+	background-size: 100%;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.gel {
+
+	background-image: url(../img/piNVIyAg_200x200.jpg);
+	background-position: center;
+	background-size: 100%;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.jatco {
+
+	background-image: url(../img/choutatu.png);
+	background-position: center;
+	background-size: 140%;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.bs {
+
+	background-image: url(../img/Hanamura.png);
+	background-position: center top;
+	background-size: 100%;
+
+}
+
+main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.paper {
+
+	background-image: url(../img/06271322_5d14447f45149.jpg);
+	background-position: center;
+	background-size: 150%;
+
+}
 
 main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.rating {
 
@@ -7663,6 +7988,23 @@ main.app section article div.settings-content div.page div.employee-list li.staf
 
 }
 
+main.app section article div.settings-content div.page div.employee-list li.staff div.pic.ben {
+	
+	background-image: url(../img/ben.png);
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff div.pic.bingbing {
+	
+	background-image: url(../img/bingbing.png);
+
+}
+
+main.app section article div.settings-content div.page div.employee-list li.staff div.pic.jessica {
+	
+	background-image: url(../img/jessica.png);
+
+}
 
 main.app section article div.settings-content div.page div.employee-list li table td.stat div.stat {
 
@@ -7722,7 +8064,7 @@ main.app section article div.settings-content div.page div.employee-list li.staf
 
 }
 
-main.app section article div.settings-content div.page div.employee-list li.staff table td.name span.username {
+main.app section article div.settings-content div.page div.employee-list li.staff table td.name span.membername {
 
 	display: block;
 	font-size: 15px;
@@ -8109,7 +8451,7 @@ div.session-widget div.profile div.img {
 	margin: auto;
 	position: relative;
 	border-radius : 100%;
-	background-image: url(../img/user_placeholder.png);
+	background-image: url(../img/member_placeholder.png);
 	background-position: center bottom;
 	background-size: 90%;
 	background-repeat: no-repeat;

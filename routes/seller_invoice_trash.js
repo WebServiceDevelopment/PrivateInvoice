@@ -22,7 +22,7 @@
 
 // Import sub
 const sub						= require("./invoice_sub.js");
-const to_client					= require("./supplier_to_client.js");
+const to_buyer					= require("./seller_to_buyer.js");
 const tran                      = require("./invoice_sub_transaction.js");
 
 // Import Router
@@ -35,19 +35,20 @@ module.exports					= router;
 // Database 
 
 // Table Name
-const SUPPLIER_DRAFT_DOCUMENT	= "supplier_document_draft";
-const SUPPLIER_DRAFT_STATUS		= "supplier_status_draft";
+const SELLER_DRAFT_DOCUMENT		= "seller_document_draft";
+const SELLER_DRAFT_STATUS		= "seller_status_draft";
 
-const SUPPLIER_DOCUMENT			= "supplier_document";
-const SUPPLIER_STATUS			= "supplier_status";
+const SELLER_DOCUMENT			= "seller_document";
+const SELLER_STATUS				= "seller_status";
 
-const SUPPLIER_ARCHIVE_DOCUMENT = "supplier_document_archive";
-const SUPPLIER_ARCHIVE_STATUS	= "supplier_status_archive";
+const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
+const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
 
 const CONTACTS					= "contacts"
 
 
-// End Points
+// ------------------------------- End Points -------------------------------
+
 /*
  * Execution of'Move to Trash'when folder is draft.
 */
@@ -64,7 +65,7 @@ router.post('/trashDraft', async function(req, res) {
 	// STATUS
     // First we go ahead and get the status.
     //
-   const [ old_status , _1 ] = await sub.getStatus( SUPPLIER_DRAFT_STATUS, req.body.document_uuid) ;
+   const [ old_status , _1 ] = await sub.getStatus( SELLER_DRAFT_STATUS, req.body.document_uuid) ;
 
     if(old_status == undefined) {
         res.json({
@@ -77,7 +78,7 @@ router.post('/trashDraft', async function(req, res) {
     // 2.
     // Second we go ahead and get the document
     //
-	const [ old_document , _2 ] = await sub.getDraftDocument( SUPPLIER_DRAFT_DOCUMENT, req.body.document_uuid) ;
+	const [ old_document , _2 ] = await sub.getDraftDocument( SELLER_DRAFT_DOCUMENT, req.body.document_uuid) ;
 
     if(old_document == undefined) {
         res.json({
@@ -92,8 +93,8 @@ router.post('/trashDraft', async function(req, res) {
     //
 
     old_document.currency_options = JSON.parse(old_document.currency_options);
-    old_document.supplier_details = JSON.parse(old_document.supplier_details);
-    old_document.client_details = JSON.parse(old_document.client_details);
+    old_document.seller_details = JSON.parse(old_document.seller_details);
+    old_document.buyer_details = JSON.parse(old_document.buyer_details);
     old_document.document_meta = JSON.parse(old_document.document_meta);
     old_document.document_body = JSON.parse(old_document.document_body);
     old_document.document_totals = JSON.parse(old_document.document_totals);
@@ -103,7 +104,7 @@ router.post('/trashDraft', async function(req, res) {
 	// 4.
 	// Does document_uuid already notexist in the archive status table?
 	//
-	const [ _4, err4 ] = await sub.notexist_check( SUPPLIER_ARCHIVE_STATUS, req.body.document_uuid)
+	const [ _4, err4 ] = await sub.notexist_check( SELLER_ARCHIVE_STATUS, req.body.document_uuid)
     if (err4 ) {
         errno = 4;
         console.log("Error: "+errno);
@@ -113,7 +114,7 @@ router.post('/trashDraft', async function(req, res) {
 	// 5.
 	// Does document_uuid already notexist in the archive document table?
 	//
-	const [ _5, err5 ] = await sub.notexist_check( SUPPLIER_ARCHIVE_DOCUMENT, req.body.document_uuid)
+	const [ _5, err5 ] = await sub.notexist_check( SELLER_ARCHIVE_DOCUMENT, req.body.document_uuid)
     if (err ) {
         errno = 5;
         console.log("Error: "+errno);
@@ -123,7 +124,7 @@ router.post('/trashDraft', async function(req, res) {
     // 6.
     // begin Transaction
     //
-    const [ conn , err6 ] = await tran.connection ();
+    const [ conn , _6 ] = await tran.connection ();
     await tran.beginTransaction(conn);
 
 	// 7.
@@ -132,15 +133,15 @@ router.post('/trashDraft', async function(req, res) {
 
     old_status.document_folder  = 'trash';
     
-    //old_status.supplier_archived  = 1;
-    //old_status.client_archived  = 1;
+    //old_status.seller_archived  = 1;
+    //old_status.buyer_archived  = 1;
 
-	// Because SUPPLIER_ARCHIVE_DOCUMEN client_uuid do not accept null.
-    old_status.client_uuid  = "";
+	// Because SELLER_ARCHIVE_DOCUMEN buyer_uuid do not accept null.
+    old_status.buyer_uuid  = "";
 
 	// 8.
 	//
-	const [ _8, err8 ] = await tran.insertArchiveStatus(conn, SUPPLIER_ARCHIVE_STATUS, old_status);
+	const [ _8, err8 ] = await tran.insertArchiveStatus(conn, SELLER_ARCHIVE_STATUS, old_status);
 
     if(err8) {
         errno = 8;
@@ -151,7 +152,7 @@ router.post('/trashDraft', async function(req, res) {
 	// 9.
 	// And then we need to insert into the archive document 
 	//
-	const [ _9, err9] = await tran.insertDocument(conn, SUPPLIER_ARCHIVE_DOCUMENT, old_status, document_json);
+	const [ _9, err9] = await tran.insertDocument(conn, SELLER_ARCHIVE_DOCUMENT, old_status, document_json);
 
 	if(err9) {
         errno = 9;
@@ -160,9 +161,9 @@ router.post('/trashDraft', async function(req, res) {
 	}
 
 	// 10.
-	// Remove recoiored from SUPPLIER_DRAFT_STATUS with docunent_uuid key
+	// Remove recoiored from SELLER_DRAFT_STATUS with docunent_uuid key
 	//
-	const [ _10, err10] = await tran.deleteStatus(conn, SUPPLIER_DRAFT_STATUS, old_status) ;
+	const [ _10, err10] = await tran.deleteStatus(conn, SELLER_DRAFT_STATUS, old_status) ;
 	if(err10) {
         errno = 10;
         code = 400;
@@ -170,9 +171,9 @@ router.post('/trashDraft', async function(req, res) {
 	}
 
 	// 11.
-	// Remove recoiored from SUPPLIER_DRAFT_DOCUMENT with docunent_uuid key
+	// Remove recoiored from SELLER_DRAFT_DOCUMENT with docunent_uuid key
 	//
-	const [ _11, err11] = await tran.deleteDocument(conn, SUPPLIER_DRAFT_DOCUMENT, old_status) ;
+	const [ _11, err11] = await tran.deleteDocument(conn, SELLER_DRAFT_DOCUMENT, old_status) ;
 	if(err11) {
         errno = 11;
         code = 400;
@@ -182,17 +183,6 @@ router.post('/trashDraft', async function(req, res) {
     // 12.
     // commit
     //
-/*
-	try {
-		await tran.commit(conn);
-	    conn.end();
-
-	} catch (err12) {
-		errno = 12;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err12, errno));
-	}
-*/
 	const [ _12, err12] = await tran.commit(conn);
 
 	if (err12) {
@@ -225,12 +215,12 @@ router.post('/trash', async function(req, res) {
 	let start = Date.now();
 
 	const { document_uuid } = req.body;
-	const { user_uuid } = req.session.data;
+	const { member_uuid } = req.session.data;
 
 	let err , errno, code;
 
     // 1.
-    const [ client_uuid, err1 ] = await sub.getClientUuid(SUPPLIER_STATUS, document_uuid, user_uuid);
+    const [ buyer_uuid, err1 ] = await sub.getBuyerUuid(SELLER_STATUS, document_uuid, member_uuid);
     if(err1) {
         console.log("Error 1 status = 400 err="+err1);
 
@@ -238,20 +228,27 @@ router.post('/trash', async function(req, res) {
     }
 
     // 2
-    const [ client_host, err2 ] = await sub.getClientHost(CONTACTS, user_uuid, client_uuid);
+    const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_uuid, buyer_uuid);
     if(err2) {
         console.log("Error 2 status = 400 err="+err2);
         return res.status(400).end(err2);
     }
 
-	//3. client connect check
-    const [ code3, err3 ] = await to_client.connect(client_host, user_uuid, client_uuid);
+	//3. buyer connect check
+    const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
     if(code3 !== 200) {
         let msg;
         if(code == 500) {
-            msg = {"err":"client connect check:ECONNRESET"};
+            msg = {"err":"buyer connect check:ECONNRESET"};
         } else {
-            msg = {"err":err3};
+            switch(err3) {
+            case "Not found.":
+                msg = {"err":"The destination node cannot be found."};
+            break;
+            default:
+                msg = {"err":err3};
+            break;
+            }
         }
         return res.status(400).json(msg);
     }
@@ -260,7 +257,7 @@ router.post('/trash', async function(req, res) {
 	// STATUS
     // First we go ahead and get the status.
     //
-    const [ old_status , _4 ] = await sub.getStatus( SUPPLIER_STATUS, req.body.document_uuid) ;
+    const [ old_status , _4 ] = await sub.getStatus( SELLER_STATUS, req.body.document_uuid) ;
 
     if(old_status == undefined) {
         res.json({
@@ -273,7 +270,7 @@ router.post('/trash', async function(req, res) {
     // 5.
     // Second we go ahead and get the document
     //
-	const [ old_document , _5 ]  = await sub.getDocument( SUPPLIER_DOCUMENT, req.body.document_uuid) ;
+	const [ old_document , _5 ]  = await sub.getDocument( SELLER_DOCUMENT, req.body.document_uuid) ;
 
     if(old_document == undefined) {
         res.json({
@@ -286,7 +283,7 @@ router.post('/trash', async function(req, res) {
 	// 6. 
 	// Does document_uuid not exist in the archive status table yet?
 	//
-	const [ _6, err6] = await sub.notexist_check( SUPPLIER_ARCHIVE_STATUS, req.body.document_uuid)
+	const [ _6, err6] = await sub.notexist_check( SELLER_ARCHIVE_STATUS, req.body.document_uuid)
     if (err6 ) {
         errno = 6;
         console.log("Error: "+errno);
@@ -296,7 +293,7 @@ router.post('/trash', async function(req, res) {
 	// 7.
 	// Does document_uuid not exist in the archive document table yet?
 	//
-	const [ _7, err7] = await sub.notexist_check( SUPPLIER_ARCHIVE_DOCUMENT, req.body.document_uuid)
+	const [ _7, err7] = await sub.notexist_check( SELLER_ARCHIVE_DOCUMENT, req.body.document_uuid)
     if (err7 ) {
         errno = 7;
         console.log("Error: "+errno);
@@ -306,7 +303,7 @@ router.post('/trash', async function(req, res) {
     // 8.
     // begin Transaction
     //
-    const [ conn , err8 ] = await tran.connection ();
+    const [ conn , _8 ] = await tran.connection ();
     await tran.beginTransaction(conn);
 
 	// 9.
@@ -315,11 +312,11 @@ router.post('/trash', async function(req, res) {
 
     old_status.document_folder  = 'trash';
     
-    //old_status.supplier_archived  = 1;
-    //old_status.client_archived  = 1;
+    //old_status.seller_archived  = 1;
+    //old_status.buyer_archived  = 1;
 
 	// 10.
-	const [ _10, err10 ] = await tran.insertArchiveStatus(conn, SUPPLIER_ARCHIVE_STATUS, old_status);
+	const [ _10, err10 ] = await tran.insertArchiveStatus(conn, SELLER_ARCHIVE_STATUS, old_status);
 
 	if (err10 ) {
         errno = 10;
@@ -330,7 +327,7 @@ router.post('/trash', async function(req, res) {
 	// 11.
 	// And then we need to insert into the archive document 
 	//
-	const [ _11, err11 ] = await tran.insertDocument(conn, SUPPLIER_ARCHIVE_DOCUMENT, old_status, old_document.document_json);
+	const [ _11, err11 ] = await tran.insertDocument(conn, SELLER_ARCHIVE_DOCUMENT, old_status, old_document.document_json);
 
 	if(err11) {
         errno = 11;
@@ -339,9 +336,9 @@ router.post('/trash', async function(req, res) {
     }
 
 	// 12.
-	// Remove recoiored from SUPPLIER_STATUS with docunent_uuid key
+	// Remove recoiored from SELLER_STATUS with docunent_uuid key
 	//
-	const [ _12, err12 ] = await tran.deleteStatus(conn, SUPPLIER_STATUS, old_status) ;
+	const [ _12, err12 ] = await tran.deleteStatus(conn, SELLER_STATUS, old_status) ;
     if(err) {
         errno = 12;
         code = 400;
@@ -349,9 +346,9 @@ router.post('/trash', async function(req, res) {
     }
 
 	// 13.
-	// Remove recoiored from SUPPLIER_DOCUMENT with docunent_uuid key
+	// Remove recoiored from SELLER_DOCUMENT with docunent_uuid key
 	//
-	const [ _13, err13] = await tran.deleteDocument(conn, SUPPLIER_DOCUMENT, old_status) ;
+	const [ _13, err13] = await tran.deleteDocument(conn, SELLER_DOCUMENT, old_status) ;
     if(err13) {
         errno = 13;
         code = 400;
@@ -360,7 +357,7 @@ router.post('/trash', async function(req, res) {
 
 	// 14.
     //
-    const [ code14, err14 ] = await to_client.trash(client_host, old_status.document_uuid, old_status.supplier_uuid);
+    const [ code14, err14 ] = await to_buyer.trash(buyer_host, old_status.document_uuid, old_status.seller_uuid);
 
     if(code14 !== 200) {
         errno = 14;

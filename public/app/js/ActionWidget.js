@@ -22,7 +22,7 @@
 const ActionWidget = (function() {
 
 	this.MEM = {
-        timeout: 2000,
+        timeout: 1500,
         getTimeout : () => this.MEM.timeout,
 
         saveTimeout : null,
@@ -39,30 +39,57 @@ const ActionWidget = (function() {
 		getDocument_uuid : () => this.MEM.document_uuid,
 		setDocument_uuid : (uuid) => this.MEM.document_uuid = uuid,
 
+		ipfs_address : null,
+		getIpfsAddress : () => this.MEM.ipfs_address,
+		setIpfsAddress : (address) => this.MEM.ipfs_address = address,
+
+		transaction_hash : null,
+		getTransactionHash : () => this.MEM.transaction_hash,
+		setTransactionHash : (hash) => this.MEM.transaction_hash = hash,
 	}
+
+	const Elem = (id) => document.getElementById(id);
 
 	this.DOM = {
 		modal : {
-			body : document.getElementById('ActionWidget.modal.body'),
-			close : document.getElementById('ActionWidget.modal.close'),
-			cancel : document.getElementById('ActionWidget.modal.cancel'),
-			submit : document.getElementById('ActionWidget.modal.submit')
+			body : Elem('ActionWidget.modal.body'),
+			close : Elem('ActionWidget.modal.close'),
+			cancel : Elem('ActionWidget.modal.cancel'),
+			submit : Elem('ActionWidget.modal.submit'),
+			gasLimit_input : Elem('ActionWidget.modal.gasLimit.input'),
+			sending : Elem('ActionWidget.modal.sending'),
+		},
+		modal_transaction : {
+			body : Elem('ActionWidget.modal_transaction.body'),
+			close : Elem('ActionWidget.modal_transaction.close'),
+			cancel : Elem('ActionWidget.modal_transaction.cancel'),
+			ipfs_cid : Elem('ActionWidget.modal_transaction.ipfs_cid'),
+		},
+		modal_receipt : {
+			body : Elem('ActionWidget.modal_receipt.body'),
+			close : Elem('ActionWidget.modal_receipt.close'),
+			cancel : Elem('ActionWidget.modal_receipt.cancel'),
+			ipfs_cid : Elem('ActionWidget.modal_receipt.ipfs_cid'),
 		},
 		invoice : {
-			removeDraft :  document.getElementById('ActionWidget.invoice.removeDraft'),
-			sendInvoice : document.getElementById('ActionWidget.invoice.sendInvoice'),
-			returnInvoice : document.getElementById('ActionWidget.invoice.returnToSender'),
-			confirmInvoice : document.getElementById('ActionWidget.invoice.confirmInvoice'),
-			moveToTrash : document.getElementById('ActionWidget.invoice.moveToTrash'),
-			recreate : document.getElementById('ActionWidget.invoice.recreate'),
-			unconfirm : document.getElementById('ActionWidget.invoice.unconfirm'),
-			makePayment : document.getElementById('ActionWidget.invoice.makePayment'),
-			withdrawSent : document.getElementById('ActionWidget.invoice.withdrawSent'),
-			clientWaiting : document.getElementById('ActionWidget.invoice.clientWaiting'),
-			makePaymentWaiting : document.getElementById('ActionWidget.invoice.makePaymentWaiting'),
-			supplierArchive : document.getElementById('ActionWidget.invoice.supplierArchive'),
-			clientTrash : document.getElementById('ActionWidget.invoice.clientTrash'),
-			supplierTrash : document.getElementById('ActionWidget.invoice.supplierTrash'),
+			// draft
+			removeDraft :  Elem('ActionWidget.invoice.removeDraft'),
+			sendInvoice : Elem('ActionWidget.invoice.sendInvoice'),
+			returnInvoice : Elem('ActionWidget.invoice.returnToSender'),
+			confirmInvoice : Elem('ActionWidget.invoice.confirmInvoice'),
+			moveToTrash : Elem('ActionWidget.invoice.moveToTrash'),
+			recreate : Elem('ActionWidget.invoice.recreate'),
+			unconfirm : Elem('ActionWidget.invoice.unconfirm'),
+			makePayment : Elem('ActionWidget.invoice.makePayment'),
+			withdrawSent : Elem('ActionWidget.invoice.withdrawSent'),
+			makePaymentWaiting : Elem('ActionWidget.invoice.makePaymentWaiting'),
+
+			// paid
+			sellerArchive : Elem('ActionWidget.invoice.sellerArchive'),
+
+			// Trash
+			buyerTrash : Elem('ActionWidget.invoice.buyerTrash'),
+			sellerTrash : Elem('ActionWidget.invoice.sellerTrash'),
 			sendInvoiceDisabled : () => {
 				this.DOM.invoice.sendInvoice.setAttribute("disabled", "disabled")
 				this.DOM.invoice.sendInvoice.disabled = true;
@@ -71,7 +98,17 @@ const ActionWidget = (function() {
 				this.DOM.invoice.sendInvoice.removeAttribute("disabled")
 				this.DOM.invoice.sendInvoice.disabled = false;
 			},
+			sending : Elem('ActionWidget.invoice.sender-wrap'),
 
+		},
+		viewReport : {
+			// paid
+			moveToArciveBuyer : Elem('ActionWidget.viewReport.moveToArciveBuyer'),
+			moveToArciveSeller : Elem('ActionWidget.viewReport.moveToArciveSeller'),
+
+			// complete
+			completeBuyer : Elem('ActionWidget.viewReport.completeBuyer'),
+			completeSeller : Elem('ActionWidget.viewReport.completeSeller'),
 		}
 	}
 
@@ -86,13 +123,37 @@ const ActionWidget = (function() {
 		handleInvoiceUnconfirm : evt_handleInvoiceUnconfirm.bind(this),
 		handleInvoiceMakePayment : evt_handleInvoiceMakePayment.bind(this),
 		handleInvoiceWithdrawSent : evt_handleInvoiceWithdrawSent.bind(this),
+
+// modal
 		handleModalCloseClick : evt_handleModalCloseClick.bind(this),
 		handleModalSubmitClick : evt_handleModalSubmitClick.bind(this),
-		handleClientWaitingClick : evt_handleClientWaitingClick.bind(this),
+
+// modal_transaction
+		handleModalTransactionCloseClick : evt_handleModalTransactionCloseClick.bind(this),
+
+// modal_receipt
+		handleModalReceiptCloseClick : evt_handleModalReceiptCloseClick.bind(this),
+
+		handleBuyerWaitingClick : evt_handleBuyerWaitingClick.bind(this),
 		handleMakePaymentWaitingClick : evt_handleMakePaymentWaitingClick.bind(this),
 		handleSupplyArchiveClick : evt_handleSupplyArchiveClick.bind(this),
-		handleClientTrashClick : evt_handleClientTrashClick.bind(this),
-		handleSupplyTrashClick : evt_handleSupplyTrashClick.bind(this)
+		handleBuyerTrashClick : evt_handleBuyerTrashClick.bind(this),
+		handleSupplyTrashClick : evt_handleSupplyTrashClick.bind(this),
+
+		handleViewReport : {
+			moveToArciveBuyerClick : evt_handleViewReport_MoveToArciveBuyerClick.bind(this),
+			moveToArciveSellerClick : evt_handleViewReport_MoveToArciveSellerClick.bind(this),
+
+			completeBuyerClick : evt_handleViewReport_CompleteBuyerClick.bind(this),
+			completeSellerClick : evt_handleViewReport_CompleteSellerClick.bind(this),
+		},
+
+		handleGasLimitBlur : evt_handleGasLimitBlur.bind(this),
+
+		handleIpfs : {
+			jsonDataClick : evt_handleIpfs_jsonDataClick.bind(this),
+			jsonDataByTransactionClick : evt_handleIpfs_jsonDataByTransactionClick.bind(this),
+		}
 	}
 
 	this.API = {
@@ -103,6 +164,8 @@ const ActionWidget = (function() {
 			reset: api_submitReset.bind(this),
 		},
 		trayRefreshAndClearDocument : api_trayRefreshAndClearDocument.bind(this),
+		transaction_receipt : api_transaction_receipt.bind(this),
+    	handleModalSubmit : api_handleModalSubmit.bind(this),
 	}
 
 	this.NETWORK = {
@@ -127,6 +190,17 @@ const ActionWidget = (function() {
 		}
 	}
 
+	this.SENDING = {
+		visible : () => { this.DOM.modal.sending.style.visibility = "visible"; },
+		hidden : () => { this.DOM.modal.sending.style.visibility = "hidden"; },
+	}
+
+	this.SENDING_WRAP = {
+		visible : () => { this.DOM.invoice.sending.style.visibility = "visible"; },
+		hidden : () => { this.DOM.invoice.sending.style.visibility = "hidden"; },
+	}
+
+
 	init.apply(this);
 	return this;
 
@@ -141,17 +215,153 @@ const ActionWidget = (function() {
 		this.DOM.invoice.unconfirm.addEventListener('click', this.EVT.handleInvoiceUnconfirm);
 		this.DOM.invoice.makePayment.addEventListener('click', this.EVT.handleInvoiceMakePayment);
 		this.DOM.invoice.withdrawSent.addEventListener('click', this.EVT.handleInvoiceWithdrawSent);
+
+// modal
 		this.DOM.modal.close.addEventListener('click', this.EVT.handleModalCloseClick);
 		this.DOM.modal.cancel.addEventListener('click', this.EVT.handleModalCloseClick);
 		this.DOM.modal.submit.addEventListener('click', this.EVT.handleModalSubmitClick);
-		this.DOM.invoice.clientWaiting.addEventListener('click', this.EVT.handleClientWaitingClick);
+
+//  modal_transaction
+		this.DOM.modal_transaction.close.addEventListener('click', this.EVT.handleModalTransactionCloseClick);
+		this.DOM.modal_transaction.cancel.addEventListener('click', this.EVT.handleModalTransactionCloseClick);
+
+//  modal_receipt
+		this.DOM.modal_receipt.close.addEventListener('click', this.EVT.handleModalReceiptCloseClick);
+		this.DOM.modal_receipt.cancel.addEventListener('click', this.EVT.handleModalReceiptCloseClick);
+
+
+// Await Payment
+// [ make Payment Waiting ]
 		this.DOM.invoice.makePaymentWaiting.addEventListener('click', this.EVT.handleMakePaymentWaitingClick);
 
-		this.DOM.invoice.supplierArchive.addEventListener('click', this.EVT.handleSupplyArchiveClick);
-		this.DOM.invoice.clientTrash.addEventListener('click', this.EVT.handleClientTrashClick);
-		this.DOM.invoice.supplierTrash.addEventListener('click', this.EVT.handleSupplyTrashClick);
+
+// paid 
+// [ View Taransaction Receipt ]
+		this.DOM.viewReport.moveToArciveBuyer.addEventListener('click', this.EVT.handleViewReport.moveToArciveBuyerClick);
+
+// [ View Taransaction Receipt ]
+		this.DOM.viewReport.moveToArciveSeller.addEventListener('click', this.EVT.handleViewReport.moveToArciveSellerClick);
+
+// complete
+// [ View Taransaction Receipt ]
+		this.DOM.viewReport.completeBuyer.addEventListener('click', this.EVT.handleViewReport.completeBuyerClick);
+
+// [ View Taransaction Receipt ]
+		this.DOM.viewReport.completeSeller.addEventListener('click', this.EVT.handleViewReport.completeSellerClick);
+
+//
+
+		this.DOM.invoice.sellerArchive.addEventListener('click', this.EVT.handleSupplyArchiveClick);
+		this.DOM.invoice.buyerTrash.addEventListener('click', this.EVT.handleBuyerTrashClick);
+		this.DOM.invoice.sellerTrash.addEventListener('click', this.EVT.handleSupplyTrashClick);
+
+
+		this.DOM.modal.gasLimit_input.addEventListener('blur', this.EVT.handleGasLimitBlur);
+
+		this.DOM.modal_transaction.ipfs_cid.addEventListener('click',this.EVT.handleIpfs.jsonDataClick);
+
+		this.DOM.modal_receipt.ipfs_cid.addEventListener('click',this.EVT.handleIpfs.jsonDataByTransactionClick);
+
+		this.SENDING_WRAP.hidden();
+	}
+
+	async function evt_handleIpfs_jsonDataByTransactionClick() {
+
+		const transactionHash = this.MEM.getTransactionHash();
+
+        const params = {
+            transactionHash : transactionHash
+        };
+
+        const url = '/api/wallet/getIPFScidByTransactionHash';
+
+        const opts = {
+            method: 'POST',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        };
+
+
+        let response;
+        try {
+            response = await fetch( url, opts);
+        } catch(err) {
+
+            throw err;
+        }
+
+        let res;
+        try {
+            res = await response.json();
+        } catch(err) {
+
+            throw err;
+        }
+
+        if(response.status != 200) {
+            alert("this.Message.sent\n"+res.err);
+        }
+
+		const ipfs_address = res.msg.ipfs_address;
+		const hash = res.msg.ipfs_cid;
+
+		const base = `${ipfs_address}/ipfs`;
+
+
+		let newwin = window.open (`${base}/${hash}`);
 
 	}
+
+	function evt_handleIpfs_jsonDataClick() {
+
+		const ipfs_address= this.MEM.getIpfsAddress();
+
+		//const base = `${window.location.protocol}//${ipfs_hostname}:8080/ipfs`;
+		const base = `${ipfs_address}/ipfs`;
+
+		let id = 'ActionWidget.modal_transaction.input';
+		let hash = document.getElementById(id).innerText;
+
+		let newwin = window.open (`${base}/${hash}`);
+	}
+
+    function evt_handleGasLimitBlur(evt) {
+
+        const elm = evt.target;
+        let value = elm.value;
+
+		if( value != "") {
+			if(value.indexOf(",") !== -1) {
+				value = value.replace(/,/g,'');
+			}
+		}
+
+        if(value == null ) {
+			console.log("value-"+value)	
+            return;
+        }
+
+		value = value.replace(/[^0-9]/g, '');
+
+		if( typeof(parseInt(value)) !== 'number') {
+			
+			alert("Please enter a number.");
+			return;
+		} 
+
+		value = Number(value).toLocaleString();
+
+		elm.value = value;
+
+        //const opts = DocumentWidget.MEM.document.currency_options;
+        //const c = currency(value, opts);
+        //elm.value = c.format(true);
+
+    }
 
 	async function evt_handleUndelivered() {
 
@@ -165,35 +375,269 @@ const ActionWidget = (function() {
 
 	}
 
-	function evt_handleClientWaitingClick() {
-		alert(" Waiting for Confirmation ");
+	function evt_handleBuyerWaitingClick() {
+
+		this.DOM.modal_receipt.body.classList.add('open');
+
 	}
 
+// Await Payment : open
 	function evt_handleMakePaymentWaitingClick() {
-		alert(" Waiting for Make Payment");
+
+		console.log("Await Payment : handleMakePaymentWaitingClick")
+		alert("Make Payment Waiting");
+
 	}
 
+// Confirmed : modal : close
 	function evt_handleModalCloseClick() {
+		//this.DOM.modal.sending.style.visibility = "hidden";
+		
+		this.SENDING.hidden();
 	
 		this.DOM.modal.body.classList.remove('open');
 
 	}
 
-	async function evt_handleArchiveSupply() {
-
-		console.log('archive supplier delivery');
+// Paid : modal_transaction : close
+	function evt_handleModalTransactionCloseClick() {
+	
+		console.log("Paid : handleModalTransactionCloseClick")
+		this.DOM.modal_transaction.body.classList.remove('open');
 
 	}
 
-	async function evt_handleArchiveClient() {
+// Paid : modal_receipt : close
+	function evt_handleModalReceiptCloseClick() {
+	
+		//console.log("Paid : handleModalReceiptCloseClick")
+		this.DOM.modal_receipt.body.classList.remove('open');
+
+	}
+
+// Paid : View Transaction Report
+	function evt_handleViewReport_MoveToArciveBuyerClick(){
+
+		//console.log("Paid : handleViewReport_MoveToArciveBuyerClick");
+
+		const role = "buyer"; 
+		const archive = 0;
+
+		this.API.transaction_receipt(role, archive) ; 
+	}
+
+	function evt_handleViewReport_MoveToArciveSellerClick(){
+
+		//console.log("Paid : handleViewReport_MoveToArciveSellerClick");
+
+		const role = "seller"; 
+		const archive = 0;
+
+		this.API.transaction_receipt(role, archive) ; 
+
+		//this.DOM.modal_receipt.body.classList.add('open');
+
+	}
+
+// Complete : View Transaction Report
+	function evt_handleViewReport_CompleteBuyerClick(){
+
+		//console.log("Paid : handleViewReport_CompleteBuyer");
+
+		const role = "buyer"; 
+		const archive = 1;
+
+		this.API.transaction_receipt(role, archive) ; 
+
+		//this.DOM.modal_receipt.body.classList.add('open');
+
+	}
+
+	function evt_handleViewReport_CompleteSellerClick(){
+
+		console.log("Paid : handleViewReport_CompleteSeller");
+
+		const role = "seller"; 
+		const archive = 1;
+
+		this.API.transaction_receipt(role, archive) ; 
+
+		//this.DOM.modal_receipt.body.classList.add('open');
+
+	}
+
+
+	async function evt_handleArchiveSupply() {
+
+		console.log('archive seller delivery');
+
+	}
+
+	async function evt_handleArchiveBuyer() {
 
 		console.log('archive archive delivery');
 
 	}
 
-	function evt_handleInvoiceMakePayment() {
+/*
+ * [ View transaction Receipt ]
+ */
+	async function api_transaction_receipt(role, archive) { 
 
-		console.log("make payment!!");
+		const url = '/api/wallet/getTransactionReceipt';
+
+        const doc = DocumentWidget.API.getDocument();
+
+        const params = {
+            "document_uuid" : doc.document_uuid,
+			"role" : role,
+			"archive" : archive
+        };
+
+        const opts = {
+            method: 'POST',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        };
+
+        let response;
+        try {
+            response = await fetch( url, opts);
+        } catch(err) {
+			console.log("err="+err);
+			alert("Cannot connect server.");
+			return;
+        }
+
+        let res;
+        try {
+            res = await response.json();
+        } catch(err) {
+			return;
+        }
+
+		//console.log(res.msg.receipt);
+		let i,id, elm;
+
+		if(res.err != 0) {
+			alert(res.err);
+			return;
+		}
+		if(res.msg == null) {
+			alert("Error View Transaction Rceipt.");
+			return;
+		}
+
+		let receipt = res.msg.receipt;
+		let hash	= res.msg.hash;
+
+		if(receipt == null) {
+			alert("Transaction Receipt not found.");
+			return;
+		}
+
+		let base ='ActionWidget.modal_receipt.';
+		let ids = [
+			'transactionHash',
+			'transactionIndex',
+			'blockNumber',
+			'blockHash',
+			'from',
+			'to',
+			'cumulativeGasUsed',
+			'gasUsed',
+			'contractAddress',
+			'type',
+			'effectiveGasPrice'
+		]
+
+		for(i = 0; i < ids.length; i++) {
+			id = ids[i];
+			elm = document.getElementById(base + id);
+			elm.innerText =  receipt[id];
+		}
+
+		id = 'transactionHash';
+		this.MEM.setTransactionHash(receipt[id]);
+		
+		this.DOM.modal_receipt.body.classList.add('open');
+
+
+	}
+
+
+/*
+ * [ Make Payment ] 
+ */
+	async function evt_handleInvoiceMakePayment() {
+
+
+		const GAS_LIMIT = '210,000';
+		//console.log("make payment!!");
+
+		const url = '/api/wallet/getCurrentBalanceOfBuyer';
+
+        const doc = DocumentWidget.API.getDocument();
+
+        const params = {
+            document_uuid : doc.document_uuid
+        };
+
+        const opts = {
+            method: 'POST',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        };
+
+
+        let response;
+        try {
+            response = await fetch( url, opts);
+        } catch(err) {
+			return;
+        }
+
+        let res;
+        try {
+            res = await response.json();
+        } catch(err) {
+			return;
+        }
+
+		let base = 'ActionWidget.modal.';	
+		let i, id, elm;
+
+		let msg = res.msg;
+
+		let ids  = [
+			'balanceGwei',
+			'makePaymantTo',
+			'transferCost',
+			'gas',
+		];
+
+		for ( i=0; i<ids.length; i++) {
+			id = ids[i];
+			elm = document.getElementById(base + id)
+			try {
+			elm.innerText = msg[id];
+			} catch (e) {
+				console.log(i+":"+id)
+			}
+		}
+
+		this.DOM.modal.gasLimit_input.value = GAS_LIMIT;
+
+		this.SENDING.hidden();
+
 		this.DOM.modal.body.classList.add('open');
 
 	}
@@ -835,8 +1279,8 @@ const ActionWidget = (function() {
 	}
 
 /*
-* [ Move to Trash ]
-*/
+ * [ Move to Trash ]
+ */
 	async function evt_handleQuoteDraftDelete() {
 
 		const button = this.DOM.invoice.removeDraft;
@@ -881,16 +1325,19 @@ const ActionWidget = (function() {
 		DocumentWidget.API.clearDocument();
 		TrayWidget.API.clearDocument();
 
+		if(response.status != 200) {
+			alert("[ Move to Trash ]\n"+res.err);
+		}
 		this.BUTTON.enabled(button);
 	}
 
 
 /*
-* [ Soft Delete ]
-*/
+ * [ Soft Delete ]
+ */
 	async function evt_handleSupplyTrashClick() {
 
-		const button = this.DOM.invoice.supplierTrash;
+		const button = this.DOM.invoice.sellerTrash;
 		this.BUTTON.disabled(button);
 
 		const doc = DocumentWidget.API.getDocument();
@@ -899,7 +1346,7 @@ const ActionWidget = (function() {
 			document_uuid : doc.document_uuid
 		};
 
-        const url = '/api/invoice/softDeleteSupplier';
+        const url = '/api/invoice/softDeleteSeller';
 
         const opts = {
             method: 'POST',
@@ -930,17 +1377,17 @@ const ActionWidget = (function() {
 		this.API.trayRefreshAndClearDocument();
 
 		if(response.status != 200) {
-			alert("this.MESSAGE.sent\n"+res.err);
+			alert("[ Soft Delete ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
 	}
 
 /*
-* [ Soft Delete ]
-*/
-	async function evt_handleClientTrashClick() {
+ * [ Soft Delete ]
+ */
+	async function evt_handleBuyerTrashClick() {
 
-		const button = this.DOM.invoice.clientTrash;
+		const button = this.DOM.invoice.buyerTrash;
 		this.BUTTON.disabled(button);
 
 		const doc = DocumentWidget.API.getDocument();
@@ -949,7 +1396,7 @@ const ActionWidget = (function() {
 			document_uuid : doc.document_uuid
 		};
 
-        const url = '/api/invoice/softDeleteClient';
+        const url = '/api/invoice/softDeleteBuyer';
 
         const opts = {
             method: 'POST',
@@ -980,7 +1427,7 @@ const ActionWidget = (function() {
 		this.API.trayRefreshAndClearDocument();
 
 		if(response.status != 200) {
-			alert("this.MESSAGE.sent\n"+res.err);
+			alert("[ Soft Delete ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
 	}
@@ -990,7 +1437,7 @@ const ActionWidget = (function() {
 */
 	async function evt_handleSupplyArchiveClick() {
 
-		const button = this.DOM.invoice.supplierArchive;
+		const button = this.DOM.invoice.sellerArchive;
 		this.BUTTON.disabled(button);
 
 		const doc = DocumentWidget.API.getDocument();
@@ -999,7 +1446,7 @@ const ActionWidget = (function() {
 			document_uuid : doc.document_uuid
 		};
 
-        const url = '/api/invoice/supplierArchive';
+        const url = '/api/invoice/sellerArchive';
 
         const opts = {
             method: 'POST',
@@ -1030,57 +1477,149 @@ const ActionWidget = (function() {
 		this.API.trayRefreshAndClearDocument();
 
 		if(response.status != 200) {
-			alert("this.MESSAGE.sent\n"+res.err);
+			alert("[ Move to Archive ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
 	}
 
 /*
-* [ Make Paymant ]
-*/
-    function evt_handleModalSubmitClick() {
+ * [ Make Paymant ]
+ */
+    async function evt_handleModalSubmitClick() {
+		this.SENDING.visible();
 
-		const button = this.DOM.invoice.makePayment;
-		this.BUTTON.disabled(button);
+		await this.API.handleModalSubmit();
+	}
+
+	function _GwaiToNumber(gasLimit) {
+
+			let g = gasLimit;
+
+			//console.log("g="+g);
+
+			if(g == null) {
+				return g;
+			}
+			
+			if(g.indexOf(" Gwei") != -1) {
+				g = g.replace(" Gwei","");
+			}
+			if(g.indexOf(",") != -1) {
+				g = g.replace(/,/g,"");
+			}
+
+			return g;
+	}
+
+/*
+ * [ Send Transaction ]
+ */
+    async function api_handleModalSubmit() {
+
 
 		const url = '/api/invoice/makePayment';
 
         const doc = DocumentWidget.API.getDocument();
 
+		let gasLimit = _GwaiToNumber(this.DOM.modal.gasLimit_input.value);
+
+		//console.log("gasLimit = "+gasLimit);
+
         const params = {
-            document_uuid : doc.document_uuid
+            document_uuid : doc.document_uuid,
+			gasLimit : gasLimit
         };
 
-        const ajax = new XMLHttpRequest();
-        ajax.open('POST', url);
-        ajax.setRequestHeader('Content-Type', 'application/json');
-        ajax.responseType = "json";
-        ajax.send(JSON.stringify(params));
+        const opts = {
+            method: 'POST',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        };
 
-        ajax.onload = () => {
 
-			let res = ajax.response;
-
-            FolderWidget.API.getCount();
-            TrayWidget.API.refresh();
-            DocumentWidget.API.clearDocument();
-            this.DOM.modal.body.classList.remove('open');
-            TrayWidget.API.clearDocument();
-
-			if(ajax.status != 200) {
-				setTimeout(function() {
-					alert("this.MESSAGE.sent\n"+res.err);
-				}, 10);
-			}
-			this.BUTTON.enabled(button);
-
+        let response;
+        try {
+            response = await fetch( url, opts);
+        } catch(err) {
+			return;
         }
+
+        let res;
+        try {
+            res = await response.json();
+        } catch(err) {
+			return;
+        }
+
+		await this.DOM.modal.body.classList.remove('open');
+
+		FolderWidget.API.getCount();
+		TrayWidget.API.refresh();
+		DocumentWidget.API.clearDocument();
+		TrayWidget.API.clearDocument();
+
+		this.SENDING.visible();
+
+		if(response.status != 200) {
+			setTimeout(function() {
+				alert("[ makePayment ]\nerr="+res.err+"\ncode : "+res.code);
+			}, 100);
+		} else {
+
+			setTimeout(function(res) {
+				let r = res.msg.transaction_result
+
+				let base,i,id,elm;
+
+					//'chainId',
+					//'maxPriorityFeePerGas',
+					//'maxFeePerGas',
+
+				let ids = [
+					'type',
+					'hash',
+					'input',
+					'nonce',
+					'blockNumber',
+					'blockHash',
+					'from',
+					'to',
+					'value',
+					'gasPrice',
+					'gas'
+				]
+
+				base = 'ActionWidget.modal_transaction.';
+			
+				for( i=0 ;i<ids.length;i++ ) {
+					id = ids[i];
+					elm = document.getElementById(base+id);
+
+					if(id == 'input') {
+						elm.title = r[id];
+						elm.innerText = res.msg.ipfs_cid;
+						continue;
+					}
+
+					elm.innerText = r[id];
+				}
+
+				this.MEM.setIpfsAddress(res.msg.ipfs_address);
+
+				this.DOM.modal_transaction.body.classList.add('open');
+
+			}.bind(this, res), 100);
+		}
 
     }
 
 /*
-* [ Withdraw ]
-*/
+ * [ Withdraw ]
+ */
 	async function evt_handleInvoiceWithdrawSent() {
 
 		const button = this.DOM.invoice.withdrawSent;
@@ -1128,15 +1667,15 @@ const ActionWidget = (function() {
 		this.API.trayRefreshAndClearDocument();
 
 		if(response.status != 200) {
-			alert("this.Message.sent\n"+res.err);
+			alert("[ Withdraw ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
 
 	}
 	
 /*
-* [ Move to Trash ] 
-*/
+ * [ Move to Trash ] 
+ */
 	async function evt_handleInvoiceTrashClick() {
 
 		const button = this.DOM.invoice.moveToTrash;
@@ -1179,14 +1718,14 @@ const ActionWidget = (function() {
 		this.API.trayRefreshAndClearDocument();
 
 		if(response.status != 200) {
-			alert("this.MESSAGE.sent\n"+res.err);
+			alert("[ Move to Trash ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
 	}
 
 /*
-* [ Unconfirm ]
-*/
+ * [ Unconfirm ]
+ */
 	async function evt_handleInvoiceUnconfirm() {
 
 		const button = this.DOM.invoice.unconfirm;
@@ -1229,15 +1768,15 @@ const ActionWidget = (function() {
 		this.API.trayRefreshAndClearDocument();
 
 		if(response.status != 200) {
-			alert("this.MESSAGE.sent\n"+res.err);
+			alert("[ Unconfirm ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
 
 	}
 
 /*
-* [ Move to Draft ]
-*/
+ * [ Move to Draft ]
+ */
 	async function evt_handleInvoiceRecreate() {
 
 		const button = this.DOM.invoice.recreate;
@@ -1281,15 +1820,15 @@ const ActionWidget = (function() {
 		this.API.trayRefreshAndClearDocument();
 
 		if(response.status != 200) {
-			alert("this.MESSAGE.sent\n"+res.err);
+			alert("[ Move to Draft ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
 
 	}
 
 /*
-* [ Confirm Invoice ]
-*/
+ * [ Confirm Invoice ]
+ */
 	async function evt_handleInvoiceConfirmClick() {
 
 		const button = this.DOM.invoice.confirmInvoice;
@@ -1332,14 +1871,14 @@ const ActionWidget = (function() {
 		this.API.trayRefreshAndClearDocument();
 
 		if(response.status != 200) {
-			alert("this.MESSAGE.sent\n"+res.err);
+			alert("[ Confirm Invoice ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
 	}
 
 /*
-* [ Return to Sender ]
-*/
+ * [ Return to Sender ]
+ */
 	async function evt_handleInvoiceReturnClick() {
 
 		const button = this.DOM.invoice.returnInvoice;
@@ -1351,7 +1890,7 @@ const ActionWidget = (function() {
 			document_uuid : doc.document_uuid
 		};
 
-        const url = '/api/invoice/return';
+        const url = '/api/invoice/returnToSender';
 
         const opts = {
             method: 'POST',
@@ -1382,39 +1921,12 @@ const ActionWidget = (function() {
 		this.API.trayRefreshAndClearDocument();
 
 		if(response.status != 200) {
-			alert("this.MESSAGE.sent\n"+res.err);
+			alert("[ Return to Sender ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
 	}
 
 
-	function api_closePanel() {
-
-		const panel = this.MEM.getPanel();
-		if(panel) {
-			panel.classList.remove("open");
-			this.MEM.initPanel();
-		}
-
-	}
-
-	function api_submitReadonly() {
-
-		this.DOM.invoice.sendInvoice.style.disabled = true;
-		this.DOM.invoice.moveToTrash.style.disabled = true;
-		this.DOM.invoice.sendInvoice.classList.add("nonactive");
-		this.DOM.invoice.moveToTrash.classList.add("nonactive");
-
-	}
-
-	function api_submitReset() {
-
-		this.DOM.invoice.sendInvoice.style.disabled = false;
-		this.DOM.invoice.moveToTrash.style.disabled = false;
-		this.DOM.invoice.sendInvoice.classList.remove("nonactive");
-		this.DOM.invoice.moveToTrash.classList.remove("nonactive");
-
-	}
 
 /*
  * [ Send Invoice ]
@@ -1431,6 +1943,10 @@ const ActionWidget = (function() {
 			alert(errors);
 			return;
 		}
+
+		this.DOM.invoice.sendInvoiceDisabled();
+
+		DocumentWidget.API.updateDocument();
 
 		const message="Subject has not been entered. Do you want to send it?";
 
@@ -1455,6 +1971,7 @@ const ActionWidget = (function() {
 		console.log("Contact="+ ContactWidget.API.checkSaveTimeout() +":"+
 			"Document="+DocumentWidget.API.checkSaveTimeout() ) ;
 */
+		this.SENDING_WRAP.visible();
 
 
 		if( ContactWidget.API.checkSaveTimeout() &&
@@ -1480,6 +1997,9 @@ const ActionWidget = (function() {
 
 	}
 		
+/*
+ *  [ Send Invoice ]
+ */
 	function network_invoiceDraftSend() {
 
 		const doc = DocumentWidget.API.getDocument();
@@ -1509,12 +2029,17 @@ const ActionWidget = (function() {
 			this.API.submit.reset();
 
 			if(ajax.status != 200) {
-				alert("this.MESSAGE.sent\n"+res.err);
+				alert("[ Send Invoice ]\n"+res.err);
 			}
+
+			this.SENDING_WRAP.hidden();
 		}
 
 	}
 	
+/*
+ * [ Move to Trash ]
+ */
 	function evt_handleInvoiceDraftDelete() {
 		
 		const params = {
@@ -1567,6 +2092,34 @@ const ActionWidget = (function() {
 
 		panel.classList.add("open");
 		this.MEM.setPanel( panel );
+
+	}
+
+	function api_closePanel() {
+
+		const panel = this.MEM.getPanel();
+		if(panel) {
+			panel.classList.remove("open");
+			this.MEM.initPanel();
+		}
+
+	}
+
+	function api_submitReadonly() {
+
+		this.DOM.invoice.sendInvoice.style.disabled = true;
+		this.DOM.invoice.moveToTrash.style.disabled = true;
+		this.DOM.invoice.sendInvoice.classList.add("nonactive");
+		this.DOM.invoice.moveToTrash.classList.add("nonactive");
+
+	}
+
+	function api_submitReset() {
+
+		this.DOM.invoice.sendInvoice.style.disabled = false;
+		this.DOM.invoice.moveToTrash.style.disabled = false;
+		this.DOM.invoice.sendInvoice.classList.remove("nonactive");
+		this.DOM.invoice.moveToTrash.classList.remove("nonactive");
 
 	}
 

@@ -28,23 +28,25 @@ const SettingsProfile = (function() {
 		profile : {
 			img : document.getElementById('SettingsProfile.profile.img'),
 			file : document.getElementById('SettingsProfile.profile.file'),
-			username : document.getElementById('SettingsProfile.profile.username'),
-			user_uuid : document.getElementById('SettingsProfile.profile.user_uuid'),
+			membername : document.getElementById('SettingsProfile.profile.membername'),
+			member_uuid : document.getElementById('SettingsProfile.profile.member_uuid'),
 			work_email : document.getElementById('SettingsProfile.profile.work_email'),
 			edit : document.getElementById('SettingsProfile.profile.edit'),
 			cancel : document.getElementById('SettingsProfile.profile.cancel'),
 			save : document.getElementById('SettingsProfile.profile.save')
 		},
-		company : {
-			company_name : document.getElementById('SettingsProfile.company.company_name'),
-			company_address : document.getElementById('SettingsProfile.company.company_address'),
-			company_building : document.getElementById('SettingsProfile.company.company_building'),
-			company_department : document.getElementById('SettingsProfile.company.company_department'),
-			company_tax_id : document.getElementById('SettingsProfile.company.company_tax_id'),
-			company_postcode : document.getElementById('SettingsProfile.company.company_postcode'),
-			edit : document.getElementById('SettingsProfile.company.edit'),
-			save : document.getElementById('SettingsProfile.company.save'), 
-			cancel : document.getElementById('SettingsProfile.company.cancel')
+		organization : {
+			organization_name : document.getElementById('SettingsProfile.organization.organization_name'),
+			organization_postcode : document.getElementById('SettingsProfile.organization.organization_postcode'),
+			organization_address : document.getElementById('SettingsProfile.organization.organization_address'),
+			organization_building : document.getElementById('SettingsProfile.organization.organization_building'),
+			organization_department : document.getElementById('SettingsProfile.organization.organization_department'),
+			organization_tax_id : document.getElementById('SettingsProfile.organization.organization_tax_id'),
+			addressCountry: document.getElementById('SettingsProfile.organization.addressCountry'),
+			addressRegion : document.getElementById('SettingsProfile.organization.addressRegion'),
+			edit : document.getElementById('SettingsProfile.organization.edit'),
+			save : document.getElementById('SettingsProfile.organization.save'), 
+			cancel : document.getElementById('SettingsProfile.organization.cancel')
 		},
 		logo : {
 			img : document.getElementById('SettingsProfile.logo.img'),
@@ -90,31 +92,33 @@ const SettingsProfile = (function() {
 		this.DOM.profile.save.addEventListener('click', this.EVT.handleProfileSave);
 		this.DOM.profile.cancel.addEventListener('click', this.EVT.handleProfileCancel);
 
-		this.DOM.company.edit.addEventListener('click', this.EVT.handleCompanyEditClick);
-		this.DOM.company.save.addEventListener('click', this.EVT.handleCompanySaveClick);
-		this.DOM.company.cancel.addEventListener('click', this.EVT.handleCompanyCancelClick);
+		this.DOM.organization.edit.addEventListener('click', this.EVT.handleCompanyEditClick);
+		this.DOM.organization.save.addEventListener('click', this.EVT.handleCompanySaveClick);
+		this.DOM.organization.cancel.addEventListener('click', this.EVT.handleCompanyCancelClick);
 
-		this.DOM.company.save.setAttribute('disabled', 'disabled');
-		this.DOM.company.cancel.setAttribute('disabled', 'disabled');
-		this.DOM.company.edit.classList.remove('disabled');
+		this.DOM.organization.save.setAttribute('disabled', 'disabled');
+		this.DOM.organization.cancel.setAttribute('disabled', 'disabled');
+		this.DOM.organization.edit.classList.remove('disabled');
 
-		console.log(this.DOM);
+		//console.log(this.DOM);
 
 	}
 
 	function api_updateCompanyProfile() {
 		
-		console.log("updating company profile!!!");
+		console.log("updating organization profile!!!");
 
-		let userData = this.MEM.userData;
+		let memberData = this.MEM.memberData;
 
 		const args = {
-			company_name : userData.company_name,
-			company_postcode : userData.company_postcode,
-			company_address : userData.company_address,
-			company_building : userData.company_building,
-			company_department : userData.company_department,
-			company_tax_id : userData.company_tax_id
+			organization_name : memberData.organization_name,
+			organization_postcode : memberData.organization_postcode,
+			organization_address : memberData.organization_address,
+			organization_building : memberData.organization_building,
+			organization_department : memberData.organization_department,
+			organization_tax_id : memberData.organization_tax_id,
+			addressCountry : memberData.addressCountry,
+			addressRegion : memberData.addressRegion,
 		}
 
 		let ajax = new XMLHttpRequest();
@@ -135,20 +139,22 @@ const SettingsProfile = (function() {
 
 		console.log("edit click!!!");
 
-		let company = this.DOM.company;
+		let organization = this.DOM.organization;
 
-		company.save.removeAttribute('disabled');
-		company.cancel.removeAttribute('disabled');
-		company.edit.classList.add('disabled');
+		organization.save.removeAttribute('disabled');
+		organization.cancel.removeAttribute('disabled');
+		organization.edit.classList.add('disabled');
 
-		company.company_name.removeAttribute("readonly");
-		company.company_postcode.removeAttribute("readonly");
-		company.company_address.removeAttribute("readonly");
-		company.company_building.removeAttribute("readonly");
-		company.company_department.removeAttribute("readonly");
-		company.company_tax_id.removeAttribute("readonly");
+		organization.organization_name.removeAttribute("readonly");
+		organization.organization_postcode.removeAttribute("readonly");
+		organization.organization_address.removeAttribute("readonly");
+		organization.organization_building.removeAttribute("readonly");
+		organization.organization_department.removeAttribute("readonly");
+		organization.organization_tax_id.removeAttribute("readonly");
+		organization.addressCountry.removeAttribute("readonly");
+		organization.addressRegion.removeAttribute("readonly");
 
-		company.company_name.focus();
+		organization.organization_name.focus();
 
 	}
 
@@ -156,33 +162,37 @@ const SettingsProfile = (function() {
 
 		let bool = confirm([
 			"This will automatically update your information for your contacts.",
-			"Are you sure you would like to change your company information?"
+			"Are you sure you would like to change your organization information?"
 		].join("\n"));
 
 		if(!bool) {
 			return;
 		}
 
-		let company = this.DOM.company;
-		let userData = this.MEM.userData;
+		let organization = this.DOM.organization;
+		let memberData = this.MEM.memberData;
 
-		company.save.setAttribute('disabled', 'disabled');
-		company.cancel.setAttribute('disabled', 'disabled');
-		company.edit.classList.remove('disabled');
+		organization.save.setAttribute('disabled', 'disabled');
+		organization.cancel.setAttribute('disabled', 'disabled');
+		organization.edit.classList.remove('disabled');
 
-		userData.company_name		= company.company_name.value;
-		userData.company_postcode	= company.company_postcode.value;
-		userData.company_address	= company.company_address.value;
-		userData.company_building	= company.company_building.value;
-		userData.company_department = company.company_department.value;
-		userData.company_tax_id		= company.company_tax_id.value;
+		memberData.organization_name		= organization.organization_name.value;
+		memberData.organization_postcode	= organization.organization_postcode.value;
+		memberData.organization_address		= organization.organization_address.value;
+		memberData.organization_building	= organization.organization_building.value;
+		memberData.organization_department	= organization.organization_department.value;
+		memberData.organization_tax_id		= organization.organization_tax_id.value;
+		memberData.addressCountry			= organization.addressCountry.value;
+		memberData.addressRegion			= organization.addressRegion.value;
 
-		company.company_name.setAttribute("readonly", "readonly");
-		company.company_postcode.setAttribute("readonly", "readonly");
-		company.company_address.setAttribute("readonly", "readonly");
-		company.company_building.setAttribute("readonly", "readonly");
-		company.company_department.setAttribute("readonly", "readonly");
-		company.company_tax_id.setAttribute("readonly", "readonly");
+		organization.organization_name.setAttribute("readonly", "readonly");
+		organization.organization_postcode.setAttribute("readonly", "readonly");
+		organization.organization_address.setAttribute("readonly", "readonly");
+		organization.organization_building.setAttribute("readonly", "readonly");
+		organization.organization_department.setAttribute("readonly", "readonly");
+		organization.organization_tax_id.setAttribute("readonly", "readonly");
+		organization.addressCountry.setAttribute("readonly", "readonly");
+		organization.addressRegion.setAttribute("readonly", "readonly");
 
 		this.API.updateCompanyProfile()
 
@@ -192,26 +202,30 @@ const SettingsProfile = (function() {
 
 		console.log("cancel click!!");
 
-		let company = this.DOM.company;
-		let userData = this.MEM.userData;
+		let organization = this.DOM.organization;
+		let memberData = this.MEM.memberData;
 
-		company.save.setAttribute('disabled', 'disabled');
-		company.cancel.setAttribute('disabled', 'disabled');
-		company.edit.classList.remove('disabled');
+		organization.save.setAttribute('disabled', 'disabled');
+		organization.cancel.setAttribute('disabled', 'disabled');
+		organization.edit.classList.remove('disabled');
 
-		company.company_name.value		= userData.company_name;
-		company.company_postcode.value	= userData.company_postcode;
-		company.company_address.value	= userData.company_address;
-		company.company_building.value	= userData.company_building;
-		company.company_department.value = userData.company_department;
-		company.company_tax_id.value	= userData.company_tax_id;
+		organization.organization_name.value		= memberData.organization_name;
+		organization.organization_postcode.value	= memberData.organization_postcode;
+		organization.organization_address.value		= memberData.organization_address;
+		organization.organization_building.value	= memberData.organization_building;
+		organization.organization_department.value	= memberData.organization_department;
+		organization.organization_tax_id.value		= memberData.organization_tax_id;
+		organization.addressCountry.value			= memberData.addressCountry;
+		organization.addressRegion.value			= memberData.addressRegion;
 
-		company.company_name.setAttribute("readonly", "readonly");
-		company.company_postcode.setAttribute("readonly", "readonly");
-		company.company_address.setAttribute("readonly", "readonly");
-		company.company_building.setAttribute("readonly", "readonly");
-		company.company_department.setAttribute("readonly", "readonly");
-		company.company_tax_id.setAttribute("readonly", "readonly");
+		organization.organization_name.setAttribute("readonly", "readonly");
+		organization.organization_postcode.setAttribute("readonly", "readonly");
+		organization.organization_address.setAttribute("readonly", "readonly");
+		organization.organization_building.setAttribute("readonly", "readonly");
+		organization.organization_department.setAttribute("readonly", "readonly");
+		organization.organization_tax_id.setAttribute("readonly", "readonly");
+		organization.addressCountry.setAttribute("readonly", "readonly");
+		organization.addressRegion.setAttribute("readonly", "readonly");
 
 	}
 
@@ -280,11 +294,11 @@ const SettingsProfile = (function() {
 		profile.cancel.removeAttribute('disabled');
 		profile.edit.classList.add('disabled');
 
-		profile.username.removeAttribute("readonly");
-		profile.user_uuid.removeAttribute("readonly");
+		profile.membername.removeAttribute("readonly");
+		profile.member_uuid.removeAttribute("readonly");
 		profile.work_email.removeAttribute("readonly");
 
-		profile.username.focus();
+		profile.membername.focus();
 
 	}
 
@@ -294,36 +308,36 @@ const SettingsProfile = (function() {
 		console.log("cancel click!!");
 
 		let profile = this.DOM.profile;
-		let userData = this.MEM.userData;
+		let memberData = this.MEM.memberData;
 
 		profile.save.setAttribute('disabled', 'disabled');
 		profile.cancel.setAttribute('disabled', 'disabled');
 		profile.edit.classList.remove('disabled');
 
-		profile.username.value		= userData.username;
-		profile.user_uuid.value		= userData.user_uuid;
-		profile.work_email.value	= userData.work_email;
+		profile.membername.value		= memberData.membername;
+		profile.member_uuid.value		= memberData.member_uuid;
+		profile.work_email.value	= memberData.work_email;
 
-		profile.username.setAttribute("readonly", "readonly");
-		profile.user_uuid.setAttribute("readonly", "readonly");
+		profile.membername.setAttribute("readonly", "readonly");
+		profile.member_uuid.setAttribute("readonly", "readonly");
 		profile.work_email.setAttribute("readonly", "readonly");
 	}
 
 	async function evt_handleProfileSave() {
 
 		let profile = this.DOM.profile;
-		let userData = this.MEM.userData;
+		let memberData = this.MEM.memberData;
 
 		profile.save.setAttribute('disabled', 'disabled');
 		profile.cancel.setAttribute('disabled', 'disabled');
 		profile.edit.classList.remove('disabled');
 
-		userData.username	= profile.username.value;
-		userData.user_uuid	= profile.user_uuid.value;
-		userData.work_email	= profile.work_email.value;
+		memberData.membername	= profile.membername.value;
+		memberData.member_uuid	= profile.member_uuid.value;
+		memberData.work_email	= profile.work_email.value;
 
-		profile.username.setAttribute("readonly", "readonly");
-		profile.user_uuid.setAttribute("readonly", "readonly");
+		profile.membername.setAttribute("readonly", "readonly");
+		profile.member_uuid.setAttribute("readonly", "readonly");
 		profile.work_email.setAttribute("readonly", "readonly");
 
 		this.API.updateProfile();
@@ -332,14 +346,14 @@ const SettingsProfile = (function() {
 
 	function api_updateProfile() {
 		
-		console.log("updating user profile!!!");
+		console.log("updating member profile!!!");
 
-		let userData = this.MEM.userData;
+		let memberData = this.MEM.memberData;
 
 		const args = {
-			username : userData.username,
-			user_uuid : userData.user_uuid,
-			work_email : userData.work_email,
+			membername : memberData.membername,
+			member_uuid : memberData.member_uuid,
+			work_email : memberData.work_email,
 		}
 
 		const PATH = '/api/session/updateProfile';
@@ -356,18 +370,18 @@ const SettingsProfile = (function() {
 
 	}
 
-	function api_renderForm(userData) {
+	function api_renderForm(memberData) {
 
-		this.MEM.userData = userData;
+		this.MEM.memberData = memberData;
 	
 		// Profile 
 
-		this.DOM.profile.username.value = userData.username;
-		this.DOM.profile.user_uuid.value = userData.user_uuid;
-		this.DOM.profile.work_email.value = userData.work_email;
+		this.DOM.profile.membername.value = memberData.membername;
+		this.DOM.profile.member_uuid.value = memberData.member_uuid;
+		this.DOM.profile.work_email.value = memberData.work_email;
 
-		this.DOM.profile.username.setAttribute("readonly", "readonly");
-		this.DOM.profile.user_uuid.setAttribute("readonly", "readonly");
+		this.DOM.profile.membername.setAttribute("readonly", "readonly");
+		this.DOM.profile.member_uuid.setAttribute("readonly", "readonly");
 		this.DOM.profile.work_email.setAttribute("readonly", "readonly");
 
         const ajax = new XMLHttpRequest();
@@ -384,7 +398,7 @@ const SettingsProfile = (function() {
 				return;
 			}
 
-			this.MEM.userData.profile_img = res.msg.dataUrl;
+			this.MEM.memberData.profile_img = res.msg.dataUrl;
 			let url = res.msg.dataUrl;
 			this.DOM.profile.img.style.backgroundImage = `url('${url}')`;
 
@@ -392,22 +406,26 @@ const SettingsProfile = (function() {
 		
 		// Company
 	
-		this.MEM.userData = userData;
-		let company = this.DOM.company;
+		this.MEM.memberData = memberData;
+		let organization = this.DOM.organization;
 
-		company.company_name.value = userData.company_name;
-		company.company_postcode.value = userData.company_postcode;
-		company.company_address.value = userData.company_address;
-		company.company_building.value = userData.company_building;
-		company.company_department.value = userData.company_department;
-		company.company_tax_id.value = userData.company_tax_id;
+		organization.organization_name.value = memberData.organization_name;
+		organization.organization_postcode.value = memberData.organization_postcode;
+		organization.organization_address.value = memberData.organization_address;
+		organization.organization_building.value = memberData.organization_building;
+		organization.organization_department.value = memberData.organization_department;
+		organization.organization_tax_id.value = memberData.organization_tax_id;
+		organization.addressCountry.value = memberData.addressCountry;
+		organization.addressRegion.value = memberData.addressRegion;
 
-		company.company_name.setAttribute("readonly", "readonly");
-		company.company_postcode.setAttribute("readonly", "readonly");
-		company.company_address.setAttribute("readonly", "readonly");
-		company.company_building.setAttribute("readonly", "readonly");
-		company.company_department.setAttribute("readonly", "readonly");
-		company.company_tax_id.setAttribute("readonly", "readonly");
+		organization.organization_name.setAttribute("readonly", "readonly");
+		organization.organization_postcode.setAttribute("readonly", "readonly");
+		organization.organization_address.setAttribute("readonly", "readonly");
+		organization.organization_building.setAttribute("readonly", "readonly");
+		organization.organization_department.setAttribute("readonly", "readonly");
+		organization.organization_tax_id.setAttribute("readonly", "readonly");
+		organization.addressCountry.setAttribute("readonly", "readonly");
+		organization.addressRegion.setAttribute("readonly", "readonly");
 
 	}
 

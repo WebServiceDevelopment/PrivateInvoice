@@ -34,19 +34,44 @@ const SettingsMenu = (function() {
 			menu : document.getElementById('SettingsMenu.area.menu')
 		},
 		menu : {
-			company : document.getElementById('SettingsMenu.menu.company'),
+			organization : document.getElementById('SettingsMenu.menu.organization'),
 			profile : document.getElementById('SettingsMenu.menu.profile'),
-			contacts : document.getElementById('SettingsMenu.menu.contacts')
+			groups : document.getElementById('SettingsMenu.menu.groups'),
+			security : document.getElementById('SettingsMenu.menu.security'),
+			contacts : document.getElementById('SettingsMenu.menu.contacts'),
+			directory : document.getElementById('SettingsMenu.menu.directory'),
+			wallet : document.getElementById('SettingsMenu.menu.wallet'),
+			activity : document.getElementById('SettingsMenu.menu.activity'),
+			statement : document.getElementById('SettingsMenu.menu.statement'),
+			invite : document.getElementById('SettingsMenu.menu.invite'),
+			api : document.getElementById('SettingsMenu.menu.api'),
+			pro : document.getElementById('SettingsMenu.menu.pro')
 		},
 		pages : {
-			company : document.getElementById('SettingsMenu.pages.company'),
+			organization : document.getElementById('SettingsMenu.pages.organization'),
 			profile : document.getElementById('SettingsMenu.pages.profile'),
-			contacts : document.getElementById('SettingsMenu.pages.contacts')
+			groups : document.getElementById('SettingsMenu.pages.groups'),
+			security : document.getElementById('SettingsMenu.pages.security'),
+			contacts : document.getElementById('SettingsMenu.pages.contacts'),
+			directory : document.getElementById('SettingsMenu.pages.directory'),
+			wallet : document.getElementById('SettingsMenu.pages.wallet'),
+			activity : document.getElementById('SettingsMenu.pages.activity'),
+			statement : document.getElementById('SettingsMenu.pages.statement'),
+			invite : document.getElementById('SettingsMenu.pages.invite'),
+			api : document.getElementById('SettingsMenu.pages.api'),
+			api_details : document.getElementById('SettingsMenu.pages.api_details'),
+			pro : document.getElementById('SettingsMenu.pages.pro')
+		},
+		btns : {
+			createApi : document.getElementById('SettingsMenu.btns.createApi'),	
+			cancelApi : document.getElementById('SettingsMenu.btns.cancelApi')
 		}
 	}
 
 	this.EVT = {
-		handleMenuClick : evt_handleMenuClick.bind(this)
+		handleMenuClick : evt_handleMenuClick.bind(this),
+		handleCreateApiClick : evt_handleCreateApiClick.bind(this),
+		handleCancelApiClick : evt_handleCancelApiClick.bind(this)
 	}
 
 	this.API = {
@@ -59,8 +84,26 @@ const SettingsMenu = (function() {
 
 	function init() {
 		
-		this.API.openPage('company');
+		this.API.openPage('contacts');
+		
 		this.DOM.area.menu.addEventListener('click', this.EVT.handleMenuClick);
+
+		this.DOM.btns.createApi.addEventListener('click', this.EVT.handleCreateApiClick);
+		this.DOM.btns.cancelApi.addEventListener('click', this.EVT.handleCancelApiClick);
+
+	}
+
+	function evt_handleCancelApiClick() {
+		
+		console.log("cancel api");
+		this.API.swapPage("api");
+
+	}
+
+	function evt_handleCreateApiClick() {
+		
+		console.log("create api!!");
+		this.API.swapPage("api_details");
 
 	}
 
@@ -76,8 +119,9 @@ const SettingsMenu = (function() {
 
 	function api_openPage(leaf) {
 
-		console.log("Open : %s", leaf);
+		//console.log("Open : %s", leaf);
 
+		//if(this.MEM.leaf === leaf) {
 		if(this.MEM.getLeaf() === leaf) {
 			return;
 		}
@@ -87,6 +131,14 @@ const SettingsMenu = (function() {
 			this.DOM.activePage.classList.remove("active");
 		}
 
+		switch(leaf) {
+		case "invite":
+			SettingsInvite.API.open();
+			break;
+		}
+
+		//console.log(leaf)
+		//this.MEM.leaf = leaf;
 		this.MEM.setLeaf( leaf );
 		this.DOM.activeMenu = this.DOM.menu[leaf];
 		this.DOM.activePage = this.DOM.pages[leaf];
@@ -98,7 +150,7 @@ const SettingsMenu = (function() {
 
 	function evt_handleMenuClick(evt) {
 
-		console.log("click");
+		//console.log("click");
 
 		let elem = evt.target;
 		while(elem.parentNode && elem.tagName !== "LI") {
@@ -116,13 +168,17 @@ const SettingsMenu = (function() {
 
 		const leaf = id.split(".").pop();
 
-		if(leaf === "back") {
+		switch(leaf) {
+		case "back":
 			TabWidget.API.openSection("supplier");
-			return;
+		return;
+		case "wallet":
+			SettingsWallet.API.loadResentActivity();
+		break;
 		}
+
 		this.API.openPage(leaf);
 
 	}
-
 
 }).apply({});

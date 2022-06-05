@@ -21,52 +21,70 @@
 "use strict";
 
 // Inport
-const sub           = require("./tray_sub.js");
+const sub					= require("./tray_sub.js");
 
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express				= require('express');
+const router				= express.Router();
+module.exports				= router;
 
 // Database
 
-const CLIENT_ARCHIVE_STATUS = "client_status_archive";
-const SUPPLIER_ARCHIVE_STATUS = "supplier_status_archive";
+const BUYER_ARCHIVE_STATUS	= "buyer_status_archive";
+const SELLER_ARCHIVE_STATUS	= "seller_status_archive";
 
-// Total
-router.post('/getTotalClient', async function(req, res) {
+//--------------------------------- End Points --------------------------------
+/*
+ * Total
+ */
+router.post('/getTotalBuyer', async function(req, res) {
 
-    sub.getTotal(req, res, CLIENT_ARCHIVE_STATUS);
-
-});
-router.post('/getTotalSupplier', async function(req, res) {
-
-    sub.getTotal(req, res, SUPPLIER_ARCHIVE_STATUS);
+    sub.getTotal(req, res, BUYER_ARCHIVE_STATUS);
 
 });
 
-// End Points
-router.post('/getCountClient', function(req, res) {
+/*
+ * getTotalSeller
+ */
+router.post('/getTotalSeller', async function(req, res) {
 
-    sub.getCount(req, res, CLIENT_ARCHIVE_STATUS);
-
-});
-
-router.post('/getCountSupplier', function(req, res) {
-
-    sub.getCount(req, res, SUPPLIER_ARCHIVE_STATUS);
+    sub.getTotal(req, res, SELLER_ARCHIVE_STATUS);
 
 });
 
-router.post('/getFolderClient', function(req, res) {
+/*
+ * getCountBuyer
+ */
+router.post('/getCountBuyer', function(req, res) {
 
-    sub.getFolder(req, res, CLIENT_ARCHIVE_STATUS);
+    sub.getCount(req, res, BUYER_ARCHIVE_STATUS);
 
 });
 
-router.post('/getFolderSupplier', function(req, res) {
+/*
+ * getCountSeller
+ */
+router.post('/getCountSeller', function(req, res) {
 
-    sub.getFolder(req, res, SUPPLIER_ARCHIVE_STATUS);
+    sub.getCount(req, res, SELLER_ARCHIVE_STATUS);
+
+});
+
+/*
+ * getFolderBuyer
+ */
+router.post('/getFolderBuyer', function(req, res) {
+
+    sub.getFolder(req, res, BUYER_ARCHIVE_STATUS);
+
+});
+
+/*
+ * getFolderSeller
+ */
+router.post('/getFolderSeller', function(req, res) {
+
+    sub.getFolder(req, res, SELLER_ARCHIVE_STATUS);
 
 });
