@@ -1,6 +1,6 @@
 -- MariaDB dump 10.19  Distrib 10.5.13-MariaDB, for Linux (x86_64)
 --
--- Host: localhost    Database: Seller_450
+-- Host: localhost    Database: Buyer_490
 -- ------------------------------------------------------
 -- Server version	10.5.13-MariaDB
 
@@ -118,6 +118,40 @@ CREATE TABLE `buyer_status_archive` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `buyer_status_draft`
+--
+
+DROP TABLE IF EXISTS `buyer_status_draft`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `buyer_status_draft` (
+  `document_uuid` varchar(100) NOT NULL,
+  `document_type` varchar(100) NOT NULL,
+  `document_number` varchar(36) NOT NULL,
+  `document_folder` varchar(36) NOT NULL,
+  `seller_uuid` varchar(100) NOT NULL,
+  `seller_membername` varchar(255) DEFAULT NULL,
+  `seller_organization` varchar(255) DEFAULT NULL,
+  `seller_archived` int(11) NOT NULL DEFAULT 0,
+  `seller_last_action` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `buyer_uuid` varchar(100) DEFAULT NULL,
+  `buyer_membername` varchar(255) DEFAULT NULL,
+  `buyer_organization` varchar(255) DEFAULT NULL,
+  `buyer_archived` int(11) NOT NULL DEFAULT 0,
+  `buyer_last_action` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created_from` varchar(36) DEFAULT NULL,
+  `root_document` varchar(36) DEFAULT NULL,
+  `created_on` datetime NOT NULL DEFAULT current_timestamp(),
+  `removed_on` datetime DEFAULT NULL,
+  `opened` int(11) NOT NULL DEFAULT 0,
+  `subject_line` varchar(255) DEFAULT NULL,
+  `due_by` date DEFAULT NULL,
+  `amount_due` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`document_uuid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `contacts`
 --
 
@@ -209,9 +243,11 @@ CREATE TABLE `members` (
   `organization_name` varchar(255) NOT NULL,
   `organization_postcode` varchar(255) DEFAULT NULL,
   `organization_address` varchar(255) DEFAULT NULL,
-  `organization_building` varchar(255) DEFAULT NULL,
+  `organization_building` varchar(255) DEFAULT '',
   `organization_department` varchar(255) DEFAULT NULL,
   `organization_tax_id` varchar(32) DEFAULT NULL,
+  `addressCountry` varchar(50) DEFAULT '',
+  `addressRegion` varchar(21) DEFAULT '',
   `wallet_address` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`member_uuid`) USING BTREE,
   UNIQUE KEY `username` (`membername`) USING BTREE
@@ -406,4 +442,4 @@ CREATE TABLE `seller_status_draft` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-05-29 10:36:02
+-- Dump completed on 2022-06-05  9:49:04
