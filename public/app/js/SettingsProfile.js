@@ -37,11 +37,13 @@ const SettingsProfile = (function() {
 		},
 		organization : {
 			organization_name : document.getElementById('SettingsProfile.organization.organization_name'),
+			organization_postcode : document.getElementById('SettingsProfile.organization.organization_postcode'),
 			organization_address : document.getElementById('SettingsProfile.organization.organization_address'),
 			organization_building : document.getElementById('SettingsProfile.organization.organization_building'),
 			organization_department : document.getElementById('SettingsProfile.organization.organization_department'),
 			organization_tax_id : document.getElementById('SettingsProfile.organization.organization_tax_id'),
-			organization_postcode : document.getElementById('SettingsProfile.organization.organization_postcode'),
+			addressCountry: document.getElementById('SettingsProfile.organization.addressCountry'),
+			addressRegion : document.getElementById('SettingsProfile.organization.addressRegion'),
 			edit : document.getElementById('SettingsProfile.organization.edit'),
 			save : document.getElementById('SettingsProfile.organization.save'), 
 			cancel : document.getElementById('SettingsProfile.organization.cancel')
@@ -114,7 +116,9 @@ const SettingsProfile = (function() {
 			organization_address : memberData.organization_address,
 			organization_building : memberData.organization_building,
 			organization_department : memberData.organization_department,
-			organization_tax_id : memberData.organization_tax_id
+			organization_tax_id : memberData.organization_tax_id,
+			addressCountry : memberData.addressCountry,
+			addressRegion : memberData.addressRegion,
 		}
 
 		let ajax = new XMLHttpRequest();
@@ -147,6 +151,8 @@ const SettingsProfile = (function() {
 		organization.organization_building.removeAttribute("readonly");
 		organization.organization_department.removeAttribute("readonly");
 		organization.organization_tax_id.removeAttribute("readonly");
+		organization.addressCountry.removeAttribute("readonly");
+		organization.addressRegion.removeAttribute("readonly");
 
 		organization.organization_name.focus();
 
@@ -172,10 +178,12 @@ const SettingsProfile = (function() {
 
 		memberData.organization_name		= organization.organization_name.value;
 		memberData.organization_postcode	= organization.organization_postcode.value;
-		memberData.organization_address	= organization.organization_address.value;
+		memberData.organization_address		= organization.organization_address.value;
 		memberData.organization_building	= organization.organization_building.value;
-		memberData.organization_department = organization.organization_department.value;
+		memberData.organization_department	= organization.organization_department.value;
 		memberData.organization_tax_id		= organization.organization_tax_id.value;
+		memberData.addressCountry			= organization.addressCountry.value;
+		memberData.addressRegion			= organization.addressRegion.value;
 
 		organization.organization_name.setAttribute("readonly", "readonly");
 		organization.organization_postcode.setAttribute("readonly", "readonly");
@@ -183,6 +191,8 @@ const SettingsProfile = (function() {
 		organization.organization_building.setAttribute("readonly", "readonly");
 		organization.organization_department.setAttribute("readonly", "readonly");
 		organization.organization_tax_id.setAttribute("readonly", "readonly");
+		organization.addressCountry.setAttribute("readonly", "readonly");
+		organization.addressRegion.setAttribute("readonly", "readonly");
 
 		this.API.updateCompanyProfile()
 
@@ -201,10 +211,12 @@ const SettingsProfile = (function() {
 
 		organization.organization_name.value		= memberData.organization_name;
 		organization.organization_postcode.value	= memberData.organization_postcode;
-		organization.organization_address.value	= memberData.organization_address;
+		organization.organization_address.value		= memberData.organization_address;
 		organization.organization_building.value	= memberData.organization_building;
-		organization.organization_department.value = memberData.organization_department;
-		organization.organization_tax_id.value	= memberData.organization_tax_id;
+		organization.organization_department.value	= memberData.organization_department;
+		organization.organization_tax_id.value		= memberData.organization_tax_id;
+		organization.addressCountry.value			= memberData.addressCountry;
+		organization.addressRegion.value			= memberData.addressRegion;
 
 		organization.organization_name.setAttribute("readonly", "readonly");
 		organization.organization_postcode.setAttribute("readonly", "readonly");
@@ -212,6 +224,8 @@ const SettingsProfile = (function() {
 		organization.organization_building.setAttribute("readonly", "readonly");
 		organization.organization_department.setAttribute("readonly", "readonly");
 		organization.organization_tax_id.setAttribute("readonly", "readonly");
+		organization.addressCountry.setAttribute("readonly", "readonly");
+		organization.addressRegion.setAttribute("readonly", "readonly");
 
 	}
 
@@ -401,6 +415,8 @@ const SettingsProfile = (function() {
 		organization.organization_building.value = memberData.organization_building;
 		organization.organization_department.value = memberData.organization_department;
 		organization.organization_tax_id.value = memberData.organization_tax_id;
+		organization.addressCountry.value = memberData.addressCountry;
+		organization.addressRegion.value = memberData.addressRegion;
 
 		organization.organization_name.setAttribute("readonly", "readonly");
 		organization.organization_postcode.setAttribute("readonly", "readonly");
@@ -408,6 +424,8 @@ const SettingsProfile = (function() {
 		organization.organization_building.setAttribute("readonly", "readonly");
 		organization.organization_department.setAttribute("readonly", "readonly");
 		organization.organization_tax_id.setAttribute("readonly", "readonly");
+		organization.addressCountry.setAttribute("readonly", "readonly");
+		organization.addressRegion.setAttribute("readonly", "readonly");
 
 	}
 
