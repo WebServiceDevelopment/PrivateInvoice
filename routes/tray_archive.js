@@ -21,50 +21,68 @@
 "use strict";
 
 // Inport
-const sub				= require("./tray_sub.js");
+const sub					= require("./tray_sub.js");
 
 // Import Router
 
-const express			= require('express');
-const router			= express.Router();
-module.exports			= router;
+const express				= require('express');
+const router				= express.Router();
+module.exports				= router;
 
 // Database
 
 const BUYER_ARCHIVE_STATUS	= "buyer_status_archive";
 const SELLER_ARCHIVE_STATUS	= "seller_status_archive";
 
-// Total
+//--------------------------------- End Points --------------------------------
+/*
+ * Total
+ */
 router.post('/getTotalBuyer', async function(req, res) {
 
     sub.getTotal(req, res, BUYER_ARCHIVE_STATUS);
 
 });
+
+/*
+ * getTotalSeller
+ */
 router.post('/getTotalSeller', async function(req, res) {
 
     sub.getTotal(req, res, SELLER_ARCHIVE_STATUS);
 
 });
 
-// End Points
+/*
+ * getCountBuyer
+ */
 router.post('/getCountBuyer', function(req, res) {
 
     sub.getCount(req, res, BUYER_ARCHIVE_STATUS);
 
 });
 
+/*
+ * getCountSeller
+ */
 router.post('/getCountSeller', function(req, res) {
 
     sub.getCount(req, res, SELLER_ARCHIVE_STATUS);
 
 });
 
+/*
+ * getFolderBuyer
+ */
 router.post('/getFolderBuyer', function(req, res) {
 
     sub.getFolder(req, res, BUYER_ARCHIVE_STATUS);
 
 });
 
+/*
+ * getFolderSeller
+ */
 router.post('/getFolderSeller', function(req, res) {
 
     sub.getFolder(req, res, SELLER_ARCHIVE_STATUS);

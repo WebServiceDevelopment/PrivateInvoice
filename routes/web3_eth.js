@@ -26,15 +26,15 @@ const config                    = require('../config.json');
 // Database Libraries
 
 // web3.js
-const Web3 = require('web3');
+const Web3						= require('web3');
 
-const web3 = new Web3();
+const web3						= new Web3();
 
-const URL = config.GANACHE_ADDRESS;
+const URL						= config.GANACHE_ADDRESS;
 
 web3.setProvider(new web3.providers.HttpProvider(URL));
 
-web3.eth.defaultAccount = process.env.ACCOUNT;
+web3.eth.defaultAccount			= process.env.ACCOUNT;
 
 
 // Exports 

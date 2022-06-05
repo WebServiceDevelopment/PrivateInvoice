@@ -23,6 +23,9 @@
   "homepage": "https://PrivateInvoice.io",
   "dependencies": {
     "@ethereumjs/common": "^2.6.4",
+    "@transmute/credentials-context": "^0.7.0-unstable.60",
+    "@transmute/ed25519-signature-2018": "^0.7.0-unstable.60",
+    "@transmute/vc.js": "^0.7.0-unstable.60",
     "axios": "^0.27.1",
     "bcrypt": "^5.0.1",
     "binary-uuid": "^2.0.3",

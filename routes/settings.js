@@ -22,20 +22,23 @@
 
 // Import Router
 
-const express = require('express');
-const router = express.Router();
-module.exports = router;
+const express				= require('express');
+const router				= express.Router();
+module.exports				= router;
 
 // Libraries
 
-const uuidv1 = require('uuid').v1;
+const uuidv1				= require('uuid').v1;
 
 // Database
 
-const db = require('../database.js');
+const db					= require('../database.js');
 
 // End Points
 
+/*
+ * setProfileImage
+ */
 router.post('/setProfileImage', async function(req, res) {
 
 	const avatar_uuid = uuidv1();
@@ -90,6 +93,9 @@ router.post('/setProfileImage', async function(req, res) {
 
 });
 
+/*
+ * setCompanyLogo
+ */
 router.post('/setCompanyLogo', async function(req, res) {
 
 	const logo_uuid = uuidv1();
@@ -144,6 +150,9 @@ router.post('/setCompanyLogo', async function(req, res) {
 
 });
 
+/*
+ * getProfileImage
+ */
 router.post('/getProfileImage', async function(req, res) {
 
 	let sql = `
@@ -179,6 +188,9 @@ router.post('/getProfileImage', async function(req, res) {
 
 });
 
+/*
+ * getCompanyLogo
+ */
 router.post('/getCompanyLogo', async function(req, res) {
 
 	let sql = `
