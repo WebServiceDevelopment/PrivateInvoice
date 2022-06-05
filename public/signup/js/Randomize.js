@@ -36,7 +36,8 @@ const Randomize = (function() {
 
 	this.API = {
 		generateRandomCompany : api_generateRandomCompany.bind(this),
-		generateRandomTaxId : api_generateRandomTaxId.bind(this)
+		generateRandomTaxId : api_generateRandomTaxId.bind(this),
+		generatePassword : api_generatePassword.bind(this)
 	}
 
 	init.apply(this);
@@ -49,18 +50,49 @@ const Randomize = (function() {
 
 	}
 
-	function evt_handleCompanyClick() {
+	async function evt_handleCompanyClick() {
+
+		let req;
+
+		req = await fetch('data/usaCities.json');
+		const cities = await req.json();
+		const { city, state } = cities[Math.floor(cities.length * Math.random())];
 
 		const data = {
 			company_name : this.API.generateRandomCompany(),
-			company_tax_id : this.API.generateRandomTaxId()
+			company_tax_id : this.API.generateRandomTaxId(),
+			country : "USA",
+			state: state,
+			city: city,
+			postcode : "123-4567",
+			line1 : "123 Fake Street",
+			line2 : "Suite 109"
 		}
+
 		SignupForm.API.setCompanyData(data);
 
 	}
 
-	function evt_handleMemberClick() {
+	async function evt_handleMemberClick() {
+		
+		let req;
 
+		req = await fetch('data/names.json');
+		const names = await req.json();
+		const name = names[Math.floor(names.length * Math.random())];
+
+		req = await fetch('data/jobtitles.json');
+		const titles = await req.json();
+		const title = titles[Math.floor(titles.length * Math.random())];
+
+		const data = {
+			member_name : name.toLowerCase(),
+			job_title : title,
+			contact_email : `${name.toLowerCase()}@example.com`,
+			password : this.API.generatePassword()
+		}
+		
+		SignupForm.API.setMemberData(data);
 
 	}
 
@@ -127,9 +159,29 @@ const Randomize = (function() {
 	
 	function api_generateRandomTaxId() {
 
-		const prefix = Math.floor(Math.random() * 100);
-		const postfix = Math.floor(Math.random() * 10000000);
+		let prefix = Math.floor(Math.random() * 100).toString();
+		while(prefix.length < 2) {
+			prefix = "0" + prefix;
+		}
+
+		let postfix = Math.floor(Math.random() * 10000000).toString();
+		while(postfix.length < 2) {
+			postfix = "0" + postfix;
+		}
+
 		return `${prefix}-${postfix}`;
+
+	}
+
+	function api_generatePassword() {
+
+		const length = 8;
+		const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		let pass = "";
+		for (let i = 0, n = charset.length; i < length; ++i) {
+			pass += charset.charAt(Math.floor(Math.random() * n));
+		}
+		return pass;
 
 	}
 

@@ -81,7 +81,7 @@
 
 						<div class="field">
 							<label class="placeholder required">Company Country</label>
-							<input type="text" id="SignupForm.address.company" autocomplete="off"/>
+							<input type="text" id="SignupForm.address.country" autocomplete="off"/>
 							<div class="underline"></div>
 						</div>
 
@@ -98,13 +98,19 @@
 						</div>
 
 						<div class="field">
+							<label class="placeholder required">Company City</label>
+							<input type="text" id="SignupForm.address.city" autocomplete="off"/>
+							<div class="underline"></div>
+						</div>
+
+						<div class="field">
 							<label class="placeholder required">Company Address Line 1</label>
 							<input type="text" id="SignupForm.address.line1" autocomplete="off"/>
 							<div class="underline"></div>
 						</div>
 
 						<div class="field">
-							<label class="placeholder required">Company Address Line 2</label>
+							<label class="placeholder">Company Address Line 2</label>
 							<input type="text" id="SignupForm.address.line2" autocomplete="off"/>
 							<div class="underline"></div>
 						</div>
@@ -160,13 +166,13 @@
 							<div class="underline"></div>
 							<div class='helper'>Minimum 8 characters in length, must contain a letter and number</div>
 							<div class='icon'>
-								<img src='img/visibility.png'/>
+								<img id='SignupForm.visible' src='img/visibility_off.png'/>
 							</div>
 						</div>
 
 						<div class="field">
 							<label class="placeholder required">Confirm Password</label>
-							<input type="password" id="SignupForm.member.confirmPassword" autocomplete="off"/>
+							<input type="password" id="SignupForm.member.confirm_password" autocomplete="off"/>
 							<div class="underline"></div>
 							<div class='helper'>Please re-enter your password to make sure you remember it</div>
 						</div>
