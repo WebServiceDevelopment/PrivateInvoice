@@ -237,22 +237,21 @@ CREATE TABLE `members` (
   `membername` varchar(255) NOT NULL,
   `job_title` varchar(50) NOT NULL DEFAULT '',
   `work_email` varchar(255) NOT NULL,
-  `password_hash` varchar(255) DEFAULT NULL,
-  `avatar_uuid` varchar(100) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `avatar_uuid` varchar(100) DEFAULT NULL,
   `created_on` datetime NOT NULL DEFAULT current_timestamp(),
-  `logo_uuid` varchar(100) NOT NULL,
+  `logo_uuid` varchar(100) DEFAULT NULL,
   `organization_name` varchar(255) NOT NULL,
-  `organization_postcode` varchar(255) DEFAULT NULL,
-  `organization_address` varchar(255) DEFAULT NULL,
+  `organization_postcode` varchar(255) DEFAULT '',
+  `organization_address` varchar(255) DEFAULT '',
   `organization_building` varchar(255) DEFAULT '',
-  `organization_department` varchar(255) DEFAULT NULL,
-  `organization_tax_id` varchar(32) DEFAULT NULL,
+  `organization_department` varchar(255) DEFAULT '',
+  `organization_tax_id` varchar(32) DEFAULT '',
   `addressCountry` varchar(50) DEFAULT '',
   `addressRegion` varchar(25) DEFAULT '',
   `addressCity` varchar(25) DEFAULT '',
-  `wallet_address` varchar(255) DEFAULT NULL,
-  PRIMARY KEY (`member_uuid`) USING BTREE,
-  UNIQUE KEY `username` (`membername`) USING BTREE
+  `wallet_address` varchar(255) DEFAULT '',
+  PRIMARY KEY (`member_uuid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

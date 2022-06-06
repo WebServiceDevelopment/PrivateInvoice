@@ -44,10 +44,9 @@ const wallet				= require('@sidetree/wallet')
 const createDid = async ( mnemonic ) => {
 
 	const keyType = 'Ed25519';
-
 	const publicKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/0/0");
-	const recoveryKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/0/1");
-	const updateKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/0/2");
+	const recoveryKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/1/0");
+	const updateKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/2/0");
 
 	const createOperation = await wallet.operations.create({
 		document : {
@@ -58,27 +57,79 @@ const createDid = async ( mnemonic ) => {
 					publicKeyJwk: publicKey.publicKeyJwk,
 					purposes: ['authentication', 'assertionMethod']
 				}
-			],
-			services: []
+			]
 		},
 		recoveryKey : recoveryKey.publicKeyJwk,
 		updateKey : updateKey.publicKeyJwk
 	});
 
 	const didUniqueSuffix = wallet.computeDidUniqueSuffix(createOperation.suffixData);
-
-	const host = 'https://ganache.privateinvoice.io/';
+	const id = `did:elem:ganache${didUniqueSuffix}`
+	const host = 'http://localhost:4000';
 	const url = `${host}/api/1.0/operations`;
-	const { status, data } = await axios.post(url, createOperation);
+	
+	try {
+		await axios.post(url, createOperation);
+	} catch(err) {
+		return [ null, err ];
+	}
 
-	console.log(status);
-	console.log(data);
-	console.log(didUniqueSuffix);
+	const keys = {
+		id,
+		publicKey,
+		recoveryKey,
+		updateKey
+	};
+		
 
-	return `did:elem:ganache${didUniqueSuffix}`;
+	return [ keys, null ];
 
 }
 
+
+const insertMember = (mnemonic, id, publicKey, req.body) => {
+
+
+	let sql = `
+		INSERT INTO members (
+		) VALUES (
+		)
+	`;
+
+	console.log(req.body);
+	console.log('Before hash');
+	console.log(req.body.account.password);
+
+	try {
+		req.body.hash = await db.hash(req.body.account.password);
+	} catch(err) {
+		throw err;
+	}
+
+	console.log('after hash');
+
+	console.log(mnemonic);
+
+
+	let args = [
+		member_uuid,
+		req.body.account.membername,
+		req.body.account.job_title,
+		req.body.account.work_email,
+		req.body.hash,
+		req.body.organization.name,
+		req.body.organization.postcode,
+		req.body.organization.address,
+		req.body.organization.building,
+		req.body.organization.department,
+		req.body.organization.organization_tax_id,
+		req.body.organization.addressCountry,
+		req.body.organization.addressRegion,
+		req.body.organization.addressCity,
+		mnemonic
+	];
+
+}
 
 
 // End Points
@@ -301,8 +352,23 @@ router.post('/login', async function(req, res) {
 
 router.post('/signup', async function(req, res) {
 
+	// First we generate a mnemonic for the organization
+
 	const mnemonic = bip39.generateMnemonic();
-	const did = await createDid(mnemonic);
+
+	// Then we generare a did from the first index
+
+	const [ keys, err1 ] = await createDid(mnemonic);
+	if(err1) {
+		return res.status(500).json({
+			err : 1,
+			msg : 'Could not anchor did'
+		});
+	}
+	
+	const { id, publicKey } = keys;
+
+	const [ err2 ] = await insertMember(mnemonic, id, publicKey, req.body);
 
 	res.json({
 		err : 1,
@@ -312,79 +378,6 @@ router.post('/signup', async function(req, res) {
 	/*
 
 	// First we insert into the database
-
-	const member_uuid = uuidv1();
-
-	let sql = `
-		INSERT INTO members (
-			member_uuid,
-			membername,
-			job_title,
-			work_email,
-			password_hash,
-			organization_name,
-			organization_postcode,
-			organization_address,
-			organization_building,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			addressCity,
-			wallet_address,
-			avatar_uuid,
-			logo_uuid
-		) VALUES (
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			'',
-			''
-		)
-	`;
-
-	console.log(req.body);
-	console.log('Before hash');
-	console.log(req.body.account.password);
-
-	try {
-		req.body.hash = await db.hash(req.body.account.password);
-	} catch(err) {
-		throw err;
-	}
-
-	console.log('after hash');
-
-	console.log(mnemonic);
-
-
-	let args = [
-		member_uuid,
-		req.body.account.membername,
-		req.body.account.job_title,
-		req.body.account.work_email,
-		req.body.hash,
-		req.body.organization.name,
-		req.body.organization.postcode,
-		req.body.organization.address,
-		req.body.organization.building,
-		req.body.organization.department,
-		req.body.organization.organization_tax_id,
-		req.body.organization.addressCountry,
-		req.body.organization.addressRegion,
-		req.body.organization.addressCity,
-		mnemonic
-	];
 
 	try {
 		await db.insert(sql, args);
