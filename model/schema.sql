@@ -251,7 +251,8 @@ CREATE TABLE `members` (
   `addressRegion` varchar(25) DEFAULT '',
   `addressCity` varchar(25) DEFAULT '',
   `wallet_address` varchar(255) DEFAULT '',
-  PRIMARY KEY (`member_uuid`) USING BTREE
+  PRIMARY KEY (`member_uuid`) USING BTREE,
+  UNIQUE KEY `username` (`membername`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
