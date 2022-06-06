@@ -1,6 +1,6 @@
 -- MariaDB dump 10.19  Distrib 10.5.13-MariaDB, for Linux (x86_64)
 --
--- Host: localhost    Database: Buyer_490
+-- Host: localhost    Database: Buyer_515
 -- ------------------------------------------------------
 -- Server version	10.5.13-MariaDB
 
@@ -235,6 +235,7 @@ DROP TABLE IF EXISTS `members`;
 CREATE TABLE `members` (
   `member_uuid` varchar(100) NOT NULL,
   `membername` varchar(255) NOT NULL,
+  `job_title` varchar(50) NOT NULL DEFAULT '',
   `work_email` varchar(255) NOT NULL,
   `password_hash` varchar(255) DEFAULT NULL,
   `avatar_uuid` varchar(100) NOT NULL,
@@ -247,7 +248,8 @@ CREATE TABLE `members` (
   `organization_department` varchar(255) DEFAULT NULL,
   `organization_tax_id` varchar(32) DEFAULT NULL,
   `addressCountry` varchar(50) DEFAULT '',
-  `addressRegion` varchar(21) DEFAULT '',
+  `addressRegion` varchar(25) DEFAULT '',
+  `addressCity` varchar(25) DEFAULT '',
   `wallet_address` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`member_uuid`) USING BTREE,
   UNIQUE KEY `username` (`membername`) USING BTREE
@@ -442,4 +444,4 @@ CREATE TABLE `seller_status_draft` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-06-05  9:49:04
+-- Dump completed on 2022-06-06 11:08:34
