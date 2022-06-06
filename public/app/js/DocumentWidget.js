@@ -72,6 +72,7 @@ const DocumentWidget = (function() {
 			organization_building : document.getElementById('DocumentWidget.from.organization_building'),
 			organization_department : document.getElementById('DocumentWidget.from.organization_department'),
 			addressRegion : document.getElementById('DocumentWidget.from.addressRegion'),
+			addressCity : document.getElementById('DocumentWidget.from.addressCity'),
 			addressCountry : document.getElementById('DocumentWidget.from.addressCountry')
 		},
 
@@ -81,6 +82,7 @@ const DocumentWidget = (function() {
 			organization_building : document.getElementById('DocumentWidget.to.organization_building'),
 			organization_department : document.getElementById('DocumentWidget.to.organization_department'),
 			addressRegion : document.getElementById('DocumentWidget.to.addressRegion'),
+			addressCity : document.getElementById('DocumentWidget.to.addressCity'),
 			addressCountry : document.getElementById('DocumentWidget.to.addressCountry')
 		},
 
@@ -311,6 +313,7 @@ const DocumentWidget = (function() {
 		f( this.DOM.from.organization_building );
 		f( this.DOM.from.organization_department );
 		f( this.DOM.from.addressRegion );
+		f( this.DOM.from.addressCity );
 		f( this.DOM.from.addressCountry );
 
 		f( this.DOM.to.organization_name );
@@ -318,6 +321,7 @@ const DocumentWidget = (function() {
 		f( this.DOM.to.organization_building );
 		f( this.DOM.to.organization_department );
 		f( this.DOM.to.addressRegion );
+		f( this.DOM.to.addressCity );
 		f( this.DOM.to.addressCountry );
 	}
 
@@ -331,6 +335,7 @@ const DocumentWidget = (function() {
 			this.DOM.to.organization_building.value = memberData.organization_building || "";
 			this.DOM.to.organization_department.value = memberData.organization_department || "";
 			this.DOM.to.addressRegion.value = memberData.addressRegion || "";
+			this.DOM.to.addressCity.value = memberData.addressCity || "";
 			this.DOM.to.addressCountry.value = memberData.addressCountry || "";
 		} else {
 			this.MEM.document.buyer_uuid = null;
@@ -339,6 +344,7 @@ const DocumentWidget = (function() {
 			this.DOM.to.organization_building.value = "";
 			this.DOM.to.organization_department.value = "";
 			this.DOM.to.addressRegion.value = "";
+			this.DOM.to.addressCity.value = "";
 			this.DOM.to.addressCountry.value = "";
 		}
 
@@ -1338,6 +1344,7 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			this.DOM.to.organization_building.value = sd.organization_building;
 			this.DOM.to.organization_department.value = sd.organization_department;
 			this.DOM.to.addressRegion.value = sd.addressRegion;
+			this.DOM.to.addressCity.value = sd.addressCity;
 			this.DOM.to.addressCountry.value = sd.addressCountry;
 				
 			let cd = this.MEM.document.buyer_details;
@@ -1346,6 +1353,7 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			this.DOM.from.organization_building.value = cd.organization_building || "";
 			this.DOM.from.organization_department.value = cd.organization_department || "";
 			this.DOM.from.addressRegion.value = cd.addressRegion || "";
+			this.DOM.from.addressCity.value = cd.addressCity || "";
 			this.DOM.from.addressCountry.value = cd.addressCountry || "";
 
 		} else {
@@ -1357,8 +1365,9 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 				this.DOM.from.organization_address.value = sd.organization_address;
 				this.DOM.from.organization_building.value = sd.organization_building;
 				this.DOM.from.organization_department.value = sd.organization_department;
-				this.DOM.from.addressRegion.value = sd.addressRegion;
-				this.DOM.from.addressCountry.value = sd.addressCountry;
+				this.DOM.from.addressRegion.value = sd.addressRegion || "";
+				this.DOM.from.addressCity.value = sd.addressCity || "";
+				this.DOM.from.addressCountry.value = sd.addressCountry || "";
 
 			} else {
 
@@ -1367,6 +1376,7 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 				this.DOM.from.organization_building.value = "";
 				this.DOM.from.organization_department.value = "";
 				this.DOM.from.addressRegion.value = "";
+				this.DOM.from.addressCity.value = "";
 				this.DOM.from.addressCountry.value = "";
 
 			}
@@ -1379,6 +1389,7 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 				this.DOM.to.organization_building.value = cd.organization_building || "";
 				this.DOM.to.organization_department.value = cd.organization_department || "";
 				this.DOM.to.addressRegion.value = cd.addressRegion || "";
+				this.DOM.to.addressCity.value = cd.addressCity || "";
 				this.DOM.to.addressCountry.value = cd.addressCountry || "";
 
 			} else {
@@ -1388,6 +1399,7 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 				this.DOM.to.organization_building.value = "";
 				this.DOM.to.organization_department.value = "";
 				this.DOM.to.addressRegion.value = "";
+				this.DOM.to.addressCity.value = "";
 				this.DOM.to.addressCountry.value = "";
 
 			}
@@ -1421,6 +1433,7 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			f( this.DOM.from.organization_building );
 			f( this.DOM.from.organization_department );
 			f( this.DOM.from.addressRegion );
+			f( this.DOM.from.addressCity );
 			f( this.DOM.from.addressCountry );
 
 			f( this.DOM.to.organization_name );
@@ -1428,6 +1441,7 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			f( this.DOM.to.organization_building );
 			f( this.DOM.to.organization_department );
 			f( this.DOM.to.addressRegion );
+			f( this.DOM.to.addressCity );
 			f( this.DOM.to.addressCountry );
 
 		}
