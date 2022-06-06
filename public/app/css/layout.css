@@ -2754,12 +2754,13 @@ main.app section article div.document div.paper div.content div.paddr ul li.text
 
 }
 
+main.app section article div.document div.paper div.content div.paddr ul li.text input.city  ,
 main.app section article div.document div.paper div.content div.paddr ul li.text input.country  ,
 main.app section article div.document div.paper div.content div.paddr ul li.text input.region  {
 
 	border: none;
 	background-color: transparent;
-	width: 120px;
+	width: 110px;
 
 }
 

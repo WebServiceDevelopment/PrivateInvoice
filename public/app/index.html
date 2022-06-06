@@ -2897,7 +2897,20 @@
 												</td>
 												<td>
 												<div class="input">
-													<input type="text" placeholder="1234567890123" id="SettingsProfile.organization.addressRegion"/>
+													<input type="text" placeholder="Region" id="SettingsProfile.organization.addressRegion"/>
+												</div>
+												</td>
+												<td>
+													<p></p>
+												</td>
+											</tr>
+											<tr>
+												<td>
+												<label>City :</label>
+												</td>
+												<td>
+												<div class="input">
+													<input type="text" placeholder="City" id="SettingsProfile.organization.addressCity"/>
 												</div>
 												</td>
 												<td>
@@ -2991,6 +3004,20 @@
 												</td>
 												<td>
 												This is your member uuid for reference.
+												</td>
+											</tr>
+
+											<tr>
+												<td>
+												<label>Job Title :</label>
+												</td>
+												<td>
+												<div class="input">
+													<input type="text" placeholder="" id="SettingsProfile.profile.job_title" readonly="readonly"/>
+												</div>
+												</td>
+												<td>
+												This is your job title.
 												</td>
 											</tr>
 
@@ -3613,6 +3640,9 @@
 													</li>
 													<li class="text">
 													<span>
+								<input type="text" class="city" id="DocumentWidget.to.addressCity" value="" placeholder="City"/>
+													</span>
+													<span>
 								<input type="text" class="region" id="DocumentWidget.to.addressRegion" value="" placeholder="Region"/>
 													</span>
 													<span>
@@ -3641,6 +3671,9 @@
 								<input type="text" id="DocumentWidget.from.organization_department" value="" placeholder="Organization Department"/>
 													</li>
 													<li class="text">
+													<span>
+								<input type="text" class="city" id="DocumentWidget.from.addressCity" value="" placeholder="City"/>
+													</span>
 													<span>
 								<input type="text" class="region" id="DocumentWidget.from.addressRegion" value="" placeholder="Region"/>
 													</span>
