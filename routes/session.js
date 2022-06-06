@@ -86,48 +86,191 @@ const createDid = async ( mnemonic ) => {
 
 }
 
+const insertMnemonic = async (organization_id, mnemonic) => {
 
-const insertMember = (mnemonic, id, publicKey, req.body) => {
-
-
-	let sql = `
-		INSERT INTO members (
+	const sql = `
+		INSERT INTO mnemonics (
+			organization_did,
+			recovery_phrase
 		) VALUES (
+			?,
+			?
 		)
 	`;
 
-	console.log(req.body);
-	console.log('Before hash');
-	console.log(req.body.account.password);
+	const args = [
+		organization_id,
+		mnemonic
+	];
 
 	try {
-		req.body.hash = await db.hash(req.body.account.password);
+		await db.insert(sql, args);
+	} catch(err) {
+		return [err];
+	}
+
+	return [ null ];
+
+}
+
+const insertPrivateKeys = async (keys) => {
+
+ 	const {
+		id,
+		publicKey,
+		recoveryKey,
+		updateKey
+	} = keys;
+
+	const sql = `
+		INSERT INTO privatekeys (
+			member_did,
+			public_key,
+			update_key,
+			recovery_key
+		) VALUES (
+			?,
+			?,
+			?,
+			?
+		)
+	`;
+
+	const args = [
+		id, 
+		JSON.stringify(publicKey),
+		JSON.stringify(updateKey),
+		JSON.stringify(recoveryKey)
+	];
+
+	try {
+		await db.insert(sql, args);
+	} catch(err) {
+		return [err];
+	}
+
+	return [ null ];
+
+}
+
+
+const insertMember = async (member_did, body) => {
+
+	// Then insert into database
+
+	const sql = `
+		INSERT INTO members (
+			member_uuid,
+			membername,
+			job_title,
+			work_email,
+			password_hash,
+
+			organization_name,
+			organization_department,
+			organization_tax_id,
+
+			addressCountry,
+			addressRegion,
+			organization_postcode,
+			addressCity,
+			organization_address,
+			organization_building
+		) VALUES (
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?
+		)
+	`;
+
+	// Deconstruct postbody arguments
+
+	const { member, company, address } = body;
+
+	// First Create Password Hash
+
+	let password_hash;
+	try {
+		password_hash = await db.hash(member.password);
 	} catch(err) {
 		throw err;
 	}
 
-	console.log('after hash');
-
-	console.log(mnemonic);
-
-
-	let args = [
-		member_uuid,
-		req.body.account.membername,
-		req.body.account.job_title,
-		req.body.account.work_email,
-		req.body.hash,
-		req.body.organization.name,
-		req.body.organization.postcode,
-		req.body.organization.address,
-		req.body.organization.building,
-		req.body.organization.department,
-		req.body.organization.organization_tax_id,
-		req.body.organization.addressCountry,
-		req.body.organization.addressRegion,
-		req.body.organization.addressCity,
-		mnemonic
+	// Construct arguments
+	
+	const args = [
+		member_did,
+		member.membername,
+		member.job_title,
+		member.contact_email,
+		password_hash,
+		company.name,
+		company.department,
+		company.tax_id,
+		address.country,
+		address.region,
+		address.postcode,
+		address.city,
+		address.line1,
+		address.line2
 	];
+
+	try {
+		await db.insert(sql, args);
+	} catch(err) {
+		return [err];
+	}
+
+	return [ null ];
+
+}
+
+const getSessionData = async(member_did) => {
+
+	const sql = `
+		SELECT
+			member_uuid,
+			membername,
+			job_title,
+			work_email,
+			password_hash,
+			organization_name,
+			organization_postcode,
+			organization_address,
+			organization_building,
+			organization_department,
+			organization_tax_id,
+			addressCountry,
+			addressRegion,
+			addressCity,
+			created_on
+		FROM
+			members
+		WHERE
+			member_uuid = ?
+	`;
+
+	let member_data;
+	try {
+		member_data = await db.selectOne(sql, [member_did]);
+	} catch(err) {
+		return [null, err];
+	}
+
+	delete member_data.password_hash;
+	member_data.member_uuid = member_data.member_uuid.toString();
+	return [ member_data, null ];
 
 }
 
@@ -352,14 +495,17 @@ router.post('/login', async function(req, res) {
 
 router.post('/signup', async function(req, res) {
 
+	// 0.
 	// First we generate a mnemonic for the organization
 
 	const mnemonic = bip39.generateMnemonic();
 
+	// 1.
 	// Then we generare a did from the first index
 
 	const [ keys, err1 ] = await createDid(mnemonic);
 	if(err1) {
+		console.log(err1);
 		return res.status(500).json({
 			err : 1,
 			msg : 'Could not anchor did'
@@ -368,68 +514,62 @@ router.post('/signup', async function(req, res) {
 	
 	const { id, publicKey } = keys;
 
-	const [ err2 ] = await insertMember(mnemonic, id, publicKey, req.body);
+	// 2.
+	// Then we insert the newly created member
 
-	res.json({
-		err : 1,
-		msg : 'Debug'
-	});
-
-	/*
-
-	// First we insert into the database
-
-	try {
-		await db.insert(sql, args);
-	} catch(err) {
-		console.log("yeah, problem");
-		throw err;
+	const [err2] = await insertMember(id, req.body);
+	if(err2) {
+		console.log(err2);
+		return res.status(500).json({
+			err : 2,
+			msg : 'Could not insert member'
+		});
 	}
 
-	// And then we request from the database and start the session
+	// 3.
+	// Then we store the created mnemonic for the organization
 
-	sql = `
-		SELECT
-			member_uuid,
-			membername,
-			job_title,
-			work_email,
-			password_hash,
-			organization_name,
-			organization_postcode,
-			organization_address,
-			organization_building,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			addressCity,
-			created_on,
-			avatar_uuid
-		FROM
-			${MEMBERS_TABLE}
-		WHERE
-			member_uuid = ?
-	`;
-
-	let member_data;
-	try {
-		member_data = await db.selectOne(sql, [member_uuid]);
-	} catch(err) {
-		throw err;
+	const [err3] = await insertMnemonic(id, mnemonic);
+	if(err3) {
+		console.log(err3);
+		return res.status(500).json({
+			err : 3,
+			msg : 'Could not insert mnemonic'
+		});
 	}
 
-	delete member_data.password_hash;
-	member_data.member_uuid = member_data.member_uuid.toString();
-	member_data.avatar_uuid = member_data.avatar_uuid.toString();
+	// 4.
+	// Then we store the private keys to be able to sign later
+
+	const [err4] = await insertPrivateKeys(keys);
+	if(err4) {
+		console.log(err4);
+		return res.status(500).json({
+			err : 4,
+			msg : 'Could not store private keys'
+		});
+	}
+
+	// 5.
+	// Then we select session data to auto-login
+
+	const [member_data, err5] = await getSessionData(id);
+	if(err4) {
+		console.log(err5);
+		return res.status(500).json({
+			err : 5,
+			msg : 'Could not get session data'
+		});
+	}
 	req.session.data = member_data;
 
+	// Return response to client
+	
 	res.json({
 		err : 0,
 		msg : "okay"
 	});
 
-	*/
 
 });
 
