@@ -37,7 +37,11 @@ const Randomize = (function() {
 	this.API = {
 		generateRandomCompany : api_generateRandomCompany.bind(this),
 		generateRandomTaxId : api_generateRandomTaxId.bind(this),
-		generatePassword : api_generatePassword.bind(this)
+		generatePassword : api_generatePassword.bind(this),
+		generateDepartment : api_generateDepartment.bind(this),
+		generatePostcode : api_generatePostcode.bind(this),
+		generateLine1 : api_generateLine1.bind(this),
+		generateLine2 : api_generateLine2.bind(this),
 	}
 
 	init.apply(this);
@@ -61,12 +65,13 @@ const Randomize = (function() {
 		const data = {
 			company_name : this.API.generateRandomCompany(),
 			company_tax_id : this.API.generateRandomTaxId(),
+			department: this.API.generateDepartment(),
 			country : "USA",
 			state: state,
 			city: city,
-			postcode : "123-4567",
-			line1 : "123 Fake Street",
-			line2 : "Suite 109"
+			postcode : this.API.generatePostcode(),
+			line1 : this.API.generateLine1(),
+			line2 : this.API.generateLine2()
 		}
 
 		SignupForm.API.setCompanyData(data);
@@ -165,7 +170,7 @@ const Randomize = (function() {
 		}
 
 		let postfix = Math.floor(Math.random() * 10000000).toString();
-		while(postfix.length < 2) {
+		while(postfix.length < 7) {
 			postfix = "0" + postfix;
 		}
 
@@ -182,6 +187,118 @@ const Randomize = (function() {
 			pass += charset.charAt(Math.floor(Math.random() * n));
 		}
 		return pass;
+
+	}
+
+	function api_generateDepartment() {
+
+		const dept = [
+			"Administration",
+			"Marketing",
+			"Transportation",
+			"Shipping",
+			"Human Resources",
+			"Operations",
+			"Inventory",
+			"Sales",
+			"Finance",
+			"Documentation",
+			"Billing",
+			"Control And Credit"
+		]
+
+		return dept[Math.floor(Math.random()*dept.length)]
+
+	}
+
+	function api_generatePostcode() {
+
+		let prefix = Math.floor(Math.random() * 1000).toString();
+		while(prefix.length < 3) {
+			prefix = "0" + prefix;
+		}
+
+		let postfix = Math.floor(Math.random() * 10000).toString();
+		while(postfix.length < 4) {
+			postfix = "0" + postfix;
+		}
+
+		return `${prefix}-${postfix}`;
+
+	}
+
+	function api_generateLine1() {
+
+		let no = Math.floor(Math.random() * 1000).toString();
+		while(no.length < 3) {
+			no = "0" + prefix;
+		}
+
+		const suffix = [
+			'Way',
+			'Road',
+			'Lane',
+			'Drive',
+			'Grove',
+			'Gardens',
+			'Circus' ,
+			'Square',
+			'Hill',
+			'Avenue'
+		]
+		const c = suffix[Math.floor(Math.random()*suffix.length)];
+
+		const names = [
+			'Main',
+			'Pine',
+			'Oak',
+			'Elm',
+			'Church',
+			'Maple',
+			'Walnut',
+			'Washington',
+			'Park',
+			'Center',
+			'Cedar',
+			'Chestnut',
+			'Mill',
+			'Cherry',
+			'Meadow',
+			'Spruce',
+			'Jackson',
+			'Shady',
+			'Lincoln',
+		]
+		const b = names[Math.floor(Math.random()*names.length)];
+
+		return `${no} ${b} ${c}`;
+
+	}
+
+	function api_generateLine2() {
+
+		if (Math.random() < 0.5) {
+			return '';
+		}
+
+		const suffix = [
+			'Unit',
+			'Suite',
+			'Room No.',
+			'Space No.',
+			'Apartment',
+			'Floor'
+		]
+
+		const a = Math.floor(Math.random() * 10);
+		const b = Math.floor(Math.random() * 10);
+		const c = suffix[Math.floor(Math.random()*suffix.length)];
+
+		if(c === 'Floor') {
+			return `${c} ${a}`;
+		}
+		
+		return `${c} ${a}0${b}`;
 
 	}
 
