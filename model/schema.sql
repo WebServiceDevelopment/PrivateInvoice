@@ -1,6 +1,6 @@
 -- MariaDB dump 10.19  Distrib 10.5.13-MariaDB, for Linux (x86_64)
 --
--- Host: localhost    Database: Buyer_515
+-- Host: localhost    Database: 512r_dev
 -- ------------------------------------------------------
 -- Server version	10.5.13-MariaDB
 
@@ -257,6 +257,22 @@ CREATE TABLE `members` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `mnemonics`
+--
+
+DROP TABLE IF EXISTS `mnemonics`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mnemonics` (
+  `organization_did` varchar(64) NOT NULL,
+  `recovery_phrase` text NOT NULL,
+  `current_index` int(11) NOT NULL DEFAULT 1,
+  `created_on` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`organization_did`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `organization_img`
 --
 
@@ -269,6 +285,23 @@ CREATE TABLE `organization_img` (
   `created_on` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`logo_uuid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `privatekeys`
+--
+
+DROP TABLE IF EXISTS `privatekeys`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `privatekeys` (
+  `member_did` varchar(64) NOT NULL,
+  `public_key` text NOT NULL CHECK (json_valid(`public_key`)),
+  `update_key` text NOT NULL CHECK (json_valid(`update_key`)),
+  `recovery_key` text NOT NULL CHECK (json_valid(`recovery_key`)),
+  `created_on` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`member_did`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -444,4 +477,4 @@ CREATE TABLE `seller_status_draft` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-06-06 11:08:34
+-- Dump completed on 2022-06-06 12:31:28
