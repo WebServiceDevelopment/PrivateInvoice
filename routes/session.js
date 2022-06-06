@@ -121,7 +121,8 @@ router.post('/updateCompany', async function(req, res) {
 			organization_department = ?,
 			organization_tax_id = ?,
 			addressCountry = ?,
-			addressRegion = ?
+			addressRegion = ?,
+			addressCity = ?
 		WHERE
 			member_uuid = ?
 	`;
@@ -135,6 +136,7 @@ router.post('/updateCompany', async function(req, res) {
 		req.body.organization_tax_id,
 		req.body.addressCountry,
 		req.body.addressRegion,
+		req.body.addressCity,
 		req.session.data.member_uuid
 	];
 
@@ -156,6 +158,7 @@ router.post('/updateCompany', async function(req, res) {
 	req.session.data.organization_tax_id = req.body.organization_tax_id;
 	req.session.data.addressCountry = req.body.addressCountry;
 	req.session.data.addressRegion = req.body.addressRegion;
+	req.session.data.addressCity = req.body.addressCity;
 
 	res.json({
 		err : 0,
@@ -177,6 +180,7 @@ router.post('/updateProfile', async function(req, res) {
 		SET
 			member_uuid = ?,
 			membername = ?,
+			job_title = ?,
 			work_email = ?
 		WHERE
 			member_uuid = ?
@@ -185,6 +189,7 @@ router.post('/updateProfile', async function(req, res) {
 	let args = [
 		req.body.member_uuid,
 		req.body.membername,
+		req.body.job_title,
 		req.body.work_email,
 		req.session.data.member_uuid
 	];
@@ -208,6 +213,7 @@ router.post('/updateProfile', async function(req, res) {
 
 	req.session.data.member_uuid = req.body.member_uuid;
 	req.session.data.membername = req.body.membername;
+	req.session.data.job_title = req.body.job_title;
 	req.session.data.work_email = req.body.work_email;
 
 	res.json({
@@ -226,6 +232,7 @@ router.post('/login', async function(req, res) {
 		SELECT
 			member_uuid,
 			membername,
+			job_title,
 			work_email,
 			password_hash,
 			organization_name,
@@ -236,6 +243,7 @@ router.post('/login', async function(req, res) {
 			organization_tax_id,
 			addressCountry,
 			addressRegion,
+			addressCity,
 			created_on,
 			wallet_address,
 			avatar_uuid
@@ -311,6 +319,7 @@ router.post('/signup', async function(req, res) {
 		INSERT INTO members (
 			member_uuid,
 			membername,
+			job_title,
 			work_email,
 			password_hash,
 			organization_name,
@@ -321,6 +330,7 @@ router.post('/signup', async function(req, res) {
 			organization_tax_id,
 			addressCountry,
 			addressRegion,
+			addressCity,
 			wallet_address,
 			avatar_uuid,
 			logo_uuid
@@ -361,6 +371,7 @@ router.post('/signup', async function(req, res) {
 	let args = [
 		member_uuid,
 		req.body.account.membername,
+		req.body.account.job_title,
 		req.body.account.work_email,
 		req.body.hash,
 		req.body.organization.name,
@@ -371,6 +382,7 @@ router.post('/signup', async function(req, res) {
 		req.body.organization.organization_tax_id,
 		req.body.organization.addressCountry,
 		req.body.organization.addressRegion,
+		req.body.organization.addressCity,
 		mnemonic
 	];
 
@@ -387,6 +399,7 @@ router.post('/signup', async function(req, res) {
 		SELECT
 			member_uuid,
 			membername,
+			job_title,
 			work_email,
 			password_hash,
 			organization_name,
@@ -397,6 +410,7 @@ router.post('/signup', async function(req, res) {
 			organization_tax_id,
 			addressCountry,
 			addressRegion,
+			addressCity,
 			created_on,
 			avatar_uuid
 		FROM

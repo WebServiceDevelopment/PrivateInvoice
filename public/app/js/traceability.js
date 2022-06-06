@@ -395,6 +395,7 @@ function  Traceability_class () {
 
 		seller.address.addressCountry = details.addressCountry||"";
 		seller.address.addressRegion = details.addressRegion||"";
+		seller.address.addressCity = details.addressCity||"";
 
 		seller.contactPoint = details.contactPoint 
 
@@ -418,6 +419,7 @@ function  Traceability_class () {
 
 		obj.addressCountry = seller.address.addressCountry;
 		obj.addressRegion = seller.address.addressRegion;
+		obj.addressCity = seller.address.addressCity;
 
 		obj.contactPoint = seller.contactPoint;
 
@@ -446,6 +448,7 @@ function  Traceability_class () {
 
 		buyer.address.addressCountry = details.addressCountry||"";
 		buyer.address.addressRegion = details.addressRegion||"";
+		buyer.address.addressCity = details.addressCity||"";
 
 		buyer.contactPoint = details.contactPoint 
 
@@ -469,6 +472,7 @@ function  Traceability_class () {
 
 		obj.addressCountry = buyer.address.addressCountry;
 		obj.addressRegion = buyer.address.addressRegion;
+		obj.addressCity = buyer.address.addressCity;
 
 		obj.contactPoint = buyer.contactPoint;
 

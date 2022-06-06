@@ -364,6 +364,7 @@ router.post('/contacts', async function(req, res) {
 			organization_tax_id,
 			addressCountry,
 			addressRegion,
+			addressCity,
 			wallet_address
 		FROM
 			members
