@@ -30,6 +30,7 @@ const SignupForm = (function() {
 	this.DOM = {
 		company : {
 			name : document.getElementById('SignupForm.company.name'),
+			department : document.getElementById('SignupForm.company.department'),
 			tax_id : document.getElementById('SignupForm.company.tax_id'),
 		},
 		address : {
@@ -127,6 +128,7 @@ const SignupForm = (function() {
 		
 		this.DOM.company.tax_id.value = data.company_tax_id;
 		this.DOM.company.name.value = data.company_name;
+		this.DOM.company.department.value = data.department;
 
 		this.DOM.address.country.value = data.country;
 		this.DOM.address.region.value = data.state;
@@ -218,6 +220,7 @@ const SignupForm = (function() {
 			},
 			company : {
 				name : this.DOM.company.name.value,
+				department : this.DOM.company.department.value,
 				tax_id : this.DOM.company.tax_id.value
 			},
 			address : {
