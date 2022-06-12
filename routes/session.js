@@ -38,7 +38,7 @@ const MEMBERS_TABLE			= "members";
 
 // Module Functions
 
-const axios				 = require('axios')
+const axios					= require('axios')
 const wallet				= require('@sidetree/wallet')
 
 const createDid = async ( mnemonic ) => {
@@ -66,6 +66,7 @@ const createDid = async ( mnemonic ) => {
 	const didUniqueSuffix = wallet.computeDidUniqueSuffix(createOperation.suffixData);
 	const id = `did:elem:ganache${didUniqueSuffix}`
 	const host = 'http://localhost:4000';
+	//const host = 'http://192.168.1.126:4000';
 	const url = `${host}/api/1.0/operations`;
 	
 	try {
@@ -422,6 +423,7 @@ router.post('/updateProfile', async function(req, res) {
  */
 router.post('/login', async function(req, res) {
 
+/*
 	const sql = `
 		SELECT
 			member_uuid,
@@ -446,6 +448,31 @@ router.post('/login', async function(req, res) {
 		WHERE
 			membername = ?
 	`;
+*/
+	const sql = `
+		SELECT
+			member_uuid,
+			membername,
+			job_title,
+			work_email,
+			password_hash,
+			organization_name,
+			organization_postcode,
+			organization_address,
+			organization_building,
+			organization_department,
+			organization_tax_id,
+			addressCountry,
+			addressRegion,
+			addressCity,
+			created_on,
+			wallet_address,
+			avatar_uuid
+		FROM
+			${MEMBERS_TABLE}
+		WHERE
+			work_email = ?
+	`;
 
 	let member_data;
 
@@ -456,6 +483,7 @@ router.post('/login', async function(req, res) {
 	}
 
 	if(!member_data) {
+		console.log("req.body.membername="+req.body.membername);
 		return res.json({
 			err : 100,
 			msg : "USERNAME NOT FOUND"
@@ -479,7 +507,10 @@ router.post('/login', async function(req, res) {
 
 	delete member_data.password_hash;
 	member_data.member_uuid = member_data.member_uuid.toString();
-	member_data.avatar_uuid = member_data.avatar_uuid.toString();
+
+	if( member_data.avatar_uuid != null) {
+		member_data.avatar_uuid = member_data.avatar_uuid.toString();
+	}
 	req.session.data = member_data;
 
 	res.json({
