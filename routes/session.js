@@ -15,7 +15,7 @@
  limitations under the License.
 
  Author: Ogawa Kousei (kogawa@wsd.co.jp)
-    
+	
 **/
 
 "use strict";
@@ -35,6 +35,246 @@ const bip39					= require('bip39')
 
 const db					= require('../database.js');
 const MEMBERS_TABLE			= "members";
+
+// Module Functions
+
+const axios					= require('axios')
+const wallet				= require('@sidetree/wallet')
+
+const createDid = async ( mnemonic ) => {
+
+	const keyType = 'Ed25519';
+	const publicKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/0/0");
+	const recoveryKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/1/0");
+	const updateKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/2/0");
+
+	const createOperation = await wallet.operations.create({
+		document : {
+			publicKeys: [
+				{
+					id: publicKey.id.split('#').pop(),
+					type: publicKey.type,
+					publicKeyJwk: publicKey.publicKeyJwk,
+					purposes: ['authentication', 'assertionMethod']
+				}
+			]
+		},
+		recoveryKey : recoveryKey.publicKeyJwk,
+		updateKey : updateKey.publicKeyJwk
+	});
+
+	const didUniqueSuffix = wallet.computeDidUniqueSuffix(createOperation.suffixData);
+	const id = `did:elem:ganache${didUniqueSuffix}`
+	const host = 'http://localhost:4000';
+	//const host = 'http://192.168.1.126:4000';
+	const url = `${host}/api/1.0/operations`;
+	
+	try {
+		await axios.post(url, createOperation);
+	} catch(err) {
+		return [ null, err ];
+	}
+
+	const keys = {
+		id,
+		publicKey,
+		recoveryKey,
+		updateKey
+	};
+		
+
+	return [ keys, null ];
+
+}
+
+const insertMnemonic = async (organization_id, mnemonic) => {
+
+	const sql = `
+		INSERT INTO mnemonics (
+			organization_did,
+			recovery_phrase
+		) VALUES (
+			?,
+			?
+		)
+	`;
+
+	const args = [
+		organization_id,
+		mnemonic
+	];
+
+	try {
+		await db.insert(sql, args);
+	} catch(err) {
+		return [err];
+	}
+
+	return [ null ];
+
+}
+
+const insertPrivateKeys = async (keys) => {
+
+ 	const {
+		id,
+		publicKey,
+		recoveryKey,
+		updateKey
+	} = keys;
+
+	const sql = `
+		INSERT INTO privatekeys (
+			member_did,
+			public_key,
+			update_key,
+			recovery_key
+		) VALUES (
+			?,
+			?,
+			?,
+			?
+		)
+	`;
+
+	const args = [
+		id, 
+		JSON.stringify(publicKey),
+		JSON.stringify(updateKey),
+		JSON.stringify(recoveryKey)
+	];
+
+	try {
+		await db.insert(sql, args);
+	} catch(err) {
+		return [err];
+	}
+
+	return [ null ];
+
+}
+
+
+const insertMember = async (member_did, body) => {
+
+	// Then insert into database
+
+	const sql = `
+		INSERT INTO members (
+			member_uuid,
+			membername,
+			job_title,
+			work_email,
+			password_hash,
+
+			organization_name,
+			organization_department,
+			organization_tax_id,
+
+			addressCountry,
+			addressRegion,
+			organization_postcode,
+			addressCity,
+			organization_address,
+			organization_building
+		) VALUES (
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?
+		)
+	`;
+
+	// Deconstruct postbody arguments
+
+	const { member, company, address } = body;
+
+	// First Create Password Hash
+
+	let password_hash;
+	try {
+		password_hash = await db.hash(member.password);
+	} catch(err) {
+		throw err;
+	}
+
+	// Construct arguments
+	
+	const args = [
+		member_did,
+		member.membername,
+		member.job_title,
+		member.contact_email,
+		password_hash,
+		company.name,
+		company.department,
+		company.tax_id,
+		address.country,
+		address.region,
+		address.postcode,
+		address.city,
+		address.line1,
+		address.line2
+	];
+
+	try {
+		await db.insert(sql, args);
+	} catch(err) {
+		return [err];
+	}
+
+	return [ null ];
+
+}
+
+const getSessionData = async(member_did) => {
+
+	const sql = `
+		SELECT
+			member_uuid,
+			membername,
+			job_title,
+			work_email,
+			password_hash,
+			organization_name,
+			organization_postcode,
+			organization_address,
+			organization_building,
+			organization_department,
+			organization_tax_id,
+			addressCountry,
+			addressRegion,
+			addressCity,
+			created_on
+		FROM
+			members
+		WHERE
+			member_uuid = ?
+	`;
+
+	let member_data;
+	try {
+		member_data = await db.selectOne(sql, [member_did]);
+	} catch(err) {
+		return [null, err];
+	}
+
+	delete member_data.password_hash;
+	member_data.member_uuid = member_data.member_uuid.toString();
+	return [ member_data, null ];
+
+}
+
 
 // End Points
 
@@ -76,7 +316,8 @@ router.post('/updateCompany', async function(req, res) {
 			organization_department = ?,
 			organization_tax_id = ?,
 			addressCountry = ?,
-			addressRegion = ?
+			addressRegion = ?,
+			addressCity = ?
 		WHERE
 			member_uuid = ?
 	`;
@@ -90,6 +331,7 @@ router.post('/updateCompany', async function(req, res) {
 		req.body.organization_tax_id,
 		req.body.addressCountry,
 		req.body.addressRegion,
+		req.body.addressCity,
 		req.session.data.member_uuid
 	];
 
@@ -111,6 +353,7 @@ router.post('/updateCompany', async function(req, res) {
 	req.session.data.organization_tax_id = req.body.organization_tax_id;
 	req.session.data.addressCountry = req.body.addressCountry;
 	req.session.data.addressRegion = req.body.addressRegion;
+	req.session.data.addressCity = req.body.addressCity;
 
 	res.json({
 		err : 0,
@@ -132,6 +375,7 @@ router.post('/updateProfile', async function(req, res) {
 		SET
 			member_uuid = ?,
 			membername = ?,
+			job_title = ?,
 			work_email = ?
 		WHERE
 			member_uuid = ?
@@ -140,6 +384,7 @@ router.post('/updateProfile', async function(req, res) {
 	let args = [
 		req.body.member_uuid,
 		req.body.membername,
+		req.body.job_title,
 		req.body.work_email,
 		req.session.data.member_uuid
 	];
@@ -151,18 +396,19 @@ router.post('/updateProfile', async function(req, res) {
 		result = await db.update(sql, args);
 	} catch(err) {
 		//throw err;
-        return res.status(400).end(err);
+		return res.status(400).end(err);
 	}
 
-    if(result.affectedRows != 1) {
+	if(result.affectedRows != 1) {
 		err = {err: 9, msg :"result.affectedRows != 1"}
-        return res.status(406).end(err);
-    }
+		return res.status(406).end(err);
+	}
 
 	// Step 3 : Update Current Reddis Session
 
 	req.session.data.member_uuid = req.body.member_uuid;
 	req.session.data.membername = req.body.membername;
+	req.session.data.job_title = req.body.job_title;
 	req.session.data.work_email = req.body.work_email;
 
 	res.json({
@@ -177,10 +423,12 @@ router.post('/updateProfile', async function(req, res) {
  */
 router.post('/login', async function(req, res) {
 
+/*
 	const sql = `
 		SELECT
 			member_uuid,
 			membername,
+			job_title,
 			work_email,
 			password_hash,
 			organization_name,
@@ -191,6 +439,7 @@ router.post('/login', async function(req, res) {
 			organization_tax_id,
 			addressCountry,
 			addressRegion,
+			addressCity,
 			created_on,
 			wallet_address,
 			avatar_uuid
@@ -198,6 +447,31 @@ router.post('/login', async function(req, res) {
 			${MEMBERS_TABLE}
 		WHERE
 			membername = ?
+	`;
+*/
+	const sql = `
+		SELECT
+			member_uuid,
+			membername,
+			job_title,
+			work_email,
+			password_hash,
+			organization_name,
+			organization_postcode,
+			organization_address,
+			organization_building,
+			organization_department,
+			organization_tax_id,
+			addressCountry,
+			addressRegion,
+			addressCity,
+			created_on,
+			wallet_address,
+			avatar_uuid
+		FROM
+			${MEMBERS_TABLE}
+		WHERE
+			work_email = ?
 	`;
 
 	let member_data;
@@ -209,6 +483,7 @@ router.post('/login', async function(req, res) {
 	}
 
 	if(!member_data) {
+		console.log("req.body.membername="+req.body.membername);
 		return res.json({
 			err : 100,
 			msg : "USERNAME NOT FOUND"
@@ -232,7 +507,10 @@ router.post('/login', async function(req, res) {
 
 	delete member_data.password_hash;
 	member_data.member_uuid = member_data.member_uuid.toString();
-	member_data.avatar_uuid = member_data.avatar_uuid.toString();
+
+	if( member_data.avatar_uuid != null) {
+		member_data.avatar_uuid = member_data.avatar_uuid.toString();
+	}
 	req.session.data = member_data;
 
 	res.json({
@@ -245,127 +523,84 @@ router.post('/login', async function(req, res) {
 /*
  * signup
  */
+
 router.post('/signup', async function(req, res) {
 
-	// First we insert into the database
+	// 0.
+	// First we generate a mnemonic for the organization
 
-	const member_uuid = uuidv1();
+	const mnemonic = bip39.generateMnemonic();
 
-	let sql = `
-		INSERT INTO ${MEMBERS_TABLE} (
-			member_uuid,
-			membername,
-			work_email,
-			password_hash,
-			organization_name,
-			organization_postcode,
-			organization_address,
-			organization_building,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			wallet_address,
-			avatar_uuid,
-			logo_uuid
-		) VALUES (
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			'',
-			''
-		)
-	`;
+	// 1.
+	// Then we generare a did from the first index
 
-	console.log(req.body);
-	console.log('Before hash');
-	console.log(req.body.account.password);
+	const [ keys, err1 ] = await createDid(mnemonic);
+	if(err1) {
+		console.log(err1);
+		return res.status(500).json({
+			err : 1,
+			msg : 'Could not anchor did'
+		});
+	}
+	
+	const { id, publicKey } = keys;
 
-	try {
-		req.body.hash = await db.hash(req.body.account.password);
-	} catch(err) {
-		throw err;
+	// 2.
+	// Then we insert the newly created member
+
+	const [err2] = await insertMember(id, req.body);
+	if(err2) {
+		console.log(err2);
+		return res.status(500).json({
+			err : 2,
+			msg : 'Could not insert member'
+		});
 	}
 
-	console.log('after hash');
+	// 3.
+	// Then we store the created mnemonic for the organization
 
-	const mnemonic = bip39.generateMnemonic()
-	console.log(mnemonic);
-
-
-	let args = [
-		member_uuid,
-		req.body.account.membername,
-		req.body.account.work_email,
-		req.body.hash,
-		req.body.organization.name,
-		req.body.organization.postcode,
-		req.body.organization.address,
-		req.body.organization.building,
-		req.body.organization.department,
-		req.body.organization.organization_tax_id,
-		req.body.organization.addressCountry,
-		req.body.organization.addressRegion,
-		mnemonic
-	];
-
-	try {
-		await db.insert(sql, args);
-	} catch(err) {
-		console.log("yeah, problem");
-		throw err;
+	const [err3] = await insertMnemonic(id, mnemonic);
+	if(err3) {
+		console.log(err3);
+		return res.status(500).json({
+			err : 3,
+			msg : 'Could not insert mnemonic'
+		});
 	}
 
-	// And then we request from the database and start the session
+	// 4.
+	// Then we store the private keys to be able to sign later
 
-	sql = `
-		SELECT
-			member_uuid,
-			membername,
-			work_email,
-			password_hash,
-			organization_name,
-			organization_postcode,
-			organization_address,
-			organization_building,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			created_on,
-			avatar_uuid
-		FROM
-			${MEMBERS_TABLE}
-		WHERE
-			member_uuid = ?
-	`;
-
-	let member_data;
-	try {
-		member_data = await db.selectOne(sql, [member_uuid]);
-	} catch(err) {
-		throw err;
+	const [err4] = await insertPrivateKeys(keys);
+	if(err4) {
+		console.log(err4);
+		return res.status(500).json({
+			err : 4,
+			msg : 'Could not store private keys'
+		});
 	}
 
-	delete member_data.password_hash;
-	member_data.member_uuid = member_data.member_uuid.toString();
-	member_data.avatar_uuid = member_data.avatar_uuid.toString();
+	// 5.
+	// Then we select session data to auto-login
+
+	const [member_data, err5] = await getSessionData(id);
+	if(err4) {
+		console.log(err5);
+		return res.status(500).json({
+			err : 5,
+			msg : 'Could not get session data'
+		});
+	}
 	req.session.data = member_data;
 
+	// Return response to client
+	
 	res.json({
 		err : 0,
 		msg : "okay"
 	});
+
 
 });
 

@@ -365,6 +365,9 @@ router.post('/add', async function(req, res) {
  */
 router.get('/getContactList', async function(req, res) {
 
+	console.log('My session data');
+	console.log(req.session.data);
+
 	const { member_uuid } = req.session.data;
 	const contacts = await getContacts(member_uuid);
 	console.log('--- Getting contacts ---');
