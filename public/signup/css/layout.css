@@ -30,6 +30,12 @@ h1 {
 
 }
 
+b.warning {
+
+	color: #ff0000;
+
+}
+
 h1 img {
 
 	height: 64px;
@@ -40,6 +46,17 @@ h1 img {
 h2 {
 
 	text-align: center;
+
+}
+
+h3 button {
+
+	color: #027de9;
+	text-transform: uppercase;
+	background: transparent;
+	border: transparent;
+	cursor: pointer;
+	margin-left: 20px;
 
 }
 
@@ -95,15 +112,15 @@ div.row li {
 
 div.row div.main {
 
-	flex: 0 0 52%;
-	width: 52%;
+	flex: 0 0 64%;
+	width: 64%;
 	min-height: 40px;
 
 }
 
 div.row div.aside {
 
-	flex: 0 0 34%;
+	flex: 0 0 30%;
 	width: 30%;
 	min-height: 40px;
 
@@ -129,6 +146,31 @@ div.field {
 
 	position: relative;
 	margin-bottom: 10px;
+
+}
+
+div.field div.helper {
+
+	font-size: 12px;
+	color: #6b6b6b;
+	text-indent: 10px;
+
+}
+
+div.field div.icon {
+
+	position: absolute;
+	z-index: 1;
+	right: 8px;
+	bottom: 20px;
+	cursor: pointer;
+
+}
+
+div.field div.icon img {
+
+	width: 28px;
+	height: 28px;
 
 }
 
