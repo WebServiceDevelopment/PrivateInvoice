@@ -406,7 +406,8 @@ router.post('/create', async function(req, res) {
 		organization_department : req.session.data.organization_department,
 		organization_tax_id : req.session.data.organization_tax_id,
 		addressCountry : req.session.data.addressCountry,
-		addressRegion : req.session.data.addressRegion
+		addressRegion : req.session.data.addressRegion,
+		addressCity : req.session.data.addressCity
 	}
 
 	// 2.
@@ -454,10 +455,10 @@ router.post('/create', async function(req, res) {
 					"organizationName"	: "",
 					"streetAddress"		: "",
 					"addressLocality"	: "",
-					"addressRegion"		: "",
 					"postalCode"		: "",
 					"addressCountry"	: "",
-                    "addressRegion"		: ""
+                    "addressRegion"		: "",
+					"addressCity"		: ""
 				}
 			},
 
@@ -486,7 +487,8 @@ router.post('/create', async function(req, res) {
                     "streetAddress" 	: "",
                     "addressLocality"	: "",
                     "addressCountry"	: "",
-                    "addressRegion"		: ""
+                    "addressRegion"		: "",
+                    "addressCity"		: ""
                 }
             },
 
@@ -502,7 +504,8 @@ router.post('/create', async function(req, res) {
                     "streetAddress" 	: "",
                     "addressLocality"	: "",
                     "addressCountry"	: "",
-                    "addressRegion"		: ""
+                    "addressRegion"		: "",
+                    "addressCity"		: ""
                 }
             },
 
@@ -588,6 +591,7 @@ router.post('/create', async function(req, res) {
 			organization_postcode,
             addressCountry,
             addressRegion,
+            addressCity,
             wallet_address
         FROM
             members
@@ -613,6 +617,11 @@ router.post('/create', async function(req, res) {
 	//
 	let seller = credentialSubject.seller;
 
+	console.log(req.session.data.member_uuid);
+	console.log('---- seller ---- ');
+	console.log(seller);
+	console.log(row);
+
 	seller.id						= row.member_uuid;
 	seller.name						= row.organization_name;
 	seller.taxId					= row.organization_tax_id;
@@ -623,6 +632,7 @@ router.post('/create', async function(req, res) {
 
 	seller.address.addressCountry	= row.addressCountry;
 	seller.address.addressRegion	= row.addressRegion;
+	seller.address.addressCity		= row.addressCity;
 
 	let ip_address = process.env.SERVER_IP_ADDRESS;
 	let port = process.env.SERVER_PORT || DEFAULT_SERVER_PORT;
@@ -655,6 +665,7 @@ router.post('/create', async function(req, res) {
 
 	issuer.address.addressCountry	= row.addressCountry;
 	issuer.address.addressRegion	= row.addressRegion;
+	issuer.address.addressCity		= row.addressCity;
 
     // 9.
     // begin Transaction

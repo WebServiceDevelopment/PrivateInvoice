@@ -30,6 +30,7 @@ const SettingsProfile = (function() {
 			file : document.getElementById('SettingsProfile.profile.file'),
 			membername : document.getElementById('SettingsProfile.profile.membername'),
 			member_uuid : document.getElementById('SettingsProfile.profile.member_uuid'),
+			job_title : document.getElementById('SettingsProfile.profile.job_title'),
 			work_email : document.getElementById('SettingsProfile.profile.work_email'),
 			edit : document.getElementById('SettingsProfile.profile.edit'),
 			cancel : document.getElementById('SettingsProfile.profile.cancel'),
@@ -44,6 +45,7 @@ const SettingsProfile = (function() {
 			organization_tax_id : document.getElementById('SettingsProfile.organization.organization_tax_id'),
 			addressCountry: document.getElementById('SettingsProfile.organization.addressCountry'),
 			addressRegion : document.getElementById('SettingsProfile.organization.addressRegion'),
+			addressCity : document.getElementById('SettingsProfile.organization.addressCity'),
 			edit : document.getElementById('SettingsProfile.organization.edit'),
 			save : document.getElementById('SettingsProfile.organization.save'), 
 			cancel : document.getElementById('SettingsProfile.organization.cancel')
@@ -119,6 +121,7 @@ const SettingsProfile = (function() {
 			organization_tax_id : memberData.organization_tax_id,
 			addressCountry : memberData.addressCountry,
 			addressRegion : memberData.addressRegion,
+			addressCity : memberData.addressCity,
 		}
 
 		let ajax = new XMLHttpRequest();
@@ -153,6 +156,7 @@ const SettingsProfile = (function() {
 		organization.organization_tax_id.removeAttribute("readonly");
 		organization.addressCountry.removeAttribute("readonly");
 		organization.addressRegion.removeAttribute("readonly");
+		organization.addressCity.removeAttribute("readonly");
 
 		organization.organization_name.focus();
 
@@ -184,6 +188,7 @@ const SettingsProfile = (function() {
 		memberData.organization_tax_id		= organization.organization_tax_id.value;
 		memberData.addressCountry			= organization.addressCountry.value;
 		memberData.addressRegion			= organization.addressRegion.value;
+		memberData.addressCity				= organization.addressCity.value;
 
 		organization.organization_name.setAttribute("readonly", "readonly");
 		organization.organization_postcode.setAttribute("readonly", "readonly");
@@ -193,6 +198,7 @@ const SettingsProfile = (function() {
 		organization.organization_tax_id.setAttribute("readonly", "readonly");
 		organization.addressCountry.setAttribute("readonly", "readonly");
 		organization.addressRegion.setAttribute("readonly", "readonly");
+		organization.addressCity.setAttribute("readonly", "readonly");
 
 		this.API.updateCompanyProfile()
 
@@ -217,6 +223,7 @@ const SettingsProfile = (function() {
 		organization.organization_tax_id.value		= memberData.organization_tax_id;
 		organization.addressCountry.value			= memberData.addressCountry;
 		organization.addressRegion.value			= memberData.addressRegion;
+		organization.addressCity.value				= memberData.addressCity;
 
 		organization.organization_name.setAttribute("readonly", "readonly");
 		organization.organization_postcode.setAttribute("readonly", "readonly");
@@ -226,6 +233,7 @@ const SettingsProfile = (function() {
 		organization.organization_tax_id.setAttribute("readonly", "readonly");
 		organization.addressCountry.setAttribute("readonly", "readonly");
 		organization.addressRegion.setAttribute("readonly", "readonly");
+		organization.addressCity.setAttribute("readonly", "readonly");
 
 	}
 
@@ -296,6 +304,7 @@ const SettingsProfile = (function() {
 
 		profile.membername.removeAttribute("readonly");
 		profile.member_uuid.removeAttribute("readonly");
+		profile.job_title.removeAttribute("readonly");
 		profile.work_email.removeAttribute("readonly");
 
 		profile.membername.focus();
@@ -316,10 +325,12 @@ const SettingsProfile = (function() {
 
 		profile.membername.value		= memberData.membername;
 		profile.member_uuid.value		= memberData.member_uuid;
-		profile.work_email.value	= memberData.work_email;
+		profile.job_title.value			= memberData.job_title;
+		profile.work_email.value		= memberData.work_email;
 
 		profile.membername.setAttribute("readonly", "readonly");
 		profile.member_uuid.setAttribute("readonly", "readonly");
+		profile.job_title.setAttribute("readonly", "readonly");
 		profile.work_email.setAttribute("readonly", "readonly");
 	}
 
@@ -334,10 +345,12 @@ const SettingsProfile = (function() {
 
 		memberData.membername	= profile.membername.value;
 		memberData.member_uuid	= profile.member_uuid.value;
+		memberData.job_title	= profile.job_title.value;
 		memberData.work_email	= profile.work_email.value;
 
 		profile.membername.setAttribute("readonly", "readonly");
 		profile.member_uuid.setAttribute("readonly", "readonly");
+		profile.job_title.setAttribute("readonly", "readonly");
 		profile.work_email.setAttribute("readonly", "readonly");
 
 		this.API.updateProfile();
@@ -353,6 +366,7 @@ const SettingsProfile = (function() {
 		const args = {
 			membername : memberData.membername,
 			member_uuid : memberData.member_uuid,
+			job_title : memberData.job_title,
 			work_email : memberData.work_email,
 		}
 
@@ -378,10 +392,12 @@ const SettingsProfile = (function() {
 
 		this.DOM.profile.membername.value = memberData.membername;
 		this.DOM.profile.member_uuid.value = memberData.member_uuid;
+		this.DOM.profile.job_title.value = memberData.job_title;
 		this.DOM.profile.work_email.value = memberData.work_email;
 
 		this.DOM.profile.membername.setAttribute("readonly", "readonly");
 		this.DOM.profile.member_uuid.setAttribute("readonly", "readonly");
+		this.DOM.profile.job_title.setAttribute("readonly", "readonly");
 		this.DOM.profile.work_email.setAttribute("readonly", "readonly");
 
         const ajax = new XMLHttpRequest();
@@ -417,6 +433,7 @@ const SettingsProfile = (function() {
 		organization.organization_tax_id.value = memberData.organization_tax_id;
 		organization.addressCountry.value = memberData.addressCountry;
 		organization.addressRegion.value = memberData.addressRegion;
+		organization.addressCity.value = memberData.addressCity;
 
 		organization.organization_name.setAttribute("readonly", "readonly");
 		organization.organization_postcode.setAttribute("readonly", "readonly");
@@ -426,6 +443,7 @@ const SettingsProfile = (function() {
 		organization.organization_tax_id.setAttribute("readonly", "readonly");
 		organization.addressCountry.setAttribute("readonly", "readonly");
 		organization.addressRegion.setAttribute("readonly", "readonly");
+		organization.addressCity.setAttribute("readonly", "readonly");
 
 	}
 

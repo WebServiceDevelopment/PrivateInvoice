@@ -1,6 +1,6 @@
 -- MariaDB dump 10.19  Distrib 10.5.13-MariaDB, for Linux (x86_64)
 --
--- Host: localhost    Database: Seller_450
+-- Host: localhost    Database: 512r_dev
 -- ------------------------------------------------------
 -- Server version	10.5.13-MariaDB
 
@@ -118,6 +118,40 @@ CREATE TABLE `buyer_status_archive` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `buyer_status_draft`
+--
+
+DROP TABLE IF EXISTS `buyer_status_draft`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `buyer_status_draft` (
+  `document_uuid` varchar(100) NOT NULL,
+  `document_type` varchar(100) NOT NULL,
+  `document_number` varchar(36) NOT NULL,
+  `document_folder` varchar(36) NOT NULL,
+  `seller_uuid` varchar(100) NOT NULL,
+  `seller_membername` varchar(255) DEFAULT NULL,
+  `seller_organization` varchar(255) DEFAULT NULL,
+  `seller_archived` int(11) NOT NULL DEFAULT 0,
+  `seller_last_action` datetime NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `buyer_uuid` varchar(100) DEFAULT NULL,
+  `buyer_membername` varchar(255) DEFAULT NULL,
+  `buyer_organization` varchar(255) DEFAULT NULL,
+  `buyer_archived` int(11) NOT NULL DEFAULT 0,
+  `buyer_last_action` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `created_from` varchar(36) DEFAULT NULL,
+  `root_document` varchar(36) DEFAULT NULL,
+  `created_on` datetime NOT NULL DEFAULT current_timestamp(),
+  `removed_on` datetime DEFAULT NULL,
+  `opened` int(11) NOT NULL DEFAULT 0,
+  `subject_line` varchar(255) DEFAULT NULL,
+  `due_by` date DEFAULT NULL,
+  `amount_due` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`document_uuid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `contacts`
 --
 
@@ -127,10 +161,10 @@ DROP TABLE IF EXISTS `contacts`;
 CREATE TABLE `contacts` (
   `_id` varchar(36) NOT NULL,
   `invite_code` varchar(36) NOT NULL,
-  `local_member_uuid` varchar(36) NOT NULL,
+  `local_member_uuid` varchar(64) NOT NULL,
   `local_membername` varchar(255) NOT NULL,
   `remote_origin` varchar(255) NOT NULL,
-  `remote_member_uuid` varchar(36) NOT NULL,
+  `remote_member_uuid` varchar(64) NOT NULL,
   `remote_membername` varchar(255) NOT NULL,
   `remote_organization` text NOT NULL,
   `local_to_remote` tinyint(4) NOT NULL,
@@ -201,21 +235,41 @@ DROP TABLE IF EXISTS `members`;
 CREATE TABLE `members` (
   `member_uuid` varchar(100) NOT NULL,
   `membername` varchar(255) NOT NULL,
+  `job_title` varchar(50) NOT NULL DEFAULT '',
   `work_email` varchar(255) NOT NULL,
-  `password_hash` varchar(255) DEFAULT NULL,
-  `avatar_uuid` varchar(100) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `avatar_uuid` varchar(100) DEFAULT NULL,
   `created_on` datetime NOT NULL DEFAULT current_timestamp(),
-  `logo_uuid` varchar(100) NOT NULL,
+  `logo_uuid` varchar(100) DEFAULT NULL,
   `organization_name` varchar(255) NOT NULL,
-  `organization_postcode` varchar(255) DEFAULT NULL,
-  `organization_address` varchar(255) DEFAULT NULL,
-  `organization_building` varchar(255) DEFAULT NULL,
-  `organization_department` varchar(255) DEFAULT NULL,
-  `organization_tax_id` varchar(32) DEFAULT NULL,
-  `wallet_address` varchar(255) DEFAULT NULL,
+  `organization_postcode` varchar(255) DEFAULT '',
+  `organization_address` varchar(255) DEFAULT '',
+  `organization_building` varchar(255) DEFAULT '',
+  `organization_department` varchar(255) DEFAULT '',
+  `organization_tax_id` varchar(32) DEFAULT '',
+  `addressCountry` varchar(50) DEFAULT '',
+  `addressRegion` varchar(25) DEFAULT '',
+  `addressCity` varchar(25) DEFAULT '',
+  `wallet_address` varchar(255) DEFAULT '',
   PRIMARY KEY (`member_uuid`) USING BTREE,
   UNIQUE KEY `username` (`membername`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `mnemonics`
+--
+
+DROP TABLE IF EXISTS `mnemonics`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mnemonics` (
+  `organization_did` varchar(64) NOT NULL,
+  `recovery_phrase` text NOT NULL,
+  `current_index` int(11) NOT NULL DEFAULT 1,
+  `created_on` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`organization_did`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -231,6 +285,23 @@ CREATE TABLE `organization_img` (
   `created_on` datetime NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`logo_uuid`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `privatekeys`
+--
+
+DROP TABLE IF EXISTS `privatekeys`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `privatekeys` (
+  `member_did` varchar(64) NOT NULL,
+  `public_key` text NOT NULL CHECK (json_valid(`public_key`)),
+  `update_key` text NOT NULL CHECK (json_valid(`update_key`)),
+  `recovery_key` text NOT NULL CHECK (json_valid(`recovery_key`)),
+  `created_on` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`member_did`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -406,4 +477,4 @@ CREATE TABLE `seller_status_draft` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-05-29 10:36:02
+-- Dump completed on 2022-06-12 10:05:56

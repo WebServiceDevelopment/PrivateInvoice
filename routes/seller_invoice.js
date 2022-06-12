@@ -429,6 +429,7 @@ router.post('/recreate', async function(req, res) {
 	seller_details.building = seller.address.addressLocality;
 	seller_details.addressCountry = seller.address.addressCountry;
 	seller_details.addressRegion = seller.address.addressRegion;
+	seller_details.addressCity = seller.address.addressCity;
 
 	document.seller_details = JSON.stringify(seller_details);
 
@@ -452,6 +453,7 @@ router.post('/recreate', async function(req, res) {
 	buyer_details.building = buyer.address.addressLocality;
 	buyer_details.addressCountry = buyer.addressCountry;
 	buyer_details.addressRegion = buyer.addressRegion;
+	buyer_details.addressCity = buyer.addressCity;
 
 	document.buyer_details = JSON.stringify(buyer_details);
 
