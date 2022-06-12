@@ -393,10 +393,12 @@ const SettingsContacts = (function() {
 			throw err;
 		}
 
+	
 		const json = await response.json();
+		console.log(json);
 		const mime = {type: "text/plain;charset=utf-8"}
 		var blob = new Blob([JSON.stringify(json, null, 2)], mime);
-		saveAs(blob, `ContactDetails_${json.host.invite_code}.json`);
+		saveAs(blob, `ContactDetails_${json.id}.json`);
 
 	}
 

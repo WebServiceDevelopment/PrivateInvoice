@@ -30,7 +30,32 @@ module.exports				= router;
 
 const uniqid				= require('uniqid')
 const uuidv1				= require('uuid').v1;
+const uuidv4				= require('uuid').v4;
 const axios					= require('axios');
+
+const moment = require('moment');
+const transmute = require('@transmute/vc.js');
+const {
+  Ed25519Signature2018,
+  Ed25519VerificationKey2018,
+} = require('@transmute/ed25519-signature-2018');
+
+const context = { 
+	"https://www.w3.org/2018/credentials/v1" : require('../context/credentials_v1.json'),
+	"https://w3id.org/traceability/v1" : require('../context/traceability_v1.json') 
+}
+
+const documentLoader = async (iri) => {
+
+	if(context[iri]) {
+		return { document: context[iri] };
+	}
+
+	const message = `Unsupported iri: ${iri}`;
+	console.error(message);
+	throw new Error(message);
+
+}
 
 // Database
 
@@ -170,6 +195,39 @@ const getContacts = async (member_uuid) => {
 
 }
 
+const signBusinessCard = async (member_did, credential) => {
+
+	const sql = `
+		SELECT
+			public_key
+		FROM
+			privatekeys
+		WHERE
+			member_did = ?
+	`;
+
+	const args = [
+		member_did
+	];
+	
+	const row = await db.selectOne(sql, args);
+	const keyPair = JSON.parse(row.public_key);
+	console.log(row);
+
+	const { items } = await transmute.verifiable.credential.create({
+		credential,
+		format: ['vc'],
+		documentLoader,
+		suite: new Ed25519Signature2018({
+			key: await Ed25519VerificationKey2018.from(keyPair)
+		})
+	});
+
+	const [ signedCredential ] = items;
+	return signedCredential;
+
+}
+
 
 
 //----------------------------- define endpoints -----------------------------
@@ -177,6 +235,7 @@ const getContacts = async (member_uuid) => {
 /*
  * generate
  */
+
 router.post('/generate', async function(req, res) {
 
 	const { body } = req;
@@ -216,6 +275,45 @@ router.post('/generate', async function(req, res) {
 		throw err;
 	}
 
+	const credential = {
+		'@context': [
+			"https://www.w3.org/2018/credentials/v1",
+			"https://w3id.org/traceability/v1"
+		],
+		type: [
+			"VerifiableCredential",
+			"VerifiableBusinessCard"
+		],
+		id: `urn:uuid/${invite_code}`,
+		name: "Verifiable Business Card",
+		relatedLink: [
+			{
+				type: "LinkRole",
+				target: `${req.headers.origin}/presentations/available`,
+				linkRelationship: 'Partner'
+			}
+		],
+		issuanceDate: moment().toJSON(),
+		issuer : {
+			id: req.session.data.member_uuid,
+			type: 'Person',
+			name: req.session.data.membername,
+			email: req.session.data.work_email
+		},
+		credentialSubject : {
+			id: req.session.data.member_uuid,
+			type: 'Organization',
+			address : {
+				type: 'PostalAddress',
+			},
+			taxId: req.session.data.organization_tax_id
+		}
+	}
+
+	const vbc = await signBusinessCard(req.session.data.member_uuid, credential);
+	res.json(vbc);
+
+	/*
 	res.json({
 		host: {
 			invite_code: invite_code,
@@ -239,6 +337,7 @@ router.post('/generate', async function(req, res) {
 			work_email: req.session.data.work_email
 		}
 	});
+	*/
 
 });
 
