@@ -617,6 +617,11 @@ router.post('/create', async function(req, res) {
 	//
 	let seller = credentialSubject.seller;
 
+	console.log(req.session.data.member_uuid);
+	console.log('---- seller ---- ');
+	console.log(seller);
+	console.log(row);
+
 	seller.id						= row.member_uuid;
 	seller.name						= row.organization_name;
 	seller.taxId					= row.organization_tax_id;
