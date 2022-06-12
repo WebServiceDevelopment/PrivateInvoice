@@ -295,7 +295,6 @@ router.post('/submit', async function(req, res) {
 router.post('/contacts', async function(req, res) {
 
 	const CONTACTS_TABLE = "contacts";
-
 	let contactType, myPosition;
 
 	// First we get a list of all of the contact uuid's
@@ -325,7 +324,10 @@ router.post('/contacts', async function(req, res) {
 	let sql = `
 		SELECT
 			${contactType} AS contact_uuid,
-			remote_origin
+			remote_member_uuid,
+			remote_membername,
+			remote_origin,
+			remote_organization
 		FROM
 			${CONTACTS_TABLE}
 		WHERE
@@ -353,52 +355,30 @@ router.post('/contacts', async function(req, res) {
 		});
 	}
 
-	sql = `
-		SELECT
-			member_uuid as member_uuid,
-			membername,
-			organization_name,
-			organization_address,
-			organization_building,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			addressCity,
-			wallet_address
-		FROM
-			members
-		WHERE
-			member_uuid = ?
-	`;
+	const contactList = rows.map( (row) => {
 
-	let rt = [];
-	let remote_origin;
-
-	for(let i = 0, j = 0; i < rows.length; i++) {
-		args = [rows[i].contact_uuid];
-		remote_origin = rows[i].remote_origin;
-
-		try {
-			rows[i] = await db.selectOne(sql, args);
-		} catch(err) {
-			continue;
+		const org = JSON.parse(row.remote_organization);
+		
+		return {
+			remote_origin : row.remote_origin,
+			member_uuid : row.remote_member_uuid,
+			membername : row.remote_membername,
+            organization_name : org.name,
+            organization_address : org.address,
+            organization_building : org.building,
+            organization_department : org.department,
+            organization_tax_id : '',
+            addressCountry : '',
+            addressRegion : '',
+            addressCity : '',
+            wallet_address : ''
 		}
-		if(rows[i] ==  null) {
-			continue;
-		}
+	});
 
-		//console.log(rows[i]);
-		//rows[i].member_uuid = rows[i].member_uuid.toString();
-
-		rt[j] = { ...rows[i] };
-		rt[j].remote_origin = remote_origin;
-		j++;
-	}
 
 	return res.json({
 		err : 0,
-		msg : rt
+		msg : contactList
 	});
 
 });

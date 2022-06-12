@@ -161,10 +161,10 @@ DROP TABLE IF EXISTS `contacts`;
 CREATE TABLE `contacts` (
   `_id` varchar(36) NOT NULL,
   `invite_code` varchar(36) NOT NULL,
-  `local_member_uuid` varchar(36) NOT NULL,
+  `local_member_uuid` varchar(64) NOT NULL,
   `local_membername` varchar(255) NOT NULL,
   `remote_origin` varchar(255) NOT NULL,
-  `remote_member_uuid` varchar(36) NOT NULL,
+  `remote_member_uuid` varchar(64) NOT NULL,
   `remote_membername` varchar(255) NOT NULL,
   `remote_organization` text NOT NULL,
   `local_to_remote` tinyint(4) NOT NULL,
@@ -477,4 +477,4 @@ CREATE TABLE `seller_status_draft` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-06-06 12:31:28
+-- Dump completed on 2022-06-12 10:05:56
