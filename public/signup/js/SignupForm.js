@@ -86,6 +86,7 @@ const SignupForm = (function() {
 		this.API.setVisibility(false);
 
 		this.API.checkForInput()
+		this.DOM.submit.removeAttribute("disabled");
 	}
 
 	function evt_handleVisibleClick(evt) {
