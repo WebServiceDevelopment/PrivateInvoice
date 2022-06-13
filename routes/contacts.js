@@ -115,8 +115,10 @@ const createBusinessCard = async (req, member_did, invite_code) => {
 			type: 'Organization',
 			name: row.organization_name,
 			contactPoint: `${row.member_name}@${req.headers.host}`,
+			department: row.organization_department,
 			address : {
 				type: 'PostalAddress',
+				postalCode: row.organization_postcode,
 				addressLocality: row.organization_address_city,
 				addressRegion: row.organization_address_region,
 				streetAddress: row.organization_address_line1,
