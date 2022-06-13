@@ -23,7 +23,7 @@
 // Import sub
 
 // Import Router
-const express                   = require('express');
+const express				   = require('express');
 
 // Libraries
 
@@ -60,14 +60,37 @@ const documentLoader = async (iri) => {
 
 // module
 module.exports = {
-	signInvoice : signInvoice,
+	signInvoice: signInvoice,
+	signBusinessCard: signBusinessCard,
 }
 
 // ------------------------------- modules -------------------------------
 
+/**
+ * Sign Business Card 
+ **/
+
+async function signBusinessCard (credential, keyPair) {
+
+	const { items } = await transmute.verifiable.credential.create({
+		credential,
+		format: ['vc'],
+		documentLoader,
+		suite: new Ed25519Signature2018({
+			key: await Ed25519VerificationKey2018.from(keyPair)
+		})
+	});
+
+	const [ signedCredential ] = items;
+	return signedCredential;
+
+
+}
+
 /*
  * signInvoice (uuid, json_str)
  */
+
 async function signInvoice (uuid, json_str) {
  
 	const keyPair = {

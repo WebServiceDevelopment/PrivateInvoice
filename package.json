@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npx dotenv -e .env node index.js",
-    "dev:seller": "npx dotenv -e .seller.env node index.js",
-    "dev:buyer": "npx dotenv -e .buyer.env node index.js",
+    "dev:seller": "NODE_OPTIONS=--openssl-legacy-provider npx dotenv -e .seller.env node index.js",
+    "dev:buyer": "NODE_OPTIONS=--openssl-legacy-provider npx dotenv -e .buyer.env node index.js",
     "ganache": "ganache --wallet.seed myCustomSeed"
   },
   "repository": {

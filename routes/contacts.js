@@ -28,34 +28,12 @@ module.exports				= router;
 
 // Import Libraries
 
-const uniqid				= require('uniqid')
 const uuidv1				= require('uuid').v1;
 const uuidv4				= require('uuid').v4;
 const axios					= require('axios');
+const moment 				= require('moment');
 
-const moment = require('moment');
-const transmute = require('@transmute/vc.js');
-const {
-  Ed25519Signature2018,
-  Ed25519VerificationKey2018,
-} = require('@transmute/ed25519-signature-2018');
-
-const context = { 
-	"https://www.w3.org/2018/credentials/v1" : require('../context/credentials_v1.json'),
-	"https://w3id.org/traceability/v1" : require('../context/traceability_v1.json') 
-}
-
-const documentLoader = async (iri) => {
-
-	if(context[iri]) {
-		return { document: context[iri] };
-	}
-
-	const message = `Unsupported iri: ${iri}`;
-	console.error(message);
-	throw new Error(message);
-
-}
+const { signBusinessCard } = require('./sign_your_credentials.js')
 
 // Database
 
@@ -68,6 +46,90 @@ const INVITE_TABLE			= 'invite';
 /*
  * Helper functions
  */
+
+const createBusinessCard = async (req, member_did, invite_code) => {
+
+	const sql = `
+		SELECT
+			member_uuid AS member_did,
+			membername AS member_name,
+			job_title AS member_job_title,
+			work_email AS member_contact_email,
+			member_uuid AS organization_did,
+			organization_name AS organization_name,
+			organization_postcode AS organization_postcode,
+			organization_address AS organization_address_line1,
+			organization_building AS organization_address_line2,
+			organization_department AS organization_department,
+			organization_tax_id AS organization_tax_id,
+			addressCountry AS organization_address_country,
+			addressRegion AS organization_address_region,
+			addressCity AS organization_address_city
+		FROM
+			members
+		WHERE
+			member_uuid = ?
+	`;
+
+	const args = [
+		member_did
+	];
+
+	console.log(req.headers);
+
+	let row;
+	try {
+		row = await db.selectOne(sql, args);
+	} catch(err) {
+		return [ null, err ];
+	}
+
+	const credential = {
+		'@context': [
+			"https://www.w3.org/2018/credentials/v1",
+			"https://w3id.org/traceability/v1"
+		],
+		type: [
+			"VerifiableCredential",
+			"VerifiableBusinessCard"
+		],
+		id: `urn:uuid:${invite_code}`,
+		name: "Verifiable Business Card",
+		relatedLink: [
+			{
+				type: "LinkRole",
+				target: `${req.headers.origin}/presentations/available`,
+				linkRelationship: 'Partner'
+			}
+		],
+		issuanceDate: moment().toJSON(),
+		issuer : {
+			id: req.session.data.member_uuid,
+			type: 'Person',
+			name: row.member_name,
+			email: row.member_contact_email,
+			jobTitle: row.member_job_title
+		},
+		credentialSubject : {
+			id: row.organization_did,
+			type: 'Organization',
+			name: row.organization_name,
+			contactPoint: `${row.member_name}@${req.headers.host}`,
+			address : {
+				type: 'PostalAddress',
+				addressLocality: row.organization_address_city,
+				addressRegion: row.organization_address_region,
+				streetAddress: row.organization_address_line1,
+				crossStreet: row.organization_address_line2,
+				addressCountry: row.organization_address_country
+			},
+			taxId: row.organization_tax_id
+		}
+	}
+
+	return [ credential, null ];
+
+}
 
 const checkForExistingContact = async (local_uuid, remote_uuid) => {
 
@@ -195,7 +257,7 @@ const getContacts = async (member_uuid) => {
 
 }
 
-const signBusinessCard = async (member_did, credential) => {
+const getPrivateKeys = async (member_did) => {
 
 	const sql = `
 		SELECT
@@ -210,21 +272,15 @@ const signBusinessCard = async (member_did, credential) => {
 		member_did
 	];
 	
-	const row = await db.selectOne(sql, args);
+	let row;
+	try {
+		row = await db.selectOne(sql, args);
+	} catch(err) {
+		return [ null, err ];
+	}
+
 	const keyPair = JSON.parse(row.public_key);
-	console.log(row);
-
-	const { items } = await transmute.verifiable.credential.create({
-		credential,
-		format: ['vc'],
-		documentLoader,
-		suite: new Ed25519Signature2018({
-			key: await Ed25519VerificationKey2018.from(keyPair)
-		})
-	});
-
-	const [ signedCredential ] = items;
-	return signedCredential;
+	return [ keyPair, null ];
 
 }
 
@@ -258,7 +314,7 @@ router.post('/generate', async function(req, res) {
 		)
 	`;
 
-	const invite_code = uniqid.time();
+	const invite_code = uuidv4();
 
 	const args = [
 		invite_code,
@@ -275,42 +331,23 @@ router.post('/generate', async function(req, res) {
 		throw err;
 	}
 
-	const credential = {
-		'@context': [
-			"https://www.w3.org/2018/credentials/v1",
-			"https://w3id.org/traceability/v1"
-		],
-		type: [
-			"VerifiableCredential",
-			"VerifiableBusinessCard"
-		],
-		id: `urn:uuid/${invite_code}`,
-		name: "Verifiable Business Card",
-		relatedLink: [
-			{
-				type: "LinkRole",
-				target: `${req.headers.origin}/presentations/available`,
-				linkRelationship: 'Partner'
-			}
-		],
-		issuanceDate: moment().toJSON(),
-		issuer : {
-			id: req.session.data.member_uuid,
-			type: 'Person',
-			name: req.session.data.membername,
-			email: req.session.data.work_email
-		},
-		credentialSubject : {
-			id: req.session.data.member_uuid,
-			type: 'Organization',
-			address : {
-				type: 'PostalAddress',
-			},
-			taxId: req.session.data.organization_tax_id
-		}
+	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code);
+	if(err1) {
+		return res.json({
+			err: 1,
+			msg: 'could not create business card'
+		});
 	}
 
-	const vbc = await signBusinessCard(req.session.data.member_uuid, credential);
+	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_uuid);
+	if(err2) {
+		return res.json({
+			err: 2,
+			msg: 'could not get private keys'
+		});
+	}
+
+	const vbc = await signBusinessCard(credential, keyPair);
 	res.json(vbc);
 
 	/*
