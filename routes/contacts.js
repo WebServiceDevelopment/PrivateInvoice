@@ -15,7 +15,7 @@
  limitations under the License.
 
  Author: Ogawa Kousei (kogawa@wsd.co.jp)
-    
+	
 **/
 
 "use strict";
@@ -162,7 +162,72 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 /*
  * insertNewContact
  */
-const insertNewContact = async (invite, localUser, remote_member, remote_organization) => {
+
+const insertNewContact = async (invite_code, local_member_uuid, credential) => {
+
+	// Get local username
+
+	const mySql = `
+		SELECT
+			membername AS local_member_name
+		FROM
+			members
+		WHERE
+			member_uuid = ?
+	`;
+
+	const myArgs = [
+		local_member_uuid
+	];
+
+	let row;
+	try {
+		row = await db.selectOne(mySql, myArgs);
+	} catch(err) {
+		return [ null, err ];
+	}
+
+	const { local_member_name } = row;
+
+	// Get Information from Business Card
+
+	const [ link ] = credential.relatedLink.filter( (link) => {
+		return link.linkRelationship !== 'Invite';
+	});
+
+	const relation = {
+		local_to_remote: 0,
+		remote_to_local: 0
+	};
+
+	switch(link.linkRelationship) {
+	case 'Partner':
+		relation.local_to_remote = 1;
+		relation.remote_to_local = 1;
+		break;
+	case 'Buyer':
+		relation.local_to_remote = 1;
+		break;
+	case 'Seller':
+		relation.remote_to_local = 1;
+		break;
+	}
+
+	const remote_origin = link.target.replace('/presentations/available', '')
+	const remote_member_uuid = credential.issuer.id;
+	const remote_member_name = credential.issuer.name;
+
+	const remote_organization = {
+		name: credential.credentialSubject.name,
+		postcode: credential.credentialSubject.address.postalCode,
+		address: credential.credentialSubject.address.streetAddress,
+		building: credential.credentialSubject.address.crossStreet,
+		department: credential.credentialSubject.department,
+		city: credential.credentialSubject.address.addressLocality,
+		state: credential.credentialSubject.address.addressRegion,
+		country: credential.credentialSubject.address.addressCountry,
+		taxId: credential.credentialSubject.taxId
+	}
 
 	const sql = `
 		INSERT INTO contacts (
@@ -190,25 +255,20 @@ const insertNewContact = async (invite, localUser, remote_member, remote_organiz
 		)
 	`;
 
-	console.log(remote_member);
-	console.log(remote_organization);
-	console.log(JSON.stringify(remote_organization));
-
 	const _id = uuidv1();
 
 	const args = [
 		_id,
-		invite.invite_code,
-		localUser.member_uuid,
-		localUser.membername,
-		remote_member.origin,
-		remote_member.member_uuid,
-		remote_member.membername,
+		invite_code,
+		local_member_uuid,
+		local_member_name,
+		remote_origin,
+		remote_member_uuid,
+		remote_member_name,
 		JSON.stringify(remote_organization),
-		invite.rel_buyer,
-		invite.rel_seller
+		relation.local_to_remote,
+		relation.remote_to_local
 	];
-
 
 	try {
 		await db.insert(sql, args);
@@ -216,9 +276,12 @@ const insertNewContact = async (invite, localUser, remote_member, remote_organiz
 		return [ null, err ];
 	}
 
+	// TODO: update use_count on invite table
+
 	return [ true, null ];
 
 }
+
 
 /*
  * getContacts
@@ -352,49 +415,22 @@ router.post('/generate', async function(req, res) {
 	const vbc = await signBusinessCard(credential, keyPair);
 	res.json(vbc);
 
-	/*
-	res.json({
-		host: {
-			invite_code: invite_code,
-			origin: req.headers.origin,
-			isBuyer : req.body.buyer,
-			isBuyerDescription : 'Inviter can send invoices to invitee',
-			isSeller : req.body.seller,
-			isSellerDescription : 'Invitee can send invoices to inviter',
-			orientation: 'The entity described in this JSON is the inviter'
-		},
-		organization : {
-			name: req.session.data.organization_name,
-			postcode: req.session.data.organization_postcode,
-			address: req.session.data.organization_address,
-			building: req.session.data.organization_building,
-			department: req.session.data.organization_department,
-		},
-		member : {
-			member_uuid: req.session.data.member_uuid,
-			membername: req.session.data.membername,
-			work_email: req.session.data.work_email
-		}
-	});
-	*/
 
 });
 
 /*
  * add
  */
+
 router.post('/add', async function(req, res) {
 
 	const { body } = req;
-
-	console.log(body);
-	console.log(body.member);
 
 	// 1.1 
 	// First we need to check if the contact already exists
 
 	const local_member_uuid = req.session.data.member_uuid;
-	const remote_member_uuid = body.member.member_uuid;
+	const remote_member_uuid = body.issuer.id;
 
 	const exists = await checkForExistingContact(local_member_uuid, remote_member_uuid)
 	if(exists) {
@@ -403,39 +439,45 @@ router.post('/add', async function(req, res) {
 
 	// 1.2 
 	// Then we need to try and contact the remote host
-	// When we do, we need to tell the remote host who we are
-	
-	const { origin, invite_code, isBuyer, isSeller } = body.host;
-	const { member_uuid, membername, work_email } = body.member;
-	const url = `${origin}/api/message/contactRequest`;
-	
-	// Create a request from the remote perspective
-	const contactRequest = {
-		invite_code: invite_code,
-		local_member : {
-			member_uuid : member_uuid,
-			membername : membername,
-			work_email : work_email
-		},
-		remote_organization : {
-			name: req.session.data.organization_name,
-			postcode: req.session.data.organization_postcode,
-			address: req.session.data.organization_address,
-			building: req.session.data.organization_building,
-			department: req.session.data.organization_department,
-		},
-		remote_member : {
-			origin: req.headers.origin,
-			member_uuid: req.session.data.member_uuid,
-			membername: req.session.data.membername,
-			work_email: req.session.data.work_email
-		}
+	// We start by creating our own verifiable business card
+
+	const invite_code = body.id.split(':').pop();
+
+	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code);
+	if(err1) {
+		return res.json({
+			err: 1,
+			msg: 'could not create business card'
+		});
 	}
+
+	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_uuid);
+	if(err2) {
+		return res.json({
+			err: 2,
+			msg: 'could not get private keys'
+		});
+	}
+
+	credential.relatedLink.push({
+		type: 'LinkRole',
+		target: body.issuer.id,
+		linkRelationship: 'Invite'
+	});
+
+	const vbc = await signBusinessCard(credential, keyPair);
+	
+	// 1.3
+	// Then we need to send our verifiable business card to the other
+	// party
+	
+	const [ link ] = body.relatedLink;
+	const url = link.target.replace('/presentations/available', '/api/message/contactRequest');
 
 	const params = {
 		method: 'post',
 		url: url,
-		data : contactRequest
+		data : vbc
 	}
 
 	let response;
@@ -464,32 +506,16 @@ router.post('/add', async function(req, res) {
 		return res.status(400).end(response.data);
 	}
 
+	console.log('we good bruh!!!');
+
 	// 1.3 
 	// If we get a 200 response, we need to insert our own contact
-
-	const invite = {
-		invite_code,
-		rel_buyer : req.body.host.isSeller,
-		rel_seller : req.body.host.isBuyer,
-	}
-
-	const local_member = {
-		member_uuid: req.session.data.member_uuid,
-		membername: req.session.data.membername,
-		work_email: req.session.data.work_email
-	}
-
-	const remote_member = {
-		origin : req.body.host.origin,
-		member_uuid : member_uuid,
-		membername : membername,
-		work_email : work_email
-	}
-
-	const remote_organization = req.body.organization;
-	const [ created, creatErr ] = await insertNewContact(invite, local_member, remote_member, remote_organization);
-	if(creatErr) {
-		return res.status(400).end(creatErr.toString());
+	
+	if( local_member_uuid !== remote_member_uuid) {
+		const [ created, creatErr ] = await insertNewContact(invite_code, local_member_uuid, body);
+		if(creatErr) {
+			return res.status(400).end(creatErr.toString());
+		}
 	}
 
 	res.json({
