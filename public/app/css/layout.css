@@ -221,7 +221,7 @@ aside div.modal div.body li.request {
 aside div.modal div.body li.label {
 
 	font-weight: bold;
-	font-size: 14px;
+	font-size: 16px;
 	padding-bottom: 5px;
 
 }
@@ -233,6 +233,41 @@ aside div.modal div.body .balance {
 	text-align: right;
 	padding-bottom: 6px;
 	word-break:break-all;
+
+}
+
+aside div.modal div.body table.contact-preview {
+
+	width: 100%;
+	table-layout: fixed;
+	border: collapse: collapse;
+
+}
+
+aside div.modal div.body table.contact-preview tr td {
+
+	padding-top: 4px;
+	padding-bottom: 4px;
+	border-bottom: 1px dashed #9a9a9a;
+
+}
+
+aside div.modal div.body table.contact-preview tr:first-child td {
+
+	border-top: 1px dashed #9a9a9a;
+
+}
+
+aside div.modal div.body table.contact-preview tr td:first-child {
+
+	width: 130px;
+	font-weight: bold;
+
+}
+
+aside div.modal div.body table.contact-preview tr td.char{
+
+	width: 14px;
 
 }
 
