@@ -27,7 +27,7 @@ main.app {
 	--tray-width: 390px;
 	--chat-width: 360px;
 
-	--stamp-width: 100px;
+	--stamp-width: 96px;
 	--input-placeholder-color: #bababa;
 }
 
@@ -5777,7 +5777,7 @@ main.app section article div.settings-content div.page div.contacts-header {
 main.app section article div.settings-content div.page div.contacts-header div.card {
 
 	width: calc(50% - 10px);
-	border: 1px solid #9a9a9a;
+	border: 1px dashed #9a9a9a;
 	display: block;
 	background-color: rgba(0,0,0,0.1);
 	border-radius: 5px;
@@ -5802,7 +5802,7 @@ main.app section article div.settings-content div.page div.contacts-header div.c
 
 main.app section article div.settings-content div.page div.contacts-header div.card table td.a {
 
-	width: 130px;
+	width: 120px;
 
 }
 
@@ -5819,23 +5819,70 @@ main.app section article div.settings-content div.page div.contacts-header div.c
 
 }
 
-main.app section article div.settings-content div.page div.contacts-header div.card table td.d button,
+main.app section article div.settings-content div.page div.contacts-header div.card table td.d button {
+
+	width: 90%;
+	padding: 20px 0;
+	border: 1px outset #ffffff;
+	border-radius: 3px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card table td.d span {
+
+	border: 1px inset #ffffff;
+	margin : 0px;
+	border-radius: 3px;
+	padding: 18px 0 18px 0;
+
+}
+
+@-moz-document url-prefix() {
+main.app section article div.settings-content div.page div.contacts-header div.card table td.d span {
+
+	padding: 19px 0 18px 0;
+
+}
+}
+
+
 main.app section article div.settings-content div.page div.contacts-header div.card table td.v button {
 
 	width: 90%;
 	padding: 20px 0;
+	border: 1px outset #ffffff;
+	border-radius: 3px;
 
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card table td.v span {
+
+	border: 1px inset #ffffff;
+	margin : 0px;
+	border-radius: 3px;
+	top : 25px;
+	position : relative;
+	padding: 18px 0 18px 0;
+}
+
+
+@-moz-document url-prefix() {
+main.app section article div.settings-content div.page div.contacts-header div.card table td.v span {
+
+	padding: 19px 0 18px 0;
+
+}
 }
 
 main.app section article div.settings-content div.page div.contacts-header div.card.export {
 
-	width: calc(70% - 20px);
+	width: calc(66% - 24px);
 
 }
 
 main.app section article div.settings-content div.page div.contacts-header div.card.import {
 
-	width: calc(30% - 10px);
+	width: calc(33% - 12px);
 
 }
 
@@ -5860,6 +5907,13 @@ main.app section article div.settings-content div.page div.contacts-header div.c
 main.app section article div.settings-content div.page div.contacts-header div.card table {
 
 	font-size: 14px;
+
+}
+
+main.app section article div.settings-content div.page div.contacts-header div.card table td.u {
+
+	width : 70%;
+	padding : 10px;
 
 }
 
