@@ -75,10 +75,15 @@ const SettingsContacts = (function() {
 			membername : document.getElementById('SettingsContacts.form.membername'),
 			work_email : document.getElementById('SettingsContacts.form.work_email'),
 			organization_name : document.getElementById('SettingsContacts.form.organization_name'),
+			organization_country : document.getElementById('SettingsContacts.form.organization_country'),
+
 			organization_postcode : document.getElementById('SettingsContacts.form.organization_postcode'),
+			organization_region : document.getElementById('SettingsContacts.form.organization_region'),
+			organization_city : document.getElementById('SettingsContacts.form.organization_city'),
 			organization_address : document.getElementById('SettingsContacts.form.organization_address'),
 			organization_building : document.getElementById('SettingsContacts.form.organization_building'),
-			organization_department : document.getElementById('SettingsContacts.form.organization_department')
+			organization_department : document.getElementById('SettingsContacts.form.organization_department'),
+			organization_tax_id : document.getElementById('SettingsContacts.form.organization_tax_id')
 		}
 	}
 
@@ -393,10 +398,16 @@ const SettingsContacts = (function() {
 			throw err;
 		}
 
+	
 		const json = await response.json();
+		console.log(json);
 		const mime = {type: "text/plain;charset=utf-8"}
 		var blob = new Blob([JSON.stringify(json, null, 2)], mime);
-		saveAs(blob, `ContactDetails_${json.host.invite_code}.json`);
+
+		const { id } = json;
+		const uuid = id.split(':').pop();
+		const time = uuid.split('-').shift();
+		saveAs(blob, `ContactDetails_${time}.json`);
 
 	}
 
@@ -428,20 +439,28 @@ const SettingsContacts = (function() {
 		const details = await this.API.readContactFile(file)
 		this.MEM.details = details;
 
+		console.log(details);
+
 		this.DOM.modal.body.classList.add('open')
 		const { form } = this.DOM;
-
-		const { host, organization, member } = details;
-
-		form.origin.textContent = host.origin;
-		form.membername.textContent = member.membername;
-		form.work_email.textContent = member.work_email;
 		
-		form.organization_name.textContent = organization.name;
-		form.organization_postcode.textContent = organization.postcode;
-		form.organization_address.textContent = organization.address;
-		form.organization_building.textContent = organization.building;
-		form.organization_department.textContent = organization.department;
+		const { credentialSubject, issuer } = details;
+		const [ membername, host ] = credentialSubject.contactPoint.split('@');
+		const { address } = credentialSubject;
+
+		form.origin.textContent = host;
+		form.membername.textContent = membername;
+		form.work_email.textContent = issuer.email;
+		
+		form.organization_name.textContent = credentialSubject.name;
+		form.organization_postcode.textContent = address.postalCode;
+		form.organization_region.textContent = address.addressRegion;
+		form.organization_city.textContent = address.addressLocality;
+		form.organization_country.textContent = address.addressCountry;
+		form.organization_address.textContent = address.streetAddress;
+		form.organization_building.textContent = address.crossStreet;
+		form.organization_department.textContent = credentialSubject.department;
+		form.organization_tax_id.textContent = credentialSubject.taxId;
 
 	}
 
