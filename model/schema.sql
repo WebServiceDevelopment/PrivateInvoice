@@ -160,7 +160,7 @@ DROP TABLE IF EXISTS `contacts`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `contacts` (
   `_id` varchar(36) NOT NULL,
-  `invite_code` varchar(36) NOT NULL,
+  `invite_code` varchar(64) NOT NULL,
   `local_member_uuid` varchar(64) NOT NULL,
   `local_membername` varchar(255) NOT NULL,
   `remote_origin` varchar(255) NOT NULL,
@@ -213,7 +213,7 @@ DROP TABLE IF EXISTS `invite`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `invite` (
-  `invite_code` varchar(16) NOT NULL,
+  `invite_code` varchar(64) NOT NULL,
   `local_member_uuid` varchar(100) NOT NULL,
   `rel_buyer` int(11) NOT NULL DEFAULT 0,
   `rel_seller` int(11) NOT NULL DEFAULT 0,
@@ -221,7 +221,8 @@ CREATE TABLE `invite` (
   `max_count` int(11) DEFAULT NULL,
   `created_on` datetime NOT NULL DEFAULT current_timestamp(),
   `expires_on` datetime DEFAULT NULL,
-  `removed_on` datetime DEFAULT NULL
+  `removed_on` datetime DEFAULT NULL,
+  PRIMARY KEY (`invite_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -477,4 +478,4 @@ CREATE TABLE `seller_status_draft` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-06-12 10:05:56
+-- Dump completed on 2022-06-13 12:06:31

@@ -394,21 +394,54 @@
 					<li class='label'>
 						Organization
 					</li>
-					<li class='balance' id='SettingsContacts.form.organization_name'>
-						Organization Name
-					</li>
-					<li class='balance' id='SettingsContacts.form.organization_postcode'>
-						Organization Postcode
-					</li>
-					<li class='balance' id='SettingsContacts.form.organization_address'>
-						Organization Address
-					</li>
-					<li class='balance' id='SettingsContacts.form.organization_building'>
-						Organization Building
-					</li>
-					<li class='balance' id='SettingsContacts.form.organization_department'>
-						Organization Department
-					</li>
+
+					<table class='contact-preview'>
+						<tr>
+							<td>Name</td>
+							<td class='char'>:</td>
+							<td id='SettingsContacts.form.organization_name'></td>
+						</tr>
+						<tr>
+							<td>Country</td>
+							<td class='char'>:</td>
+							<td id='SettingsContacts.form.organization_country'></td>
+						</tr>
+						<tr>
+							<td>Postal Code</td>
+							<td class='char'>:</td>
+							<td id='SettingsContacts.form.organization_postcode'></td>
+						</tr>
+						<tr>
+							<td>Region</td>
+							<td class='char'>:</td>
+							<td id='SettingsContacts.form.organization_region'></td>
+						</tr>
+						<tr>
+							<td>City</td>
+							<td class='char'>:</td>
+							<td id='SettingsContacts.form.organization_city'></td>
+						</tr>
+						<tr>
+							<td>Line 1</td>
+							<td class='char'>:</td>
+							<td id='SettingsContacts.form.organization_address'></td>
+						</tr>
+						<tr>
+							<td>Line 2</td>
+							<td class='char'>:</td>
+							<td id='SettingsContacts.form.organization_building'></td>
+						</tr>
+						<tr>
+							<td>Department</td>
+							<td class='char'>:</td>
+							<td id='SettingsContacts.form.organization_department'></td>
+						</tr>
+						<tr>
+							<td>Tax Id</td>
+							<td class='char'>:</td>
+							<td id='SettingsContacts.form.organization_tax_id'></td>
+						</tr>
+					</table>
 
 				</div>
 
@@ -1795,7 +1828,9 @@
 												<input type='number' value='1' disabled='disabled' id='SettingsContacts.exportDetails.uses'/> Times(s)
 											</td>
 											<td class='d' rowspan='3'>
+												<span>
 												<button id='SettingsContacts.exportDetails.submit'>Export</button>
+												</span>
 											</td>
 										</tr>
 										<tr>
@@ -1827,10 +1862,6 @@
 
 								<div class='card import'>
 									<h3>Import Contact Details</h3>
-									<p>
-									Drag and Drop contact details here to add a new contact, or click the button to import
-
-									</p>
 
 									<input type='file' id='SettingsContacts.importDetails.file' style='display: none' accept='.json'/>
 
@@ -1838,9 +1869,15 @@
 										<table>
 											<tr>
 												<td class='u'>
+									<p>
+									Drag and Drop contact details here to add a new contact, or click the button to import
+
+									</p>
 												</td>
 												<td class='v'>
+													<span>
 													<button id='SettingsContacts.importDetails.select'>Select</button>
+													</span>
 												</td>
 											</tr>
 										</table>
