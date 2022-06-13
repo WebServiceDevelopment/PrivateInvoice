@@ -398,7 +398,11 @@ const SettingsContacts = (function() {
 		console.log(json);
 		const mime = {type: "text/plain;charset=utf-8"}
 		var blob = new Blob([JSON.stringify(json, null, 2)], mime);
-		saveAs(blob, `ContactDetails_${json.id}.json`);
+
+		const { id } = json;
+		const uuid = id.split(':').pop();
+		const time = uuid.split('-').shift();
+		saveAs(blob, `ContactDetails_${time}.json`);
 
 	}
 
