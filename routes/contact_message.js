@@ -109,9 +109,71 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 /*
  * insertNewContact
  */
-const insertNewContact = async (invite, localUser, remote_member, remote_organization) => {
+const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 
-	// TODO update use_count on invite table
+	// Get local username
+
+	const mySql = `
+		SELECT
+			membername AS local_member_name
+		FROM
+			members
+		WHERE
+			member_uuid = ?
+	`;
+
+	const myArgs = [
+		local_member_uuid
+	];
+
+	let row;
+	try {
+		row = await db.selectOne(mySql, myArgs);
+	} catch(err) {
+		return [ null, err ];
+	}
+	
+	const { local_member_name } = row;
+
+	// Get Information from Business Card
+
+	const [ link ] = credential.relatedLink.filter( (link) => {
+		return link.linkRelationship !== 'Invite';
+	});
+
+	const relation = {
+		local_to_remote: 0,
+		remote_to_local: 0
+	};
+
+	switch(link.linkRelationship) {
+	case 'Partner':
+		relation.local_to_remote = 1;
+		relation.remote_to_local = 1;
+		break;
+	case 'Buyer':
+		relation.local_to_remote = 1;
+		break;
+	case 'Seller':
+		relation.remote_to_local = 1;
+		break;
+	}
+
+	const remote_origin = link.target.replace('/presentations/available', '')
+	const remote_member_uuid = credential.issuer.id;
+	const remote_member_name = credential.issuer.name;
+
+	const remote_organization = {
+		name: credential.credentialSubject.name,
+		postcode: credential.credentialSubject.address.postalCode,
+		address: credential.credentialSubject.address.streetAddress,
+		building: credential.credentialSubject.address.crossStreet,
+		department: credential.credentialSubject.department,
+		city: credential.credentialSubject.address.addressLocality,
+		state: credential.credentialSubject.address.addressRegion,
+		country: credential.credentialSubject.address.addressCountry,
+		taxId: credential.credentialSubject.taxId
+	}
 
 	const sql = `
 		INSERT INTO contacts (
@@ -139,31 +201,28 @@ const insertNewContact = async (invite, localUser, remote_member, remote_organiz
 		)
 	`;
 
-	console.log(remote_member);
-	console.log(remote_organization);
-	console.log(JSON.stringify(remote_organization));
-
 	const _id = uuidv1();
 
 	const args = [
 		_id,
-		invite.invite_code,
-		localUser.member_uuid,
-		localUser.membername,
-		remote_member.origin,
-		remote_member.member_uuid,
-		remote_member.membername,
+		invite_code,
+		local_member_uuid,
+		local_member_name,
+		remote_origin,
+		remote_member_uuid,
+		remote_member_name,
 		JSON.stringify(remote_organization),
-		invite.rel_buyer,
-		invite.rel_seller
+		relation.local_to_remote,
+		relation.remote_to_local
 	];
-
 	
 	try {
 		await db.insert(sql, args);
 	} catch(err) {
 		return [ null, err ];
 	}
+	
+	// TODO: update use_count on invite table
 
 	return [ true, null ];
 
@@ -178,29 +237,33 @@ const insertNewContact = async (invite, localUser, remote_member, remote_organiz
 router.all('/contactRequest', async(req, res) => {
 
 	console.log('--- Got Contact Request ---');
-
 	const { body } = req;
-	console.log(body);
 
 	// First we see if the invite code is still valid
+	
+	const invite_code = body.id.split(':').pop();
+	const [ linkRelationship ] = body.relatedLink.filter( (link) => {
+		return link.linkRelationship === 'Invite';
+	});
+	const local_member_uuid = linkRelationship.target;
 
-	const { invite_code, local_member, remote_member, remote_organization } = body;
-	const [ invite, inviteEr ] = await checkInviteCodeValid(local_member.member_uuid, invite_code);
+	const [ invite, inviteEr ] = await checkInviteCodeValid(local_member_uuid, invite_code);
 	if(inviteEr) {
 		return res.status(400).end(inviteEr.toString());
 	}
 
 	// Then we see if the contact already exists
 	
-	const exists = await checkForExistingContact(local_member.member_uuid, remote_member.member_uuid);
+	const remote_member_uuid = body.issuer.id;
+	const exists = await checkForExistingContact(local_member_uuid, remote_member_uuid);
 	if(exists) {
 		return res.status(400).end('Contact already exists');
 	}
 
 	// Then we try to insert the contact
 	
-	const [ created, creatErr ] = await insertNewContact(invite, local_member, remote_member, remote_organization);
-	if(creatErr) {
+	const [ created, createErr ] = await insertNewContact(invite_code, local_member_uuid, body);
+	if(createErr) {
 		return res.status(400).end(creatErr.toString());
 	}
 
