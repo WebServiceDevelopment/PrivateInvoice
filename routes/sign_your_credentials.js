@@ -43,6 +43,8 @@ const context = {
 }
 
 const { checkStatus } = require('@transmute/vc-status-rl-2020');
+const { resolve } = require('@transmute/did-key.js');
+
 
 /*
  * documentLoader;
@@ -51,6 +53,11 @@ const documentLoader = async (iri) => {
 
 	if(context[iri]) {
 		return { document: context[iri] };
+	}
+
+	if(iri.indexOf('did:key') === 0) {
+		const document = await resolve(iri);
+		return { document };
 	}
 
 	const message = `Unsupported iri: ${iri}`;
