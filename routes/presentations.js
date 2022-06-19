@@ -31,6 +31,7 @@ module.exports					= router;
 const uuidv4					= require('uuid').v4;
 const { createClient } 			= require('redis');
 const redisClient 				= createClient();
+const { verifyPresentation } = require('./sign_your_credentials.js');
 
 // Define 
 
@@ -39,21 +40,37 @@ router.post('/available', async (req, res) => {
 	console.log(req.body);
 
 	// Create a challenge
+	const domain = process.env.DOMAIN;
 	const challenge = uuidv4();
 
 	// Store it in Redis with a expiration timer of 100 seconds
-	await redisClient.set(challenge, 'pending', 'EX', '100');
+	await redisClient.set(challenge, domain, 'EX', '100');
 	
 	// Return the domain and challenge
 	res.json({
 		...req.body,
-		domain: process.env.DOMAIN,
+		domain,
 		challenge
 	});
 
 });
 
 router.post('/submissions', async (req, res) => {
+
+	console.log('--- /api/presentations/submissions ---');
+	console.log(req.body);
+
+	// 1.
+	// First we need to see if the challenge is still available
+
+	// 2.
+	// Then we need to verify the presentation 
+
+	const valid = await verifyPresentation(req.body);
+	console.log(valid);
+
+	// 3.
+	// Assuming that works, then we need to consume the challenge
 
 	res.json({
 		code : 0,
