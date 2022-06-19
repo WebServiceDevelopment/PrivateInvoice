@@ -25,8 +25,11 @@ const TabWidget = (function() {
 	this.MEM = {}
 
 	this.DOM = {
+		test: {
+			present: document.getElementById('TabWidget.tab.present')
+		},
 		tab : {
-			settings : document.getElementById('TabWidget.tab.settings')
+			settings : document.getElementById('TabWidget.tab.settings'),
 		},
 		section : {
 			supplier : document.getElementById('TabWidget.section.seller'),
@@ -35,7 +38,8 @@ const TabWidget = (function() {
 	}
 
 	this.EVT = {
-		handleToggleClick : evt_handleToggleClick.bind(this)
+		handleToggleClick : evt_handleToggleClick.bind(this),
+		handlePresentClick : evt_handlePresentClick.bind(this),
 	}
 
 	this.API = {
@@ -51,9 +55,24 @@ const TabWidget = (function() {
 			this.DOM.tab[key].addEventListener('click', this.EVT.handleToggleClick);
 		}
 
-		// this.API.openSection("supplier");
+		this.API.openSection("supplier");
+		this.DOM.test.present.addEventListener('click', this.EVT.handlePresentClick);
 
-		this.API.openSection("settings");
+	}
+
+	function evt_handlePresentClick() {
+
+		console.log('click!!!');
+
+		const ajax = new XMLHttpRequest();
+		ajax.open('POST', '/api/test/present');
+		ajax.send();
+
+		ajax.onload = () => {
+
+			console.log(ajax.responseText);
+
+		}
 
 	}
 
