@@ -26,6 +26,7 @@
     "@sidetree/wallet": "^0.3.1-unstable.58",
     "@transmute/credentials-context": "^0.7.0-unstable.60",
     "@transmute/ed25519-signature-2018": "^0.7.0-unstable.60",
+    "@transmute/vc-status-rl-2020": "^0.7.0-unstable.61",
     "@transmute/vc.js": "^0.7.0-unstable.60",
     "axios": "^0.27.1",
     "bcrypt": "^5.0.1",
