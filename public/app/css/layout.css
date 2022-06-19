@@ -5163,6 +5163,20 @@ main.app section article div.settings-menu div.menu li table td.icon {
 
 }
 
+main.app section article div.settings-menu div.menu li table td.icon img {
+
+	width: 24px;
+	padding-top: 6px;
+
+}
+main.app section article div.settings-menu div.menu li:hover table td.icon img,
+main.app section article div.settings-menu div.menu li.active table td.icon img {
+
+  -webkit-filter: invert(100%);
+  filter: invert(100%);
+
+}
+
 main.app section article div.settings-menu div.menu li:hover {
 
 	cursor: pointer;
