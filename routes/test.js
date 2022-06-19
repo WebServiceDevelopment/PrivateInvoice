@@ -34,7 +34,7 @@ const { signPresentation } = require('./sign_your_credentials.js');
 
 // Helper functions
 
-const exampleVC = {
+const placeholder = {
 	"@context": [
 		"https://www.w3.org/2018/credentials/v1"
 	],
@@ -152,7 +152,7 @@ const sendPresentation = async( keyPair, domain, challenge, vc ) => {
 	if(vc) {
 		presentation.verifiableCredential.push(vc);
 	} else {
-		presentation.verifiableCredential.push(exampleVC);
+		presentation.verifiableCredential.push(placeholder);
 	}
 
 	console.log('before sign');
