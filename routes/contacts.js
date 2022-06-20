@@ -34,6 +34,7 @@ const axios					= require('axios');
 const moment 				= require('moment');
 
 const { signBusinessCard } = require('./sign_your_credentials.js')
+const { makePresentation } = require('../modules/presentations_out.js')
 
 // Database
 
@@ -98,7 +99,7 @@ const createBusinessCard = async (req, member_did, invite_code) => {
 		relatedLink: [
 			{
 				type: "LinkRole",
-				target: `${req.headers.origin}/presentations/available`,
+				target: `${req.headers.origin}/api/presentations/available`,
 				linkRelationship: 'Partner'
 			}
 		],
@@ -213,7 +214,7 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 		break;
 	}
 
-	const remote_origin = link.target.replace('/presentations/available', '')
+	const remote_origin = link.target.replace('/api/presentations/available', '');
 	const remote_member_uuid = credential.issuer.id;
 	const remote_member_name = credential.issuer.name;
 
@@ -429,6 +430,8 @@ router.post('/add', async function(req, res) {
 	// 1.1 
 	// First we need to check if the contact already exists
 
+	console.log('1.1');
+
 	const local_member_uuid = req.session.data.member_uuid;
 	const remote_member_uuid = body.issuer.id;
 
@@ -441,6 +444,7 @@ router.post('/add', async function(req, res) {
 	// Then we need to try and contact the remote host
 	// We start by creating our own verifiable business card
 
+	console.log('1.2');
 	const invite_code = body.id.split(':').pop();
 
 	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code);
@@ -471,52 +475,39 @@ router.post('/add', async function(req, res) {
 	// Then we need to send our verifiable business card to the other
 	// party
 	
+	console.log('1.3');
 	const [ link ] = body.relatedLink;
-	const url = link.target.replace('/presentations/available', '/api/message/contactRequest');
+	const url = link.target;
 
-	const params = {
-		method: 'post',
-		url: url,
-		data : vbc
+	const [ response, err3 ] = await makePresentation(url, keyPair, vbc);
+	if(err3) {
+		return res.json({
+			err: 3,
+			msg: 'Presentation failed: ' + err3
+		});
 	}
-
-	let response;
-	try {
-		response = await axios(params);
-	} catch(err) {
-		if(err.response) {
-			response = {
-				status : err.response.status,
-				data : err.response.data
-			}
-		} else if(err.code === 'ECONNRESET') {
-			response = {
-				status : 500,
-				data : 'ECONNRESET'
-			}
-		} else {
-			response = {
-				status : 400,
-				data : "Undefined Error"
-			}
-		}
-	}
-
-	if(response.status !== 200) {
-		return res.status(400).end(response.data);
-	}
-
-	console.log('we good bruh!!!');
-
-	// 1.3 
-	// If we get a 200 response, we need to insert our own contact
 	
-	if( local_member_uuid !== remote_member_uuid) {
-		const [ created, creatErr ] = await insertNewContact(invite_code, local_member_uuid, body);
-		if(creatErr) {
-			return res.status(400).end(creatErr.toString());
-		}
+	// 1.4
+	// For debug purposes, if we add ourselves as a contact, then the
+	// entry has already been made as a result of the presentation
+	// on our server
+	
+	if( local_member_uuid === remote_member_uuid) {
+		return res.json({
+			msg : 'okay'
+		});
 	}
+
+	// 1.5
+	// If we get a successful response from the presentation,
+	// then we need to add a contact on our own server
+
+	const [ created, creatErr ] = await insertNewContact(invite_code, local_member_uuid, body);
+	if(creatErr) {
+		return res.status(400).end(creatErr.toString());
+	}
+	
+	// End Route
 
 	res.json({
 		msg : 'okay'
@@ -528,9 +519,6 @@ router.post('/add', async function(req, res) {
  * getContactList
  */
 router.get('/getContactList', async function(req, res) {
-
-	console.log('My session data');
-	console.log(req.session.data);
 
 	const { member_uuid } = req.session.data;
 	const contacts = await getContacts(member_uuid);
