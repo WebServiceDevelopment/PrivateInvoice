@@ -38,7 +38,10 @@ const uniqid					= require('uniqid');
 const moment					= require('moment');
 
 // import Sign
-const sign_your_credentials           = require("./sign_your_credentials.js");
+
+const db                    = require('../database.js');
+const sign_your_credentials		   = require("./sign_your_credentials.js");
+const { makePresentation } = require('../modules/presentations_out.js');
 
 // Database 
 
@@ -55,12 +58,42 @@ const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
 const CONTACTS	  				= "contacts"
 
 
+const getPrivateKeys = async (member_did) => {
+
+	const sql = `
+		SELECT
+			public_key
+		FROM
+			privatekeys
+		WHERE
+			member_did = ?
+	`;
+
+	const args = [
+		member_did
+	];
+
+	let row;
+	try {
+		row = await db.selectOne(sql, args);
+	} catch(err) {
+		return [ null, err ];
+	}
+
+	const keyPair = JSON.parse(row.public_key);
+	return [ keyPair, null ];
+
+}
+
+
 // ------------------------------- End Points -------------------------------
+
 
 /*
  * [ Send Invoice ]
  * send
  */
+
 router.post('/send', async function(req, res) {
 	const METHOD = "/send";
 
@@ -242,10 +275,32 @@ router.post('/send', async function(req, res) {
 
 	// 15.
 	// Send 'send' message to buyer.
-	//
-	const [ code15, err15 ] = await to_buyer.sendInvoice(buyer_host, document, status);
+	
+	const messageSlug = '/api/message/buyerToSend';
+	const presenationSlug = '/api/presentations/available'
+	// const url = buyer_host.replace(messageSlug, presenationSlug);
+	const url = buyer_host + presenationSlug;
+
+	const [ keyPair, keyErr ] = await getPrivateKeys(member_uuid);
+	console.log('KEY PAIR');
+	console.log( keyErr );
+	console.log(member_uuid);
+	console.log( keyPair );
+
+	const vc = JSON.parse(document.document_json);
+
+	console.log('HERE');
+	console.log(buyer_host);
+	console.log(url);
+
+	const [ stats, message ] = await makePresentation(url, keyPair, vc);
+
+	// const [ code15, err15 ] = await to_buyer.sendInvoice(buyer_host, document, status);
 	//console.log(code);
 	//console.log(err);
+
+	const code15 = 400;
+	const err15 = 'oh nou'
 
 	if(parseInt(code15) !== 200) {
 		errno = 15;

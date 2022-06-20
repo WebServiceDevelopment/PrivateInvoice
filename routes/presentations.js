@@ -117,6 +117,9 @@ router.post('/submissions', async (req, res) => {
 		// Handle Contact Request
 		const [ status, message ] = await handleContactRequest( credential );
 		return res.status(status).end(message);
+	} else if(credential.type.indexOf('CommercialInvoiceCertificate') !== -1) {
+		// Handle Commercial Invoice
+
 	}
 
 	res.status(400).end('no valid credential detected');
