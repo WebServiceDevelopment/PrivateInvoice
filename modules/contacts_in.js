@@ -18,17 +18,7 @@
     
 **/
 
-// TODO: REMOVE THIS FILE FROM ROUTES
-
 "use strict";
-
-// Import sub
-
-// Import Router
-
-const express				= require('express');
-const router				= express.Router();
-module.exports				= router;
 
 // Import Libraries
 
@@ -162,7 +152,7 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 		break;
 	}
 
-	const remote_origin = link.target.replace('/presentations/available', '')
+	const remote_origin = link.target.replace('/api/presentations/available', '')
 	const remote_member_uuid = credential.issuer.id;
 	const remote_member_name = credential.issuer.name;
 
@@ -237,11 +227,12 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 /*
  * contactRequest
  */
-router.all('/contactRequest', async(req, res) => {
 
-	console.log('--- Got Contact Request ---');
-	const { body } = req;
+const handleContactRequest = async (body) => {
 
+	console.log('--- Handle Contact Request ---');
+	
+	// 1.
 	// First we see if the invite code is still valid
 	
 	const invite_code = body.id.split(':').pop();
@@ -250,28 +241,34 @@ router.all('/contactRequest', async(req, res) => {
 	});
 	const local_member_uuid = linkRelationship.target;
 
+
 	const [ invite, inviteEr ] = await checkInviteCodeValid(local_member_uuid, invite_code);
 	if(inviteEr) {
-		return res.status(400).end(inviteEr.toString());
+		return [ 400, 'invite code invalid' ];
 	}
 
+	// 2.
 	// Then we see if the contact already exists
 	
 	const remote_member_uuid = body.issuer.id;
 	const exists = await checkForExistingContact(local_member_uuid, remote_member_uuid);
 	if(exists) {
-		return res.status(400).end('Contact already exists');
+		return [ 400, 'contact already exists' ];
 	}
 
+	// 3.
 	// Then we try to insert the contact
 	
 	const [ created, createErr ] = await insertNewContact(invite_code, local_member_uuid, body);
 	if(createErr) {
-		return res.status(400).end(creatErr.toString());
+		return [ 400, 'could not create contact' ];
 	}
 
 	// Then we return a confirmation status
 	
-	return res.status(200).end('okay');
+	return [ 200, 'contact created' ];
+}
 
-});
+module.exports = { 
+	handleContactRequest 
+};

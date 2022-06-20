@@ -42,6 +42,10 @@ const context = {
 	"https://w3id.org/traceability/v1" : require('../context/traceability_v1.json')
 }
 
+const { checkStatus } = require('@transmute/vc-status-rl-2020');
+const { resolve } = require('@transmute/did-key.js');
+
+
 /*
  * documentLoader;
  */
@@ -49,6 +53,11 @@ const documentLoader = async (iri) => {
 
 	if(context[iri]) {
 		return { document: context[iri] };
+	}
+
+	if(iri.indexOf('did:key') === 0) {
+		const document = await resolve(iri);
+		return { document };
 	}
 
 	const message = `Unsupported iri: ${iri}`;
@@ -62,6 +71,8 @@ const documentLoader = async (iri) => {
 module.exports = {
 	signInvoice: signInvoice,
 	signBusinessCard: signBusinessCard,
+	signPresentation: signPresentation,
+	verifyPresentation: verifyPresentation
 }
 
 // ------------------------------- modules -------------------------------
@@ -84,6 +95,54 @@ async function signBusinessCard (credential, keyPair) {
 	const [ signedCredential ] = items;
 	return signedCredential;
 
+}
+
+/**
+ * Sign Presentation
+ **/
+
+async function signPresentation (presentation, keyPair, domain, challenge) {
+
+	console.log('okay?');
+
+	const { items } = await transmute.verifiable.presentation.create({
+		presentation,
+		format: ['vp'],
+		domain,
+		challenge,
+		documentLoader,
+		suite: new Ed25519Signature2018({
+			key: await Ed25519VerificationKey2018.from(keyPair)
+		})
+	});
+
+	console.log('oh god!!');
+
+	const [ signedPresentation ] = items;
+	return signedPresentation;
+
+}
+
+/**
+ * Verify Presentation
+ **/
+
+async function verifyPresentation (signedPresentation) {
+	
+	const suite = new Ed25519Signature2018();
+	const { domain, challenge } = signedPresentation.proof;
+
+	const result = await transmute.verifiable.presentation.verify({
+		presentation: signedPresentation,
+		domain,
+		challenge,
+ 		suite,
+		checkStatus,
+		format: ['vp'],
+		documentLoader,
+	});
+
+	return result;
 
 }
 

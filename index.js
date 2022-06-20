@@ -78,15 +78,18 @@ app.all("*", function (req, res, next) {
         return next();
     }
 
-    // Otherwise we need to allow for access on session to non-logged
-    // in users, so that they can log in
+    // Allow access to message
     if(req.url.startsWith('/api/message')) {
         return next();
     }
 
-    // Otherwise we need to allow for access on session to non-logged
-    // in users, so that they can log in
+    // Allow access to session
     if(req.url.startsWith('/api/session')) {
+        return next();
+    }
+
+    // Allow access to presentations
+    if(req.url.startsWith('/api/presentations')) {
         return next();
     }
 
@@ -140,6 +143,8 @@ app.use('/api/settings', require('./routes/settings.js'));
 app.use('/api/message', require('./routes/contact_message.js'));
 
 app.use('/api/wallet', require('./routes/wallet.js'));
+app.use('/api/test', require('./routes/test.js'));
+app.use('/api/presentations', require('./routes/presentations.js'));
 
 
 // Public Directory and listen
