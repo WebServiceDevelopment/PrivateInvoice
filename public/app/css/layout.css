@@ -5163,18 +5163,10 @@ main.app section article div.settings-menu div.menu li table td.icon {
 
 }
 
-main.app section article div.settings-menu div.menu li table td.icon img {
+main.app section article div.settings-menu div.menu li table td.icon  img{
 
-	width: 24px;
-	padding-top: 6px;
-
-}
-main.app section article div.settings-menu div.menu li:hover table td.icon img,
-main.app section article div.settings-menu div.menu li.active table td.icon img {
-
-  -webkit-filter: invert(100%);
-  filter: invert(100%);
-
+	width: 32px;
+	height: 32px;
 }
 
 main.app section article div.settings-menu div.menu li:hover {
@@ -5834,6 +5826,13 @@ main.app section article div.settings-content div.page div.contacts-header div.c
 
 }
 
+main.app section article div.settings-content div.page div.contacts-header div.card div.drag-area {
+
+	position : relative;
+	top : -60px;
+	height: 100px;
+}
+
 main.app section article div.settings-content div.page div.contacts-header div.card div.drag-area.over {
 
 	background-color: rgba(0,0,0,0.1);
@@ -5909,7 +5908,7 @@ main.app section article div.settings-content div.page div.contacts-header div.c
 	border: 1px inset #ffffff;
 	margin : 0px;
 	border-radius: 3px;
-	top : 25px;
+	top : -25px;
 	position : relative;
 	padding: 18px 0 18px 0;
 }
@@ -5932,6 +5931,7 @@ main.app section article div.settings-content div.page div.contacts-header div.c
 main.app section article div.settings-content div.page div.contacts-header div.card.import {
 
 	width: calc(33% - 12px);
+	height : 120px;
 
 }
 
@@ -5961,7 +5961,7 @@ main.app section article div.settings-content div.page div.contacts-header div.c
 
 main.app section article div.settings-content div.page div.contacts-header div.card table td.u {
 
-	width : 70%;
+	width : 72%;
 	padding : 10px;
 
 }
