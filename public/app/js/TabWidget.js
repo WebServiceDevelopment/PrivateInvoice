@@ -26,7 +26,7 @@ const TabWidget = (function() {
 
 	this.DOM = {
 		tab : {
-			settings : document.getElementById('TabWidget.tab.settings')
+			settings : document.getElementById('TabWidget.tab.settings'),
 		},
 		section : {
 			supplier : document.getElementById('TabWidget.section.seller'),
@@ -51,9 +51,7 @@ const TabWidget = (function() {
 			this.DOM.tab[key].addEventListener('click', this.EVT.handleToggleClick);
 		}
 
-		// this.API.openSection("supplier");
-
-		this.API.openSection("settings");
+		this.API.openSection("supplier");
 
 	}
 
