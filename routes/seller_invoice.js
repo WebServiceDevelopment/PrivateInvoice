@@ -90,7 +90,14 @@ router.post('/send', async function(req, res) {
 		return res.status(400).json(err2);
 	}
 
+	console.log('Buyer host: ', buyer_host);
+
 	//3. buyer connect check
+	
+	console.log('lets try skipping this');
+	console.log('but maybe we can call init manually');
+
+	/*
 	const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
 
 	if(code3 !== 200) {
@@ -110,6 +117,7 @@ router.post('/send', async function(req, res) {
 		}
 		return res.status(400).json(msg);
 	}
+	*/
 
 	// 4. 
 	// DRAFT_STATUS
