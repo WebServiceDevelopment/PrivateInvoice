@@ -83,7 +83,11 @@ router.post('/submissions', async (req, res) => {
 	// https://github.com/WebServiceDevelopment/PrivateInvoice/issues/15
 
 	const result = await verifyPresentation(signedPresentation);
+
 	console.log(result);
+	console.log(result.credentials);
+	console.log(result.presentation);
+
 	if(!result.verified) {
 		// return 400;
 	}
