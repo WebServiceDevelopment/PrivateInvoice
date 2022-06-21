@@ -87,9 +87,7 @@ const getPrivateKeys = async (member_did) => {
  */
 
 router.post("/send", async function (req, res) {
-  const METHOD = "/send";
-
-  let start = Date.now();
+  const start = Date.now();
 
   const { document_uuid } = req.body;
   const { member_uuid } = req.session.data;
@@ -132,35 +130,6 @@ router.post("/send", async function (req, res) {
     return res.status(400).json(err2);
   }
 
-  console.log("Buyer host: ", buyer_host);
-
-  //3. buyer connect check
-
-  console.log("lets try skipping this");
-  console.log("but maybe we can call init manually");
-
-  /*
-	const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
-
-	if(code3 !== 200) {
-		console.log("Error 3 code="+code3+":err="+err3);
-		let msg;
-		if(code == 500) {
-			msg = {"err":"buyer connect check:ECONNRESET"};
-		} else {
-			switch(err3) {
-			case "Not found.":
-				msg = {"err":"The destination node cannot be found."};
-			break;
-			default:
-				msg = {"err":err3};
-			break;
-			}
-		}
-		return res.status(400).json(msg);
-	}
-	*/
-
   // 4.
   // DRAFT_STATUS
   // First we go ahead and get the draft status.
@@ -184,7 +153,7 @@ router.post("/send", async function (req, res) {
   // 6.
   // Second we go ahead and get the draft document
   //
-  const [document, _6] = await sub.getDraftDocumentForSend(
+  const [document] = await sub.getDraftDocumentForSend(
     SELLER_DRAFT_DOCUMENT,
     document_uuid
   );
@@ -309,37 +278,12 @@ router.post("/send", async function (req, res) {
   // 15.
   // Send 'send' message to buyer.
 
-  const messageSlug = "/api/message/buyerToSend";
   const presenationSlug = "/api/presentations/available";
-  // const url = buyer_host.replace(messageSlug, presenationSlug);
   const url = buyer_host + presenationSlug;
 
-  const [keyPair, keyErr] = await getPrivateKeys(member_uuid);
-  console.log("KEY PAIR");
-  console.log(keyErr);
-  console.log(member_uuid);
-  console.log(keyPair);
-
+  const [keyPair] = await getPrivateKeys(member_uuid);
   const vc = JSON.parse(document.document_json);
-
-  console.log("HERE");
-  console.log(buyer_host);
-  console.log(url);
-
-  console.log("----- DOCUMENT -----");
-  console.log(document);
-
-  console.log("----- STATUS -------");
-  console.log(status);
-
   const [code15, err15] = await makePresentation(url, keyPair, vc);
-
-  console.log("got it back!!!");
-  console.log(code15);
-  console.log(err15);
-  // const [ code15, err15 ] = await to_buyer.sendInvoice(buyer_host, document, status);
-  //console.log(code);
-  //console.log(err);
 
   if (err15) {
     console.log("OMG nuuuu it failed");
@@ -372,7 +316,7 @@ router.post("/send", async function (req, res) {
     msg: status.document_uuid,
   });
 
-  let end = Date.now();
+  const end = Date.now();
   console.log("/send Time: %d ms", end - start);
 });
 
