@@ -226,6 +226,8 @@ const makePresentation = async(url, keyPair, vc) => {
 
 	// 1 Init Presentation
 
+	console.log(url);
+
 	const [ available, _err1 ] = await initPresentation(url);
 	if(_err1) {
 		return [ null, 'could not init' ];
