@@ -18,108 +18,109 @@
     
 **/
 
-"use strict";
+'use strict'
 
 // Import Router
 
-const express					= require('express');
-const router					= express.Router();
-module.exports					= router;
+const express = require('express')
+const router = express.Router()
+module.exports = router
 
 // Import Libraries
 
-const uuidv4					= require('uuid').v4;
-const { verifyPresentation } = require('./sign_your_credentials.js');
-const { handleContactRequest } = require('../modules/contacts_in.js');
+const uuidv4 = require('uuid').v4
+const { verifyPresentation } = require('./sign_your_credentials.js')
+const { handleContactRequest } = require('../modules/contacts_in.js')
+const { handleIncomingInvoice } = require('../modules/invoices_in.js')
 
 // Global Variable for Storing Challenges
 
 const challenges = {}
 
-// Define 
+// Define
 
 router.post('/available', async (req, res) => {
+    console.log('--- /api/presentations/available ---')
+    console.log(req.body)
 
-	console.log('--- /api/presentations/available ---');
-	console.log(req.body);
+    // Create a challenge
+    const domain = process.env.DOMAIN
+    const challenge = uuidv4()
 
-	// Create a challenge
-	const domain = process.env.DOMAIN;
-	const challenge = uuidv4();
+    // Store it in Redis with a expiration timer of 10 seconds
+    challenges[challenge] = 1
+    setTimeout(() => {
+        delete challenges[challenge]
+    }, 10 * 1000)
 
-	// Store it in Redis with a expiration timer of 10 seconds
-	challenges[challenge] = 1;
-	setTimeout( () => {
-		delete challenges[challenge];
-	}, 10 * 1000);
-
-	// Return the domain and challenge
-	res.json({
-		...req.body,
-		domain,
-		challenge
-	});
-
-});
+    // Return the domain and challenge
+    res.json({
+        ...req.body,
+        domain,
+        challenge,
+    })
+})
 
 router.post('/submissions', async (req, res) => {
+    console.log('--- /api/presentations/submissions ---')
+    const signedPresentation = req.body
+    const { domain, challenge } = signedPresentation.proof
 
-	console.log('--- /api/presentations/submissions ---');
-	const signedPresentation = req.body;
-	const { domain, challenge } = signedPresentation.proof;
+    // 1.
+    // First we need to see if the challenge is still available
+    // And delete it if it exists
 
-	// 1.
-	// First we need to see if the challenge is still available
-	// And delete it if it exists
+    if (!challenges[challenge]) {
+        // return 400;
+    }
+    delete challenges[challenge]
 
-	if(!challenges[challenge]) {
-		// return 400;
-	}
-	delete challenges[challenge];
+    // 2.
+    // Then we need to verify the presentation
+    // TODO: Figure out why this does not verify
+    // https://github.com/WebServiceDevelopment/PrivateInvoice/issues/15
 
-	// 2.
-	// Then we need to verify the presentation 
-	// TODO: Figure out why this does not verify
-	// https://github.com/WebServiceDevelopment/PrivateInvoice/issues/15
+    const result = await verifyPresentation(signedPresentation)
 
-	const result = await verifyPresentation(signedPresentation);
+    console.log(result)
+    console.log(result.credentials)
+    console.log(result.presentation)
 
-	console.log(result);
-	console.log(result.credentials);
-	console.log(result.presentation);
+    if (!result.verified) {
+        // return 400;
+    }
 
-	if(!result.verified) {
-		// return 400;
-	}
+    // 3.
+    // Assuming that works, then we need to figure out how to
+    // handle the contents of credentials that have been sent
+    // to us
 
-	// 3.
-	// Assuming that works, then we need to figure out how to
-	// handle the contents of credentials that have been sent
-	// to us
+    console.log('Signed Presentation')
+    console.log(signedPresentation)
 
-	console.log('Signed Presentation');
-	console.log(signedPresentation);
+    const { verifiableCredential } = signedPresentation
 
-	const { verifiableCredential } = signedPresentation;
+    console.log('Verifiable Credential List')
+    console.log(verifiableCredential)
 
-	console.log('Verifiable Credential List');
-	console.log( verifiableCredential);
+    const [credential] = verifiableCredential
 
-	const [ credential ] = verifiableCredential;
+    console.log('Credential')
+    console.log(credential)
 
-	console.log('Credential');
-	console.log(credential);
+    // First option is a contact request, which does not require the
+    // controller to be in the list of contacts
 
-	// First option is a contact request, which does not require the
-	// controller to be in the list of contacts
+    if (credential.type.indexOf('VerifiableBusinessCard') !== -1) {
+        // Handle Contact Request
+        const [status, message] = await handleContactRequest(credential)
+        return res.status(status).end(message)
+    } else if (credential.type.indexOf('CommercialInvoiceCertificate') !== -1) {
+        // Handle Commercial Invoice
+        console.log('handle commercial invoice!!!!')
+        return await handleIncomingInvoice(credential, res)
+        // return res.status(400).end("Stahhp it");
+    }
 
-	if(credential.type.indexOf('VerifiableBusinessCard') !== -1) {
-		// Handle Contact Request
-		const [ status, message ] = await handleContactRequest( credential );
-		return res.status(status).end(message);
-	}
-
-	res.status(400).end('no valid credential detected');
-
-
-});
+    res.status(400).end('no valid credential detected')
+})
