@@ -88,6 +88,16 @@ async function buyer_sendInvoice(buyer_host, document, status) {
 
 	const url = `${buyer_host}/api/message/buyerToSend`;
 
+	console.log('Sending Invoice to Buyer');
+	console.log(url);
+	
+	console.log('!!! Document !!!');
+	console.log(document);
+	console.log(JSON.parse(document.document_json));
+	
+	console.log('!!! Status !!!');
+	console.log(status);
+
     document.editable = 0;
     status.document_folder = 'sent';
 
