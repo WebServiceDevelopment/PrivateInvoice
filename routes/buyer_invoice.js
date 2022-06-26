@@ -187,6 +187,7 @@ router.post('/confirm', async function(req, res) {
 	const { document_uuid } = req.body;
 	const { member_uuid } = req.session.data;
 
+	const USE_PRESENTATION = true;
 	let errno, code;
 
     // 1.
