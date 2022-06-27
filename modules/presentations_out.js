@@ -26,13 +26,13 @@ const axios = require('axios')
 const transmute = require('@transmute/vc.js')
 
 const {
-    Ed25519Signature2018,
-    Ed25519VerificationKey2018,
+	Ed25519Signature2018,
+	Ed25519VerificationKey2018,
 } = require('@transmute/ed25519-signature-2018')
 
 const context = {
-    'https://www.w3.org/2018/credentials/v1': require('../context/credentials_v1.json'),
-    'https://w3id.org/traceability/v1': require('../context/traceability_v1.json'),
+	'https://www.w3.org/2018/credentials/v1': require('../context/credentials_v1.json'),
+	'https://w3id.org/traceability/v1': require('../context/traceability_v1.json'),
 }
 
 const { resolve } = require('@transmute/did-key.js')
@@ -46,22 +46,22 @@ const db = require('../database.js')
  **/
 
 const checkStatus = () => {
-    return true
+	return true
 }
 
 const documentLoader = async (iri) => {
-    if (context[iri]) {
-        return { document: context[iri] }
-    }
+	if (context[iri]) {
+		return { document: context[iri] }
+	}
 
-    if (iri.indexOf('did:key') === 0) {
-        const document = await resolve(iri)
-        return { document }
-    }
+	if (iri.indexOf('did:key') === 0) {
+		const document = await resolve(iri)
+		return { document }
+	}
 
-    const message = `Unsupported iri: ${iri}`
-    console.error(message)
-    throw new Error(message)
+	const message = `Unsupported iri: ${iri}`
+	console.error(message)
+	throw new Error(message)
 }
 
 /**
@@ -69,7 +69,7 @@ const documentLoader = async (iri) => {
  **/
 
 const getPrivateKeys = async (member_did) => {
-    const sql = `
+	const sql = `
 		SELECT
 			public_key
 		FROM
@@ -78,169 +78,187 @@ const getPrivateKeys = async (member_did) => {
 			member_did = ?
 	`
 
-    const args = [member_did]
+	const args = [member_did]
 
-    let row
-    try {
-        row = await db.selectOne(sql, args)
-    } catch (err) {
-        return [null, err]
-    }
+	let row
+	try {
+		row = await db.selectOne(sql, args)
+	} catch (err) {
+		return [null, err]
+	}
 
-    const keyPair = JSON.parse(row.public_key)
-    return [keyPair, null]
+	const keyPair = JSON.parse(row.public_key)
+	return [keyPair, null]
 }
 
 const initPresentation = async (url) => {
-    const method = 'post'
+	const method = 'post'
 
-    const data = {
-        query: [
-            {
-                type: 'QueryByExample',
-                credentialQuery: [
-                    {
-                        type: ['VerifiableCredential'],
-                        reason: 'We want to present credentials.',
-                    },
-                ],
-            },
-        ],
-    }
+	const data = {
+		query: [
+			{
+				type: 'QueryByExample',
+				credentialQuery: [
+					{
+						type: ['VerifiableCredential'],
+						reason: 'We want to present credentials.',
+					},
+				],
+			},
+		],
+	}
 
-    const params = { method, url, data }
+	const params = { method, url, data }
 
-    let response
-    try {
-        response = await axios(params)
-    } catch (err) {
-        const error = {
-            status: -1,
-            data: 'unknown error',
-        }
+	let response
+	try {
+		response = await axios(params)
+	} catch (err) {
+		const error = {
+			status: -1,
+			data: 'unknown error',
+		}
 
-        if (err.response) {
-            error.status = err.response.status
-            error.data = err.response.data
-        } else if (err.code === 'ECONNRESET') {
-            error.status = 500
-            error.data = 'ECONNRESET'
-        } else {
-            error.status = 400
-            error.data = 'Undefined Error'
-        }
+		if (err.response) {
+			error.status = err.response.status
+			error.data = err.response.data
+		} else if (err.code === 'ECONNRESET') {
+			error.status = 500
+			error.data = 'ECONNRESET'
+		} else {
+			error.status = 400
+			error.data = 'Undefined Error'
+		}
 
-        return [null, error]
-    }
+		return [null, error]
+	}
 
-    return [response.data, null]
+	return [response.data, null]
 }
 
 const sendPresentation = async (url, keyPair, domain, challenge, vc) => {
-    const presentation = {
-        '@context': ['https://www.w3.org/2018/credentials/v1'],
-        id: `urn:uuid:${challenge}`,
-        type: ['VerifiablePresentation'],
-        verifiableCredential: [vc],
-        holder: keyPair.controller,
-    }
 
-    url = url.replace('available', 'submissions')
-    const method = 'post'
+	console.log('--- Making presentation ---');
 
-    const data = await signPresentation(
-        presentation,
-        keyPair,
-        domain,
-        challenge
-    )
+	const presentation = {
+		'@context': [
+			'https://www.w3.org/2018/credentials/v1',
+			'https://w3id.org/traceability/v1'
+		],
+		id: `urn:uuid:${challenge}`,
+		type: ['VerifiablePresentation'],
+		verifiableCredential: [vc],
+		holder: keyPair.controller,
+	}
 
-    const params = { method, url, data }
+	url = url.replace('available', 'submissions')
+	const method = 'post'
 
-    let response
-    try {
-        response = await axios(params)
-    } catch (err) {
-        const error = {
-            status: -1,
-            data: 'unknown error',
-        }
+	console.log('before sign');
+	
+	let data;
 
-        if (err.response) {
-            error.status = err.response.status
-            error.data = err.response.data
-        } else if (err.code === 'ECONNRESET') {
-            error.status = 500
-            error.data = 'ECONNRESET'
-        } else {
-            error.status = 400
-            error.data = 'Undefined Error'
-        }
+	try {
+		data = await signPresentation(
+   			presentation,
+   			keyPair,
+			domain,
+			challenge
+		);
+	} catch(err) {
+		
+		console.log('COULD NOT SIGN PRESENTATION!!!!');
+		console.log(presentation);
+		console.log(keyPair);
+		throw err;
+	}
 
-        return [null, error]
-    }
+	const params = { method, url, data }
 
-    return [response.data, null]
+	let response
+	try {
+		response = await axios(params)
+	} catch (err) {
+		const error = {
+			status: -1,
+			data: 'unknown error',
+		}
+
+		if (err.response) {
+			error.status = err.response.status
+			error.data = err.response.data
+		} else if (err.code === 'ECONNRESET') {
+			error.status = 500
+			error.data = 'ECONNRESET'
+		} else {
+			error.status = 400
+			error.data = 'Undefined Error'
+		}
+
+		return [null, error]
+	}
+
+	return [response.data, null]
 }
 
 const signPresentation = async (presentation, keyPair, domain, challenge) => {
-    console.log('okay?')
+	console.log('okay?')
 
-    const { items } = await transmute.verifiable.presentation.create({
-        presentation,
-        format: ['vp'],
-        domain,
-        challenge,
-        documentLoader,
-        suite: new Ed25519Signature2018({
-            key: await Ed25519VerificationKey2018.from(keyPair),
-        }),
-    })
+	const { items } = await transmute.verifiable.presentation.create({
+		presentation,
+		format: ['vp'],
+		domain,
+		challenge,
+		documentLoader,
+		suite: new Ed25519Signature2018({
+			key: await Ed25519VerificationKey2018.from(keyPair),
+		}),
+	})
 
-    console.log('oh god!!')
+	console.log('oh god!!')
 
-    const [signedPresentation] = items
-    return signedPresentation
+	const [signedPresentation] = items
+	return signedPresentation
 }
 
 const makePresentation = async (url, keyPair, vc) => {
-    console.log('making the presentation!!!')
+	console.log('making the presentation!!!')
 
-    // 1 Init Presentation
+	// 1 Init Presentation
 
-    console.log(url)
+	console.log(url)
 
-    const [available, _err1] = await initPresentation(url)
-    if (_err1) {
-        return [null, 'could not init']
-    }
+	const [available, _err1] = await initPresentation(url)
+	if (_err1) {
+		return [null, 'could not init']
+	}
 
-    const { domain, challenge } = available
-    console.log(domain, challenge)
+	const { domain, challenge } = available
+	console.log(domain, challenge)
 
-    // 2 Send Presentation
+	// 2 Send Presentation
 
-    const [send, _err2] = await sendPresentation(
-        url,
-        keyPair,
-        domain,
-        challenge,
-        vc
-    )
-    if (_err2) {
-        console.log(_err2)
-        return [null, 'could not submit']
-    }
+	const [send, _err2] = await sendPresentation(
+		url,
+		keyPair,
+		domain,
+		challenge,
+		vc
+	)
+	if (_err2) {
+		console.log(_err2)
+		return [null, 'could not submit']
+	}
 
-    // Return Success
+	// Return Success
 
-    return [send, null]
+	return [send, null]
 }
 
 module.exports = {
-    getPrivateKeys: getPrivateKeys,
-    initPresentation: initPresentation,
-    sendPresentation: sendPresentation,
-    signPresentation: signPresentation,
-    makePresentation: makePresentation,
+	getPrivateKeys,
+	initPresentation,
+	sendPresentation,
+	signPresentation,
+	makePresentation,
 }

@@ -76,14 +76,12 @@ const createBusinessCard = async (req, member_did, invite_code) => {
 		member_did
 	];
 
-	console.log(req.headers);
 	let row;
 	try {
 		row = await db.selectOne(sql, args);
 	} catch(err) {
 		return [ null, err ];
 	}
-	console.log(row);
 
 	const credential = {
 		'@context': [
