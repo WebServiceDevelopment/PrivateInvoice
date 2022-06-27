@@ -32,6 +32,7 @@ const uuidv4 = require('uuid').v4
 const { verifyPresentation } = require('./sign_your_credentials.js')
 const { handleContactRequest } = require('../modules/contacts_in.js')
 const { handleIncomingInvoice } = require('../modules/invoices_in.js')
+const { handleStatusUpdate } = require('../modules/update_status.js')
 
 // Global Variable for Storing Challenges
 
@@ -119,6 +120,11 @@ router.post('/submissions', async (req, res) => {
         // Handle Commercial Invoice
         console.log('handle commercial invoice!!!!')
         return await handleIncomingInvoice(credential, res)
+        // return res.status(400).end("Stahhp it");
+    } else if (credential.type.indexOf('PGAStatusMessageCertificate') !== -1) {
+        // Handle Commercial Invoice
+        console.log('handle status update!!!!')
+        return await handleStatusUpdate(credential, res)
         // return res.status(400).end("Stahhp it");
     }
 

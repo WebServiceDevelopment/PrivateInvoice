@@ -68,14 +68,37 @@ const documentLoader = async (iri) => {
 
 
 // module
+
 module.exports = {
-	signInvoice: signInvoice,
-	signBusinessCard: signBusinessCard,
-	signPresentation: signPresentation,
-	verifyPresentation: verifyPresentation
+	signStatusMessage,
+	signInvoice,
+	signBusinessCard,
+	signPresentation,
+	verifyPresentation
 }
 
 // ------------------------------- modules -------------------------------
+
+
+/**
+ * Sign Status Message
+ **/
+
+async function signStatusMessage (credential, keyPair) {
+
+	const { items } = await transmute.verifiable.credential.create({
+		credential,
+		format: ['vc'],
+		documentLoader,
+		suite: new Ed25519Signature2018({
+			key: await Ed25519VerificationKey2018.from(keyPair)
+		})
+	});
+
+	const [ signedCredential ] = items;
+	return signedCredential;
+
+}
 
 /**
  * Sign Business Card 

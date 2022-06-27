@@ -15,7 +15,7 @@
  limitations under the License.
 
  Author: Ogawa Kousei (kogawa@wsd.co.jp)
-    
+	
 **/
 
 "use strict";
@@ -24,7 +24,7 @@
 const sub						= require("./invoice_sub.js");
 const eth						= require("./web3_eth.js");
 const to_seller					= require("./buyer_to_seller.js");
-const tran                      = require("./invoice_sub_transaction.js");
+const tran					  = require("./invoice_sub_transaction.js");
 const Tx						= require('ethereumjs-tx').Transaction;
 const util						= require("./util.js");
 
@@ -34,6 +34,9 @@ const express					= require('express');
 const router					= express.Router();
 module.exports					= router;
 
+const { creatConfirmMessage } = require('../modules/update_status.js');
+const { getPrivateKeys, makePresentation } = require('../modules/presentations_out.js');
+
 //  web3.js
 
 const web3						= eth.getWeb3();
@@ -42,12 +45,12 @@ web3.eth.transactionConfirmationBlocks = 2;
 
 // Libraries
 
-const ipfs_http_client          = require('ipfs-http-client');
-const Ipfs_Http_Client          = ipfs_http_client.create('http://192.168.1.127:5001');
+const ipfs_http_client		  = require('ipfs-http-client');
+const Ipfs_Http_Client		  = ipfs_http_client.create('http://192.168.1.127:5001');
 
 // Database
 
-const config                    = require('../config.json');
+const config					= require('../config.json');
 
 const BUYER_STATUS				= "buyer_status";
 const BUYER_DOCUMENT			= "buyer_document";
@@ -70,69 +73,69 @@ router.post('/returnToSender', async function(req, res) {
 
 	let errno, code;
 
-    // 1.
+	// 1.
 	//
-    const [ seller_uuid, err1 ] = await sub.getSellerUuid(BUYER_STATUS, document_uuid, member_uuid);
-    if(err1) {
-        console.log("Error 1 status = 400 err="+err1);
+	const [ seller_uuid, err1 ] = await sub.getSellerUuid(BUYER_STATUS, document_uuid, member_uuid);
+	if(err1) {
+		console.log("Error 1 status = 400 err="+err1);
 
-        return res.status(400).json(err1);
-    }
+		return res.status(400).json(err1);
+	}
 
-    // 2.
+	// 2.
 	//
-    const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
-    if(err2) {
-        console.log("Error 2 status = 400 err="+err2);
-        return res.status(400).json(err2);
-    }
+	const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
+	if(err2) {
+		console.log("Error 2 status = 400 err="+err2);
+		return res.status(400).json(err2);
+	}
 
-    // 3. buyer connect check
+	// 3. buyer connect check
 	//
-    const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
+	const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
 
-    if(code3 !== 200) {
-        console.log("Error 3 code="+code3+":err="+err3);
-        let msg;
-        if(code3 == 500) {
-            msg = {"err":"The destination node cannot be found."};
-        } else {
-            msg = {"err":err3};
-        }
-        return res.status(400).json(msg);
-    }
+	if(code3 !== 200) {
+		console.log("Error 3 code="+code3+":err="+err3);
+		let msg;
+		if(code3 == 500) {
+			msg = {"err":"The destination node cannot be found."};
+		} else {
+			msg = {"err":err3};
+		}
+		return res.status(400).json(msg);
+	}
 
-    // 4.
-    // begin Transaction
-    //
-    const [ conn , _4 ]  = await tran.connection ();
-    await tran.beginTransaction(conn);
+	// 4.
+	// begin Transaction
+	//
+	const [ conn , _4 ]  = await tran.connection ();
+	await tran.beginTransaction(conn);
 
 	// 5.
 	// Set BUYER_STATUS to 'return' with document_uuid as the key.
 	//
 	const [_5 , err5 ] = await tran.setReturn (conn, BUYER_STATUS, document_uuid , member_uuid);
 
-    if (err5 ) {
+	if (err5 ) {
 		errno = 5;
 		code = 400;
 		return res.status(400).json(tran.rollbackAndReturn(conn, code, err5, errno));
-    }
+	}
 	
 	// 6.
 	// Send a 'return' request to seller.
 	//
-    const [ code6, err6 ] = await to_seller.return(seller_host, document_uuid, member_uuid);
+	const [ code6, err6 ] = await to_seller.return(seller_host, document_uuid, member_uuid);
 
-    if(code6 !== 200) {
+	if(code6 !== 200) {
 
 		errno = 6;
 		return res.status(400).json(tran.rollbackAndReturn(conn, code6, err6, errno));
-    }
+	}
 	
-    // 7.
-    // commit
-    //
+	// 7.
+	// commit
+	//
 
    	const [ _7, err7 ] = await tran.commit(conn);
 
@@ -190,77 +193,98 @@ router.post('/confirm', async function(req, res) {
 	const USE_PRESENTATION = true;
 	let errno, code;
 
-    // 1.
+	// 1.
 	//
-    const [ seller_uuid, err1 ] = await sub.getSellerUuid(BUYER_STATUS, document_uuid, member_uuid);
-    if(err1) {
-        console.log("Error 1 status = 400 err="+err1);
+	const [ seller_uuid, err1 ] = await sub.getSellerUuid(BUYER_STATUS, document_uuid, member_uuid);
+	if(err1) {
+		console.log("Error 1 status = 400 err="+err1);
 
-        return res.status(400).json(err1);
-    }
+		return res.status(400).json(err1);
+	}
 
-    // 2.
+	// 2.
 	//
-    const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
+	const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
 
-    if(err2) {
-        console.log("Error 2 status = 400 err="+err2);
-        return res.status(400).json(err2);
-    }
+	if(err2) {
+		console.log("Error 2 status = 400 err="+err2);
+		return res.status(400).json(err2);
+	}
 
-    //3. buyer connect check
+	//3. buyer connect check
 	//
-    const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
+	
+	if(!USE_PRESENTATION) {
+		const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
 
-    if(code3 !== 200) {
-        console.log("Error 3 code="+code3+":err="+err3);
-        let msg;
-        if(code3 == 500) {
-            msg = {"err":"The destination node cannot be found."};
-        } else {
-            msg = {"err":err3};
-        }
-        return res.status(400).json(msg);
-    }
+		if(code3 !== 200) {
+   			console.log("Error 3 code="+code3+":err="+err3);
+   			const msg = code3 === 500 ? 
+				{"err":"The destination node cannot be found"} :
+				{"err":err3};
+			return res.status(400).json(msg);
+		}
+	}
 
 
-    // 4.
-    // begin Transaction
-    //
-    const [ conn , _4 ]= await tran.connection ();
-    await tran.beginTransaction(conn);
+	// 4.
+	// begin Transaction
+	//
+	const [ conn , _4 ]= await tran.connection ();
+	await tran.beginTransaction(conn);
 
 	// 5.
 	//
 	const [ _5, err5 ] = await tran.setConfirm (conn, BUYER_STATUS, document_uuid , member_uuid);
 
-    if (err5 ) {
+	if (err5 ) {
 		errno = 5;
 		code = 400;
 
 		return res.status(400).json(tran.rollbackAndReturn(conn, code, err5, errno));
-    }
+	}
 
 	// 6.
 	//
-    const [ code6, err6 ] = await to_seller.confirm(seller_host, document_uuid, member_uuid);
-
-    if(code6 !== 200) {
-		console.log("seller_host="+seller_host+":"+document_uuid+":"+member_uuid);
-		errno = 6;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code6, err6, errno));
-    }
 	
-    // 7.
-    // commit
-    //
+	if(!USE_PRESENTATION) {
+		const [ code6, err6 ] = await to_seller.confirm(seller_host, document_uuid, member_uuid);
+
+		if(code6 !== 200) {
+			console.log("seller_host="+seller_host+":"+document_uuid+":"+member_uuid);
+			errno = 6;
+			return res.status(400).json(tran.rollbackAndReturn(conn, code6, err6, errno));
+		}
+
+	} else {
+		
+    	// Get private keys to sign credential
+
+		const [keyPair, err] = await getPrivateKeys(member_uuid);
+		if(err) {
+			throw err;
+		}
+
+		const url = `${seller_host}/api/presentations/available`
+		console.log(url);
+		const credential = await creatConfirmMessage(document_uuid,member_uuid, keyPair);
+		const [ sent, err6 ] = await makePresentation(url, keyPair, credential);
+		if(err6) {
+			return res.status(400).json(tran.rollbackAndReturn(conn, 'code6', err6, 6));
+		}
+
+	}
+	
+	// 7.
+	// commit
+	//
 	const [ _7, err7 ] = await tran.commit(conn);
 
 	if (err7) {
 
 		errno = 7;
-        code = 400;
-        let msg = tran.rollbackAndReturn(conn, code, err7, errno);
+		code = 400;
+		let msg = tran.rollbackAndReturn(conn, code, err7, errno);
 
 	// 8.
 	//
@@ -275,7 +299,7 @@ router.post('/confirm', async function(req, res) {
 			}
 		}
 
-        return res.status(400).json(msg);
+		return res.status(400).json(msg);
 	}
 
 	// 9.
@@ -290,7 +314,7 @@ router.post('/confirm', async function(req, res) {
 	});
 
 	let end = Date.now();
-    console.log("/confirm Time: %d ms", end - start);
+	console.log("/confirm Time: %d ms", end - start);
 
 });
 
@@ -309,75 +333,75 @@ router.post('/unconfirm', async function(req, res) {
 
 	let errno, code;
 
-    // 1.
+	// 1.
 	//
-    const [ seller_uuid, err1 ] = await sub.getSellerUuid( BUYER_STATUS, document_uuid, member_uuid);
+	const [ seller_uuid, err1 ] = await sub.getSellerUuid( BUYER_STATUS, document_uuid, member_uuid);
 
-    if(err1) {
-        console.log("Error 1 status = 400 err="+err1);
+	if(err1) {
+		console.log("Error 1 status = 400 err="+err1);
 
-        return res.status(400).json(err1);
-    }
+		return res.status(400).json(err1);
+	}
 
-    // 2.
+	// 2.
 	//
-    const [ seller_host, err2 ] = await sub.getSellerHost( CONTACTS, seller_uuid, member_uuid);
+	const [ seller_host, err2 ] = await sub.getSellerHost( CONTACTS, seller_uuid, member_uuid);
 
-    if(err2) {
-        console.log("Error 2 status = 400 err="+err2);
+	if(err2) {
+		console.log("Error 2 status = 400 err="+err2);
 
-        return res.status(400).json(err2);
-    }
+		return res.status(400).json(err2);
+	}
 
-    // 3. buyer connect check
+	// 3. buyer connect check
 	//
-    const [ code3 , err3 ] = await to_seller.connect( seller_host, member_uuid, seller_uuid);
+	const [ code3 , err3 ] = await to_seller.connect( seller_host, member_uuid, seller_uuid);
 
-    if( code3 !== 200) {
-        console.log("Error 3 code="+code3+":err="+err3);
-        let msg;
-        if(code3 == 500) {
-            msg = {"err":"The destination node cannot be found."};
-        } else {
-            msg = {"err":err3};
-        }
-        return res.status(400).json(msg);
-    }
+	if( code3 !== 200) {
+		console.log("Error 3 code="+code3+":err="+err3);
+		let msg;
+		if(code3 == 500) {
+			msg = {"err":"The destination node cannot be found."};
+		} else {
+			msg = {"err":err3};
+		}
+		return res.status(400).json(msg);
+	}
 
-    // 4
-    // begin Transaction
-    //
-    const [ conn , _4 ] = await tran.connection ();
-    await tran.beginTransaction(conn);
+	// 4
+	// begin Transaction
+	//
+	const [ conn , _4 ] = await tran.connection ();
+	await tran.beginTransaction(conn);
 
 	// 5.
 	//
 	const [ _5, err5] = await tran.setUnconfirm (conn, BUYER_STATUS, document_uuid , member_uuid);
 
-    if (err5 ) {
-        errno = 54
+	if (err5 ) {
+		errno = 54
 		code = 400;
 		return res.status(400).json(tran.rollbackAndReturn(conn, code, err5, errno));
-    }
+	}
 
 	// 6.
 	//
-    const [ code6, err6 ] = await to_seller.unconfirm(seller_host, document_uuid, member_uuid);
+	const [ code6, err6 ] = await to_seller.unconfirm(seller_host, document_uuid, member_uuid);
 
-    if(code6 !== 200) {
+	if(code6 !== 200) {
 		errno = 6;
 		return res.status(400).json(tran.rollbackAndReturn(conn, code6, err6, errno));
-    }
+	}
 
-    // 7.
-    // commit
-    //
-    const [ _7, err7 ] = await tran.commit(conn);
+	// 7.
+	// commit
+	//
+	const [ _7, err7 ] = await tran.commit(conn);
 
 	if (err7) {
-        errno = 7;
-        code = 400;
-        let msg = tran.rollbackAndReturn(conn, code, err7, errno);
+		errno = 7;
+		code = 400;
+		let msg = tran.rollbackAndReturn(conn, code, err7, errno);
 
 	// 8.
 	//
@@ -407,7 +431,7 @@ router.post('/unconfirm', async function(req, res) {
 	});
 
 	let end = Date.now();
-    console.log("/unconfirm Time: %d ms", end - start);
+	console.log("/unconfirm Time: %d ms", end - start);
 
 });
 
@@ -428,43 +452,43 @@ router.post('/makePayment', async function(req, res) {
 
 	let errno, code ;
 
-    // 1.
+	// 1.
 	// getSellerUuid
 	//
-    const [ seller_uuid, err1 ] = await sub.getSellerUuid(BUYER_STATUS, document_uuid, member_uuid);
+	const [ seller_uuid, err1 ] = await sub.getSellerUuid(BUYER_STATUS, document_uuid, member_uuid);
 
-    if(err1) {
-        console.log("Error 1 status = 400 err="+err1);
+	if(err1) {
+		console.log("Error 1 status = 400 err="+err1);
 
-        return res.status(400).json(err1);
-    }
+		return res.status(400).json(err1);
+	}
 
-    // 2.
+	// 2.
 	// getSellerHost
 	//
-    const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
+	const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
 
-    if(err2) {
-        console.log("Error 2 status = 400 err="+err2);
+	if(err2) {
+		console.log("Error 2 status = 400 err="+err2);
 
-        return res.status(400).json(err2);
-    }
+		return res.status(400).json(err2);
+	}
 
-    // 3.
+	// 3.
 	// connect
 	//
-    const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
+	const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
 
-    if(code3 !== 200) {
-        console.log("Error 3 code="+code3+":err="+err3);
-        let msg;
-        if(code3 == 500) {
-            msg = {"err":"The destination node cannot be found."};
-        } else {
-            msg = {"err":err3};
-        }
-        return res.status(400).json(msg);
-    }
+	if(code3 !== 200) {
+		console.log("Error 3 code="+code3+":err="+err3);
+		let msg;
+		if(code3 == 500) {
+			msg = {"err":"The destination node cannot be found."};
+		} else {
+			msg = {"err":err3};
+		}
+		return res.status(400).json(msg);
+	}
 
 	// 4.
 	// Ask for remittance amount from document.
@@ -473,18 +497,18 @@ router.post('/makePayment', async function(req, res) {
 	// 5.
 	// paymentReservation
 	//
-    const [ code5, err5 ] = await to_seller.paymentReservation(seller_host, document_uuid, member_uuid);
+	const [ code5, err5 ] = await to_seller.paymentReservation(seller_host, document_uuid, member_uuid);
 
-    if(code5 !== 200) {
-        console.log("Error 5 code="+code5+":err="+err5);
-        let msg;
-        if(code5 == 500) {
-            msg = {"err":"seller connect check:ECONNRESET"};
-        } else {
-            msg = {"err":err5};
-        }
-        return res.status(400).json(msg);
-    }
+	if(code5 !== 200) {
+		console.log("Error 5 code="+code5+":err="+err5);
+		let msg;
+		if(code5 == 500) {
+			msg = {"err":"seller connect check:ECONNRESET"};
+		} else {
+			msg = {"err":err5};
+		}
+		return res.status(400).json(msg);
+	}
 
 
 	// 6.
@@ -497,7 +521,7 @@ router.post('/makePayment', async function(req, res) {
 
 		console.log("error 6: getDocumen");
 
-        return res.status(400).json(err6);
+		return res.status(400).json(err6);
 		return;
 	}
 
@@ -514,7 +538,7 @@ router.post('/makePayment', async function(req, res) {
 			console.log(key +":"+ doc[key]);
 		}
 
-        return res.status(400).json(err7);
+		return res.status(400).json(err7);
 		return;
 	}
 
@@ -524,7 +548,7 @@ router.post('/makePayment', async function(req, res) {
 
 	const contract_address = process.env.ACCOUNT;
 
-    //console.log("contract_address ="+contract_address)
+	//console.log("contract_address ="+contract_address)
 
 	// 9.
 	// Balance before the start of payment
@@ -536,29 +560,29 @@ router.post('/makePayment', async function(req, res) {
 
 		console.log("error 9: getBalance");
 
-        return res.status(400).json(err9);
+		return res.status(400).json(err9);
 		return;
 	}
 
 
-    // 10.
-    // Get seller account
-    //
-    const [status10, data10] = await to_seller.getAccountOfSellerWallet(seller_host, seller_uuid, member_uuid) ;
+	// 10.
+	// Get seller account
+	//
+	const [status10, data10] = await to_seller.getAccountOfSellerWallet(seller_host, seller_uuid, member_uuid) ;
 
-    if(status10 != 200) {
+	if(status10 != 200) {
 		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
 
-        console.log("Error 10 status = 400 err="+data10);
+		console.log("Error 10 status = 400 err="+data10);
 
-        return res.status(400).json(data10);
-    }
+		return res.status(400).json(data10);
+	}
 
-    const msg = (data10.msg);
+	const msg = (data10.msg);
 
-    const to_address = msg.account;
+	const to_address = msg.account;
 
-    //console.log("to_address="+to_address);
+	//console.log("to_address="+to_address);
 
 
 	// 11.
@@ -568,12 +592,12 @@ router.post('/makePayment', async function(req, res) {
 	let payment = doc.credentialSubject.totalPaymentDue.price.replace(/,/g,"")
 
 	if(payment.indexOf(' ')) {
-        payment = payment.split(" ")[0];
-    }
+		payment = payment.split(" ")[0];
+	}
 
 	if(payment.indexOf('$')) {
-        payment = payment.replace(/$/g,'');
-    }
+		payment = payment.replace(/$/g,'');
+	}
 
 	//console.log("payment="+payment)
 	
@@ -586,8 +610,8 @@ router.post('/makePayment', async function(req, res) {
 	//
 	
 	const ipfs_result = await Ipfs_Http_Client.add( document.document_json );
-    const ipfs_cid = ipfs_result.cid.toString();
-    const ipfs_cid_hex = web3.utils.toHex(ipfs_cid);
+	const ipfs_cid = ipfs_result.cid.toString();
+	const ipfs_cid_hex = web3.utils.toHex(ipfs_cid);
 
 	console.log("cid="+ipfs_cid+":ipfs_cid_hex ="+ipfs_cid_hex)
 
@@ -615,11 +639,11 @@ router.post('/makePayment', async function(req, res) {
 	console.log("14 a :"+hash);
 
 
-    // 15.
-    // begin Transaction
-    //
-    const [ conn , _15 ] = await tran.connection ();
-    await tran.beginTransaction(conn);
+	// 15.
+	// begin Transaction
+	//
+	const [ conn , _15 ] = await tran.connection ();
+	await tran.beginTransaction(conn);
 
 
 	// 16.
@@ -627,48 +651,48 @@ router.post('/makePayment', async function(req, res) {
 	//
 	const [ _16, err16 ] = await tran.setMakePayment_status (conn, BUYER_STATUS, document_uuid , member_uuid);
 
-    if (err16 ) {
+	if (err16 ) {
 		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
 
-        errno = 16;
+		errno = 16;
 		code = 400;
 		return res.status(400).json(tran.rollbackAndReturn(conn, code, err16, errno));
-    }
+	}
 
 	// 17.
 	// setMakePayment_document
 	//
 	const [ _17, err17 ] = await tran.setMakePayment_document (conn, BUYER_DOCUMENT, document_uuid , hash);
 
-    if (err17 ) {
+	if (err17 ) {
 		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
 
-        errno = 17;
+		errno = 17;
 		code = 400;
 		return res.status(400).json(tran.rollbackAndReturn(conn, code, err17, errno));
-    }
+	}
 
 
 	// 18.
 	// makePayment
 	//
-    const [ code18, err18 ] = await to_seller.makePayment(seller_host, document_uuid, member_uuid, hash);
+	const [ code18, err18 ] = await to_seller.makePayment(seller_host, document_uuid, member_uuid, hash);
 
-    if(code18 !== 200) {
+	if(code18 !== 200) {
 		errno = 18;
 		return res.status(400).json(tran.rollbackAndReturn(conn, code18, err18, errno));
-    }
+	}
 
 
-    // 19.
-    // commit
-    //
+	// 19.
+	// commit
+	//
    	const [ _19, err19 ] = await tran.commit(conn);
 
 	if (err19) {
-        errno = 19;
-        code = 400;
-        let msg = tran.rollbackAndReturn(conn, code, err19, errno);
+		errno = 19;
+		code = 400;
+		let msg = tran.rollbackAndReturn(conn, code, err19, errno);
 
 
 	// 20.
@@ -684,7 +708,7 @@ router.post('/makePayment', async function(req, res) {
 			}
 		}
 
-        return res.status(400).json(msg);
+		return res.status(400).json(msg);
 	}
 
 
@@ -705,9 +729,9 @@ router.post('/makePayment', async function(req, res) {
 	//console.log("Before:"+balanceETH_1+"ETH"+":"+"After:"+balanceETH_2+"ETH"+"paid="+balanceETH_3+" ETH");
 
 	// 23.
-    // ETH transaction result
-    //
-    const [ transaction_result, err23 ] = await  eth.getTransaction(web3, hash) ;
+	// ETH transaction result
+	//
+	const [ transaction_result, err23 ] = await  eth.getTransaction(web3, hash) ;
 
 	if( err23) {
 			console.log("err23"+err23);
@@ -721,7 +745,7 @@ router.post('/makePayment', async function(req, res) {
 	//console.log("/makePayment accepted");
 
 	let end = Date.now();
-    console.log("/makePayment Time: %d ms", end - start);
+	console.log("/makePayment Time: %d ms", end - start);
 
 	res.json({
 		err : 0,
