@@ -29,7 +29,7 @@ const handleStatusUpdate = async(credential, res) => {
 
 	const [ message ] = credential.credentialSubject.items;
 	
-	let status, document_uuid, buyer_uuid;
+	let status, document_uuid, buyer_uuid, seller_uuid;
 
 	switch(message.statusCode) {
 	case 'toConfirm':
@@ -47,6 +47,15 @@ const handleStatusUpdate = async(credential, res) => {
         document_uuid = message.recordNo;
         buyer_uuid = message.entryNo;
 		await sub.setReturn(status, document_uuid, buyer_uuid);
+		return res.status(200).end('okay');
+
+		break;
+	case "toWithdraw":
+		
+		status = 'buyer_status';
+        document_uuid = message.recordNo;
+        seller_uuid = message.entryNo;
+		await sub.setWithdrawBuyer(status, document_uuid, seller_uuid);
 		return res.status(200).end('okay');
 
 		break;
@@ -166,8 +175,27 @@ const createReturnMessage = async(document_uuid, member_uuid, keyPair) => {
 
 }
 
+
+const createWithdrawMessage = async(document_uuid, member_uuid, keyPair) => {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_uuid,
+		entryLineSequence: "Message sent from seller",
+		statusCode: "toWithdraw",
+		statusCodeDescription: "Seller has retracted this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_uuid, message, keyPair);
+
+}
+
 module.exports = {
 	handleStatusUpdate,
 	createConfirmMessage,
-	createReturnMessage
+	createReturnMessage,
+	createWithdrawMessage
 }
