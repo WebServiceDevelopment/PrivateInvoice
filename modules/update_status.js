@@ -61,6 +61,7 @@ const handleStatusUpdate = async(credential, res) => {
 
 		break;
 	case "toTrash":
+	case "toRecreate":
 		
 		status = 'buyer_status';
         document_uuid = message.recordNo;
@@ -219,10 +220,28 @@ const createTrashMessage = async(document_uuid, member_uuid, keyPair) => {
 
 }
 
+const createRecreateMessage = async(document_uuid, member_uuid, keyPair) => {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_uuid,
+		entryLineSequence: "Message sent from seller",
+		statusCode: "toRecreate",
+		statusCodeDescription: "Seller has recreated this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_uuid, message, keyPair);
+
+}
+
 module.exports = {
 	handleStatusUpdate,
 	createConfirmMessage,
 	createReturnMessage,
 	createWithdrawMessage,
-	createTrashMessage
+	createTrashMessage,
+	createRecreateMessage
 }
