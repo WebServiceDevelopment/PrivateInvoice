@@ -34,8 +34,15 @@ const express					= require('express');
 const router					= express.Router();
 module.exports					= router;
 
-const { creatConfirmMessage } = require('../modules/update_status.js');
-const { getPrivateKeys, makePresentation } = require('../modules/presentations_out.js');
+const { 
+	createConfirmMessage,
+	createReturnMessage
+} = require('../modules/update_status.js');
+
+const { 
+	getPrivateKeys, 
+	makePresentation 
+} = require('../modules/presentations_out.js');
 
 //  web3.js
 
@@ -71,6 +78,7 @@ router.post('/returnToSender', async function(req, res) {
 	const { document_uuid } = req.body;
 	const { member_uuid } = req.session.data;
 
+	const USE_PRESENTATION = true;
 	let errno, code;
 
 	// 1.
@@ -92,17 +100,20 @@ router.post('/returnToSender', async function(req, res) {
 
 	// 3. buyer connect check
 	//
-	const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
+	
+	if(!USE_PRESENTATION) {
+		const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
 
-	if(code3 !== 200) {
-		console.log("Error 3 code="+code3+":err="+err3);
-		let msg;
-		if(code3 == 500) {
-			msg = {"err":"The destination node cannot be found."};
-		} else {
-			msg = {"err":err3};
+		if(code3 !== 200) {
+			console.log("Error 3 code="+code3+":err="+err3);
+			let msg;
+			if(code3 == 500) {
+				msg = {"err":"The destination node cannot be found."};
+			} else {
+				msg = {"err":err3};
+			}
+			return res.status(400).json(msg);
 		}
-		return res.status(400).json(msg);
 	}
 
 	// 4.
@@ -125,12 +136,32 @@ router.post('/returnToSender', async function(req, res) {
 	// 6.
 	// Send a 'return' request to seller.
 	//
-	const [ code6, err6 ] = await to_seller.return(seller_host, document_uuid, member_uuid);
+	if(!USE_PRESENTATION) {
+		const [ code6, err6 ] = await to_seller.return(seller_host, document_uuid, member_uuid);
 
-	if(code6 !== 200) {
+		if(code6 !== 200) {
 
-		errno = 6;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code6, err6, errno));
+			errno = 6;
+			return res.status(400).json(tran.rollbackAndReturn(conn, code6, err6, errno));
+		}
+
+	} else {
+		
+    	// Get private keys to sign credential
+
+		const [keyPair, err] = await getPrivateKeys(member_uuid);
+		if(err) {
+			throw err;
+		}
+
+		const url = `${seller_host}/api/presentations/available`
+		console.log(url);
+		const credential = await createReturnMessage(document_uuid,member_uuid, keyPair);
+		const [ sent, err6 ] = await makePresentation(url, keyPair, credential);
+		if(err6) {
+			return res.status(400).json(tran.rollbackAndReturn(conn, 'code6', err6, 6));
+		}
+
 	}
 	
 	// 7.
@@ -267,7 +298,7 @@ router.post('/confirm', async function(req, res) {
 
 		const url = `${seller_host}/api/presentations/available`
 		console.log(url);
-		const credential = await creatConfirmMessage(document_uuid,member_uuid, keyPair);
+		const credential = await createConfirmMessage(document_uuid,member_uuid, keyPair);
 		const [ sent, err6 ] = await makePresentation(url, keyPair, credential);
 		if(err6) {
 			return res.status(400).json(tran.rollbackAndReturn(conn, 'code6', err6, 6));

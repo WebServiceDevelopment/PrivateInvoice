@@ -29,14 +29,26 @@ const handleStatusUpdate = async(credential, res) => {
 
 	const [ message ] = credential.credentialSubject.items;
 	
+	let status, document_uuid, buyer_uuid;
+
 	switch(message.statusCode) {
 	case 'toConfirm':
 		
-		const status = 'seller_status';
-        const document_uuid = message.recordNo;
-        const buyer_uuid = message.entryNo;
+		status = 'seller_status';
+        document_uuid = message.recordNo;
+        buyer_uuid = message.entryNo;
 		await sub.setConfirm(status, document_uuid, buyer_uuid);
 		return res.status(200).end('okay');
+
+		break;
+	case 'toReturn':
+		
+		status = 'seller_status';
+        document_uuid = message.recordNo;
+        buyer_uuid = message.entryNo;
+		await sub.setReturn(status, document_uuid, buyer_uuid);
+		return res.status(200).end('okay');
+
 		break;
 	default:
 		return res.status(400).end('Invalid message')
@@ -119,7 +131,7 @@ const createMessage = async (document_uuid, member_uuid, message, keyPair) => {
 	return signedCredential;
 }
 
-const creatConfirmMessage = async(document_uuid, member_uuid, keyPair) => {
+const createConfirmMessage = async(document_uuid, member_uuid, keyPair) => {
 
 	const message = {
 		type: "PGAStatusMessage",
@@ -136,7 +148,26 @@ const creatConfirmMessage = async(document_uuid, member_uuid, keyPair) => {
 
 }
 
+
+const createReturnMessage = async(document_uuid, member_uuid, keyPair) => {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_uuid,
+		entryLineSequence: "Message sent from buyer",
+		statusCode: "toReturn",
+		statusCodeDescription: "Buyer has disputed this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_uuid, message, keyPair);
+
+}
+
 module.exports = {
 	handleStatusUpdate,
-	creatConfirmMessage
+	createConfirmMessage,
+	createReturnMessage
 }
