@@ -24,6 +24,7 @@ const db = require('../database.js')
 const moment = require('moment');
 const { signStatusMessage } = require('../routes/sign_your_credentials.js');
 const sub = require("../routes/invoice_sub.js");
+const { moveToTrash } = require('./move_to_trash.js');
 
 const handleStatusUpdate = async(credential, res) => {
 
@@ -56,6 +57,15 @@ const handleStatusUpdate = async(credential, res) => {
         document_uuid = message.recordNo;
         seller_uuid = message.entryNo;
 		await sub.setWithdrawBuyer(status, document_uuid, seller_uuid);
+		return res.status(200).end('okay');
+
+		break;
+	case "toTrash":
+		
+		status = 'buyer_status';
+        document_uuid = message.recordNo;
+        seller_uuid = message.entryNo;
+		await moveToTrash(status, document_uuid, seller_uuid);
 		return res.status(200).end('okay');
 
 		break;
@@ -175,7 +185,6 @@ const createReturnMessage = async(document_uuid, member_uuid, keyPair) => {
 
 }
 
-
 const createWithdrawMessage = async(document_uuid, member_uuid, keyPair) => {
 
 	const message = {
@@ -193,9 +202,27 @@ const createWithdrawMessage = async(document_uuid, member_uuid, keyPair) => {
 
 }
 
+const createTrashMessage = async(document_uuid, member_uuid, keyPair) => {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_uuid,
+		entryLineSequence: "Message sent from seller",
+		statusCode: "toTrash",
+		statusCodeDescription: "Seller has trashed this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_uuid, message, keyPair);
+
+}
+
 module.exports = {
 	handleStatusUpdate,
 	createConfirmMessage,
 	createReturnMessage,
-	createWithdrawMessage
+	createWithdrawMessage,
+	createTrashMessage
 }
