@@ -41,6 +41,7 @@ const moment = require("moment");
 const db = require("../database.js");
 const sign_your_credentials = require("./sign_your_credentials.js");
 const { makePresentation } = require("../modules/presentations_out.js");
+const { createWithdrawMessage } = require("../modules/update_status.js");
 
 // Database
 
@@ -805,6 +806,7 @@ router.post("/withdraw", async function (req, res) {
 	const { document_uuid, document_folder } = req.body;
 	const { member_uuid } = req.session.data;
 
+	const USE_PRESENTATION = true;
 	let errno, code;
 
 	// 1.
@@ -834,28 +836,33 @@ router.post("/withdraw", async function (req, res) {
 	}
 
 	//3. buyer connect check
-	const [code3, err3] = await to_buyer.connect(
-		buyer_host,
-		member_uuid,
-		buyer_uuid
-	);
+	
+	if(!USE_PRESENTATION) {
 
-	if (code3 !== 200) {
-		console.log("Error 3 status = 400 code=" + code3);
-		let msg;
-		if (code3 == 500) {
-			msg = { err: "buyer connect check:ECONNRESET" };
-		} else {
-			switch (err3) {
-				case "Not found.":
-					msg = { err: "The destination node cannot be found." };
-					break;
-				default:
-					msg = { err: err3 };
-					break;
+		const [code3, err3] = await to_buyer.connect(
+			buyer_host,
+			member_uuid,
+			buyer_uuid
+		);
+
+		if (code3 !== 200) {
+			console.log("Error 3 status = 400 code=" + code3);
+			let msg;
+			if (code3 == 500) {
+				msg = { err: "buyer connect check:ECONNRESET" };
+			} else {
+				switch (err3) {
+					case "Not found.":
+						msg = { err: "The destination node cannot be found." };
+						break;
+					default:
+						msg = { err: err3 };
+						break;
+				}
 			}
+			return res.status(400).json(msg);
 		}
-		return res.status(400).json(msg);
+
 	}
 
 	// 4
@@ -927,19 +934,39 @@ router.post("/withdraw", async function (req, res) {
 	// Send 'withdraw" message to buyer.
 	//
 
-	const [code9, err9] = await to_buyer.withdraw(
-		buyer_host,
-		old_status.document_uuid,
-		old_status.buyer_uuid,
-		document_folder
-	);
+	if(!USE_PRESENTATION) {
 
-	if (code9 !== 200) {
-		console.log("Error 9 status = 400 code=" + err9);
-		errno = 9;
-		return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, code9, err9, errno));
+		const [code9, err9] = await to_buyer.withdraw(
+			buyer_host,
+			old_status.document_uuid,
+			old_status.buyer_uuid,
+			document_folder
+		);
+
+		if (code9 !== 200) {
+			console.log("Error 9 status = 400 code=" + err9);
+			errno = 9;
+			return res
+				.status(400)
+				.json(tran.rollbackAndReturn(conn, code9, err9, errno));
+		}
+
+	} else {
+
+        // Get private keys to sign credential
+
+        const [keyPair, err] = await getPrivateKeys(member_uuid);
+        if(err) {
+            throw err;
+        }
+
+        const url = `${buyer_host}/api/presentations/available`
+        const credential = await createWithdrawMessage(document_uuid,member_uuid, keyPair);
+        const [ sent, err9 ] = await makePresentation(url, keyPair, credential);
+        if(err9) {
+            return res.status(400).json(tran.rollbackAndReturn(conn, 'code9', err9, 9));
+        }
+
 	}
 
 	// 10
