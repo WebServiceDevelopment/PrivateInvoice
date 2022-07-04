@@ -36,7 +36,8 @@ module.exports					= router;
 
 const { 
 	createConfirmMessage,
-	createReturnMessage
+	createReturnMessage,
+	createPaymentMessage
 } = require('../modules/update_status.js');
 
 const { 
@@ -477,6 +478,7 @@ router.post('/makePayment', async function(req, res) {
 	const _NO = '030';
 
 	let start = Date.now();
+	const USE_PRESENTATION = true;
 
 	const { document_uuid , gasLimit} = req.body;
 	const { member_uuid } = req.session.data;
@@ -507,18 +509,22 @@ router.post('/makePayment', async function(req, res) {
 
 	// 3.
 	// connect
-	//
-	const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
+	
+	if(!USE_PRESENTATION) {
 
-	if(code3 !== 200) {
-		console.log("Error 3 code="+code3+":err="+err3);
-		let msg;
-		if(code3 == 500) {
-			msg = {"err":"The destination node cannot be found."};
-		} else {
-			msg = {"err":err3};
+		const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
+
+		if(code3 !== 200) {
+			console.log("Error 3 code="+code3+":err="+err3);
+			let msg;
+			if(code3 == 500) {
+				msg = {"err":"The destination node cannot be found."};
+			} else {
+				msg = {"err":err3};
+			}
+			return res.status(400).json(msg);
 		}
-		return res.status(400).json(msg);
+
 	}
 
 	// 4.
@@ -527,18 +533,22 @@ router.post('/makePayment', async function(req, res) {
 
 	// 5.
 	// paymentReservation
-	//
-	const [ code5, err5 ] = await to_seller.paymentReservation(seller_host, document_uuid, member_uuid);
+	
+	if(!USE_PRESENTATION) {
 
-	if(code5 !== 200) {
-		console.log("Error 5 code="+code5+":err="+err5);
-		let msg;
-		if(code5 == 500) {
-			msg = {"err":"seller connect check:ECONNRESET"};
-		} else {
-			msg = {"err":err5};
+		const [ code5, err5 ] = await to_seller.paymentReservation(seller_host, document_uuid, member_uuid);
+
+		if(code5 !== 200) {
+			console.log("Error 5 code="+code5+":err="+err5);
+			let msg;
+			if(code5 == 500) {
+				msg = {"err":"seller connect check:ECONNRESET"};
+			} else {
+				msg = {"err":err5};
+			}
+			return res.status(400).json(msg);
 		}
-		return res.status(400).json(msg);
+
 	}
 
 
@@ -707,11 +717,33 @@ router.post('/makePayment', async function(req, res) {
 	// 18.
 	// makePayment
 	//
-	const [ code18, err18 ] = await to_seller.makePayment(seller_host, document_uuid, member_uuid, hash);
+	
+	if(!USE_PRESENTATION) {
 
-	if(code18 !== 200) {
-		errno = 18;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code18, err18, errno));
+		const [ code18, err18 ] = await to_seller.makePayment(seller_host, document_uuid, member_uuid, hash);
+
+		if(code18 !== 200) {
+			errno = 18;
+			return res.status(400).json(tran.rollbackAndReturn(conn, code18, err18, errno));
+		}
+
+	} else {
+		
+    	// Get private keys to sign credential
+
+		const [keyPair, err] = await getPrivateKeys(member_uuid);
+		if(err) {
+			throw err;
+		}
+
+		const url = `${seller_host}/api/presentations/available`
+		console.log(url);
+		const credential = await createPaymentMessage(document_uuid,member_uuid, keyPair, hash);
+		const [ sent, err18 ] = await makePresentation(url, keyPair, credential);
+		if(err18) {
+			return res.status(400).json(tran.rollbackAndReturn(conn, 'code18', err18, 18));
+		}
+
 	}
 
 
