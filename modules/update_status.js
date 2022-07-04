@@ -25,12 +25,13 @@ const moment = require('moment');
 const { signStatusMessage } = require('../routes/sign_your_credentials.js');
 const sub = require("../routes/invoice_sub.js");
 const { moveToTrash } = require('./move_to_trash.js');
+const { moveToPaid } = require('./move_to_paid.js');
 
 const handleStatusUpdate = async(credential, res) => {
 
 	const [ message ] = credential.credentialSubject.items;
 	
-	let status, document_uuid, buyer_uuid, seller_uuid;
+	let status, document_uuid, buyer_uuid, seller_uuid, hash;
 
 	switch(message.statusCode) {
 	case 'toConfirm':
@@ -39,6 +40,16 @@ const handleStatusUpdate = async(credential, res) => {
         document_uuid = message.recordNo;
         buyer_uuid = message.entryNo;
 		await sub.setConfirm(status, document_uuid, buyer_uuid);
+		return res.status(200).end('okay');
+
+		break;
+	case 'toPaid':
+		
+		status = 'seller_status';
+        document_uuid = message.recordNo;
+        buyer_uuid = message.entryNo;
+        hash = message.validCodeReason;
+		await sub.setConfirm(document_uuid, buyer_uuid, hash);
 		return res.status(200).end('okay');
 
 		break;
@@ -237,11 +248,29 @@ const createRecreateMessage = async(document_uuid, member_uuid, keyPair) => {
 
 }
 
+const createPaymentMessage = async(document_uuid, member_uuid, keyPair, hash) => {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_uuid,
+		entryLineSequence: "Message sent from buyer",
+		statusCode: "toPaid",
+		statusCodeDescription: "Buyer has paid this invoice",
+		validCodeReason: hash,
+		validCodeReasonDescription: "The hash to validate the transaction",
+	}
+
+	return await createMessage(document_uuid, member_uuid, message, keyPair);
+
+}
+
 module.exports = {
 	handleStatusUpdate,
 	createConfirmMessage,
 	createReturnMessage,
 	createWithdrawMessage,
 	createTrashMessage,
-	createRecreateMessage
+	createRecreateMessage,
+	createPaymentMessage
 }
