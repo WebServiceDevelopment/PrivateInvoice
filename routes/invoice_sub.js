@@ -1284,7 +1284,7 @@ async function _setWithdrawSeller (table, document_uuid , seller_uuid, document_
 /*
  * setWithdrawBuyer
  */
-async function _setWithdrawBuyer (table, document_uuid , buyer_uuid, document_folder) {
+async function _setWithdrawBuyer (table, document_uuid , buyer_uuid) {
 
 	let err;
 
@@ -1298,15 +1298,12 @@ async function _setWithdrawBuyer (table, document_uuid , buyer_uuid, document_fo
         AND
             document_uuid = ?
         AND
-            document_folder = ?
-        AND
             document_type = 'invoice'
     `;
 
     let args = [
         buyer_uuid,
-        document_uuid,
-        document_folder
+        document_uuid
     ];
 
     let result;
