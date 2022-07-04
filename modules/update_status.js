@@ -26,12 +26,13 @@ const { signStatusMessage } = require('../routes/sign_your_credentials.js');
 const sub = require("../routes/invoice_sub.js");
 const { moveToTrash } = require('./move_to_trash.js');
 const { moveToPaid } = require('./move_to_paid.js');
+const { moveToArchive } = require('./move_to_archive.js');
 
 const handleStatusUpdate = async(credential, res) => {
 
 	const [ message ] = credential.credentialSubject.items;
 	
-	let status, document_uuid, buyer_uuid, seller_uuid, hash;
+	let status, document_uuid, buyer_uuid, seller_uuid, hash, moveErr;
 
 	switch(message.statusCode) {
 	case 'toConfirm':
@@ -49,7 +50,7 @@ const handleStatusUpdate = async(credential, res) => {
         document_uuid = message.recordNo;
         buyer_uuid = message.entryNo;
         hash = message.validCodeReason;
-		const moveErr = await moveToPaid(document_uuid, buyer_uuid, hash);
+		moveErr = await moveToPaid(document_uuid, buyer_uuid, hash);
 		if(moveErr) {
 			return res.status(400).end(moveErr);
 		}
@@ -81,6 +82,18 @@ const handleStatusUpdate = async(credential, res) => {
         document_uuid = message.recordNo;
         seller_uuid = message.entryNo;
 		await moveToTrash(status, document_uuid, seller_uuid);
+		return res.status(200).end('okay');
+
+		break;
+	case "toArchive":
+		
+		status = 'buyer_status';
+        document_uuid = message.recordNo;
+        seller_uuid = message.entryNo;
+		moveErr = await moveToArchive(document_uuid);
+		if(moveErr) {
+			return res.status(400).end(moveErr);
+		}
 		return res.status(200).end('okay');
 
 		break;
@@ -268,6 +281,23 @@ const createPaymentMessage = async(document_uuid, member_uuid, keyPair, hash) =>
 
 }
 
+const createArchiveMessage = async(document_uuid, member_uuid, keyPair) => {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_uuid,
+		entryLineSequence: "Message sent from seller",
+		statusCode: "toArchive",
+		statusCodeDescription: "Seller has archived this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_uuid, message, keyPair);
+
+}
+
 module.exports = {
 	handleStatusUpdate,
 	createConfirmMessage,
@@ -275,5 +305,6 @@ module.exports = {
 	createWithdrawMessage,
 	createTrashMessage,
 	createRecreateMessage,
-	createPaymentMessage
+	createPaymentMessage,
+	createArchiveMessage
 }
