@@ -36,6 +36,8 @@ const CONTACTS				  = "contacts";
 
 const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
 
+	const [ _, err] = await sub.setPaymentReservation(SELLER_STATUS, document_uuid, buyer_uuid);
+
 	// 1.
 	// Check the transaction receipt.
 	// Happy path just okay.
@@ -47,7 +49,7 @@ const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
 		let msg = "No transaction reciept was found."
 		console.log("error :"+msg);
 		let err = {err:msg}
-		return res.status(400).json(err);
+		return 1;
 	}
 
 	console.log(receipt);
@@ -60,7 +62,7 @@ const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
 		let msg = "No transaction was found."
 		console.log("error :"+msg);
 		let err = {err:msg}
-		return res.status(400).json(err);
+		return 2;
 	}
 
 	// 3.
@@ -97,7 +99,7 @@ const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
 		let msg = "Transaction value and invoice total do not match."
 			console.log("error :"+msg);
 			let err = {err:msg}
-			return res.status(400).json(err);
+			return 4;
 		}
 	} else {
 		console.log("4:"+result)
@@ -117,7 +119,8 @@ const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
 		console.log(err6);
 		let code = 400;
 		let errno = 6;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err6, errno));
+		tran.rollbackAndReturn(conn, code, err6, errno);
+		return 6;
 	}
 
 	// 7.
@@ -128,7 +131,8 @@ const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
 		console.log(err7);
 		let code = 400;
 		let errno = 7;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err7, errno));
+		tran.rollbackAndReturn(conn, code, err7, errno);
+		return 7;
 	}
 
 	// 8.
@@ -140,12 +144,17 @@ const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
 		console.log(err8);
 		let errno = 8;
 		let code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err8, errno));
+		tran.rollbackAndReturn(conn, code, err8, errno);
+		return 8;
 	}
 
 	// 9.
 	//
 	conn.end();
+	return null;
 
+}
 
+module.exports = {
+	moveToPaid
 }

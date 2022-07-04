@@ -49,7 +49,10 @@ const handleStatusUpdate = async(credential, res) => {
         document_uuid = message.recordNo;
         buyer_uuid = message.entryNo;
         hash = message.validCodeReason;
-		await sub.setConfirm(document_uuid, buyer_uuid, hash);
+		const moveErr = await moveToPaid(document_uuid, buyer_uuid, hash);
+		if(moveErr) {
+			return res.status(400).end(moveErr);
+		}
 		return res.status(200).end('okay');
 
 		break;
