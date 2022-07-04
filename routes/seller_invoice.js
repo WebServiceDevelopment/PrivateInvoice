@@ -98,7 +98,7 @@ router.post("/send", async function (req, res) {
 	const { member_uuid } = req.session.data;
 
 	let code, errno;
-	const USE_PRESENTATION = false;
+	const USE_PRESENTATION = true;
 
 	// 1.
 	const [buyer_uuid, err1] = await sub.getBuyerUuidForDraft(
