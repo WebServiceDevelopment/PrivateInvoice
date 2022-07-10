@@ -13,6 +13,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 pids
 *.sh
 *.swp
+*.old
 *.pid
 *.seed
 *.pid.lock

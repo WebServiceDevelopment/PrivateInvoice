@@ -35,6 +35,7 @@ const moment 				= require('moment');
 
 const { signBusinessCard } = require('./sign_your_credentials.js')
 const { makePresentation } = require('../modules/presentations_out.js')
+const { verifyCredential } = require('../modules/verify_utils.js')
 
 // Database
 
@@ -48,7 +49,7 @@ const INVITE_TABLE			= 'invite';
  * Helper functions
  */
 
-const createBusinessCard = async (req, member_did, invite_code) => {
+const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 
 	const sql = `
 		SELECT
@@ -83,6 +84,10 @@ const createBusinessCard = async (req, member_did, invite_code) => {
 		return [ null, err ];
 	}
 
+	const timestamp = moment().toJSON()
+	const issuanceDate = timestamp.split('.').shift() + 'Z';
+	const { controller } = keyPair;
+
 	const credential = {
 		'@context': [
 			"https://www.w3.org/2018/credentials/v1",
@@ -101,9 +106,10 @@ const createBusinessCard = async (req, member_did, invite_code) => {
 				linkRelationship: 'Partner'
 			}
 		],
-		issuanceDate: moment().toJSON(),
+		issuanceDate: issuanceDate,
 		issuer : {
-			id: req.session.data.member_uuid,
+			// id: req.session.data.member_uuid,
+			id: controller,
 			type: 'Person',
 			name: row.member_name,
 			email: row.member_contact_email,
@@ -353,6 +359,7 @@ const getPrivateKeys = async (member_did) => {
 //----------------------------- define endpoints -----------------------------
 
 /*
+ * 1.
  * generate
  */
 
@@ -395,14 +402,9 @@ router.post('/generate', async function(req, res) {
 		throw err;
 	}
 
-	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code);
-	if(err1) {
-		return res.json({
-			err: 1,
-			msg: 'could not create business card'
-		});
-	}
+	console.log(req.session.data.member_uuid);
 
+	console.log('--- aaa ---');
 	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_uuid);
 	if(err2) {
 		return res.json({
@@ -411,13 +413,26 @@ router.post('/generate', async function(req, res) {
 		});
 	}
 
+	console.log('--- bbb ---');
+	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code, keyPair);
+	if(err1) {
+		return res.json({
+			err: 1,
+			msg: 'could not create business card'
+		});
+	}
+	
+	console.log('--- ccc ---');
 	const vbc = await signBusinessCard(credential, keyPair);
+	
+	console.log('--- eee ---');
 	res.json(vbc);
 
 
 });
 
 /*
+ * 2.
  * add
  */
 
@@ -425,17 +440,33 @@ router.post('/add', async function(req, res) {
 
 	const { body } = req;
 
+	const verified = await verifyCredential(body);
+	if(!verified) {
+		return res.status(400).end('Contact did not verify')
+	}
+
 	// 1.1 
 	// First we need to check if the contact already exists
 
 	console.log('1.1');
 
 	const local_member_uuid = req.session.data.member_uuid;
-	const remote_member_uuid = body.issuer.id;
+	// const remote_member_uuid = body.issuer.id;
+	const remote_member_uuid = body.credentialSubject.id;
 
 	const exists = await checkForExistingContact(local_member_uuid, remote_member_uuid)
 	if(exists) {
 		return res.status(400).end('Contact already exists')
+	}
+
+	// Keypair
+
+	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_uuid);
+	if(err2) {
+		return res.json({
+			err: 2,
+			msg: 'could not get private keys'
+		});
 	}
 
 	// 1.2 
@@ -445,7 +476,7 @@ router.post('/add', async function(req, res) {
 	console.log('1.2');
 	const invite_code = body.id.split(':').pop();
 
-	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code);
+	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code, keyPair);
 	if(err1) {
 		return res.json({
 			err: 1,
@@ -453,17 +484,9 @@ router.post('/add', async function(req, res) {
 		});
 	}
 
-	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_uuid);
-	if(err2) {
-		return res.json({
-			err: 2,
-			msg: 'could not get private keys'
-		});
-	}
-
 	credential.relatedLink.push({
 		type: 'LinkRole',
-		target: body.issuer.id,
+		target: local_member_uuid,
 		linkRelationship: 'Invite'
 	});
 
@@ -492,6 +515,7 @@ router.post('/add', async function(req, res) {
 	
 	if( local_member_uuid === remote_member_uuid) {
 		return res.json({
+		    err: 0,
 			msg : 'okay'
 		});
 	}
@@ -508,12 +532,14 @@ router.post('/add', async function(req, res) {
 	// End Route
 
 	res.json({
+		err: 0,
 		msg : 'okay'
 	});
 
 });
 
 /*
+ * 3.
  * getContactList
  */
 router.get('/getContactList', async function(req, res) {

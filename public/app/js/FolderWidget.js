@@ -535,10 +535,10 @@ async function api_getDFolderCount() {
 			}
 		]
 
-		let PATH = '/api/trayDrafts/getCountSeller';
+		let url = '/api/trayDrafts/getCountSeller';
 
 		const ajax = new XMLHttpRequest();
-		ajax.open('POST', PATH );
+		ajax.open('POST', url );
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send(JSON.stringify(args));

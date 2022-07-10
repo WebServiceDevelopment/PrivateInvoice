@@ -54,6 +54,7 @@ const CONTACTS                  = "contacts";
 // ------------------------------- End Points -------------------------------
 
 /*
+ * 1.
  * getReceiptInResentActivity
  */
 router.post('/getReceiptInResentActivity', async function(req, res) {
@@ -85,6 +86,7 @@ router.post('/getReceiptInResentActivity', async function(req, res) {
 });
 
 /*
+ * 2.
  * getResentActivityOfWallet
  */
 router.post('/getResentActivityOfWallet', async function(req, res) {
@@ -234,6 +236,11 @@ router.post('/getResentActivityOfWallet', async function(req, res) {
 
 });
 
+/*
+ * 3.
+ * getWalletInfo
+ */
+
 router.post('/getWalletInfo', async function(req, res) {
 
 	const { member_uuid } = req.session.data;
@@ -256,12 +263,6 @@ router.post('/getWalletInfo', async function(req, res) {
 
     const [ balanceWei, err2 ] = await  eth.getBalance(web3, from_account) ;
 
-	//console.log("balanceWei ="+balanceWei)
-
-	let balanceGwei = web3.utils.fromWei(balanceWei,'Gwei');
-	//console.log("balanceGwei ="+balanceGwei)
-
-
     if(err2) {
         console.log("error 2: balanceWei");
         res.json({
@@ -270,6 +271,11 @@ router.post('/getWalletInfo', async function(req, res) {
         });
         return;
     }
+
+	//console.log("balanceWei ="+balanceWei)
+
+	let balanceGwei = web3.utils.fromWei(balanceWei,'Gwei');
+	//console.log("balanceGwei ="+balanceGwei)
 
 	res.json({
 		err : 0,
@@ -286,6 +292,7 @@ router.post('/getWalletInfo', async function(req, res) {
 });
 
 /*
+ * 4.
  * [ Make Paymant]
  * getCurrentBalanceOfBuyer
  */
@@ -508,7 +515,7 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 		"balanceGwei" 	: currency(balanceGwei,config.CURRENCY).format(true) ,
 		"makePaymantTo" : currency(makePaymantTo,config.CURRENCY).format(true),
 		"transferCost" 	: currency(transferCost,config.CURRENCY).format(true),
-		"gas" 		: currency(gasGwei,config.CURRENCY).format(true),
+		"gas" 			: currency(gasGwei,config.CURRENCY).format(true),
 		"endBalance" 	: currency(endBalance,config.CURRENCY).format(true)
 	}
 
@@ -575,6 +582,7 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 });
 
 /*
+ * 5.
  * [ View Transaction Receipt ]
  */
 router.post('/getTransactionReceipt', async function(req, res) {
@@ -678,110 +686,7 @@ router.post('/getTransactionReceipt', async function(req, res) {
 });
 
 /*
- * getTransaction
- * (Not used)
- */
-router.post('/getTransaction', async function(req, res) {
-
-	const METHOD = '/getTransaction'
-
-	const { document_uuid , role, archive} = req.body;
-
-	let table;
-
-	// 1.
-	//
-
-	switch(role){
-	case 'buyer':
-		switch(archive){
-		case 0:
-			table = BUYER_DOCUMENT;
-		break;
-		case 1:
-			table = BUYER_DOCUMENT_ARCHIVE;
-		break;
-		default:
-			res.json({
-				err : "Invalid argument.",
-				msg : null
-			});
-			return ;
-		}
-	break;
-	case 'seller':
-		switch(archive){
-		case 0:
-			table = SELLER_DOCUMENT;
-		break;
-		case 1:
-			table = SELLER_DOCUMENT_ARCHIVE;
-		break;
-		default:
-			res.json({
-				err : "Invalid argument.",
-				msg : null
-			});
-			return ;
-		}
-	break;
-	default:
-		res.json({
-			err : "Invalid argument.",
-			msg : null
-		});
-		return ;
-	}
-
-	// 2.
-	//
-	const [ document , err2 ] = await sub.getDocument(table, document_uuid);
-
-	if(err2) {
-		console.log("error getDocumen");
-		res.json({
-			err : err2,
-			msg : null
-		});
-		return;
-	}
-
-	if(document == null ) {
-		console.log("Documen is null");
-		res.json({
-			err : "Not found.",
-			msg : null
-		});
-		return;
-	}
-
-	const hash = document.settlement_hash;
-
-	// 3.
-	//
-	const [ result, err3 ] = await  eth.getTransaction(web3, hash) ;
-
-	if(err3) {
-		console.log("error balanceWei");
-		res.json({
-			err : err3,
-			msg : null
-		});
-		return;
-	}
-
-	res.json({
-		err : 0,
-		msg : {
-			"receipt" 	: result,
-		}
-	});
-
-	return;
-
-});
-
-/*
+ * 6.
  * [ JSON DATA ]
  * getIPFScidByTransactionHash
  */

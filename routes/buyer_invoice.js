@@ -68,6 +68,7 @@ const CONTACTS					= "contacts";
 // ------------------------------- End Points -------------------------------
 
 /*
+ * 1.
  * [ Return to Sender ]
  * returnToSender
  */
@@ -210,6 +211,7 @@ router.post('/returnToSender', async function(req, res) {
 });
 
 /*
+ * 2.
  * [ Confirm Invoice ]
  * confirm
  */
@@ -351,6 +353,7 @@ router.post('/confirm', async function(req, res) {
 });
 
 /*
+ * 3.
  * [ Unconfirm ]
  * unconfirm
  */
@@ -468,9 +471,10 @@ router.post('/unconfirm', async function(req, res) {
 });
 
 /*
-* [ Make Payment ]
-* makePayment
-*/
+ * 4.
+ * [ Make Payment ]
+ * makePayment
+ */
 
 router.post('/makePayment', async function(req, res) {
 

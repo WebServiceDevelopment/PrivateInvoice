@@ -37,6 +37,7 @@ const db					= require('../database.js');
 // End Points
 
 /*
+ * 1.
  * setProfileImage
  */
 router.post('/setProfileImage', async function(req, res) {
@@ -94,6 +95,7 @@ router.post('/setProfileImage', async function(req, res) {
 });
 
 /*
+ * 2.
  * setCompanyLogo
  */
 router.post('/setCompanyLogo', async function(req, res) {
@@ -151,6 +153,7 @@ router.post('/setCompanyLogo', async function(req, res) {
 });
 
 /*
+ * 3.
  * getProfileImage
  */
 router.post('/getProfileImage', async function(req, res) {
@@ -189,6 +192,7 @@ router.post('/getProfileImage', async function(req, res) {
 });
 
 /*
+ * 4.
  * getCompanyLogo
  */
 router.post('/getCompanyLogo', async function(req, res) {

@@ -1,0 +1,2621 @@
+---
+
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  title: PrivateInvoice
+  description: >-
+    PrivateInvoice API
+  termsOfService: 'http://swagger.io/terms/'
+  contact:
+    name: Swagger API Team
+    email: apiteam@swagger.io
+    url: 'http://swagger.io'
+  license:
+    name: Apache 2.0
+    url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
+
+tags:
+- name: "invoice"
+  description: "Paths related to handling invoices"
+- name: "contacts"
+  description: "Paths related to handling contacts"
+- name: "invite"
+  description: "Paths related to handling invites"
+- name: "session"
+  description: "Paths related to handling logins and sessions"
+- name: "settings"
+  description: "Paths related to handling settings"
+- name: "tray"
+  description: "Paths related to handling document tray"
+- name: "wallet"
+  description: "Paths related to handling wallets"
+- name: "trace"
+  description: "Paths related to sending and receiving presentations"
+
+servers:
+  # - url: 'http://petstore.swagger.io/api'
+  - url: 'http://192.168.1.126:3000/api'
+  - url: 'http://192.168.1.126:3001/api'
+
+paths:
+  #1. /api/contacts
+  #require('./routes/contacts.js');
+
+  #1.1.1
+  /api/contacts/generate:
+    post:
+      tags:
+        - "contacts"
+      description: \#1.1.1 contacts generate
+      operationId: contacts_generate
+      requestBody:
+        description: contacts generate
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/contacts/schemas/Request_generate'
+      responses:
+        '200':
+          description: generate response
+          content:
+            application/json:
+              schema:
+                $ref: '#/contacts/schemas/Responses_generate'
+
+  #1.1.2
+  /api/contacts/add:
+    post:
+      tags:
+        - "contacts"
+      description: \#1.1.2 contacts add
+      operationId: contacts_add
+      requestBody:
+        description: contacts add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/contacts/schemas/Request_add'
+      responses:
+        '200':
+          description: add response
+          content:
+            application/json:
+              schema:
+                $ref: '#/contacts/schemas/Responses_add'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/contacts/schemas/Error_add'
+
+  #1.1.3
+  /api/contacts/getContactList:
+    post:
+      tags:
+        - "contacts"
+      description: \#1.1.3 contacts getContactList
+      operationId: contacts_getContactList
+      requestBody:
+        description: contacts getContactList
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/contacts/schemas/Request_getContactList'
+      responses:
+        '200':
+          description: getContactList response
+          content:
+            application/json:
+              schema:
+                $ref: '#/contacts/schemas/Responses_getContactList'
+
+  #2.1
+  #require('./routes/buyer_invoice.js');
+  #2.1.1
+  /api/invoice/returnToSender:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.1.1 invoice returnToSender 
+      operationId: invoice_returnToSender
+      requestBody:
+        description: invoice returnToSender
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_returnToSender'
+      responses:
+        '200':
+          description: returnToSender response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_returnToSender'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_returnToSender'
+
+  #2.1.2
+  /api/invoice/confirm:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.1.2 invoice confirm 
+      operationId: invoice_confirm
+      requestBody:
+        description: invoice confirm
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_confirm'
+      responses:
+        '200':
+          description: confirm response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_confirm'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_confirm'
+
+  #2.1.3
+  /api/invoice/unconfirm:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.1.3 invoice unconfirm 
+      operationId: invoice_unconfirm
+      requestBody:
+        description: invoice unconfirm
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_confirm'
+      responses:
+        '200':
+          description: unconfirm response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_unconfirm'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_unconfirm'
+
+  #2.1.4
+  /api/invoice/makePayment:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.1.4 invoice makePayment 
+      operationId: invoice_makePayment
+      requestBody:
+        description: invoice makePayment
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_makePayment'
+      responses:
+        '200':
+          description: makePayment response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_makePayment'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_makePayment'
+
+
+  #2.2
+  #require('./routes/buyer_invoice_document.js');
+  #2.2.1
+  /api/invoice/getDocumentBuyer:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.2.1 invoice getDocumentBuyer 
+      operationId: invoice_getDocumentBuyer
+      requestBody:
+        description: invoice getDocumentBuyer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_getDocumentBuyer'
+      responses:
+        '200':
+          description: buyer_invoice_document response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_getDocumentBuyer'
+
+
+  #2.2.2
+  /api/invoice/getDocumentSeller:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.2.2 invoice getDocumentSeller 
+      operationId: invoice_getDocumentSeller
+      requestBody:
+        description: invoice getDocumentSeller
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_getDocumentSeller'
+      responses:
+        '200':
+          description: getDocumentSeller response
+          content:
+            application/json:
+              schema:
+
+  #2.2.3
+  /api/invoice/getArchiveDocumentBuyer:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.2.3 invoice getArchiveDocumentBuyer 
+      operationId: invoice_getArchiveDocumentBuyer
+      requestBody:
+        description: invoice getArchiveDocumentBuyer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_getArchiveDocumentBuyer'
+      responses:
+        '200':
+          description: getArchiveDocumentBuyer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_getArchiveDocumentBuyer'
+
+
+  #2.2.4
+  /api/invoice/getArchiveDocumentSeller:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.2.4 invoice getArchiveDocumentSeller 
+      operationId: invoice_getArchiveDocumentSeller
+      requestBody:
+        description: invoice getArchiveDocumentSeller
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_getArchiveDocumentSeller'
+      responses:
+        '200':
+          description: getArchiveDocumentSeller response
+          content:
+            application/json:
+              schema:
+
+
+  #2.3
+  #require('./routes/seller_invoice_archive.js');
+
+  #2.3.1
+  /api/invoice/sellerArchive:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.3.1 invoice sellerArchive 
+      operationId: invoice_sellerArchive
+      requestBody:
+        description: invoice sellerArchive
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_sellerArchive'
+      responses:
+        '200':
+          description: sellerArchive response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_sellerArchive'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_sellerArchive'
+
+
+  #2.4
+  #require('./routes/seller_invoice_document.js');
+
+  #2.4.1
+  /api/invoice/update:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.4.1 invoice update 
+      operationId: invoice_update
+      requestBody:
+        description: invoice update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_update'
+      responses:
+        '200':
+          description: Update response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_update'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_update'
+
+  #2.4.2
+  /api/invoice/getDraftDocument:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.4.2 invoice getDraftDocument
+      operationId: invoice_getDraftDocument
+      requestBody:
+        description: invoice getDraftDocument
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_getDraftDocument'
+      responses:
+        '200':
+          description: getDraftDocument response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_getDraftDocument'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_getDraftDocument'
+
+  #2.4.3
+  /api/invoice/getDocument:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.4.3 invoice getDocument
+      operationId: invoice_getDocument
+      requestBody:
+        description: invoice getDocument
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_getDocument'
+      responses:
+        '200':
+          description: getDocument response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_getDocument'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_getDocument'
+
+  #2.4.4
+  /api/invoice/getArchiveDocument:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.4.4 invoice getArchiveDocument
+      operationId: invoice_getArchiveDocument
+      requestBody:
+        description: invoice getArchiveDocument
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_getArchiveDocument'
+      responses:
+        '200':
+          description: getArchiveDocument response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_getArchiveDocument'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_getArchiveDocument'
+
+  #2.4.5
+  /api/invoice/create:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.4.5 invoice create
+      operationId: invoice_create
+      requestBody:
+        description: invoice create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_create'
+      responses:
+        '200':
+          description: create response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_create'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_create'
+
+  #2.5
+  #require('./routes/seller_invoice.js');
+  
+  #2.5.1
+  /api/invoice/send:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.5.1 invoice send
+      operationId: invoice_send
+      requestBody:
+        description: invoice send
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_send'
+      responses:
+        '200':
+          description: send response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_send'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_send'
+
+  #2.5.2
+  /api/invoice/recreate:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.5.2 invoice recreate
+      operationId: invoice_recreate
+      requestBody:
+        description: invoice recreate
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_recreate'
+      responses:
+        '200':
+          description: recreate response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_recreate'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_recreate'
+
+  #2.5.3
+  /api/invoice/withdraw:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.5.3 invoice withdraw
+      operationId: invoice_withdraw
+      requestBody:
+        description: invoice withdraw
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_withdraw'
+      responses:
+        '200':
+          description: withdraw response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_withdraw'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_withdraw'
+
+
+  #2.6
+  #require('./routes/seller_invoice_trash.js');
+
+  #2.6.1
+  /api/invoice/trashDraft:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.6.1 invoice trashDraft
+      operationId: invoice_trashDraft
+      requestBody:
+        description: invoice trashDraft
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_trashDraft'
+      responses:
+        '200':
+          description: trashDraft response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_trashDraft'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_trashDraft'
+
+  #2.6.2
+  /api/invoice/trash:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.6.2 invoice trash
+      operationId: invoice_trash
+      requestBody:
+        description: invoice trash
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_trash'
+      responses:
+        '200':
+          description: trash response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_trash'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_trash'
+
+
+  #2.7
+  #require('./routes/softDelete.js');
+
+  #2.7.1
+  /api/invoice/softDeleteSeller:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.7.1 invoice softDeleteSeller
+      operationId: invoice_softDeleteSeller
+      requestBody:
+        description: invoice softDeleteSeller
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_softDeleteSeller'
+      responses:
+        '200':
+          description: softDeleteSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_softDeleteSeller'
+
+  #2.7.2
+  /api/invoice/softDeleteBuyer:
+    post:
+      tags:
+        - "invoice"
+      description: \#2.7.1 invoice softDeleteBuyer
+      operationId: invoice_softDeleteBuyer
+      requestBody:
+        description: invoice softDeleteBuyer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invoice/schemas/Request_softDeleteBuyer'
+      responses:
+        '200':
+          description: softDeleteBuyer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_softDeleteBuyer'
+
+
+  #3.1
+  #require('./routes/invite.js');
+  
+  #3.1.1
+  /api/invite/create:
+    post:
+      tags:
+        - "invite"
+      description: \#3.1.1 invite create
+      operationId: invite_create
+      requestBody:
+        description: invite create
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invite/schemas/Request_create'
+      responses:
+        '200':
+          description: create response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invite/schemas/Responses_create'
+
+  #3.1.2
+  /api/invite/list:
+    post:
+      tags:
+        - "invite"
+      description: \#3.1.2 invite list
+      operationId: invite_list
+
+      responses:
+        '200':
+          description: list response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invite/schemas/Responses_list'
+
+  #3.1.3
+  /api/invite/submit:
+    post:
+      tags:
+        - "invite"
+      description: \#3.1.3 invite submit
+      operationId: invite_submit
+      requestBody:
+        description: invite submit
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invite/schemas/Request_submit'
+      responses:
+        '200':
+          description: submit response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invite/schemas/Responses_submit'
+
+  #3.1.4
+  /api/invite/contacts:
+    post:
+      tags:
+        - "invite"
+      description: \#3.1.4 invite contacts
+      operationId: invite_contacts
+      requestBody:
+        description: invite contacts
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invite/schemas/Request_contacts'
+      responses:
+        '200':
+          description: contacts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invite/schemas/Responses_contacts'
+
+  #3.1.5
+  /api/invite/status:
+    post:
+      tags:
+        - "invite"
+      description: \#3.1.5 invite status
+      operationId: invite_status
+      requestBody:
+        description: invite status
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invite/schemas/Request_status'
+      responses:
+        '200':
+          description: status response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invite/schemas/Responses_status'
+
+  #3.1.6
+  /api/invite/remove:
+    post:
+      tags:
+        - "invite"
+      description: \#3.1.6 invite remove
+      operationId: invite_remove
+      requestBody:
+        description: invite remove
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/invite/schemas/Request_remove'
+      responses:
+        '200':
+          description: remove response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invite/schemas/Responses_remove'
+
+  #4.1
+  #require('./routes/seller_message.js');
+  #/api/message:
+  #  post:
+
+
+  #4.2
+  #require('./routes/buyer_invoice_archive.js');
+  #/api/message:
+  #  post:
+
+
+  #4.3
+  #require('./routes/buyer_invoice_trash.js');
+  #/api/message:
+  #  post:
+
+
+  #4.4
+  #require('./routes/buyer_message.js');
+  #/api/message:
+  #  post:
+
+
+  #4.5
+  #require('./routes/contact_message.js');
+  #/api/message:
+  #  post:
+
+
+  #5.1
+  #require('./routes/presentations.js');
+  /api/presentations:
+    post:
+      tags:
+        - "trace"
+
+
+  #6.1
+  #require('./routes/session.js');
+
+  #6.1.1
+  /api/session/logout:
+    post:
+      tags:
+        - "session"
+      description: \#6.1.1 session logout
+      operationId: session_logout
+      requestBody:
+        description: session logout
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/session/schemas/Request_logout'
+      responses:
+        307:
+          description: Redirect
+          responseParameters:
+            - in: query
+              name: status
+              description: the status of the instalation
+              schema:
+                oneOf:
+                  - type: string
+                    example: success
+                    description: When the installation was successful
+                  - type: string
+                    example: error
+                    description: When the installation was erroneous
+          headers:
+            location:
+              description: Setup state based redirect
+              schema:
+                oneOf:
+                  - type: string
+                    description: If setup is done and valid for installation id, will
+                      redirect to given redirect url
+                  - type: string
+                    description: If no setup exist for installation id, will redirect to
+                      SumUp oauth page
+                  - type: string
+                    description: If error during authorization with SumUpl, e.g. non
+                      matching editions, will redirect to a setup page for
+                      further user action
+
+  #6.1.2
+  /api/session/check:
+    post:
+      tags:
+        - "session"
+      responses:
+        '200':
+          description: check response
+          content:
+            application/json:
+              schema:
+                $ref: '#/session/schemas/Responses_check'
+
+  #6.1.3
+  /api/session/updateCompany:
+    post:
+      tags:
+        - "session"
+      description: \#6.1.3 session updateCompany
+      operationId: session_logout
+      requestBody:
+        description: session updateCompany
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/session/schemas/Request_updateCompany'
+      responses:
+        '200':
+          description: logout response
+          content:
+            application/json:
+              schema:
+                $ref: '#/session/schemas/Responses_updateCompany'
+
+  #6.1.4
+  /api/session/updateProfile:
+    post:
+      tags:
+        - "session"
+      description: \#6.1.4 session updateProfile
+      operationId: session_updateProfile
+      requestBody:
+        description: session updateProfile
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/session/schemas/Request_updateProfile'
+      responses:
+        '200':
+          description: updateProfile response
+          content:
+            application/json:
+              schema:
+                $ref: '#/session/schemas/Responses_updateProfile'
+
+  #6.1.5
+  /api/session/login:
+    post:
+      tags:
+        - "session"
+      description: \#6.1.5 session login
+      operationId: session_login
+      requestBody:
+        description: session login
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/session/schemas/Request_login'
+      responses:
+        '200':
+          description: login response
+          content:
+            application/json:
+              schema:
+                $ref: '#/session/schemas/Responses_login'
+
+  #6.1.6
+  /api/session/signup:
+    post:
+      tags:
+        - "session"
+      description: \#6.1.6 session signup
+      operationId: session_signup
+      requestBody:
+        description: session signup
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/session/schemas/Request_signup'
+      responses:
+        '200':
+          description: signup response
+          content:
+            application/json:
+              schema:
+                $ref: '#/session/schemas/Responses_signup'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/session/schemas/Error_signup'
+
+
+  #7.1
+  #require('./routes/settings.js');
+
+  #7.1.1
+  /api/settings/setProfileImage:
+    post:
+      tags:
+        - "settings"
+      description: #7.1.1 settings setProfileImage
+      operationId: settings_setProfileImage
+      requestBody:
+        description: settings setProfileImage
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/settings/schemas/Request_setProfileImage'
+      responses:
+        '200':
+          description: setProfileImage response
+          content:
+            application/json:
+              schema:
+                $ref: '#/settings/schemas/Responses_setProfileImage'
+
+  #7.1.2
+  /api/settings/setCompanyLogo:
+    post:
+      tags:
+        - "settings"
+      description: #7.1.2 settings setCompanyLogo
+      operationId: settings_setCompanyLogo
+      requestBody:
+        description: settings setCompanyLogo
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/settings/schemas/Request_setCompanyLogo'
+      responses:
+        '200':
+          description: setCompanyLogo response
+          content:
+            application/json:
+              schema:
+                $ref: '#/settings/schemas/Responses_setCompanyLogo'
+
+  #7.1.3
+  /api/settings/getProfileImage:
+    post:
+      tags:
+        - "settings"
+      description: #7.1.3 settingd getProfileImage
+      operationId: settings_getProfileImage
+      requestBody:
+        description: settings getProfileImage
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/settings/schemas/Request_getProfileImage'
+      responses:
+        '200':
+          description: getProfileImage response
+          content:
+            application/json:
+              schema:
+                $ref: '#/settings/schemas/Responses_getProfileImage'
+
+  #7.1.4
+  /api/settings/getCompanyLogo:
+    post:
+      tags:
+        - "settings"
+      description: #7.1.4 settings getCompanyLogo
+      operationId: settings_getCompanyLogo
+      requestBody:
+        description: settings getCompanyLogo
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/settings/schemas/Request_getCompanyLogo'
+      responses:
+        '200':
+          description: getCompanyLogo response
+          content:
+            application/json:
+              schema:
+                $ref: '#/settings/schemas/Responses_getCompanyLogo'
+
+
+  #8.1
+  #require('./routes/test.js');
+  /api/test:
+    post:
+
+
+  #9.1
+  #require('./routes/tray.js');
+
+  #9.1.1
+  /api/tray/getTotalBuyer:
+    post:
+      tags:
+        - "tray"
+      description: #9.1.1 tray getTotalBuyer
+      operationId: tray_getTotalBuyer
+      requestBody:
+        description: tray getTotalBuyer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/tray/schemas/Request_getTotalBuyer'
+      responses:
+        '200':
+          description: getTotalBuyer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getTotalBuyer'
+
+  #9.1.2
+  /api/tray/getTotalSeller:
+    post:
+      tags:
+        - "tray"
+      description: #9.1.2 tray getTotalSeller
+      operationId: tray_getTotalSeller
+      requestBody:
+        description: tray getTotalSeller
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/tray/schemas/Request_getTotalSeller'
+      responses:
+        '200':
+          description: getTotalSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getTotalSeller'
+
+  #9.1.3
+  /api/tray/getCountBuyer:
+    post:
+      tags:
+        - "tray"
+      description: #9.1.3 tray getCountBuyer
+      operationId: tray_getCountBuyer
+      requestBody:
+        description: tray getCountBuyer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/tray/schemas/Request_getCountBuyer'
+      responses:
+        '200':
+          description: getCountBuyer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getCountBuyer'
+
+  #9.1.4
+  /api/tray/getCountSeller:
+    post:
+      tags:
+        - "tray"
+      description: #9.1.4 tray getCountSeller
+      operationId: tray_getCountSeller
+      requestBody:
+        description: tray getCountSeller
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/tray/schemas/Request_getCountSeller'
+      responses:
+        '200':
+          description: getCountSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getCountSeller'
+
+  #9.1.5
+  /api/tray/getFolderBuyer:
+    post:
+      tags:
+        - "tray"
+      description: #9.1.5 tray getFolderBuyer
+      operationId: tray_getFolderBuyer
+      requestBody:
+        description: tray getFolderBuyer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/tray/schemas/Request_getFolderBuyer'
+      responses:
+        '200':
+          description: getFolderBuyer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getFolderBuyer'
+
+  #9.1.6
+  /api/tray/getFolderSeller:
+    post:
+      tags:
+        - "tray"
+      description: #9.1.6 tray getFolderSeller
+      operationId: tray_getFolderSeller
+      requestBody:
+        description: tray getFolderSeller
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/tray/schemas/Request_getFolderSeller'
+      responses:
+        '200':
+          description: getFolderSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getFolderSeller'
+
+
+  #10.1
+  #require('./routes/tray_archive.js');
+  /api/trayArchive:
+    post:
+
+
+  #11.1
+  #require('./routes/seller_tray_drafts.js');
+  /api/trayDrafts:
+    post:
+
+
+  #12.1
+  #require('./routes/wallet.js');
+  #call by ActionWidget.js 
+
+  #12.1.1
+  /api/wallet/getReceiptInResentActivity: 
+    post:
+      tags:
+        - "wallet"
+      description: \#12.1.1 wallet getReceiptInResentActivity
+      operationId: wallet_getReceiptInResentActivity
+      requestBody:
+        description: wallet getReceiptInResentActivity
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/wallet/schemas/Request_getReceiptInResentActivity'
+      responses:
+        '200':
+          description: getReceiptInResentActivity response
+          content:
+            application/json:
+              schema:
+                $ref: '#/wallet/schemas/Responses_getReceiptInResentActivity'
+
+  #12.1.2
+  /api/wallet/getResentActivityOfWallet:
+    post:
+      tags:
+        - "wallet"
+      description: \#12.1.2 wallet getResentActivityOfWallet
+      operationId: wallet_getResentActivityOfWallet
+      requestBody:
+        description: wallet getResentActivityOfWallet
+        required: false
+
+      responses:
+        '200':
+          description: getResentActivityOfWallet response
+          content:
+            application/json:
+              schema:
+                $ref: '#/wallet/schemas/Responses_getResentActivityOfWallet'
+
+  #12.1.3
+  /api/wallet/getWalletInfo:
+    post:
+      tags:
+        - "wallet"
+      description: \#12.1.3 wallet getWalletInfo
+      operationId: wallet_getWalletInfo
+      requestBody:
+        description: wallet getWalletInfo
+        required: false
+
+      responses:
+        '200':
+          description: getWalletInfo response
+          content:
+            application/json:
+              schema:
+                $ref: '#/wallet/schemas/Responses_getWalletInfo'
+
+  #12.1.4
+  /api/wallet/getCurrentBalanceOfBuyer:
+    post:
+      tags:
+        - "wallet"
+      description: \#12.1.4 wallet getCurrentBalanceOfBuyer
+      operationId: wallet_getCurrentBalanceOfBuyer
+      requestBody:
+        description: wallet getCurrentBalanceOfBuyer
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/wallet/schemas/Request_getCurrentBalanceOfBuyer'
+      responses:
+        '200':
+          description: getCurrentBalanceOfBuyer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/wallet/schemas/Responses_getCurrentBalanceOfBuyer'
+
+  #12.1.5
+  /api/wallet/getTransactionReceipt:
+    post:
+      tags:
+        - "wallet"
+      description: \#12.1.5 wallet getTransactionReceipt
+      operationId: wallet_getTransactionReceipt
+      requestBody:
+        description: wallet getTransactionReceipt
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/wallet/schemas/Request_getTransactionReceipt'
+      responses:
+        '200':
+          description: getTransactionReceipt response
+          content:
+            application/json:
+              schema:
+                $ref: '#/wallet/schemas/Responses_getTransactionReceipt'
+
+  #12.1.6
+  /api/wallet/getIPFScidByTransactionHash:
+    post:
+      tags:
+        - "wallet"
+      description: \#12.1.7 wallet getIPFScidByTransactionHash
+      operationId: wallet_getIPFScidByTransactionHash
+      requestBody:
+        description: wallet getIPFScidByTransactionHash
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/wallet/schemas/Request_getIPFScidByTransactionHash'
+      responses:
+        '200':
+          description: getIPFScidByTransactionHash response
+          content:
+            application/json:
+              schema:
+                $ref: '#/wallet/schemas/Responses_getIPFScidByTransactionHash'
+
+#------------------------------------- schemas ---------------------------------
+
+contacts:
+  schemas:
+    #1.1.1
+    Request_generate:
+      allOf:
+        - required:
+          properties:
+            buyer:
+              type: string
+            seller:
+              type: string
+            uses:
+              type: string
+            expire:
+              type: string
+
+    Responses_generate:
+      required:
+      properties:
+        type: !anything
+
+    #1.1.2
+    Request_add:
+      allOf:
+        - required:
+          properties:
+            issuer:
+              type: object
+              properties:
+                id:
+                type: issuer.id;string
+
+    Responses_add:
+      required:
+      properties:
+        msg:
+          type: string
+          enum:
+            - "okay"
+
+    Error_add:
+      required:
+      properties:
+        type: string
+
+    #1.1.3
+    Request_getContactList:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_getContactList:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: array
+          items:
+            type: object
+            properties: 
+              remote_origin:
+                type: string
+              remote_member_uuid:
+                type: string
+              remote_membername:
+                type: string
+              remote_organization:
+                type: object
+                properties: 
+                  name:
+                    type: string
+                  postcode:
+                    type: string
+                  address:
+                    type: string
+                  building:
+                    type: string
+                  department:
+                    type: string
+              local_to_remote:
+                type: string
+              remote_to_local:
+                type: string
+              created_on:
+                type: date-time
+
+
+invoice:
+  #2.1
+  schemas:
+    #2.1.1
+    Request_returnToSender:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_returnToSender:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_returnToSender:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+
+    #2.1.2
+    Request_confirm:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_confirm:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_confirm:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+
+    #2.1.3
+    Request_unconfirm:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_unconfirm:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_unconfirm:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+
+    #2.1.4
+    Request_makePayment:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_makePayment:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_makePayment:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+
+    #2.2.1
+    Request_getDocumentBuyer:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_getDocumentBuyer:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.2.2
+    Request_getDocumentSeller:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_getDocumentSeller:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.2.3
+    Request_getArchiveDocumentBuyer:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_getArchiveDocumentBuyer:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.2.4
+    Request_getArchiveDocumentSeller:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_getArchiveDocumentSeller:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+
+    #2.4.1
+    Request_update:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_update:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_update:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.4.2
+    Request_getDraftDocument:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_getDraftDocument:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_getDraftDocument:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.4.3
+    Request_getDocument:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_getDocument:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_getDocument:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.4.4
+    Request_getArchiveDocument:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+    Responses_getArchiveDocument:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_getArchiveDocument:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.4.5
+    Request_create:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_create:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_create:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.5.1
+    Request_send:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_send:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_send:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.5.2
+    Request_recreate:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_recreate:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_recreate:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.5.3
+    Request_withdraw:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_withdraw:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_withdraw:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.6.1
+    Request_trashDraft:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_trashDraft:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_trashDraft:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.6.2
+    Request_trash:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_trash:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_trash:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.7.1
+    Request_softDeleteSeller:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_softDeleteSeller:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #2.7.2
+    Request_softDeleteBuyer:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_softDeleteBuyer:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+
+invite:
+  #3.1
+  schemas:
+    #3.1.1
+    Request_create:
+      allOf:
+        - required:
+          properties:
+            buyer:
+              type: string
+            seller:
+              type: string
+
+    Responses_create:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: object
+          properties:
+            invite_code:
+              type: string
+            local_member_uuid:
+              type: string
+            rel_buyer:
+              type: string
+            rel_seller:
+              type: string
+            max_count:
+              type: integer
+              format: int32
+
+    #3.1.2
+    Responses_list:
+      $ref: '#/invite/schemas/Responses_create'
+
+    #3.1.3
+    Request_submit:
+      allOf:
+        - required:
+          properties:
+            code:
+              type: string
+
+    Responses_submit:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #3.1.4
+    Request_contacts:
+      allOf:
+        - required:
+          properties:
+            contactType:
+              type: string
+
+    Responses_contacts:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: array
+          items: 
+            type: object
+            properties: 
+              remote_origin:
+                type: string
+              member_uuid:
+                type: string
+              membername:
+                type: string
+              organization_name:
+                type: string
+              organization_address:
+                type: string
+              organization_building:
+                type: string
+              organization_department:
+                type: string
+              organization_tax_id:
+                type: string
+              addressCountry:
+                type: string
+              addressRegion:
+                type: string
+              addressCity:
+                type: string
+              wallet_address:
+                type: string
+
+    #3.1.5
+    Request_status:
+      allOf:
+        - required:
+          properties:
+            code:
+              type: string
+
+    Responses_status:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: object
+          properties:
+            invite:
+              type: string
+            host:
+              type: string
+            session:
+              type: object
+              properties:
+                member_uuid:
+                  type: string
+                organization_name:
+                  type: string
+                organization_postcode:
+                  type: string
+                organization_address:
+                  type: string
+                organization_building:
+                  type: string
+                organization_department:
+                  type: string
+                organization_tax_id:
+                  type: string
+                addressCountry:
+                  type: string
+                addressRegion:
+                  type: string
+                addressCity:
+                  type: string
+
+    #3.1.6
+    Request_remove:
+      allOf:
+        - required:
+          properties:
+            invite_code:
+              type: string
+
+    Responses_remove:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+          enum:
+            - "okey"
+
+session:
+  #6.1
+  schemas:
+    #6.1.1
+    Request_logout:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_logout:
+      302:
+        description: Redirect
+        responseParameters:
+          - in: query
+            name: status
+            description: the status of the instalation
+            schema:
+              oneOf:
+                - type: string
+                  example: success
+                  description: When the installation was successful
+                - type: string
+                  example: error
+                  description: When the installation was erroneous
+        headers:
+          location:
+            description: Setup state based redirect
+            schema:
+              oneOf:
+                - type: string
+                  description: If setup is done and valid for installation id, will
+                    redirect to given redirect url
+                - type: string
+                  description: If no setup exist for installation id, will redirect to
+                    SumUp oauth page
+                - type: string
+                  description: If error during authorization with SumUpl, e.g. non
+                    matching editions, will redirect to a setup page for
+                    further user action
+
+    #6.1.2
+    Responses_check:
+      required:
+      properties:
+        member_uuid:
+          type: string
+        organization_name:
+          type: string
+        organization_postcode:
+          type: string
+        organization_address:
+          type: string
+        organization_building:
+          type: string
+        organization_department:
+          type: string
+        organization_tax_id:
+          type: string
+        addressCountry:
+          type: string
+        addressRegion:
+          type: string
+        addressCity:
+          type: string
+
+    #6.1.3
+    Request_updateCompany:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_updateCompany:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+          enum:
+            - "okey"
+
+    #6.1.4
+    Request_updateProfile:
+      allOf:
+        - required:
+          properties:
+            id:
+              type: integer
+              format: int64
+
+    Responses_updateProfile:
+      $ref: '#/session/schemas/Responses_updateCompany'
+
+    #6.1.5
+    Request_login:
+      allOf:
+        - required:
+          properties:
+            membername:
+              type: string
+            password:
+              type: string
+
+    Responses_login:
+      $ref: '#/session/schemas/Responses_updateCompany'
+
+    #6.1.6
+    Request_signup:
+      allOf:
+        - required:
+          properties:
+            member_did:
+              type: string
+            member.membername:
+              type: string
+            member.job_title:
+              type: string
+            member.contact_email:
+              type: string
+            password_hash:
+              type: string
+            company.name:
+              type: string
+            company.department:
+              type: string
+            company.tax_id:
+              type: string
+            address.country:
+              type: string
+            address.region:
+              type: string
+            address.postcode:
+              type: string
+            address.city:
+              type: string
+            address.line1:
+              type: string
+            address.line2:
+              type: string
+
+    Responses_signup:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+settings:
+  #7.1
+  schemas:
+    #7.1.1
+    Request_setProfileImage: #ok
+      allOf:
+        - required:
+          properties:
+            dataUrl:
+              type: string
+
+    Responses_setProfileImage:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+          enum:
+            - "okey"
+
+    #7.1.2
+    Request_setCompanyLogo: #ok
+      allOf:
+        - required:
+          properties:
+            dataUrl:
+              type: string
+
+    Responses_setCompanyLogo:
+      $ref: '#/settings/schemas/Responses_setProfileImage'
+
+    #7.1.3
+    Request_getProfileImage:
+      allOf:
+        - required:
+          properties:
+            data:
+              type: object
+              properties:
+                avatar_uuid:
+                  type: string
+
+    Responses_getProfileImage: #ok
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: object
+          properties:
+            row:
+              type: object
+              properties:
+                dataUrl:
+                  type: string
+                  format: byte
+
+    #7.1.4
+    Request_getCompanyLogo: #ok
+      allOf:
+        - required:
+          properties:
+            data:
+              type: object
+              properties:
+                logo_uuid:
+                  type: string
+
+    Responses_getCompanyLogo:
+      $ref: '#/settings/schemas/Request_getProfileImage'
+
+tray:
+  #9.1
+  schemas:
+    #9.1.1
+    Request_getTotalBuyer: #ok
+      allOf:
+        - required:
+          properties:
+            archive:
+              type: string
+            role:
+              type: string
+            folder:
+              type: string
+            type:
+              type: string
+
+    Responses_getTotalBuyer:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #9.1.2
+    Request_getTotalSeller:
+      $ref: '#/tray/schemas/Request_getTotalBuyer'
+
+    Responses_getTotalSeller:
+      $ref: '#/tray/schemas/Responses_getTotalBuyer'
+
+    #9.1.3
+    Request_getCountBuyer:
+      $ref: '#/tray/schemas/Request_getTotalBuyer'
+
+    Responses_getCountBuyer:
+      required:
+      properties:
+        document_uuid:
+          type: string
+        document_type:
+          type: string
+        document_number:
+          type: string
+        document_folder:
+          type: string
+        seller_uuid:
+          type: string
+        seller_membername:
+          type: string
+        seller_organization:
+          type: string
+        seller_archived:
+          type: string
+        seller_last_action:
+          type: date-time
+        buyer_uuid:
+          type: string
+        buyer_membername:
+          type: string
+        buyer_organization:
+          type: string
+        buyer_archived:
+          type: string
+        buyer_last_action:
+          type: string
+        created_from:
+          type: string
+        root_document:
+          type: string
+        created_on:
+          type: date-time
+        opened:
+          type: string
+        subject_line:
+          type: string
+        due_by:
+          type: date-time
+        amount_due:
+          type: integer
+          format: int32
+
+    #9.1.4
+    Request_getCountSeller:
+      $ref: '#/tray/schemas/Request_getTotalBuyer'
+
+    Responses_getCountSeller:
+      $ref: '#/tray/schemas/Responses_getCountBuyer'
+
+    #9.1.5
+    Request_getFolderBuyer:
+      allOf:
+        - required:
+          properties:
+            archive:
+              type: string
+            role:
+              type: string
+            folder:
+              type: string
+            type:
+              type: string
+            key: 
+              - type: string
+              
+
+    Responses_getFolderBuyer: #ng
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          - properties:
+            
+
+    #9.1.6
+    Request_getFolderSeller:
+      $ref: '#/tray/schemas/Request_getFolderBuyer'
+
+    Responses_getFolderSeller:
+      $ref: '#/tray/schemas/Responses_getFolderBuyer'
+
+wallet:
+  #12.1
+  schemas:
+
+    #12.1.1
+    Request_getReceiptInResentActivity: #ok
+      allOf:
+        - required:
+          properties:
+            settlement_hash:
+              type: string
+
+    Responses_getReceiptInResentActivity:
+      $ref: '#/wallet/schemas/Responses_getTransactionReceipt'
+
+    #12.1.2
+    Responses_getResentActivityOfWallet: #ok
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: object
+          properties:
+            activity:
+              type: array
+              items:
+                document_uuid:
+                  type: string
+                document_json:
+                  type: string
+                settlement_hash:
+                  type: string
+                settlement_time:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - "Sale"
+                    - "Purchase"
+                amount:
+                  type: integer
+                  format: int32
+
+    #12.1.3
+    Responses_getWalletInfo:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: object
+          properties:
+            balanceGwei:
+              type: string
+            accountAddress:
+              type: string
+            networkType:
+              type: string
+            chainId:
+              type: string
+
+    #12.1.4
+    Request_getCurrentBalanceOfBuyer: #ok
+      allOf:
+        - required:
+          properties:
+            document_uuid:
+              type: string
+
+    Responses_getCurrentBalanceOfBuyer:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: object
+          properties:
+            transaction_result:
+              type: object
+              properties:
+                balanceGwei:
+                  type: string
+                makePaymantTo:
+                  type: string
+                transferCost:
+                  type: string
+                gas:
+                  type: string
+                endBalance:
+                  type: string
+
+    #12.1.5
+    Request_getTransactionReceipt: #ok
+      allOf:
+        - required:
+          properties:
+            document_uuid:
+              type: string
+            role:
+              type: string
+              enum:
+                - "buyer"
+                - "seller"
+            archive:
+              type: integer
+              format: int64
+
+    Responses_getTransactionReceipt:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: object
+          properties:
+            receipt:
+              type: object
+              properties:
+                status:
+                  type: "boolean"
+                  default: true
+                transactionHash:
+                  contractAddress:
+                transactionIndex:
+                  type: integer
+                  format: int64
+                blockHash:
+                  contractAddress:
+                blockNumber:
+                  type: integer
+                  format: int64
+                contractAddress:
+                  type: string
+                cumulativeGasUsed:
+                  type: integer
+                  format: int64
+                gasUsed:
+                  type: integer
+                  format: int64
+                logs:
+                  - {  }
+
+    #12.1.6
+    Request_getIPFScidByTransactionHash: #ok
+      allOf:
+        - required:
+          properties:
+            transactionHash:
+              type: string
+
+    Responses_getIPFScidByTransactionHash:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: object
+          properties:
+            ipfs_cid:
+              type: string
+            ipfs_address:
+              type: string
