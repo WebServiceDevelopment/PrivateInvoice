@@ -142,7 +142,9 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
         '/api/presentations/available',
         ''
     )
-    const remote_member_uuid = credential.issuer.id
+    
+	const remote_member_uuid = credential.credentialSubject.id
+    // const remote_member_uuid = credential.issuer.id
     const remote_member_name = credential.issuer.name
 
     const remote_organization = {
@@ -225,12 +227,15 @@ const handleContactRequest = async (body) => {
     const [linkRelationship] = body.relatedLink.filter((link) => {
         return link.linkRelationship === 'Invite'
     })
+
+	console.log(linkRelationship);
     const local_member_uuid = linkRelationship.target
 
     const [invite, inviteEr] = await checkInviteCodeValid(
         local_member_uuid,
         invite_code
     )
+
     if (inviteEr) {
         return [400, 'invite code invalid']
     }
@@ -238,7 +243,9 @@ const handleContactRequest = async (body) => {
     // 2.
     // Then we see if the contact already exists
 
-    const remote_member_uuid = body.issuer.id
+    // const remote_member_uuid = body.issuer.id
+	
+    const remote_member_uuid = body.credentialSubject.id
     const exists = await checkForExistingContact(
         local_member_uuid,
         remote_member_uuid

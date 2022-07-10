@@ -35,6 +35,7 @@ const moment 				= require('moment');
 
 const { signBusinessCard } = require('./sign_your_credentials.js')
 const { makePresentation } = require('../modules/presentations_out.js')
+const { verifyCredential } = require('../modules/verify_utils.js')
 
 // Database
 
@@ -48,7 +49,7 @@ const INVITE_TABLE			= 'invite';
  * Helper functions
  */
 
-const createBusinessCard = async (req, member_did, invite_code) => {
+const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 
 	const sql = `
 		SELECT
@@ -85,6 +86,7 @@ const createBusinessCard = async (req, member_did, invite_code) => {
 
 	const timestamp = moment().toJSON()
 	const issuanceDate = timestamp.split('.').shift() + 'Z';
+	const { controller } = keyPair;
 
 	const credential = {
 		'@context': [
@@ -106,7 +108,8 @@ const createBusinessCard = async (req, member_did, invite_code) => {
 		],
 		issuanceDate: issuanceDate,
 		issuer : {
-			id: req.session.data.member_uuid,
+			// id: req.session.data.member_uuid,
+			id: controller,
 			type: 'Person',
 			name: row.member_name,
 			email: row.member_contact_email,
@@ -401,14 +404,6 @@ router.post('/generate', async function(req, res) {
 
 	console.log(req.session.data.member_uuid);
 
-	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code);
-	if(err1) {
-		return res.json({
-			err: 1,
-			msg: 'could not create business card'
-		});
-	}
-
 	console.log('--- aaa ---');
 	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_uuid);
 	if(err2) {
@@ -417,11 +412,20 @@ router.post('/generate', async function(req, res) {
 			msg: 'could not get private keys'
 		});
 	}
-	
-	console.log('--- bbb ---');
-	const vbc = await signBusinessCard(credential, keyPair);
 
+	console.log('--- bbb ---');
+	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code, keyPair);
+	if(err1) {
+		return res.json({
+			err: 1,
+			msg: 'could not create business card'
+		});
+	}
+	
 	console.log('--- ccc ---');
+	const vbc = await signBusinessCard(credential, keyPair);
+	
+	console.log('--- eee ---');
 	res.json(vbc);
 
 
@@ -436,39 +440,26 @@ router.post('/add', async function(req, res) {
 
 	const { body } = req;
 
+	const verified = await verifyCredential(body);
+	if(!verified) {
+		return res.status(400).end('Contact did not verify')
+	}
+
 	// 1.1 
 	// First we need to check if the contact already exists
 
 	console.log('1.1');
 
 	const local_member_uuid = req.session.data.member_uuid;
-	const remote_member_uuid = body.issuer.id;
+	// const remote_member_uuid = body.issuer.id;
+	const remote_member_uuid = body.credentialSubject.id;
 
 	const exists = await checkForExistingContact(local_member_uuid, remote_member_uuid)
 	if(exists) {
 		return res.status(400).end('Contact already exists')
 	}
 
-	// 1.1b
-	// Then we will attempt to verify the business card
-
-
-	return res.status(400).end();
-
-	// 1.2 
-	// Then we need to try and contact the remote host
-	// We start by creating our own verifiable business card
-
-	console.log('1.2');
-	const invite_code = body.id.split(':').pop();
-
-	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code);
-	if(err1) {
-		return res.json({
-			err: 1,
-			msg: 'could not create business card'
-		});
-	}
+	// Keypair
 
 	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_uuid);
 	if(err2) {
@@ -478,9 +469,24 @@ router.post('/add', async function(req, res) {
 		});
 	}
 
+	// 1.2 
+	// Then we need to try and contact the remote host
+	// We start by creating our own verifiable business card
+
+	console.log('1.2');
+	const invite_code = body.id.split(':').pop();
+
+	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code, keyPair);
+	if(err1) {
+		return res.json({
+			err: 1,
+			msg: 'could not create business card'
+		});
+	}
+
 	credential.relatedLink.push({
 		type: 'LinkRole',
-		target: body.issuer.id,
+		target: local_member_uuid,
 		linkRelationship: 'Invite'
 	});
 

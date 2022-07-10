@@ -20,20 +20,20 @@
 
 // Libraries
 
-const axios                 = require('axios')
-const moment                    = require('moment');
+const axios								 = require('axios')
+const moment										= require('moment');
 
 // Sign
-const transmute                 = require('@transmute/vc.js');
+const transmute								 = require('@transmute/vc.js');
 
 const {
-    Ed25519Signature2018,
-    Ed25519VerificationKey2018,
+		Ed25519Signature2018,
+		Ed25519VerificationKey2018,
 } = require('@transmute/ed25519-signature-2018');
 
 const context = {
-    "https://www.w3.org/2018/credentials/v1" : require('../context/credentials_v1.json'),
-    "https://w3id.org/traceability/v1" : require('../context/traceability_v1.json')
+	"https://www.w3.org/2018/credentials/v1" : require('../context/credentials_v1.json'),
+	"https://w3id.org/traceability/v1" : require('../context/traceability_v1.json')
 }
 
 const { checkStatus } = require('@transmute/vc-status-rl-2020');
@@ -45,58 +45,108 @@ const db = require('../database.js');
 
 
 const documentLoader = async (iri) => {
+	
+	console.log('Starting document loader!!!!');
+	console.log(iri);
 
-    if(context[iri]) {
-        return { document: context[iri] };
-    }
+	if(context[iri]) {
+		console.log('Found in context');
+		return { document: context[iri] };
+	}
 
-    if(iri.indexOf('did:key') === 0) {
-        const document = await resolve(iri);
-        return { document };
-    }
+	if(iri.indexOf('did:key') === 0) {
+		console.log('Found id key');
+		const res = await resolve(iri.split('#')[0]);
+		return { document: res.didDocument || res };
+	}
 
-    if(iri.indexOf('did:elem:ganache') === 0) {
+	if(iri.indexOf('did:elem:ganache') === 0) {
+		console.log('Found did element');
 		const url = `http://192.168.1.126:4000/api/1.0/identifiers/${iri}`
 		const res = await axios.get(url);
-        return { document : res.data };
-    }
+		return { document : res.data };
+	}
 
-    const message = `Unsupported iri: ${iri}`;
-    console.error(message);
-    throw new Error(message);
+	const message = `Unsupported iri: ${iri}`;
+	console.error(message);
+	throw new Error(message);
+
+}
+
+const verifyCredential = async(credential) => {
+	
+	console.log(credential);
+
+	let checks;
+	try {
+		checks = await transmute.verifiable.credential.verify({
+			credential,
+			format: ['vc'],
+			documentLoader,
+			suite: [new Ed25519Signature2018()],
+			checkStatus: () => ({ verified: true }),
+		});
+	} catch(err) {
+		throw err;
+	}
+
+	/*
+	const suite = new Ed25519Signature2018();
+	const { proof, ...document } = credential
+
+	const checks = await suite.verifyProof({
+		proof,
+		document,
+		purpose: {
+		  validate: () => {
+			return { valid: true };
+		  },
+		  update: (proof) => {
+			proof.proofPurpose = "assertionMethod";
+			return proof;
+		  }
+		},
+		documentLoader,
+		compactProof: false
+  	});
+	*/
+
+	console.log(checks);
+	return checks.verified;
 
 }
 
 
 const getPrivateKeys = async (member_did) => {
 
-    const sql = `
-        SELECT
-            public_key
-        FROM
-            privatekeys
-        WHERE
-            member_did = ?
-    `;
+		const sql = `
+				SELECT
+						public_key
+				FROM
+						privatekeys
+				WHERE
+						member_did = ?
+		`;
 
-    const args = [
-        member_did
-    ];
+		const args = [
+				member_did
+		];
 
-    let row;
-    try {
-        row = await db.selectOne(sql, args);
-    } catch(err) {
-        return [ null, err ];
-    }
+		let row;
+		try {
+				row = await db.selectOne(sql, args);
+		} catch(err) {
+				return [ null, err ];
+		}
 
-    const keyPair = JSON.parse(row.public_key);
-    return [ keyPair, null ];
+		const keyPair = JSON.parse(row.public_key);
+		return [ keyPair, null ];
 
 }
 
 
 module.exports = {
+	verifyCredential,
 	documentLoader,
 	getPrivateKeys
 }
