@@ -60,29 +60,7 @@ const SELLER_ARCHIVE_DOCUMENT = "seller_document_archive";
 const SELLER_ARCHIVE_STATUS = "seller_status_archive";
 
 const CONTACTS = "contacts";
-
-const getPrivateKeys = async (member_did) => {
-	const sql = `
-		SELECT
-			public_key
-		FROM
-			privatekeys
-		WHERE
-			member_did = ?
-	`;
-
-	const args = [member_did];
-
-	let row;
-	try {
-		row = await db.selectOne(sql, args);
-	} catch (err) {
-		return [null, err];
-	}
-
-	const keyPair = JSON.parse(row.public_key);
-	return [keyPair, null];
-};
+const { getPrivateKeys } = require('../modules/verify_utils.js');
 
 // ------------------------------- End Points -------------------------------
 
@@ -202,9 +180,11 @@ router.post("/send", async function (req, res) {
 	// signInvoice
 	//
 
+	const [ keyPair ] = await getPrivateKeys(member_uuid);
 	const signedCredential = await sign_your_credentials.signInvoice(
 		document.document_uuid,
-		document.document_json
+		document.document_json,
+		keyPair
 	);
 	const document_json = JSON.stringify(signedCredential);
 
@@ -319,7 +299,6 @@ router.post("/send", async function (req, res) {
 		const presenationSlug = "/api/presentations/available";
 		const url = buyer_host + presenationSlug;
 
-		const [keyPair] = await getPrivateKeys(member_uuid);
 		const vc = JSON.parse(document.document_json);
 		const [ code15, err15 ] = await makePresentation(url, keyPair, vc);
 		
