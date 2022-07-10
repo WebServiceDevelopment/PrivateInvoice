@@ -29,6 +29,12 @@ const session = require('express-session');
 const RedisStore = require('connect-redis')(session);
 const redisClient = redis.createClient();
 
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+
+// API Spec
+
+
 // Load Config
 
 require('dotenv').config()
@@ -44,6 +50,10 @@ const session_opts = config.SESSION;
 session_opts.store = new RedisStore({ client: redisClient });
 
 app.use(session(session_opts));
+
+//const swaggerDocument = YAML.load('./swagger.yaml');
+const swaggerDocument = YAML.load('./openapi.yaml');
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 // Middleware
 
@@ -127,8 +137,8 @@ app.use('/api/message', require('./routes/buyer_invoice_archive.js'));
 app.use('/api/message', require('./routes/buyer_invoice_trash.js'));
 app.use('/api/message', require('./routes/buyer_message.js'));
 
-app.use('/api/invoice', require('./routes/seller_invoice_document.js'));
 app.use('/api/invoice', require('./routes/seller_invoice.js'));
+app.use('/api/invoice', require('./routes/seller_invoice_document.js'));
 app.use('/api/invoice', require('./routes/seller_invoice_archive.js'));
 app.use('/api/invoice', require('./routes/seller_invoice_trash.js'));
 app.use('/api/message', require('./routes/seller_message.js'));
@@ -157,5 +167,7 @@ app.listen(parseInt(process.env.SERVER_PORT), function() {
 	console.log('Private Invoice is using database: %s', process.env.DATABASE_NAME);
 	console.log('Private Invoice is listening on IP: %s', process.env.SERVER_IP_ADDRESS||netUtil.getLocalIp());
 	console.log('Private Invoice is listening on Port: %d', process.env.SERVER_PORT);
+	const MY_IP = process.env.SERVER_IP_ADDRESS||netUtil.getLocalIp();
+    console.log(`API Documentaion: http://${MY_IP}:${process.env.SERVER_PORT}/api-docs`)
 
 });

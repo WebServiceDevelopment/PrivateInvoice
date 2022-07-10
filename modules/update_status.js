@@ -145,6 +145,9 @@ const createMessage = async (document_uuid, member_uuid, message, keyPair) => {
 	// 2.
 	// Create credential to be signed
 
+	const timestamp = moment().toJSON()
+
+
 	const credential = {
 		"@context": [
 			'https://www.w3.org/2018/credentials/v1',
@@ -155,12 +158,12 @@ const createMessage = async (document_uuid, member_uuid, message, keyPair) => {
 			"VerifiableCredential",
 			"PGAStatusMessageCertificate"
 		],
-		issuanceDate: moment().toJSON(),
+		issuanceDate: timestamp.split('.').shift() + 'Z',
 		name: "Private Invoice Status Update",
 		description: "An update message issued by Private Invoice",
 		relatedLink: [],
 		issuer: {
-			id: member_uuid,
+			id: keyPair.controller,
 			type: 'Person',
 			name: row.member_name,
 			email: row.member_contact_email,

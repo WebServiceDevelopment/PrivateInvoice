@@ -23,7 +23,7 @@
 // Import sub
 const sub						= require("./invoice_sub.js");
 const to_buyer					= require("./seller_to_buyer.js");
-const tran				  	= require("./invoice_sub_transaction.js");
+const tran				  		= require("./invoice_sub_transaction.js");
 
 // Import Router
 const express					= require('express');
@@ -80,6 +80,7 @@ const getPrivateKeys = async (member_did) => {
 
 
 /*
+ * 1.
  * [ Move to Archive ]
  */
 router.post('/sellerArchive', async function(req, res) {

@@ -271,15 +271,22 @@ const SettingsContacts = (function() {
 			body: JSON.stringify(details)
 		};
 
+		const url = '/api/contacts/add';
+
 		let response;
 		try {
-			response = await fetch('/api/contacts/add', opts);
+			response = await fetch(url, opts);
 		} catch(err) {
 			throw err;
 		}
 
 		const json = await response.json();
 		console.log(json);
+
+		if(json.err !== 0) {
+			alert(json.msg);
+			return;	
+		}
 
 		delete this.MEM.details;
 		this.API.renderContacts();

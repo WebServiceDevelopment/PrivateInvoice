@@ -37,6 +37,7 @@ const db					= require('../database.js');
 //------------------------------- export modules -------------------------------
 
 /*
+ * 1.
  * create
  */
 router.post('/create', async function(req, res) {
@@ -110,6 +111,7 @@ router.post('/create', async function(req, res) {
 });
 
 /*
+ * 2.
  * list
  */
 router.post('/list', async function(req, res) {
@@ -149,6 +151,7 @@ router.post('/list', async function(req, res) {
 });
 
 /*
+ * 3.
  * submit
  */
 router.post('/submit', async function(req, res) {
@@ -290,6 +293,7 @@ router.post('/submit', async function(req, res) {
 });
 
 /*
+ * 4.
  * contacts
  */
 router.post('/contacts', async function(req, res) {
@@ -384,6 +388,7 @@ router.post('/contacts', async function(req, res) {
 });
 
 /*
+ * 5.
  * status
  */
 router.post('/status', async function(req, res) {
@@ -468,6 +473,7 @@ router.post('/status', async function(req, res) {
 });
 
 /*
+ * 6.
  * remove
  */
 router.post('/remove', async function(req, res) {

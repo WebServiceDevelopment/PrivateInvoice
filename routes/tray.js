@@ -37,6 +37,7 @@ const SELLER_STATUS			= "seller_status";
 // ------------------------------- End Points -------------------------------
 
 /*
+ * 1.
  * getTotalBuyer
  */
 router.post('/getTotalBuyer', async function(req, res) {
@@ -46,6 +47,7 @@ router.post('/getTotalBuyer', async function(req, res) {
 });
 
 /*
+ * 2.
  * getTotalSeller
  */
 router.post('/getTotalSeller', async function(req, res) {
@@ -55,6 +57,7 @@ router.post('/getTotalSeller', async function(req, res) {
 });
 
 /*
+ * 3.
  * getCountBuyer
  */
 router.post('/getCountBuyer', function(req, res) {
@@ -64,6 +67,7 @@ router.post('/getCountBuyer', function(req, res) {
 });
 
 /*
+ * 4.
  * getCountSeller
  */
 router.post('/getCountSeller', function(req, res) {
@@ -73,6 +77,7 @@ router.post('/getCountSeller', function(req, res) {
 });
 
 /*
+ * 5.
  * getFolderBuyer
  */
 router.post('/getFolderBuyer', function(req, res) {
@@ -82,6 +87,7 @@ router.post('/getFolderBuyer', function(req, res) {
 });
 
 /*
+ * 6.
  * getFolderSeller
  */
 router.post('/getFolderSeller', function(req, res) {

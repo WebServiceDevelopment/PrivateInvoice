@@ -30,16 +30,12 @@ const {
 	Ed25519VerificationKey2018,
 } = require('@transmute/ed25519-signature-2018')
 
-const context = {
-	'https://www.w3.org/2018/credentials/v1': require('../context/credentials_v1.json'),
-	'https://w3id.org/traceability/v1': require('../context/traceability_v1.json'),
-}
-
 const { resolve } = require('@transmute/did-key.js')
 
 // Local Libraries
 
 const db = require('../database.js')
+const { documentLoader } = require('./verify_utils.js');
 
 /**
  * Helper Functions
@@ -47,21 +43,6 @@ const db = require('../database.js')
 
 const checkStatus = () => {
 	return true
-}
-
-const documentLoader = async (iri) => {
-	if (context[iri]) {
-		return { document: context[iri] }
-	}
-
-	if (iri.indexOf('did:key') === 0) {
-		const document = await resolve(iri)
-		return { document }
-	}
-
-	const message = `Unsupported iri: ${iri}`
-	console.error(message)
-	throw new Error(message)
 }
 
 /**
