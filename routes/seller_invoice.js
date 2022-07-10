@@ -87,6 +87,7 @@ const getPrivateKeys = async (member_did) => {
 // ------------------------------- End Points -------------------------------
 
 /*
+ * 1.
  * [ Send Invoice ]
  * send
  */
@@ -356,6 +357,7 @@ router.post("/send", async function (req, res) {
 });
 
 /*
+ * 2.
  * [ Move to Draft ]
  */
 router.post("/recreate", async function (req, res) {
@@ -822,6 +824,7 @@ router.post("/recreate", async function (req, res) {
 });
 
 /*
+ * 3.
  * [ Withdraw ]
  * withdraw
  */

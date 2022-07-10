@@ -64,7 +64,7 @@ const createDid = async ( mnemonic ) => {
 	});
 
 	const didUniqueSuffix = wallet.computeDidUniqueSuffix(createOperation.suffixData);
-	const id = `did:elem:ganache${didUniqueSuffix}`
+	const id = `did:elem:ganache:${didUniqueSuffix}`
 	const host = 'http://localhost:4000';
 	//const host = 'http://192.168.1.126:4000';
 	const url = `${host}/api/1.0/operations`;
@@ -82,6 +82,9 @@ const createDid = async ( mnemonic ) => {
 		updateKey
 	};
 		
+
+	console.log(id);
+	console.log(publicKey);
 
 	return [ keys, null ];
 
@@ -156,6 +159,8 @@ const insertPrivateKeys = async (keys) => {
 
 
 const insertMember = async (member_did, body) => {
+
+	console.log('Member did: ', member_did);
 
 	// Then insert into database
 
@@ -276,9 +281,10 @@ const getSessionData = async(member_did) => {
 }
 
 
-// End Points
+// ------------------------------- End Points -------------------------------
 
 /*
+ * 1.
  * logout
  */
 router.get("/logout", function(req, res) {
@@ -290,6 +296,7 @@ router.get("/logout", function(req, res) {
 });
 
 /*
+ * 2.
  * check
  */
 router.all('/check', async function(req, res) {
@@ -299,6 +306,7 @@ router.all('/check', async function(req, res) {
 });
 
 /*
+ * 3.
  * Should be in settings (profile)
  */
 router.post('/updateCompany', async function(req, res) {
@@ -363,6 +371,7 @@ router.post('/updateCompany', async function(req, res) {
 });
 
 /*
+ * 4.
  * Should be in settings
  */
 router.post('/updateProfile', async function(req, res) {
@@ -419,6 +428,7 @@ router.post('/updateProfile', async function(req, res) {
 });
 
 /*
+ * 5.
  * login
  */
 router.post('/login', async function(req, res) {
@@ -521,6 +531,7 @@ router.post('/login', async function(req, res) {
 });
 
 /*
+ * 6.
  * signup
  */
 
@@ -544,6 +555,7 @@ router.post('/signup', async function(req, res) {
 	}
 	
 	const { id, publicKey } = keys;
+	console.log('id: ', id);
 
 	// 2.
 	// Then we insert the newly created member

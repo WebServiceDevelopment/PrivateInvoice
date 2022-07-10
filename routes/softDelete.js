@@ -41,6 +41,7 @@ const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
 // ------------------------------- End Points -------------------------------
 
 /*
+ * 1.
  * softDeleteSeller
  */
 router.post('/softDeleteSeller', async function(req, res) {

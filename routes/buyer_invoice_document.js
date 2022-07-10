@@ -46,6 +46,7 @@ const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
 // ------------------------------- End Points -------------------------------
 
 /*
+ * 1.
  * getDocumentBuyer
  */
 router.post('/getDocumentBuyer', async function(req, res) {
@@ -90,6 +91,7 @@ router.post('/getDocumentBuyer', async function(req, res) {
 });
 
 /*
+ * 2.
  * getDocumentSeller
  */
 router.post('/getDocumentSeller', async function(req, res) {
@@ -134,6 +136,7 @@ router.post('/getDocumentSeller', async function(req, res) {
 });
 
 /*
+ * 3.
  * getArchiveDocumentBuyer
  */
 router.post('/getArchiveDocumentBuyer', async function(req, res) {
@@ -178,6 +181,7 @@ router.post('/getArchiveDocumentBuyer', async function(req, res) {
 });
 
 /*
+ * 4.
  * getArchiveDocumentSeller
  */
 router.post('/getArchiveDocumentSeller', async function(req, res) {

@@ -83,6 +83,9 @@ const createBusinessCard = async (req, member_did, invite_code) => {
 		return [ null, err ];
 	}
 
+	const timestamp = moment().toJSON()
+	const issuanceDate = timestamp.split('.').shift() + 'Z';
+
 	const credential = {
 		'@context': [
 			"https://www.w3.org/2018/credentials/v1",
@@ -101,7 +104,7 @@ const createBusinessCard = async (req, member_did, invite_code) => {
 				linkRelationship: 'Partner'
 			}
 		],
-		issuanceDate: moment().toJSON(),
+		issuanceDate: issuanceDate,
 		issuer : {
 			id: req.session.data.member_uuid,
 			type: 'Person',
@@ -353,6 +356,7 @@ const getPrivateKeys = async (member_did) => {
 //----------------------------- define endpoints -----------------------------
 
 /*
+ * 1.
  * generate
  */
 
@@ -395,6 +399,8 @@ router.post('/generate', async function(req, res) {
 		throw err;
 	}
 
+	console.log(req.session.data.member_uuid);
+
 	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code);
 	if(err1) {
 		return res.json({
@@ -403,6 +409,7 @@ router.post('/generate', async function(req, res) {
 		});
 	}
 
+	console.log('--- aaa ---');
 	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_uuid);
 	if(err2) {
 		return res.json({
@@ -410,14 +417,18 @@ router.post('/generate', async function(req, res) {
 			msg: 'could not get private keys'
 		});
 	}
-
+	
+	console.log('--- bbb ---');
 	const vbc = await signBusinessCard(credential, keyPair);
+
+	console.log('--- ccc ---');
 	res.json(vbc);
 
 
 });
 
 /*
+ * 2.
  * add
  */
 
@@ -437,6 +448,12 @@ router.post('/add', async function(req, res) {
 	if(exists) {
 		return res.status(400).end('Contact already exists')
 	}
+
+	// 1.1b
+	// Then we will attempt to verify the business card
+
+
+	return res.status(400).end();
 
 	// 1.2 
 	// Then we need to try and contact the remote host
@@ -492,6 +509,7 @@ router.post('/add', async function(req, res) {
 	
 	if( local_member_uuid === remote_member_uuid) {
 		return res.json({
+		    err: 0,
 			msg : 'okay'
 		});
 	}
@@ -508,12 +526,14 @@ router.post('/add', async function(req, res) {
 	// End Route
 
 	res.json({
+		err: 0,
 		msg : 'okay'
 	});
 
 });
 
 /*
+ * 3.
  * getContactList
  */
 router.get('/getContactList', async function(req, res) {

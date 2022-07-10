@@ -81,6 +81,7 @@ const getPrivateKeys = async (member_did) => {
 // ------------------------------- End Points -------------------------------
 
 /*
+ * 1.
  * Execution of'Move to Trash'when folder is draft.
 */
 
@@ -237,6 +238,7 @@ router.post('/trashDraft', async function(req, res) {
 });
 
 /*
+ * 2.
  * Execution of 'Move to Trash' when folder is returned.
 */
 
