@@ -83,8 +83,10 @@ router.post('/submissions', async (req, res) => {
 
     const result = await verifyPresentation(signedPresentation)
 
-    console.log(result)
+	console.log('Are credentials verified?');
     console.log(result.credentials)
+
+	console.log('Is presentation verified?');
     console.log(result.presentation)
 
     if (!result.verified) {
