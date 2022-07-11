@@ -475,6 +475,7 @@ router.post('/add', async function(req, res) {
 
 	console.log('1.2');
 	const invite_code = body.id.split(':').pop();
+	console.log(invite_code);
 
 	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code, keyPair);
 	if(err1) {
@@ -486,7 +487,8 @@ router.post('/add', async function(req, res) {
 
 	credential.relatedLink.push({
 		type: 'LinkRole',
-		target: local_member_uuid,
+		// target: local_member_uuid,
+		target: remote_member_uuid,
 		linkRelationship: 'Invite'
 	});
 

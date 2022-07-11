@@ -16,27 +16,31 @@ info:
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 
 tags:
-- name: "invoice"
-  description: "Paths related to handling invoices"
-- name: "contacts"
-  description: "Paths related to handling contacts"
-- name: "invite"
-  description: "Paths related to handling invites"
-- name: "session"
-  description: "Paths related to handling logins and sessions"
-- name: "settings"
-  description: "Paths related to handling settings"
-- name: "tray"
-  description: "Paths related to handling document tray"
-- name: "wallet"
-  description: "Paths related to handling wallets"
-- name: "trace"
-  description: "Paths related to sending and receiving presentations"
+  - name: "contacts"
+    description: "Paths related to handling contacts"
+  - name: "invoice"
+    description: "Paths related to handling invoices"
+  - name: "invite"
+    description: "Paths related to handling invites"
+  - name: "session"
+    description: "Paths related to handling logins and sessions"
+  - name: "settings"
+    description: "Paths related to handling settings"
+  - name: "trace"
+    description: "Paths related to sending and receiving presentations"
+  - name: "tray"
+    description: "Paths related to handling document tray"
+  - name: "trayArchive"
+    description: "Paths related to handling document trayArchive"
+  - name: "trayDraft"
+    description: "Paths related to handling document trayDraft"
+  - name: "wallet"
+    description: "Paths related to handling wallets"
 
 servers:
   # - url: 'http://petstore.swagger.io/api'
-  - url: 'http://192.168.1.126:3000/api'
-  - url: 'http://192.168.1.126:3001/api'
+  - url: 'http://192.168.1.126:3000'
+  - url: 'http://192.168.1.126:3001'
 
 paths:
   #1. /api/contacts
@@ -45,17 +49,16 @@ paths:
   #1.1.1
   /api/contacts/generate:
     post:
-      tags:
-        - "contacts"
       description: \#1.1.1 contacts generate
       operationId: contacts_generate
-      requestBody:
-        description: contacts generate
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/contacts/schemas/Request_generate'
+      tags:
+        - "contacts"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/contacts/schemas/Request_generate'
       responses:
         '200':
           description: generate response
@@ -67,17 +70,16 @@ paths:
   #1.1.2
   /api/contacts/add:
     post:
-      tags:
-        - "contacts"
       description: \#1.1.2 contacts add
       operationId: contacts_add
-      requestBody:
-        description: contacts add
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/contacts/schemas/Request_add'
+      tags:
+        - "contacts"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/contacts/schemas/Request_add'
       responses:
         '200':
           description: add response
@@ -95,17 +97,16 @@ paths:
   #1.1.3
   /api/contacts/getContactList:
     post:
-      tags:
-        - "contacts"
       description: \#1.1.3 contacts getContactList
       operationId: contacts_getContactList
-      requestBody:
-        description: contacts getContactList
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/contacts/schemas/Request_getContactList'
+      tags:
+        - "contacts"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/contacts/schemas/Request_getContactList'
       responses:
         '200':
           description: getContactList response
@@ -119,17 +120,16 @@ paths:
   #2.1.1
   /api/invoice/returnToSender:
     post:
-      tags:
-        - "invoice"
       description: \#2.1.1 invoice returnToSender 
       operationId: invoice_returnToSender
-      requestBody:
-        description: invoice returnToSender
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_returnToSender'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_returnToSender'
       responses:
         '200':
           description: returnToSender response
@@ -147,17 +147,16 @@ paths:
   #2.1.2
   /api/invoice/confirm:
     post:
-      tags:
-        - "invoice"
       description: \#2.1.2 invoice confirm 
       operationId: invoice_confirm
-      requestBody:
-        description: invoice confirm
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_confirm'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_confirm'
       responses:
         '200':
           description: confirm response
@@ -175,17 +174,16 @@ paths:
   #2.1.3
   /api/invoice/unconfirm:
     post:
-      tags:
-        - "invoice"
       description: \#2.1.3 invoice unconfirm 
       operationId: invoice_unconfirm
-      requestBody:
-        description: invoice unconfirm
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_confirm'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_confirm'
       responses:
         '200':
           description: unconfirm response
@@ -203,17 +201,16 @@ paths:
   #2.1.4
   /api/invoice/makePayment:
     post:
-      tags:
-        - "invoice"
       description: \#2.1.4 invoice makePayment 
       operationId: invoice_makePayment
-      requestBody:
-        description: invoice makePayment
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_makePayment'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_makePayment'
       responses:
         '200':
           description: makePayment response
@@ -234,17 +231,16 @@ paths:
   #2.2.1
   /api/invoice/getDocumentBuyer:
     post:
-      tags:
-        - "invoice"
       description: \#2.2.1 invoice getDocumentBuyer 
       operationId: invoice_getDocumentBuyer
-      requestBody:
-        description: invoice getDocumentBuyer
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_getDocumentBuyer'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_getDocumentBuyer'
       responses:
         '200':
           description: buyer_invoice_document response
@@ -257,17 +253,16 @@ paths:
   #2.2.2
   /api/invoice/getDocumentSeller:
     post:
-      tags:
-        - "invoice"
       description: \#2.2.2 invoice getDocumentSeller 
       operationId: invoice_getDocumentSeller
-      requestBody:
-        description: invoice getDocumentSeller
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_getDocumentSeller'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_getDocumentSeller'
       responses:
         '200':
           description: getDocumentSeller response
@@ -278,17 +273,16 @@ paths:
   #2.2.3
   /api/invoice/getArchiveDocumentBuyer:
     post:
-      tags:
-        - "invoice"
       description: \#2.2.3 invoice getArchiveDocumentBuyer 
       operationId: invoice_getArchiveDocumentBuyer
-      requestBody:
-        description: invoice getArchiveDocumentBuyer
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_getArchiveDocumentBuyer'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_getArchiveDocumentBuyer'
       responses:
         '200':
           description: getArchiveDocumentBuyer response
@@ -301,17 +295,16 @@ paths:
   #2.2.4
   /api/invoice/getArchiveDocumentSeller:
     post:
-      tags:
-        - "invoice"
       description: \#2.2.4 invoice getArchiveDocumentSeller 
       operationId: invoice_getArchiveDocumentSeller
-      requestBody:
-        description: invoice getArchiveDocumentSeller
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_getArchiveDocumentSeller'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_getArchiveDocumentSeller'
       responses:
         '200':
           description: getArchiveDocumentSeller response
@@ -326,17 +319,16 @@ paths:
   #2.3.1
   /api/invoice/sellerArchive:
     post:
-      tags:
-        - "invoice"
       description: \#2.3.1 invoice sellerArchive 
       operationId: invoice_sellerArchive
-      requestBody:
-        description: invoice sellerArchive
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_sellerArchive'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_sellerArchive'
       responses:
         '200':
           description: sellerArchive response
@@ -358,17 +350,16 @@ paths:
   #2.4.1
   /api/invoice/update:
     post:
-      tags:
-        - "invoice"
       description: \#2.4.1 invoice update 
       operationId: invoice_update
-      requestBody:
-        description: invoice update
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_update'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_update'
       responses:
         '200':
           description: Update response
@@ -386,17 +377,16 @@ paths:
   #2.4.2
   /api/invoice/getDraftDocument:
     post:
-      tags:
-        - "invoice"
       description: \#2.4.2 invoice getDraftDocument
       operationId: invoice_getDraftDocument
-      requestBody:
-        description: invoice getDraftDocument
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_getDraftDocument'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_getDraftDocument'
       responses:
         '200':
           description: getDraftDocument response
@@ -414,17 +404,16 @@ paths:
   #2.4.3
   /api/invoice/getDocument:
     post:
-      tags:
-        - "invoice"
       description: \#2.4.3 invoice getDocument
       operationId: invoice_getDocument
-      requestBody:
-        description: invoice getDocument
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_getDocument'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_getDocument'
       responses:
         '200':
           description: getDocument response
@@ -442,17 +431,16 @@ paths:
   #2.4.4
   /api/invoice/getArchiveDocument:
     post:
-      tags:
-        - "invoice"
       description: \#2.4.4 invoice getArchiveDocument
       operationId: invoice_getArchiveDocument
-      requestBody:
-        description: invoice getArchiveDocument
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_getArchiveDocument'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_getArchiveDocument'
       responses:
         '200':
           description: getArchiveDocument response
@@ -470,17 +458,16 @@ paths:
   #2.4.5
   /api/invoice/create:
     post:
-      tags:
-        - "invoice"
       description: \#2.4.5 invoice create
       operationId: invoice_create
-      requestBody:
-        description: invoice create
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_create'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_create'
       responses:
         '200':
           description: create response
@@ -501,17 +488,16 @@ paths:
   #2.5.1
   /api/invoice/send:
     post:
-      tags:
-        - "invoice"
       description: \#2.5.1 invoice send
       operationId: invoice_send
-      requestBody:
-        description: invoice send
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_send'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_send'
       responses:
         '200':
           description: send response
@@ -529,17 +515,16 @@ paths:
   #2.5.2
   /api/invoice/recreate:
     post:
-      tags:
-        - "invoice"
       description: \#2.5.2 invoice recreate
       operationId: invoice_recreate
-      requestBody:
-        description: invoice recreate
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_recreate'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_recreate'
       responses:
         '200':
           description: recreate response
@@ -557,17 +542,16 @@ paths:
   #2.5.3
   /api/invoice/withdraw:
     post:
-      tags:
-        - "invoice"
       description: \#2.5.3 invoice withdraw
       operationId: invoice_withdraw
-      requestBody:
-        description: invoice withdraw
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_withdraw'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_withdraw'
       responses:
         '200':
           description: withdraw response
@@ -589,17 +573,16 @@ paths:
   #2.6.1
   /api/invoice/trashDraft:
     post:
-      tags:
-        - "invoice"
       description: \#2.6.1 invoice trashDraft
       operationId: invoice_trashDraft
-      requestBody:
-        description: invoice trashDraft
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_trashDraft'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_trashDraft'
       responses:
         '200':
           description: trashDraft response
@@ -617,17 +600,16 @@ paths:
   #2.6.2
   /api/invoice/trash:
     post:
-      tags:
-        - "invoice"
       description: \#2.6.2 invoice trash
       operationId: invoice_trash
-      requestBody:
-        description: invoice trash
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_trash'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_trash'
       responses:
         '200':
           description: trash response
@@ -649,17 +631,16 @@ paths:
   #2.7.1
   /api/invoice/softDeleteSeller:
     post:
-      tags:
-        - "invoice"
       description: \#2.7.1 invoice softDeleteSeller
       operationId: invoice_softDeleteSeller
-      requestBody:
-        description: invoice softDeleteSeller
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_softDeleteSeller'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_softDeleteSeller'
       responses:
         '200':
           description: softDeleteSeller response
@@ -671,17 +652,16 @@ paths:
   #2.7.2
   /api/invoice/softDeleteBuyer:
     post:
-      tags:
-        - "invoice"
       description: \#2.7.1 invoice softDeleteBuyer
       operationId: invoice_softDeleteBuyer
-      requestBody:
-        description: invoice softDeleteBuyer
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invoice/schemas/Request_softDeleteBuyer'
+      tags:
+        - "invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_softDeleteBuyer'
       responses:
         '200':
           description: softDeleteBuyer response
@@ -697,17 +677,16 @@ paths:
   #3.1.1
   /api/invite/create:
     post:
-      tags:
-        - "invite"
       description: \#3.1.1 invite create
       operationId: invite_create
-      requestBody:
-        description: invite create
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invite/schemas/Request_create'
+      tags:
+        - "invite"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invite/schemas/Request_create'
       responses:
         '200':
           description: create response
@@ -719,10 +698,13 @@ paths:
   #3.1.2
   /api/invite/list:
     post:
-      tags:
-        - "invite"
       description: \#3.1.2 invite list
       operationId: invite_list
+      tags:
+        - "invite"
+      parameters:
+        - in: "body"
+          name: "body"
 
       responses:
         '200':
@@ -735,17 +717,16 @@ paths:
   #3.1.3
   /api/invite/submit:
     post:
-      tags:
-        - "invite"
       description: \#3.1.3 invite submit
       operationId: invite_submit
-      requestBody:
-        description: invite submit
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invite/schemas/Request_submit'
+      tags:
+        - "invite"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invite/schemas/Request_submit'
       responses:
         '200':
           description: submit response
@@ -757,17 +738,16 @@ paths:
   #3.1.4
   /api/invite/contacts:
     post:
-      tags:
-        - "invite"
       description: \#3.1.4 invite contacts
       operationId: invite_contacts
-      requestBody:
-        description: invite contacts
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invite/schemas/Request_contacts'
+      tags:
+        - "invite"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invite/schemas/Request_contacts'
       responses:
         '200':
           description: contacts response
@@ -779,17 +759,16 @@ paths:
   #3.1.5
   /api/invite/status:
     post:
-      tags:
-        - "invite"
       description: \#3.1.5 invite status
       operationId: invite_status
-      requestBody:
-        description: invite status
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invite/schemas/Request_status'
+      tags:
+        - "invite"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invite/schemas/Request_status'
       responses:
         '200':
           description: status response
@@ -801,17 +780,16 @@ paths:
   #3.1.6
   /api/invite/remove:
     post:
-      tags:
-        - "invite"
       description: \#3.1.6 invite remove
       operationId: invite_remove
-      requestBody:
-        description: invite remove
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/invite/schemas/Request_remove'
+      tags:
+        - "invite"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invite/schemas/Request_remove'
       responses:
         '200':
           description: remove response
@@ -864,17 +842,16 @@ paths:
   #6.1.1
   /api/session/logout:
     post:
-      tags:
-        - "session"
       description: \#6.1.1 session logout
       operationId: session_logout
-      requestBody:
-        description: session logout
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/session/schemas/Request_logout'
+      tags:
+        - "session"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/session/schemas/Request_logout'
       responses:
         307:
           description: Redirect
@@ -911,6 +888,9 @@ paths:
     post:
       tags:
         - "session"
+      parameters:
+        - in: "body"
+          name: "body"
       responses:
         '200':
           description: check response
@@ -922,17 +902,16 @@ paths:
   #6.1.3
   /api/session/updateCompany:
     post:
-      tags:
-        - "session"
       description: \#6.1.3 session updateCompany
       operationId: session_logout
-      requestBody:
-        description: session updateCompany
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/session/schemas/Request_updateCompany'
+      tags:
+        - "session"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/session/schemas/Request_updateCompany'
       responses:
         '200':
           description: logout response
@@ -944,17 +923,16 @@ paths:
   #6.1.4
   /api/session/updateProfile:
     post:
-      tags:
-        - "session"
       description: \#6.1.4 session updateProfile
       operationId: session_updateProfile
-      requestBody:
-        description: session updateProfile
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/session/schemas/Request_updateProfile'
+      tags:
+        - "session"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/session/schemas/Request_updateProfile'
       responses:
         '200':
           description: updateProfile response
@@ -966,17 +944,22 @@ paths:
   #6.1.5
   /api/session/login:
     post:
-      tags:
-        - "session"
       description: \#6.1.5 session login
       operationId: session_login
+      tags:
+        - "session"
       requestBody:
-        description: session login
+        description: Parameters for logging in
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/session/schemas/Request_login'
+              type: object
+              properties:
+                membername_A:
+                  type: string
+                password_A:
+                  type: string
       responses:
         '200':
           description: login response
@@ -988,17 +971,16 @@ paths:
   #6.1.6
   /api/session/signup:
     post:
-      tags:
-        - "session"
       description: \#6.1.6 session signup
       operationId: session_signup
-      requestBody:
-        description: session signup
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/session/schemas/Request_signup'
+      tags:
+        - "session"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/session/schemas/Request_signup'
       responses:
         '200':
           description: signup response
@@ -1020,17 +1002,16 @@ paths:
   #7.1.1
   /api/settings/setProfileImage:
     post:
-      tags:
-        - "settings"
       description: #7.1.1 settings setProfileImage
       operationId: settings_setProfileImage
-      requestBody:
-        description: settings setProfileImage
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/settings/schemas/Request_setProfileImage'
+      tags:
+        - "settings"
+      parameters:
+        - in: "body"
+          required: true
+          name: "body"
+          schema:
+            $ref: '#/settings/schemas/Request_setProfileImage'
       responses:
         '200':
           description: setProfileImage response
@@ -1042,17 +1023,16 @@ paths:
   #7.1.2
   /api/settings/setCompanyLogo:
     post:
-      tags:
-        - "settings"
       description: #7.1.2 settings setCompanyLogo
       operationId: settings_setCompanyLogo
-      requestBody:
-        description: settings setCompanyLogo
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/settings/schemas/Request_setCompanyLogo'
+      tags:
+        - "settings"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/settings/schemas/Request_setCompanyLogo'
       responses:
         '200':
           description: setCompanyLogo response
@@ -1064,17 +1044,16 @@ paths:
   #7.1.3
   /api/settings/getProfileImage:
     post:
-      tags:
-        - "settings"
       description: #7.1.3 settingd getProfileImage
       operationId: settings_getProfileImage
-      requestBody:
-        description: settings getProfileImage
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/settings/schemas/Request_getProfileImage'
+      tags:
+        - "settings"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/settings/schemas/Request_getProfileImage'
       responses:
         '200':
           description: getProfileImage response
@@ -1086,17 +1065,16 @@ paths:
   #7.1.4
   /api/settings/getCompanyLogo:
     post:
-      tags:
-        - "settings"
       description: #7.1.4 settings getCompanyLogo
       operationId: settings_getCompanyLogo
-      requestBody:
-        description: settings getCompanyLogo
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/settings/schemas/Request_getCompanyLogo'
+      tags:
+        - "settings"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/settings/schemas/Request_getCompanyLogo'
       responses:
         '200':
           description: getCompanyLogo response
@@ -1116,63 +1094,18 @@ paths:
   #require('./routes/tray.js');
 
   #9.1.1
-  /api/tray/getTotalBuyer:
-    post:
-      tags:
-        - "tray"
-      description: #9.1.1 tray getTotalBuyer
-      operationId: tray_getTotalBuyer
-      requestBody:
-        description: tray getTotalBuyer
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/tray/schemas/Request_getTotalBuyer'
-      responses:
-        '200':
-          description: getTotalBuyer response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getTotalBuyer'
-
-  #9.1.2
-  /api/tray/getTotalSeller:
-    post:
-      tags:
-        - "tray"
-      description: #9.1.2 tray getTotalSeller
-      operationId: tray_getTotalSeller
-      requestBody:
-        description: tray getTotalSeller
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/tray/schemas/Request_getTotalSeller'
-      responses:
-        '200':
-          description: getTotalSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getTotalSeller'
-
-  #9.1.3
   /api/tray/getCountBuyer:
     post:
+      description: \#9.1.1 tray getCountBuyer
+      operationId: tray_getCountBuyer
       tags:
         - "tray"
-      description: #9.1.3 tray getCountBuyer
-      operationId: tray_getCountBuyer
-      requestBody:
-        description: tray getCountBuyer
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/tray/schemas/Request_getCountBuyer'
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/tray/schemas/Request_getCountBuyer'
       responses:
         '200':
           description: getCountBuyer response
@@ -1181,20 +1114,19 @@ paths:
               schema:
                 $ref: '#/tray/schemas/Responses_getCountBuyer'
 
-  #9.1.4
+  #9.1.2
   /api/tray/getCountSeller:
     post:
+      description: \#9.1.2 tray getCountSeller
+      operationId: tray_getCountSeller
       tags:
         - "tray"
-      description: #9.1.4 tray getCountSeller
-      operationId: tray_getCountSeller
-      requestBody:
-        description: tray getCountSeller
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/tray/schemas/Request_getCountSeller'
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/tray/schemas/Request_getCountSeller'
       responses:
         '200':
           description: getCountSeller response
@@ -1203,20 +1135,19 @@ paths:
               schema:
                 $ref: '#/tray/schemas/Responses_getCountSeller'
 
-  #9.1.5
+  #9.1.3
   /api/tray/getFolderBuyer:
     post:
+      description: \#9.1.3 tray getFolderBuyer
+      operationId: tray_getFolderBuyer
       tags:
         - "tray"
-      description: #9.1.5 tray getFolderBuyer
-      operationId: tray_getFolderBuyer
-      requestBody:
-        description: tray getFolderBuyer
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/tray/schemas/Request_getFolderBuyer'
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/tray/schemas/Request_getFolderBuyer'
       responses:
         '200':
           description: getFolderBuyer response
@@ -1225,20 +1156,19 @@ paths:
               schema:
                 $ref: '#/tray/schemas/Responses_getFolderBuyer'
 
-  #9.1.6
+  #9.1.4
   /api/tray/getFolderSeller:
     post:
+      description: \#9.1.4 tray getFolderSeller
+      operationId: tray_getFolderSeller
       tags:
         - "tray"
-      description: #9.1.6 tray getFolderSeller
-      operationId: tray_getFolderSeller
-      requestBody:
-        description: tray getFolderSeller
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/tray/schemas/Request_getFolderSeller'
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/tray/schemas/Request_getFolderSeller'
       responses:
         '200':
           description: getFolderSeller response
@@ -1247,17 +1177,244 @@ paths:
               schema:
                 $ref: '#/tray/schemas/Responses_getFolderSeller'
 
+  #9.1.5
+  /api/tray/getTotalBuyer:
+    post:
+      description: \#9.1.5 tray getTotalBuyer
+      operationId: tray_getTotalBuyer
+      tags:
+        - "tray"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/tray/schemas/Request_getTotalBuyer'
+      responses:
+        '200':
+          description: getTotalBuyer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getTotalBuyer'
+
+  #9.1.6
+  /api/tray/getTotalSeller:
+    post:
+      description: \#9.1.6 tray getTotalSeller
+      operationId: tray_getTotalSeller
+      tags:
+        - "tray"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/tray/schemas/Request_getTotalSeller'
+      responses:
+        '200':
+          description: getTotalSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getTotalSeller'
 
   #10.1
   #require('./routes/tray_archive.js');
-  /api/trayArchive:
+
+  #10.1.1
+  /api/trayArchive/getCountBuyer:
     post:
+      description: \#10.1.1 trayArchive getCountBuyer
+      operationId: trayArchive_getCountBuyer
+      tags:
+        - "trayArchive"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/trayArchive/schemas/Request_getCountBuyer'
+      responses:
+        '200':
+          description: getCountBuyer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/trayArchive/schemas/Responses_getCountBuyer'
+
+  #10.1.2
+  /api/trayArchive/getCountSeller:
+    post:
+      description: \#10.1.2 trayArchive getCountSeller
+      operationId: trayArchive_getCountSeller
+      tags:
+        - "trayArchive"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/trayArchive/schemas/Request_getCountSeller'
+      responses:
+        '200':
+          description: getCountSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/trayArchive/schemas/Responses_getCountSeller'
+
+  #10.1.3
+  /api/trayArchive/getFolderBuyer:
+    post:
+      description: \#10.1.3 trayArchive getFolderBuyer
+      operationId: trayArchive_getFolderBuyer
+      tags:
+        - "trayArchive"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/trayArchive/schemas/Request_getFolderBuyer'
+      responses:
+        '200':
+          description: getFolderBuyer response
+          content:
+            application/json:
+              schema:
+                $ref: '#/trayArchive/schemas/Responses_getFolderBuyer'
+
+  #10.1.4
+  /api/trayArchive/getFolderSeller:
+    post:
+      description: \#10.1.4 trayArchive getFolderSeller
+      operationId: trayArchive_getFolderSeller
+      tags:
+        - "trayArchive"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/trayArchive/schemas/Request_getFolderSeller'
+      responses:
+        '200':
+          description: getFolderSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/trayArchive/schemas/Responses_getFolderSeller'
+
+  #10.1.5
+  /api/trayArchive/getTotalBuyer:
+    post:
+      description: \#10.1.5 trayArchive getTotalBuyer
+      operationId: trayArchive_getTotalBuyer
+      tags:
+        - "trayArchive"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
+      responses:
+        '200':
+          description: getTotalSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/trayArchive/schemas/Responses_getTotalBuyer'
+
+  #10.1.6
+  /api/trayArchive/getTotalSeller:
+    post:
+      description: \#10.1.6 trayArchive getTotalSeller
+      operationId: trayArchive_getTotalSeller
+      tags:
+        - "trayArchive"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/trayArchive/schemas/Request_getTotalSeller'
+      responses:
+        '200':
+          description: getTotalSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/trayArchive/schemas/Responses_getTotalSeller'
 
 
   #11.1
   #require('./routes/seller_tray_drafts.js');
   /api/trayDrafts:
+
+  #11.1.1
+  /api/trayDraft/getCountSeller:
     post:
+      description: \#11.1.1 trayDraft getCountSeller
+      operationId: trayDraft
+      tags:
+        - "trayDraft"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/trayDraft/schemas/Request_getCountSeller'
+      responses:
+        '200':
+          description: getCountSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/trayDraft/schemas/Responses_getCountSeller'
+
+  #11.1.2
+  /api/trayDraft/getFolderSeller:
+    post:
+      description: \#11.1.2 trayDraft getFolderSeller
+      operationId: trayDraft
+      tags:
+        - "trayDraft"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/trayDraft/schemas/Request_getFolderSeller'
+      responses:
+        '200':
+          description: getFolderSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/trayDraft/schemas/Responses_getFolderSeller'
+
+  #11.1.3
+  /api/trayDraft/getTotalSeller:
+    post:
+      description: \#11.1.3 trayDraft getTotalSeller
+      operationId: trayDraft
+      tags:
+        - "trayDraft"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/trayDraft/schemas/Request_getTotalSeller'
+      responses:
+        '200':
+          description: getTotalSeller response
+          content:
+            application/json:
+              schema:
+                $ref: '#/trayDraft/schemas/Responses_getTotalSeller'
 
 
   #12.1
@@ -1267,17 +1424,16 @@ paths:
   #12.1.1
   /api/wallet/getReceiptInResentActivity: 
     post:
-      tags:
-        - "wallet"
       description: \#12.1.1 wallet getReceiptInResentActivity
       operationId: wallet_getReceiptInResentActivity
-      requestBody:
-        description: wallet getReceiptInResentActivity
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/wallet/schemas/Request_getReceiptInResentActivity'
+      tags:
+        - "wallet"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/wallet/schemas/Request_getReceiptInResentActivity'
       responses:
         '200':
           description: getReceiptInResentActivity response
@@ -1289,13 +1445,14 @@ paths:
   #12.1.2
   /api/wallet/getResentActivityOfWallet:
     post:
-      tags:
-        - "wallet"
       description: \#12.1.2 wallet getResentActivityOfWallet
       operationId: wallet_getResentActivityOfWallet
-      requestBody:
-        description: wallet getResentActivityOfWallet
-        required: false
+      tags:
+        - "wallet"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: false
 
       responses:
         '200':
@@ -1308,13 +1465,14 @@ paths:
   #12.1.3
   /api/wallet/getWalletInfo:
     post:
-      tags:
-        - "wallet"
       description: \#12.1.3 wallet getWalletInfo
       operationId: wallet_getWalletInfo
-      requestBody:
-        description: wallet getWalletInfo
-        required: false
+      tags:
+        - "wallet"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: false
 
       responses:
         '200':
@@ -1327,17 +1485,16 @@ paths:
   #12.1.4
   /api/wallet/getCurrentBalanceOfBuyer:
     post:
-      tags:
-        - "wallet"
       description: \#12.1.4 wallet getCurrentBalanceOfBuyer
       operationId: wallet_getCurrentBalanceOfBuyer
-      requestBody:
-        description: wallet getCurrentBalanceOfBuyer
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/wallet/schemas/Request_getCurrentBalanceOfBuyer'
+      tags:
+        - "wallet"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/wallet/schemas/Request_getCurrentBalanceOfBuyer'
       responses:
         '200':
           description: getCurrentBalanceOfBuyer response
@@ -1349,17 +1506,16 @@ paths:
   #12.1.5
   /api/wallet/getTransactionReceipt:
     post:
-      tags:
-        - "wallet"
       description: \#12.1.5 wallet getTransactionReceipt
       operationId: wallet_getTransactionReceipt
-      requestBody:
-        description: wallet getTransactionReceipt
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/wallet/schemas/Request_getTransactionReceipt'
+      tags:
+        - "wallet"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/wallet/schemas/Request_getTransactionReceipt'
       responses:
         '200':
           description: getTransactionReceipt response
@@ -1371,17 +1527,16 @@ paths:
   #12.1.6
   /api/wallet/getIPFScidByTransactionHash:
     post:
-      tags:
-        - "wallet"
       description: \#12.1.7 wallet getIPFScidByTransactionHash
       operationId: wallet_getIPFScidByTransactionHash
-      requestBody:
-        description: wallet getIPFScidByTransactionHash
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/wallet/schemas/Request_getIPFScidByTransactionHash'
+      tags:
+        - "wallet"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/wallet/schemas/Request_getIPFScidByTransactionHash'
       responses:
         '200':
           description: getIPFScidByTransactionHash response
@@ -1422,7 +1577,7 @@ contacts:
               type: object
               properties:
                 id:
-                type: issuer.id;string
+                  type: string
 
     Responses_add:
       required:
@@ -1434,7 +1589,6 @@ contacts:
 
     Error_add:
       required:
-      properties:
         type: string
 
     #1.1.3
@@ -1509,6 +1663,7 @@ invoice:
           type: integer
           format: int32
         msg:
+          type: string
 
     #2.1.2
     Request_confirm:
@@ -1532,6 +1687,7 @@ invoice:
           type: integer
           format: int32
         msg:
+          type: string
 
     #2.1.3
     Request_unconfirm:
@@ -1555,6 +1711,7 @@ invoice:
           type: integer
           format: int32
         msg:
+          type: string
 
     #2.1.4
     Request_makePayment:
@@ -1578,6 +1735,7 @@ invoice:
           type: integer
           format: int32
         msg:
+          type: string
 
     #2.2.1
     Request_getDocumentBuyer:
@@ -2253,6 +2411,15 @@ session:
         msg:
           type: string
 
+    Error_signup:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
 settings:
   #7.1
   schemas:
@@ -2331,6 +2498,97 @@ tray:
   #9.1
   schemas:
     #9.1.1
+    Request_getCountBuyer:
+      $ref: '#/tray/schemas/Request_getTotalBuyer'
+
+    Responses_getCountBuyer:
+      required:
+      properties:
+        document_uuid:
+          type: string
+        document_type:
+          type: string
+        document_number:
+          type: string
+        document_folder:
+          type: string
+        seller_uuid:
+          type: string
+        seller_membername:
+          type: string
+        seller_organization:
+          type: string
+        seller_archived:
+          type: string
+        seller_last_action: date
+        buyer_uuid:
+          type: string
+        buyer_membername:
+          type: string
+        buyer_organization:
+          type: string
+        buyer_archived:
+          type: string
+        buyer_last_action:
+          type: string
+        created_from:
+          type: string
+        root_document:
+          type: string
+        created_on:
+          type: date-time
+        opened:
+          type: string
+        subject_line:
+          type: string
+        due_by:
+          type: date-time
+        amount_due:
+          type: integer
+          format: int32
+
+    #9.1.2
+    Request_getCountSeller:
+      $ref: '#/tray/schemas/Request_getTotalBuyer'
+
+    Responses_getCountSeller:
+      $ref: '#/tray/schemas/Responses_getCountBuyer'
+
+    #9.1.3
+    Request_getFolderBuyer:
+      allOf:
+        - required:
+          properties:
+            archive:
+              type: string
+            role:
+              type: string
+            folder:
+              type: string
+            type:
+              type: string
+            key: 
+              - type: string
+              
+
+    Responses_getFolderBuyer: #ng
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          - properties:
+            
+
+    #9.1.4
+    Request_getFolderSeller:
+      $ref: '#/tray/schemas/Request_getFolderBuyer'
+
+    Responses_getFolderSeller:
+      $ref: '#/tray/schemas/Responses_getFolderBuyer'
+
+    #9.1.5
     Request_getTotalBuyer: #ok
       allOf:
         - required:
@@ -2353,16 +2611,20 @@ tray:
         msg:
           type: string
 
-    #9.1.2
+    #9.1.6
     Request_getTotalSeller:
       $ref: '#/tray/schemas/Request_getTotalBuyer'
 
     Responses_getTotalSeller:
       $ref: '#/tray/schemas/Responses_getTotalBuyer'
 
-    #9.1.3
+
+trayArchive:
+  #10.1
+  schemas:
+    #10.1.1
     Request_getCountBuyer:
-      $ref: '#/tray/schemas/Request_getTotalBuyer'
+      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
 
     Responses_getCountBuyer:
       required:
@@ -2411,14 +2673,14 @@ tray:
           type: integer
           format: int32
 
-    #9.1.4
+    #10.1.2
     Request_getCountSeller:
-      $ref: '#/tray/schemas/Request_getTotalBuyer'
+      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
 
     Responses_getCountSeller:
-      $ref: '#/tray/schemas/Responses_getCountBuyer'
+      $ref: '#/trayArchive/schemas/Responses_getCountBuyer'
 
-    #9.1.5
+    #10.1.3
     Request_getFolderBuyer:
       allOf:
         - required:
@@ -2445,12 +2707,145 @@ tray:
           - properties:
             
 
-    #9.1.6
+    #10.1.4
     Request_getFolderSeller:
-      $ref: '#/tray/schemas/Request_getFolderBuyer'
+      $ref: '#/trayArchive/schemas/Request_getFolderBuyer'
 
     Responses_getFolderSeller:
-      $ref: '#/tray/schemas/Responses_getFolderBuyer'
+      $ref: '#/trayArchive/schemas/Responses_getFolderBuyer'
+
+    #10.1.5
+    Request_getTotalBuyer: #ok
+      allOf:
+        - required:
+          properties:
+            archive:
+              type: string
+            role:
+              type: string
+            folder:
+              type: string
+            type:
+              type: string
+
+    Responses_getTotalBuyer:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+
+    #10.1.6
+    Request_getTotalSeller:
+      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
+
+    Responses_getTotalSeller:
+      $ref: '#/trayArchive/schemas/Responses_getTotalBuyer'
+
+trayDraft:
+  #11.1
+  schemas:
+    #11.1.1
+    Request_getCountSeller:
+      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
+
+    Responses_getCountSeller:
+      required:
+      properties:
+        document_uuid:
+          type: string
+        document_type:
+          type: string
+        document_number:
+          type: string
+        document_folder:
+          type: string
+        seller_uuid:
+          type: string
+        seller_membername:
+          type: string
+        seller_organization:
+          type: string
+        seller_archived:
+          type: string
+        seller_last_action:
+          type: date-time
+        buyer_uuid:
+          type: string
+        buyer_membername:
+          type: string
+        buyer_organization:
+          type: string
+        buyer_archived:
+          type: string
+        buyer_last_action:
+          type: string
+        created_from:
+          type: string
+        root_document:
+          type: string
+        created_on:
+          type: date-time
+        opened:
+          type: string
+        subject_line:
+          type: string
+        due_by:
+          type: date-time
+        amount_due:
+          type: integer
+          format: int32
+
+    #11.1.2
+    Request_getFolderSeller:
+      allOf:
+        - required:
+          properties:
+            archive:
+              type: string
+            role:
+              type: string
+            folder:
+              type: string
+            type:
+              type: string
+            key: 
+              - type: string
+              
+
+    Responses_getFolderBuyer: #ng
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          - properties:
+            
+    #11.1.3
+    Request_getTotalSeller: #ok
+      allOf:
+        - required:
+          properties:
+            archive:
+              type: string
+            role:
+              type: string
+            folder:
+              type: string
+            type:
+              type: string
+
+    Responses_getTotalBuyer:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
 
 wallet:
   #12.1
@@ -2619,3 +3014,7 @@ wallet:
               type: string
             ipfs_address:
               type: string
+
+
+# security
+security: []

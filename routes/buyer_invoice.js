@@ -615,6 +615,13 @@ router.post('/makePayment', async function(req, res) {
 	//
 	const [status10, data10] = await to_seller.getAccountOfSellerWallet(seller_host, seller_uuid, member_uuid) ;
 
+	console.log('--- Status 10 ---');
+	console.log(status10);
+
+	console.log('--- Data 10 ---');
+	console.log(data10);
+
+
 	if(status10 != 200) {
 		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
 

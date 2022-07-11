@@ -33,6 +33,9 @@ const db = require('../database.js')
  */
 
 const checkInviteCodeValid = async (local_uuid, invite_code) => {
+
+
+	console.log("SEARCHING FOR ", local_uuid, invite_code);
     const sql = `
 		SELECT
 			invite_code,
@@ -144,6 +147,8 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
     )
     
 	const remote_member_uuid = credential.credentialSubject.id
+	console.log(remote_member_uuid);
+
     // const remote_member_uuid = credential.issuer.id
     const remote_member_name = credential.issuer.name
 
@@ -230,6 +235,7 @@ const handleContactRequest = async (body) => {
 
 	console.log(linkRelationship);
     const local_member_uuid = linkRelationship.target
+	console.log(local_member_uuid);
 
     const [invite, inviteEr] = await checkInviteCodeValid(
         local_member_uuid,
