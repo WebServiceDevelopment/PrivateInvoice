@@ -558,6 +558,8 @@ router.post('/login', async function(req, res) {
 
 router.post('/signup', async function(req, res) {
 
+	console.log('sign up');
+
 	// 0.
 	// First we generate a mnemonic for the organization
 
