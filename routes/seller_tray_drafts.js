@@ -33,16 +33,18 @@ module.exports				= router;
 
 const SELLER_DRAFT_STATUS	= "seller_status_draft";
 
-// ------------------------------- End Points -------------------------------
-
 /*
- * getTotalSellergetTotalSeller
+ * count
  */
-router.post('/getTotalSeller', async function(req, res) {
+/*
+ * router.post('/count', async function(req, res) {
+ * 
+ *     sub.count (req, res, SELLER_DRAFT_STATUS);
+ * 
+ * });
+ */
 
-    sub.getTotal(req, res, SELLER_DRAFT_STATUS);
-
-});
+// ------------------------------- End Points -------------------------------
 
 /*
  * getCountSeller
@@ -53,14 +55,6 @@ router.post('/getCountSeller', function(req, res) {
 
 });
 
-/*
- * count
- */
-router.post('/count', async function(req, res) {
-
-    sub.count (req, res, SELLER_DRAFT_STATUS);
-
-});
 
 /*
  * getFolderSeller
@@ -68,5 +62,14 @@ router.post('/count', async function(req, res) {
 router.post('/getFolderSeller', function(req, res) {
 
     sub.getFolder(req, res, SELLER_DRAFT_STATUS);
+
+});
+
+/*
+ * getTotalSellergetTotalSeller
+ */
+router.post('/getTotalSeller', async function(req, res) {
+
+    sub.getTotal(req, res, SELLER_DRAFT_STATUS);
 
 });

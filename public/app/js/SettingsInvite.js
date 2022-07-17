@@ -75,8 +75,10 @@ const SettingsInvite = (function() {
 			invite_code : memberData.code
 		}
 
+		const url = '/api/invite/remove';
+
 		const ajax = new XMLHttpRequest();
-		ajax.open('POST', '/api/invite/remove');
+		ajax.open('POST', url);
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send(JSON.stringify(params));
@@ -113,8 +115,10 @@ const SettingsInvite = (function() {
 			params.minutes = null;
 		}
 
+		const url = '/api/invite/create';
+
 		const ajax = new XMLHttpRequest();
-		ajax.open('POST', '/api/invite/create');
+		ajax.open('POST', url);
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send(JSON.stringify(params));
@@ -149,8 +153,10 @@ const SettingsInvite = (function() {
 
 	function api_getInviteList() {
 
+		const url = '/api/invite/list';
+
 		const ajax = new XMLHttpRequest();
-		ajax.open('POST', '/api/invite/list');
+		ajax.open('POST', url);
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send();
