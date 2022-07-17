@@ -70,8 +70,10 @@ const SessionWidget = (function() {
 
 	function api_getSessionData() {
 
+		const url = '/api/session/check';
+
 		const ajax = new XMLHttpRequest();
-		ajax.open('POST', '/api/session/check');
+		ajax.open('POST', url);
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send();

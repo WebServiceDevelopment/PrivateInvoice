@@ -1120,7 +1120,7 @@ const ActionWidget = (function() {
 			body: JSON.stringify(params)
 		};
 
-		const urll = '/api/quote/withdraw';
+		const url = '/api/quote/withdraw';
 
 		let response;
 		try {
@@ -1440,6 +1440,8 @@ const ActionWidget = (function() {
 		const button = this.DOM.invoice.sellerArchive;
 		this.BUTTON.disabled(button);
 
+		this.SENDING_WRAP.visible();
+
 		const doc = DocumentWidget.API.getDocument();
 
 		const params = {
@@ -1480,6 +1482,8 @@ const ActionWidget = (function() {
 			alert("[ Move to Archive ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
+
+		this.SENDING_WRAP.hidden();
 	}
 
 /*
@@ -1687,7 +1691,7 @@ const ActionWidget = (function() {
 			document_uuid : doc.document_uuid
 		};
 
-        let url = '/api/invoice/trash';
+        const url = '/api/invoice/trash';
 
         const opts = {
             method: 'POST',
@@ -1788,7 +1792,7 @@ const ActionWidget = (function() {
 			document_uuid : doc.document_uuid
 		};
 
-        let url = '/api/invoice/recreate';
+        const url = '/api/invoice/recreate';
 
         const opts = {
             method: 'POST',
@@ -1834,6 +1838,8 @@ const ActionWidget = (function() {
 		const button = this.DOM.invoice.confirmInvoice;
 		this.BUTTON.disabled(button);
 
+		this.SENDING_WRAP.visible();
+
 		const doc = DocumentWidget.API.getDocument();
 
 		const params = {
@@ -1865,6 +1871,7 @@ const ActionWidget = (function() {
             res = await response.json();
         } catch(err) {
 			this.BUTTON.enabled(button);
+			this.SENDING_WRAP.hidden();
             throw err;
         }
 		await FolderWidget.API.getCount();
@@ -1874,6 +1881,8 @@ const ActionWidget = (function() {
 			alert("[ Confirm Invoice ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
+
+		this.SENDING_WRAP.hidden();
 	}
 
 /*
@@ -2008,8 +2017,10 @@ const ActionWidget = (function() {
 			document_uuid : doc.document_uuid
 		};
 
+		const url = '/api/invoice/send';
+
 		const ajax = new XMLHttpRequest();
-		ajax.open('POST', '/api/invoice/send');
+		ajax.open('POST', url);
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send(JSON.stringify(params));
@@ -2046,8 +2057,10 @@ const ActionWidget = (function() {
 			document_uuid : this.MEM.getDocument_uuid()
 		};
 
+		const url = '/api/invoice/trashDraft';
+
 		const ajax = new XMLHttpRequest();
-		ajax.open('POST', '/api/invoice/trashDraft');
+		ajax.open('POST', url);
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send(JSON.stringify(params));

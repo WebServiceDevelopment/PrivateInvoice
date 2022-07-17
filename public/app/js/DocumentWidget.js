@@ -887,8 +887,10 @@ const DocumentWidget = (function() {
 			document_json : document_json,
 		}
 
+		const url = '/api/invoice/update';
+
 		const ajax = new XMLHttpRequest();
-		ajax.open('POST', '/api/invoice/update');
+		ajax.open('POST', url);
 
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
@@ -1410,7 +1412,16 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 
 		this.DOM.inputs.subject.value = this.MEM.document.subject_line || "";
 
-		this.DOM.contact.input.value = this.MEM.document.buyer_membername || "";
+		switch( this.DOM.label.to_from.innerText) {
+		case "To":
+			this.DOM.contact.input.value = this.MEM.document.buyer_membername || "";
+		break;
+		case "From":
+			this.DOM.contact.input.value = this.MEM.document.seller_membername || "";
+		break;
+		default:
+		break;
+		}
 
 
 		const elem =  FolderWidget.MEM.getActiveFolder();

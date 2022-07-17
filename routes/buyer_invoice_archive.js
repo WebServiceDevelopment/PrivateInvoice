@@ -238,7 +238,7 @@ router.post('/buyerToRecreate', async function(req, res) {
 	let errno, code ;
 
 	
-	// 1 
+	// 1. 
 	// OLD STATUS
     // First we go ahead and get the status.
     // Does record exist?

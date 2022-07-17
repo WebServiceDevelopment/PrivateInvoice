@@ -400,7 +400,7 @@ main.app header table td.title h1 {
 main.app header table td.email {
 
 	padding-right: 10px;
-	font-size: 15px;
+	font-size: 20px;
 	color: #fff;
 	font-family: 'Muli', sans-serif;
 	text-align: right;
@@ -2449,7 +2449,7 @@ main.app section article div.document div.paper div.content div.paddr ul {
 	padding: 0;
 	margin: 0;
 	font-family: 'Montserrat', sans-serif;
-	font-size: 15px;
+	font-size: 16px;
 
 }
 
@@ -2499,7 +2499,7 @@ main.app section article div.document div.paper div.content div.ptable div.thead
 main.app section article div.document div.paper div.content div.paddr ul li {
 
 	list-style: none;
-	padding: 4px 0;
+	padding: 3px 0;
 
 }
 
@@ -2795,7 +2795,8 @@ main.app section article div.document div.paper div.content div.paddr ul li.text
 
 	border: none;
 	background-color: transparent;
-	width: 110px;
+	min-width: 70px;
+	max-width: 120px;
 
 }
 
@@ -3114,6 +3115,7 @@ main.app section article div.document div.paper div.summary div.wrapper li.row t
 
 	width: 40px;
 	text-align: center;
+	color : #aaa;
 
 }
 
@@ -3126,7 +3128,7 @@ main.app section article div.document div.paper div.summary div.wrapper li.row t
 
 main.app section article div.document div.paper div.summary div.wrapper li.row table td.label-2 {
 
-	width: 76px;
+	width: 92px;
 
 }
 
@@ -3178,6 +3180,7 @@ main.app section article div.document div.paper div.summary div.wrapper li.row t
 
 	border-color: transparent;
 	background-color: transparent;
+	font-size: 16px;
 
 }
 
@@ -6840,7 +6843,7 @@ main.app section article div.settings-content div.page div.wallet-graph ul li ta
 main.app section article div.settings-content div.page div.wallet-graph ul li table th.receipt ,
 main.app section article div.settings-content div.page div.wallet-graph ul li table th.invoice {
 
-	width: 100px;
+	width: 90px;
 
 }
 

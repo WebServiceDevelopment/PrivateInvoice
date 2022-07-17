@@ -16,25 +16,25 @@ info:
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 
 tags:
-  - name: "Contacts"
+  - name: "contacts"
     description: "Paths related to handling contacts"
-  - name: "Invoice"
+  - name: "invoice"
     description: "Paths related to handling invoices"
-  - name: "Invite"
+  - name: "invite"
     description: "Paths related to handling invites"
-  - name: "Session"
+  - name: "session"
     description: "Paths related to handling logins and sessions"
-  - name: "Settings"
+  - name: "settings"
     description: "Paths related to handling settings"
-  - name: "Trace"
+  - name: "trace"
     description: "Paths related to sending and receiving presentations"
-  - name: "Tray"
+  - name: "tray"
     description: "Paths related to handling document tray"
-  - name: "TrayArchive"
+  - name: "trayArchive"
     description: "Paths related to handling document trayArchive"
-  - name: "TrayDraft"
+  - name: "trayDraft"
     description: "Paths related to handling document trayDraft"
-  - name: "Wallet"
+  - name: "wallet"
     description: "Paths related to handling wallets"
 
 servers:
@@ -43,7 +43,7 @@ servers:
   - url: 'http://192.168.1.125:3001'
 
 paths:
-  #1.1 /api/contacts
+  #1. /api/contacts
   #require('./routes/contacts.js');
 
   #1.1.1
@@ -52,7 +52,7 @@ paths:
       description: \#1.1.1 contacts generate
       operationId: contacts_generate
       tags:
-        - "Contacts"
+        - "contacts"
       parameters:
         - in: "body"
           name: "body"
@@ -73,7 +73,7 @@ paths:
       description: \#1.1.2 contacts add
       operationId: contacts_add
       tags:
-        - "Contacts"
+        - "contacts"
       parameters:
         - in: "body"
           name: "body"
@@ -100,7 +100,7 @@ paths:
       description: \#1.1.3 contacts getContactList
       operationId: contacts_getContactList
       tags:
-        - "Contacts"
+        - "contacts"
       parameters:
         - in: "body"
           name: "body"
@@ -123,7 +123,7 @@ paths:
       description: \#2.1.1 invoice returnToSender 
       operationId: invoice_returnToSender
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -150,7 +150,7 @@ paths:
       description: \#2.1.2 invoice confirm 
       operationId: invoice_confirm
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -177,7 +177,7 @@ paths:
       description: \#2.1.3 invoice unconfirm 
       operationId: invoice_unconfirm
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -204,7 +204,7 @@ paths:
       description: \#2.1.4 invoice makePayment 
       operationId: invoice_makePayment
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -234,7 +234,7 @@ paths:
       description: \#2.2.1 invoice getDocumentBuyer 
       operationId: invoice_getDocumentBuyer
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -256,7 +256,7 @@ paths:
       description: \#2.2.2 invoice getDocumentSeller 
       operationId: invoice_getDocumentSeller
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -276,7 +276,7 @@ paths:
       description: \#2.2.3 invoice getArchiveDocumentBuyer 
       operationId: invoice_getArchiveDocumentBuyer
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -298,7 +298,7 @@ paths:
       description: \#2.2.4 invoice getArchiveDocumentSeller 
       operationId: invoice_getArchiveDocumentSeller
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -322,7 +322,7 @@ paths:
       description: \#2.3.1 invoice sellerArchive 
       operationId: invoice_sellerArchive
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -353,7 +353,7 @@ paths:
       description: \#2.4.1 invoice update 
       operationId: invoice_update
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -380,7 +380,7 @@ paths:
       description: \#2.4.2 invoice getDraftDocument
       operationId: invoice_getDraftDocument
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -407,7 +407,7 @@ paths:
       description: \#2.4.3 invoice getDocument
       operationId: invoice_getDocument
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -434,7 +434,7 @@ paths:
       description: \#2.4.4 invoice getArchiveDocument
       operationId: invoice_getArchiveDocument
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -461,7 +461,7 @@ paths:
       description: \#2.4.5 invoice create
       operationId: invoice_create
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -491,7 +491,7 @@ paths:
       description: \#2.5.1 invoice send
       operationId: invoice_send
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -518,7 +518,7 @@ paths:
       description: \#2.5.2 invoice recreate
       operationId: invoice_recreate
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -545,7 +545,7 @@ paths:
       description: \#2.5.3 invoice withdraw
       operationId: invoice_withdraw
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -576,7 +576,7 @@ paths:
       description: \#2.6.1 invoice trashDraft
       operationId: invoice_trashDraft
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -603,7 +603,7 @@ paths:
       description: \#2.6.2 invoice trash
       operationId: invoice_trash
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -634,7 +634,7 @@ paths:
       description: \#2.7.1 invoice softDeleteSeller
       operationId: invoice_softDeleteSeller
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -655,7 +655,7 @@ paths:
       description: \#2.7.1 invoice softDeleteBuyer
       operationId: invoice_softDeleteBuyer
       tags:
-        - "Invoice"
+        - "invoice"
       parameters:
         - in: "body"
           name: "body"
@@ -680,7 +680,7 @@ paths:
       description: \#3.1.1 invite create
       operationId: invite_create
       tags:
-        - "Invite"
+        - "invite"
       parameters:
         - in: "body"
           name: "body"
@@ -701,7 +701,7 @@ paths:
       description: \#3.1.2 invite list
       operationId: invite_list
       tags:
-        - "Invite"
+        - "invite"
       parameters:
         - in: "body"
           name: "body"
@@ -720,7 +720,7 @@ paths:
       description: \#3.1.3 invite submit
       operationId: invite_submit
       tags:
-        - "Invite"
+        - "invite"
       parameters:
         - in: "body"
           name: "body"
@@ -741,7 +741,7 @@ paths:
       description: \#3.1.4 invite contacts
       operationId: invite_contacts
       tags:
-        - "Invite"
+        - "invite"
       parameters:
         - in: "body"
           name: "body"
@@ -762,7 +762,7 @@ paths:
       description: \#3.1.5 invite status
       operationId: invite_status
       tags:
-        - "Invite"
+        - "invite"
       parameters:
         - in: "body"
           name: "body"
@@ -783,7 +783,7 @@ paths:
       description: \#3.1.6 invite remove
       operationId: invite_remove
       tags:
-        - "Invite"
+        - "invite"
       parameters:
         - in: "body"
           name: "body"
@@ -833,7 +833,7 @@ paths:
   /api/presentations:
     post:
       tags:
-        - "Trace"
+        - "trace"
 
 
   #6.1
@@ -845,7 +845,7 @@ paths:
       description: \#6.1.1 session logout
       operationId: session_logout
       tags:
-        - "Session"
+        - "session"
       parameters:
         - in: "body"
           name: "body"
@@ -887,7 +887,7 @@ paths:
   /api/session/check:
     post:
       tags:
-        - "Session"
+        - "session"
       parameters:
         - in: "body"
           name: "body"
@@ -905,7 +905,7 @@ paths:
       description: \#6.1.3 session updateCompany
       operationId: session_logout
       tags:
-        - "Session"
+        - "session"
       parameters:
         - in: "body"
           name: "body"
@@ -926,7 +926,7 @@ paths:
       description: \#6.1.4 session updateProfile
       operationId: session_updateProfile
       tags:
-        - "Session"
+        - "session"
       parameters:
         - in: "body"
           name: "body"
@@ -947,7 +947,7 @@ paths:
       description: \#6.1.5 session login
       operationId: session_login
       tags:
-        - "Session"
+        - "session"
       requestBody:
         description: Parameters for logging in
         required: true
@@ -969,7 +969,7 @@ paths:
       description: \#6.1.6 session signup
       operationId: session_signup
       tags:
-        - "Session"
+        - "session"
       parameters:
         - in: "body"
           name: "body"
@@ -1000,7 +1000,7 @@ paths:
       description: #7.1.1 settings setProfileImage
       operationId: settings_setProfileImage
       tags:
-        - "Settings"
+        - "settings"
       parameters:
         - in: "body"
           required: true
@@ -1021,7 +1021,7 @@ paths:
       description: #7.1.2 settings setCompanyLogo
       operationId: settings_setCompanyLogo
       tags:
-        - "Settings"
+        - "settings"
       parameters:
         - in: "body"
           name: "body"
@@ -1042,7 +1042,7 @@ paths:
       description: #7.1.3 settingd getProfileImage
       operationId: settings_getProfileImage
       tags:
-        - "Settings"
+        - "settings"
       parameters:
         - in: "body"
           name: "body"
@@ -1063,7 +1063,7 @@ paths:
       description: #7.1.4 settings getCompanyLogo
       operationId: settings_getCompanyLogo
       tags:
-        - "Settings"
+        - "settings"
       parameters:
         - in: "body"
           name: "body"
@@ -1094,7 +1094,7 @@ paths:
       description: \#9.1.1 tray getCountBuyer
       operationId: tray_getCountBuyer
       tags:
-        - "Tray"
+        - "tray"
       parameters:
         - in: "body"
           name: "body"
@@ -1115,7 +1115,7 @@ paths:
       description: \#9.1.2 tray getCountSeller
       operationId: tray_getCountSeller
       tags:
-        - "Tray"
+        - "tray"
       parameters:
         - in: "body"
           name: "body"
@@ -1136,7 +1136,7 @@ paths:
       description: \#9.1.3 tray getFolderBuyer
       operationId: tray_getFolderBuyer
       tags:
-        - "Tray"
+        - "tray"
       parameters:
         - in: "body"
           name: "body"
@@ -1157,7 +1157,7 @@ paths:
       description: \#9.1.4 tray getFolderSeller
       operationId: tray_getFolderSeller
       tags:
-        - "Tray"
+        - "tray"
       parameters:
         - in: "body"
           name: "body"
@@ -1178,7 +1178,7 @@ paths:
       description: \#9.1.5 tray getTotalBuyer
       operationId: tray_getTotalBuyer
       tags:
-        - "Tray"
+        - "tray"
       parameters:
         - in: "body"
           name: "body"
@@ -1199,7 +1199,7 @@ paths:
       description: \#9.1.6 tray getTotalSeller
       operationId: tray_getTotalSeller
       tags:
-        - "Tray"
+        - "tray"
       parameters:
         - in: "body"
           name: "body"
@@ -1223,7 +1223,7 @@ paths:
       description: \#10.1.1 trayArchive getCountBuyer
       operationId: trayArchive_getCountBuyer
       tags:
-        - "TrayArchive"
+        - "trayArchive"
       parameters:
         - in: "body"
           name: "body"
@@ -1244,7 +1244,7 @@ paths:
       description: \#10.1.2 trayArchive getCountSeller
       operationId: trayArchive_getCountSeller
       tags:
-        - "TrayArchive"
+        - "trayArchive"
       parameters:
         - in: "body"
           name: "body"
@@ -1265,7 +1265,7 @@ paths:
       description: \#10.1.3 trayArchive getFolderBuyer
       operationId: trayArchive_getFolderBuyer
       tags:
-        - "TrayArchive"
+        - "trayArchive"
       parameters:
         - in: "body"
           name: "body"
@@ -1286,7 +1286,7 @@ paths:
       description: \#10.1.4 trayArchive getFolderSeller
       operationId: trayArchive_getFolderSeller
       tags:
-        - "TrayArchive"
+        - "trayArchive"
       parameters:
         - in: "body"
           name: "body"
@@ -1307,7 +1307,7 @@ paths:
       description: \#10.1.5 trayArchive getTotalBuyer
       operationId: trayArchive_getTotalBuyer
       tags:
-        - "TrayArchive"
+        - "trayArchive"
       parameters:
         - in: "body"
           name: "body"
@@ -1328,7 +1328,7 @@ paths:
       description: \#10.1.6 trayArchive getTotalSeller
       operationId: trayArchive_getTotalSeller
       tags:
-        - "TrayArchive"
+        - "trayArchive"
       parameters:
         - in: "body"
           name: "body"
@@ -1354,7 +1354,7 @@ paths:
       description: \#11.1.1 trayDraft getCountSeller
       operationId: trayDraft
       tags:
-        - "TrayDraft"
+        - "trayDraft"
       parameters:
         - in: "body"
           name: "body"
@@ -1375,7 +1375,7 @@ paths:
       description: \#11.1.2 trayDraft getFolderSeller
       operationId: trayDraft
       tags:
-        - "TrayDraft"
+        - "trayDraft"
       parameters:
         - in: "body"
           name: "body"
@@ -1396,7 +1396,7 @@ paths:
       description: \#11.1.3 trayDraft getTotalSeller
       operationId: trayDraft
       tags:
-        - "TrayDraft"
+        - "trayDraft"
       parameters:
         - in: "body"
           name: "body"
@@ -1422,7 +1422,7 @@ paths:
       description: \#12.1.1 wallet getReceiptInResentActivity
       operationId: wallet_getReceiptInResentActivity
       tags:
-        - "Wallet"
+        - "wallet"
       parameters:
         - in: "body"
           name: "body"
@@ -1443,7 +1443,7 @@ paths:
       description: \#12.1.2 wallet getResentActivityOfWallet
       operationId: wallet_getResentActivityOfWallet
       tags:
-        - "Wallet"
+        - "wallet"
       parameters:
         - in: "body"
           name: "body"
@@ -1463,7 +1463,7 @@ paths:
       description: \#12.1.3 wallet getWalletInfo
       operationId: wallet_getWalletInfo
       tags:
-        - "Wallet"
+        - "wallet"
       parameters:
         - in: "body"
           name: "body"
@@ -1483,7 +1483,7 @@ paths:
       description: \#12.1.4 wallet getCurrentBalanceOfBuyer
       operationId: wallet_getCurrentBalanceOfBuyer
       tags:
-        - "Wallet"
+        - "wallet"
       parameters:
         - in: "body"
           name: "body"
@@ -1504,7 +1504,7 @@ paths:
       description: \#12.1.5 wallet getTransactionReceipt
       operationId: wallet_getTransactionReceipt
       tags:
-        - "Wallet"
+        - "wallet"
       parameters:
         - in: "body"
           name: "body"
@@ -1525,7 +1525,7 @@ paths:
       description: \#12.1.7 wallet getIPFScidByTransactionHash
       operationId: wallet_getIPFScidByTransactionHash
       tags:
-        - "Wallet"
+        - "wallet"
       parameters:
         - in: "body"
           name: "body"
@@ -1577,7 +1577,8 @@ contacts:
       properties:
         msg:
           type: string
-          enum: ["okay"]
+          enum:
+            - "okay"
 
     Error_add:
       required:
@@ -2048,7 +2049,7 @@ invite:
           format: int32
         msg:
           type: array
-          items:
+          items: 
             type: object
             properties: 
               remote_origin:
@@ -2135,7 +2136,8 @@ invite:
           format: int32
         msg:
           type: string
-          enum: ["okey"]
+          enum:
+            - "okey"
 
 session:
   #6.1
@@ -2221,7 +2223,8 @@ session:
           format: int32
         msg:
           type: string
-          enum: ["okey"]
+          enum:
+            - "okey"
 
     #6.1.4
     Request_updateProfile:
@@ -2309,7 +2312,8 @@ settings:
           format: int32
         msg:
           type: string
-          enum: ["okey"]
+          enum:
+            - "okey"
 
     #7.1.2
     Request_setCompanyLogo: #ok
@@ -2436,7 +2440,7 @@ tray:
           - type: string
               
 
-    Responses_getFolderBuyer: #contacts/ng
+    Responses_getFolderBuyer: #ng
       required:
       properties:
         err:
@@ -2734,22 +2738,22 @@ wallet:
             activity:
               type: array
               items:
-                type: object
-                properties: 
-                  document_uuid:
-                    type: string
-                  document_json:
-                    type: string
-                  settlement_hash:
-                    type: string
-                  settlement_time:
-                    type: string
-                  type:
-                    type: string
-                    enum: ["Sale","Purchase"]
-                  amount:
-                    type: integer
-                    format: int32
+                document_uuid:
+                  type: string
+                document_json:
+                  type: string
+                settlement_hash:
+                  type: string
+                settlement_time:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - "Sale"
+                    - "Purchase"
+                amount:
+                  type: integer
+                  format: int32
 
     #12.1.3
     Responses_getWalletInfo:
@@ -2809,7 +2813,9 @@ wallet:
           type: string
         role:
           type: string
-          enum: ["buyer","seller"]
+          enum:
+            - "buyer"
+            - "seller"
         archive:
           type: integer
           format: int64
