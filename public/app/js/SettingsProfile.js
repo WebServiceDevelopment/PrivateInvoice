@@ -124,8 +124,10 @@ const SettingsProfile = (function() {
 			addressCity : memberData.addressCity,
 		}
 
+		const url = '/api/session/updateCompany';
+
 		let ajax = new XMLHttpRequest();
-		ajax.open('POST', '/api/session/updateCompany');
+		ajax.open('POST', url);
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send(JSON.stringify(args));
@@ -370,10 +372,10 @@ const SettingsProfile = (function() {
 			work_email : memberData.work_email,
 		}
 
-		const PATH = '/api/session/updateProfile';
+		const url = '/api/session/updateProfile';
 
 		let ajax = new XMLHttpRequest();
-        ajax.open('POST', PATH );
+        ajax.open('POST', url );
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send(JSON.stringify(args));
@@ -400,8 +402,10 @@ const SettingsProfile = (function() {
 		this.DOM.profile.job_title.setAttribute("readonly", "readonly");
 		this.DOM.profile.work_email.setAttribute("readonly", "readonly");
 
+        const url = '/api/settings/getProfileImage';
+
         const ajax = new XMLHttpRequest();
-        ajax.open('POST', '/api/settings/getProfileImage');
+        ajax.open('POST', url);
         ajax.setRequestHeader('Content-Type', 'application/json');
         ajax.responseType = "json";
         ajax.send();

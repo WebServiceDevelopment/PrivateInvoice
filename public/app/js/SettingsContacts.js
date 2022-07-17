@@ -146,7 +146,9 @@ const SettingsContacts = (function() {
 
 	async function api_renderContacts() {
 
-		const req = await fetch('/api/contacts/getContactList');
+		const url = '/api/contacts/getContactList';
+
+		const req = await fetch(url);
 		const contacts = await req.json();
 		
 		const { page } = this.DOM.table;
@@ -398,9 +400,11 @@ const SettingsContacts = (function() {
 			body: JSON.stringify(params)
 		};
 
+		const url = '/api/contacts/generate';
+
 		let response;
 		try {
-			response = await fetch('/api/contacts/generate', opts);
+			response = await fetch('url', opts);
 		} catch(err) {
 			throw err;
 		}

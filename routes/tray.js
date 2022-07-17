@@ -38,26 +38,6 @@ const SELLER_STATUS			= "seller_status";
 
 /*
  * 1.
- * getTotalBuyer
- */
-router.post('/getTotalBuyer', async function(req, res) {
-
-	sub.getTotal(req, res, BUYER_STATUS);
-
-});
-
-/*
- * 2.
- * getTotalSeller
- */
-router.post('/getTotalSeller', async function(req, res) {
-
-	sub.getTotal(req, res, SELLER_STATUS);
-
-});
-
-/*
- * 3.
  * getCountBuyer
  */
 router.post('/getCountBuyer', function(req, res) {
@@ -67,7 +47,7 @@ router.post('/getCountBuyer', function(req, res) {
 });
 
 /*
- * 4.
+ * 2.
  * getCountSeller
  */
 router.post('/getCountSeller', function(req, res) {
@@ -77,7 +57,7 @@ router.post('/getCountSeller', function(req, res) {
 });
 
 /*
- * 5.
+ * 3.
  * getFolderBuyer
  */
 router.post('/getFolderBuyer', function(req, res) {
@@ -87,7 +67,7 @@ router.post('/getFolderBuyer', function(req, res) {
 });
 
 /*
- * 6.
+ * 4.
  * getFolderSeller
  */
 router.post('/getFolderSeller', function(req, res) {
@@ -95,3 +75,24 @@ router.post('/getFolderSeller', function(req, res) {
 	sub.getFolder(req, res, SELLER_STATUS);
 
 });
+
+/*
+ * 5.
+ * getTotalBuyer
+ */
+router.post('/getTotalBuyer', async function(req, res) {
+
+	sub.getTotal(req, res, BUYER_STATUS);
+
+});
+
+/*
+ * 6.
+ * getTotalSeller
+ */
+router.post('/getTotalSeller', async function(req, res) {
+
+	sub.getTotal(req, res, SELLER_STATUS);
+
+});
+

@@ -36,24 +36,7 @@ const SELLER_ARCHIVE_STATUS	= "seller_status_archive";
 
 //--------------------------------- End Points --------------------------------
 /*
- * Total
- */
-router.post('/getTotalBuyer', async function(req, res) {
-
-    sub.getTotal(req, res, BUYER_ARCHIVE_STATUS);
-
-});
-
-/*
- * getTotalSeller
- */
-router.post('/getTotalSeller', async function(req, res) {
-
-    sub.getTotal(req, res, SELLER_ARCHIVE_STATUS);
-
-});
-
-/*
+ * 1.
  * getCountBuyer
  */
 router.post('/getCountBuyer', function(req, res) {
@@ -63,6 +46,7 @@ router.post('/getCountBuyer', function(req, res) {
 });
 
 /*
+ * 2.
  * getCountSeller
  */
 router.post('/getCountSeller', function(req, res) {
@@ -72,6 +56,7 @@ router.post('/getCountSeller', function(req, res) {
 });
 
 /*
+ * 3.
  * getFolderBuyer
  */
 router.post('/getFolderBuyer', function(req, res) {
@@ -81,6 +66,7 @@ router.post('/getFolderBuyer', function(req, res) {
 });
 
 /*
+ * 4.
  * getFolderSeller
  */
 router.post('/getFolderSeller', function(req, res) {
@@ -88,3 +74,24 @@ router.post('/getFolderSeller', function(req, res) {
     sub.getFolder(req, res, SELLER_ARCHIVE_STATUS);
 
 });
+
+/*
+ * 5.
+ * getTotalBuyer
+ */
+router.post('/getTotalBuyer', async function(req, res) {
+
+    sub.getTotal(req, res, BUYER_ARCHIVE_STATUS);
+
+});
+
+/*
+ * 6.
+ * getTotalSeller
+ */
+router.post('/getTotalSeller', async function(req, res) {
+
+    sub.getTotal(req, res, SELLER_ARCHIVE_STATUS);
+
+});
+
