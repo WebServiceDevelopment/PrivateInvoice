@@ -41,7 +41,23 @@ const MEMBERS_TABLE			= "members";
 const axios					= require('axios')
 const wallet				= require('@sidetree/wallet')
 
-const createDid = async ( mnemonic ) => {
+const createDidKey = async ( mnemonic ) => {
+
+	const keyType = 'Ed25519';
+	const publicKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/0/0");
+
+	const keys = {
+		id: publicKey.controller,
+		publicKey,
+		recoveryKey: null,
+		updateKey: null
+	};
+		
+	return [ keys, null ];
+
+}
+
+const createDidElem = async ( mnemonic ) => {
 
 	const keyType = 'Ed25519';
 	const publicKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/0/0");
@@ -52,7 +68,7 @@ const createDid = async ( mnemonic ) => {
 		document : {
 			publicKeys: [
 				{
-					id: publicKey.id.split('#').pop(),
+					id: 'default',
 					type: publicKey.type,
 					publicKeyJwk: publicKey.publicKeyJwk,
 					purposes: ['authentication', 'assertionMethod']
@@ -63,17 +79,22 @@ const createDid = async ( mnemonic ) => {
 		updateKey : updateKey.publicKeyJwk
 	});
 
+	console.log('CREATE OPERATION');
+	console.log(createOperation);
+
+	const fragment = publicKey.id.split('#').pop();
 	const didUniqueSuffix = wallet.computeDidUniqueSuffix(createOperation.suffixData);
 	const id = `did:elem:ganache:${didUniqueSuffix}`
-	const host = 'http://localhost:4000';
-	//const host = 'http://192.168.1.126:4000';
-	const url = `${host}/api/1.0/operations`;
+	const url = `${process.env.ELEMENT_NODE}/operations`;
 	
 	try {
 		await axios.post(url, createOperation);
 	} catch(err) {
 		return [ null, err ];
 	}
+
+	publicKey.id = `${id}#default`;
+	publicKey.controller = id;
 
 	const keys = {
 		id,
@@ -545,7 +566,11 @@ router.post('/signup', async function(req, res) {
 	// 1.
 	// Then we generare a did from the first index
 
-	const [ keys, err1 ] = await createDid(mnemonic);
+	const USE_DID_KEY = true;
+	const [ keys, err1 ] = USE_DID_KEY
+		? await createDidKey(mnemonic)
+		: await createDidElem(mnemonic);
+
 	if(err1) {
 		console.log(err1);
 		return res.status(500).json({

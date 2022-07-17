@@ -57,14 +57,26 @@ const documentLoader = async (iri) => {
 	if(iri.indexOf('did:key') === 0) {
 		console.log('Found id key');
 		const res = await resolve(iri.split('#')[0]);
+
+		console.log('>-> RESOLVED DID DOCUMENT >->');
+		console.log(JSON.stringify(res.didDocument, null, 2));
+		console.log('<-< RESOLVED DID DOCUMENT <-<');
+
 		return { document: res.didDocument || res };
 	}
 
 	if(iri.indexOf('did:elem:ganache') === 0) {
 		console.log('Found did element');
-		const url = `http://192.168.1.126:4000/api/1.0/identifiers/${iri}`
+		const url = `${process.env.ELEMENT_NODE}/identifiers/${iri}`
 		const res = await axios.get(url);
-		return { document : res.data };
+
+		console.log(res.data);
+
+		console.log('>-> RESOLVED DID DOCUMENT >->');
+		console.log(JSON.stringify(res.data.didDocument, null, 2));
+		console.log('<-< RESOLVED DID DOCUMENT <-<');
+
+		return { document : res.data.didDocument };
 	}
 
 	const message = `Unsupported iri: ${iri}`;
