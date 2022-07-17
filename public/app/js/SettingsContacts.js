@@ -404,7 +404,7 @@ const SettingsContacts = (function() {
 
 		let response;
 		try {
-			response = await fetch('url', opts);
+			response = await fetch(url, opts);
 		} catch(err) {
 			throw err;
 		}

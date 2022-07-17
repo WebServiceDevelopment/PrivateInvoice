@@ -451,8 +451,8 @@ router.post('/add', async function(req, res) {
 	console.log('1.1');
 
 	const local_member_uuid = req.session.data.member_uuid;
-	// const remote_member_uuid = body.issuer.id;
-	const remote_member_uuid = body.credentialSubject.id;
+	const remote_member_uuid = body.issuer.id;
+	// const remote_member_uuid = body.credentialSubject.id;
 
 	const exists = await checkForExistingContact(local_member_uuid, remote_member_uuid)
 	if(exists) {
@@ -486,7 +486,7 @@ router.post('/add', async function(req, res) {
 
 	credential.relatedLink.push({
 		type: 'LinkRole',
-		target: local_member_uuid,
+		target: remote_member_uuid,
 		linkRelationship: 'Invite'
 	});
 
