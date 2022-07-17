@@ -240,8 +240,10 @@ const ContactWidget = (function() {
 			contactType : "buyers"
 		};
 
+		const url = '/api/invite/contacts';
+
 		const ajax = new XMLHttpRequest();
-		ajax.open('POST', '/api/invite/contacts');
+		ajax.open('POST', url);
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send(JSON.stringify(params));

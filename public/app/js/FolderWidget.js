@@ -251,8 +251,10 @@ const FolderWidget = (function() {
 		
 		//console.log("quote create click!!!");
 
+		const url = '/api/quote/create';
+
 		let ajax = new XMLHttpRequest();
-		ajax.open('POST', '/api/quote/create');
+		ajax.open('POST', url);
 		ajax.setRequestHeader('Content-Type', 'application/json');
 		ajax.responseType = "json";
 		ajax.send();
@@ -375,7 +377,7 @@ const FolderWidget = (function() {
 			{ type : "invoice", role : "seller", folder : "paid", archive : 0 }
 		];
 
-		let url = '/api/tray/getCountSeller';
+		const url = '/api/tray/getCountSeller';
 
 	    let response;
         let opts = {
@@ -428,7 +430,7 @@ const FolderWidget = (function() {
 			{ type : "invoice", role : "seller", folder : "draft", archive : 0 },
 		];
 
-		let url = '/api/trayDrafts/getCountSeller';
+		const url = '/api/trayDrafts/getCountSeller';
 
         let opts = {
             method: 'POST',
@@ -478,7 +480,7 @@ async function api_getDFolderCount() {
 			{ type : "invoice", role : "buyer", folder : "paid", archive : 0 }
 		];
 
-		let url = '/api/tray/getCountBuyer';
+		const url = '/api/tray/getCountBuyer';
 
         let opts = {
             method: 'POST',
@@ -535,7 +537,7 @@ async function api_getDFolderCount() {
 			}
 		]
 
-		let url = '/api/trayDrafts/getCountSeller';
+		const url = '/api/trayDrafts/getCountSeller';
 
 		const ajax = new XMLHttpRequest();
 		ajax.open('POST', url );
@@ -732,7 +734,7 @@ async function api_getInvoiceArchiveCount(count, role, folder , archive, exec) {
 			return;
 		}
 
-		let params = 
+		const params = 
 			{ type : type, role : role, folder : folder, archive : archive }
 
 
