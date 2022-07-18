@@ -22,17 +22,17 @@
 
 // Import sub
 
-const sub					   = require("../routes/invoice_sub.js");
-const tran					  = require("../routes/invoice_sub_transaction.js");
-const eth					   = require("../routes/web3_eth.js");
+const sub						= require("./invoice_sub.js");
+const tran						= require("./invoice_sub_transaction.js");
+const eth						= require("./web3_eth.js");
 
 //  web3.js
-const web3					  = eth.getWeb3();
+const web3						= eth.getWeb3();
 
 // Table Name
-const SELLER_STATUS			 = "seller_status";
-const SELLER_DOCUMENT		   = "seller_document";
-const CONTACTS				  = "contacts";
+const SELLER_STATUS			    = "seller_status";
+const SELLER_DOCUMENT		    = "seller_document";
+const CONTACTS				    = "contacts";
 
 const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
 

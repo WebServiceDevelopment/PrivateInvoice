@@ -21,10 +21,10 @@
 "use strict";
 
 // Import sub
-const sub						= require("./invoice_sub.js");
-const eth						= require("./web3_eth.js");
-const to_seller                 = require("./buyer_to_seller.js");
-const wallet_sub                = require("./wallet_sub.js");
+const sub						= require("../modules/invoice_sub.js");
+const eth						= require("../modules/web3_eth.js");
+const to_seller                 = require("../modules/buyer_to_seller.js");
+const wallet_sub                = require("../modules/wallet_sub.js");
 
 // Import Router
 
@@ -400,6 +400,7 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 		code: code
 	}
 
+	//console.log("from_account="+from_account);
 
 	// 9.
 	// getBalance
@@ -407,7 +408,7 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	const [ balanceWei, err9 ] = await  eth.getBalance(web3, from_account) ;
 
 	if(err9) {
-		console.log("error 9: balanceWei");
+		console.log("error 9: balanceWei "+err9);
 		res.json({
 			err : err9,
 			msg : null
@@ -719,7 +720,7 @@ router.post('/getIPFScidByTransactionHash', async function(req, res) {
 	// 3.
 	// ipfs_address
 	//
-	const ipfs_address = config.IPFS_ADDRESS;
+	const ipfs_address = process.env.IPFS_ADDRESS;
 
 	res.json({
 		err : 0,

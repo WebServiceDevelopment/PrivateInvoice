@@ -22,9 +22,9 @@
 
 // Import sub
 
-const sub                   	= require("./invoice_sub.js");
-const tran                      = require("./invoice_sub_transaction.js");
-const eth                       = require("./web3_eth.js");
+const sub                   	= require("../modules/invoice_sub.js");
+const tran                      = require("../modules/invoice_sub_transaction.js");
+const eth                       = require("../modules/web3_eth.js");
 
 // Import Router
 

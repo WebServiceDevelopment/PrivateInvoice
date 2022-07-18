@@ -140,7 +140,7 @@ const insertMnemonic = async (organization_id, mnemonic) => {
 
 const insertPrivateKeys = async (keys) => {
 
- 	const {
+	const {
 		id,
 		publicKey,
 		recoveryKey,
@@ -183,9 +183,25 @@ const insertMember = async (member_did, body) => {
 
 	console.log('Member did: ', member_did);
 
-	// Then insert into database
+// 1.
+	// Deconstruct postbody arguments
+	const { member, company, address } = body;
 
-	const sql = `
+// 2.
+	// First Create Password Hash
+	let password_hash;
+	try {
+		password_hash = await db.hash(member.password);
+	} catch(err) {
+		throw err;
+	}
+
+	let sql, args;
+
+// 3.
+	// Then insert into members table
+/*
+	sql = `
 		INSERT INTO members (
 			member_uuid,
 			membername,
@@ -221,27 +237,95 @@ const insertMember = async (member_did, body) => {
 		)
 	`;
 
-	// Deconstruct postbody arguments
-
-	const { member, company, address } = body;
-
-	// First Create Password Hash
-
-	let password_hash;
-	try {
-		password_hash = await db.hash(member.password);
-	} catch(err) {
-		throw err;
-	}
-
 	// Construct arguments
-	
-	const args = [
+
+	args = [
 		member_did,
 		member.membername,
 		member.job_title,
 		member.contact_email,
 		password_hash,
+		company.name,
+		company.department,
+		company.tax_id,
+		address.country,
+		address.region,
+		address.postcode,
+		address.city,
+		address.line1,
+		address.line2
+	];
+
+*/
+	sql = `
+		INSERT INTO members (
+			member_uuid,
+			membername,
+			job_title,
+			work_email,
+			password_hash,
+			organization_uuid
+
+		) VALUES (
+			?,
+			?,
+			?,
+			?,
+			?,
+			?
+		)
+	`;
+
+	// Construct arguments
+	
+	args = [
+		member_did,
+		member.membername,
+		member.job_title,
+		member.contact_email,
+		password_hash,
+		member_did
+	];
+
+
+	try {
+		await db.insert(sql, args);
+	} catch(err) {
+		return [err];
+	}
+
+// 4.
+	// Then insert into organizations table
+	sql = `
+		INSERT INTO organizations (
+			organization_uuid,
+
+			organization_name,
+			organization_department,
+			organization_tax_id,
+
+			addressCountry,
+			addressRegion,
+			organization_postcode,
+			addressCity,
+			organization_address,
+			organization_building
+		) VALUES (
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?
+		)
+	`;
+
+	args = [
+		member_did,
 		company.name,
 		company.department,
 		company.tax_id,
@@ -265,6 +349,7 @@ const insertMember = async (member_did, body) => {
 
 const getSessionData = async(member_did) => {
 
+/*
 	const sql = `
 		SELECT
 			member_uuid,
@@ -287,6 +372,22 @@ const getSessionData = async(member_did) => {
 		WHERE
 			member_uuid = ?
 	`;
+*/
+	let sql;
+// 1.
+	sql = `
+		SELECT
+			member_uuid,
+			membername,
+			job_title,
+			work_email,
+			password_hash,
+			organization_uuid
+		FROM
+			members
+		WHERE
+			member_uuid = ?
+	`;
 
 	let member_data;
 	try {
@@ -295,8 +396,50 @@ const getSessionData = async(member_did) => {
 		return [null, err];
 	}
 
+
+// 2.
+	sql = `
+		SELECT
+			organization_name,
+			organization_postcode,
+			organization_address,
+			organization_building,
+			organization_department,
+			organization_tax_id,
+			addressCountry,
+			addressRegion,
+			addressCity
+		FROM
+			organizations
+		WHERE
+			organization_uuid = ?
+	`;
+	let org;
+	try {
+		org = await db.selectOne(sql, [member_data.organization_uuid]);
+	} catch(err) {
+		return [null, err];
+	}
+
+// 3.
+	member_data.organization_name		= org.organization_name,
+	member_data.organization_postcode	= org.organization_postcode,
+	member_data.organization_address	= org.organization_address,
+	member_data.organization_building	= org.organization_building,
+	member_data.organization_department	= org.organization_department,
+	member_data.organization_tax_id		= org.organization_tax_id,
+	member_data.addressCountry			= org.addressCountry,
+	member_data.addressRegion			= org.addressRegion,
+	member_data.addressCity				= org.addressCity
+
+
+// 4.
 	delete member_data.password_hash;
+// 5.
+// 不要な気がする
 	member_data.member_uuid = member_data.member_uuid.toString();
+
+// 6.
 	return [ member_data, null ];
 
 }
@@ -332,8 +475,30 @@ router.all('/check', async function(req, res) {
  */
 router.post('/updateCompany', async function(req, res) {
 
-	// Step 1 : Update members table
+	let sql, args, row;
+	// step 1 
 
+	sql = `
+        SELECT
+            organization_uuid,
+        FROM
+            members
+        WHERE
+            member_uuid = ?
+    `;
+
+    args = [
+        req.session.data.member_uuid,
+    ];
+
+    try {
+        row = await db.selectOne(sql, args);
+    } catch (err) {
+        throw err;
+    }
+
+	// Step 2 : Update members table
+/*
 	let sql = `
 		UPDATE
 			${MEMBERS_TABLE}
@@ -363,8 +528,39 @@ router.post('/updateCompany', async function(req, res) {
 		req.body.addressCity,
 		req.session.data.member_uuid
 	];
+*/
 
-	// Step 2 : Write Changes to log database
+	sql = `
+		UPDATE
+			organizations
+		SET
+			organization_name = ?,
+			organization_postcode = ?,
+			organization_address = ?,
+			organization_building = ?,
+			organization_department = ?,
+			organization_tax_id = ?,
+			addressCountry = ?,
+			addressRegion = ?,
+			addressCity = ?
+		WHERE
+			organization_uuid = ?
+	`;
+
+	args = [
+		req.body.organization_name,
+		req.body.organization_postcode,
+		req.body.organization_address,
+		req.body.organization_building,
+		req.body.organization_department,
+		req.body.organization_tax_id,
+		req.body.addressCountry,
+		req.body.addressRegion,
+		req.body.addressCity,
+		row.organization_uuid
+	];
+
+	// Step 3 : Write Changes to log database
 
 	try {
 		await db.update(sql, args);
@@ -372,7 +568,7 @@ router.post('/updateCompany', async function(req, res) {
 		throw err;
 	}
 
-	// Step 3 : Update Current Reddis Session
+	// Step 4 : Update Current Reddis Session
 
 	req.session.data.organization_name = req.body.organization_name;
 	req.session.data.organization_postcode = req.body.organization_postcode;
@@ -479,23 +675,17 @@ router.post('/login', async function(req, res) {
 		WHERE
 			membername = ?
 	`;
-*/
-	const sql = `
+*/ 
+// 1.
+	let sql;
+	sql = `
 		SELECT
 			member_uuid,
 			membername,
 			job_title,
 			work_email,
 			password_hash,
-			organization_name,
-			organization_postcode,
-			organization_address,
-			organization_building,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			addressCity,
+			organization_uuid,
 			created_on,
 			wallet_address,
 			avatar_uuid
@@ -521,6 +711,7 @@ router.post('/login', async function(req, res) {
 		});
 	}
 
+// 2.
 	let match = false;
 
 	try {
@@ -536,6 +727,43 @@ router.post('/login', async function(req, res) {
 		});
 	}
 
+// 3.
+	sql = `
+		SELECT
+			organization_name,
+			organization_postcode,
+			organization_address,
+			organization_building,
+			organization_department,
+			organization_tax_id,
+			addressCountry,
+			addressRegion,
+			addressCity
+		FROM
+			organizations
+		WHERE
+			organization_uuid = ?
+	`;
+	let org;
+	try {
+		org = await db.selectOne(sql, [member_data.organization_uuid]);
+	} catch(err) {
+		return [null, err];
+	}
+
+// 4.
+	member_data.organization_name		= org.organization_name;
+	member_data.organization_postcode	= org.organization_postcode;
+	member_data.organization_address	= org.organization_address;
+	member_data.organization_building	= org.organization_building;
+	member_data.organization_department	= org.organization_department;
+	member_data.organization_tax_id		= org.organization_tax_id;
+	member_data.addressCountry			= org.addressCountry;
+	member_data.addressRegion			= org.addressRegion;
+	member_data.addressCity				= org.addressCity;
+
+
+// 5.
 	delete member_data.password_hash;
 	member_data.member_uuid = member_data.member_uuid.toString();
 
