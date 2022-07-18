@@ -30,6 +30,12 @@ module.exports				= router;
 
 const uuidv1				= require('uuid').v1
 const bip39					= require('bip39')
+const { ethers } = require('ethers')
+
+const Web3 = require('web3')
+const web3 = new Web3(process.env.GANACHE_ADDRESS)
+const { eth } = web3;
+
 
 // Database
 
@@ -179,15 +185,16 @@ const insertPrivateKeys = async (keys) => {
 }
 
 
-const insertMember = async (member_did, body) => {
+const insertMember = async (member_did, body, eth_address, privatekey) => {
 
 	console.log('Member did: ', member_did);
 
-// 1.
+	// 1.
 	// Deconstruct postbody arguments
+	
 	const { member, company, address } = body;
 
-// 2.
+	// 2.
 	// First Create Password Hash
 	let password_hash;
 	try {
@@ -198,9 +205,9 @@ const insertMember = async (member_did, body) => {
 
 	let sql, args;
 
-// 3.
+	// 3.
 	// Then insert into members table
-/*
+	
 	sql = `
 		INSERT INTO members (
 			member_uuid,
@@ -208,65 +215,12 @@ const insertMember = async (member_did, body) => {
 			job_title,
 			work_email,
 			password_hash,
-
-			organization_name,
-			organization_department,
-			organization_tax_id,
-
-			addressCountry,
-			addressRegion,
-			organization_postcode,
-			addressCity,
-			organization_address,
-			organization_building
+			organization_uuid,
+			wallet_address,
+			wallet_private_key
 		) VALUES (
 			?,
 			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?
-		)
-	`;
-
-	// Construct arguments
-
-	args = [
-		member_did,
-		member.membername,
-		member.job_title,
-		member.contact_email,
-		password_hash,
-		company.name,
-		company.department,
-		company.tax_id,
-		address.country,
-		address.region,
-		address.postcode,
-		address.city,
-		address.line1,
-		address.line2
-	];
-
-*/
-	sql = `
-		INSERT INTO members (
-			member_uuid,
-			membername,
-			job_title,
-			work_email,
-			password_hash,
-			organization_uuid
-
-		) VALUES (
 			?,
 			?,
 			?,
@@ -284,7 +238,9 @@ const insertMember = async (member_did, body) => {
 		member.job_title,
 		member.contact_email,
 		password_hash,
-		member_did
+		member_did,
+		eth_address,
+		privatekey
 	];
 
 
@@ -294,16 +250,15 @@ const insertMember = async (member_did, body) => {
 		return [err];
 	}
 
-// 4.
+	// 4.
 	// Then insert into organizations table
+
 	sql = `
 		INSERT INTO organizations (
 			organization_uuid,
-
 			organization_name,
 			organization_department,
 			organization_tax_id,
-
 			addressCountry,
 			addressRegion,
 			organization_postcode,
@@ -349,32 +304,9 @@ const insertMember = async (member_did, body) => {
 
 const getSessionData = async(member_did) => {
 
-/*
-	const sql = `
-		SELECT
-			member_uuid,
-			membername,
-			job_title,
-			work_email,
-			password_hash,
-			organization_name,
-			organization_postcode,
-			organization_address,
-			organization_building,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			addressCity,
-			created_on
-		FROM
-			members
-		WHERE
-			member_uuid = ?
-	`;
-*/
 	let sql;
-// 1.
+
+	// 1.
 	sql = `
 		SELECT
 			member_uuid,
@@ -382,7 +314,8 @@ const getSessionData = async(member_did) => {
 			job_title,
 			work_email,
 			password_hash,
-			organization_uuid
+			organization_uuid,
+			wallet_address
 		FROM
 			members
 		WHERE
@@ -397,7 +330,7 @@ const getSessionData = async(member_did) => {
 	}
 
 
-// 2.
+	// 2.
 	sql = `
 		SELECT
 			organization_name,
@@ -421,7 +354,8 @@ const getSessionData = async(member_did) => {
 		return [null, err];
 	}
 
-// 3.
+	// 3.
+	
 	member_data.organization_name		= org.organization_name,
 	member_data.organization_postcode	= org.organization_postcode,
 	member_data.organization_address	= org.organization_address,
@@ -433,13 +367,10 @@ const getSessionData = async(member_did) => {
 	member_data.addressCity				= org.addressCity
 
 
-// 4.
+	// 4.
 	delete member_data.password_hash;
-// 5.
-// 不要な気がする
-	member_data.member_uuid = member_data.member_uuid.toString();
 
-// 6.
+	// 5.
 	return [ member_data, null ];
 
 }
@@ -650,33 +581,8 @@ router.post('/updateProfile', async function(req, res) {
  */
 router.post('/login', async function(req, res) {
 
-/*
-	const sql = `
-		SELECT
-			member_uuid,
-			membername,
-			job_title,
-			work_email,
-			password_hash,
-			organization_name,
-			organization_postcode,
-			organization_address,
-			organization_building,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			addressCity,
-			created_on,
-			wallet_address,
-			avatar_uuid
-		FROM
-			${MEMBERS_TABLE}
-		WHERE
-			membername = ?
-	`;
-*/ 
-// 1.
+	// 1.
+	
 	let sql;
 	sql = `
 		SELECT
@@ -779,6 +685,37 @@ router.post('/login', async function(req, res) {
 
 });
 
+const insertFunds = async ( newMemberAddress ) => {
+
+	// 0.1 ETH in Wei
+	const UNIT_VALUE = 100000000000000000;
+	const AMOUNT = Math.floor( Math.random() * 10 );
+	const WEI_TO_SEND = UNIT_VALUE * AMOUNT;
+
+
+	const accounts = await eth.getAccounts()
+	const [ sourceAddress ] = accounts;
+	const gasPrice = await eth.getGasPrice()
+
+	const sourceBalanceStart = await eth.getBalance(sourceAddress);
+	console.log('Source Balance(start): ', sourceBalanceStart);
+
+	const transactionObj = {
+		from: sourceAddress,
+		to: newMemberAddress,
+		value: WEI_TO_SEND
+	};
+
+	const transaction = await eth.sendTransaction(transactionObj);
+
+	const sourceBalanceEnd = await eth.getBalance(sourceAddress);
+	console.log('Source Balance(end): ', sourceBalanceEnd);
+
+	const memberBalance = await eth.getBalance(newMemberAddress);
+	console.log('Member Balance: ', memberBalance);
+
+}
+
 /*
  * 6.
  * signup
@@ -790,8 +727,16 @@ router.post('/signup', async function(req, res) {
 	// First we generate a mnemonic for the organization
 
 	const mnemonic = bip39.generateMnemonic();
+	const wallet = ethers.Wallet.fromMnemonic(mnemonic);
+	const { address, privateKey } = wallet;
 
 	// 1.
+	// For testing we insert a small amount of ETH into the wallet
+	// for testing
+	
+	await insertFunds(address);
+
+	// 2.
 	// Then we generare a did from the first index
 
 	const USE_DID_KEY = true;
@@ -810,10 +755,10 @@ router.post('/signup', async function(req, res) {
 	const { id, publicKey } = keys;
 	console.log('id: ', id);
 
-	// 2.
+	// 3.
 	// Then we insert the newly created member
 
-	const [err2] = await insertMember(id, req.body);
+	const [err2] = await insertMember(id, req.body, address, privateKey);
 	if(err2) {
 		console.log(err2);
 		return res.status(500).json({
@@ -822,7 +767,7 @@ router.post('/signup', async function(req, res) {
 		});
 	}
 
-	// 3.
+	// 4.
 	// Then we store the created mnemonic for the organization
 
 	const [err3] = await insertMnemonic(id, mnemonic);
@@ -834,7 +779,7 @@ router.post('/signup', async function(req, res) {
 		});
 	}
 
-	// 4.
+	// 5.
 	// Then we store the private keys to be able to sign later
 
 	const [err4] = await insertPrivateKeys(keys);
@@ -846,7 +791,7 @@ router.post('/signup', async function(req, res) {
 		});
 	}
 
-	// 5.
+	// 6.
 	// Then we select session data to auto-login
 
 	const [member_data, err5] = await getSessionData(id);
