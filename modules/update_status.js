@@ -22,11 +22,11 @@
 
 const db = require('../database.js')
 const moment = require('moment');
-const { signStatusMessage } = require('../routes/sign_your_credentials.js');
-const sub = require("../routes/invoice_sub.js");
-const { moveToTrash } = require('./move_to_trash.js');
-const { moveToPaid } = require('./move_to_paid.js');
-const { moveToArchive } = require('./move_to_archive.js');
+const { signStatusMessage } = require('./sign_your_credentials.js');
+const sub					= require("./invoice_sub.js");
+const { moveToTrash }		= require('./move_to_trash.js');
+const { moveToPaid }		= require('./move_to_paid.js');
+const { moveToArchive }		= require('./move_to_archive.js');
 
 const handleStatusUpdate = async(credential, res) => {
 
@@ -43,7 +43,6 @@ const handleStatusUpdate = async(credential, res) => {
 		await sub.setConfirm(status, document_uuid, buyer_uuid);
 		return res.status(200).end('okay');
 
-		break;
 	case 'toPaid':
 		
 		status = 'seller_status';
@@ -56,7 +55,6 @@ const handleStatusUpdate = async(credential, res) => {
 		}
 		return res.status(200).end('okay');
 
-		break;
 	case 'toReturn':
 		
 		status = 'seller_status';
@@ -65,7 +63,6 @@ const handleStatusUpdate = async(credential, res) => {
 		await sub.setReturn(status, document_uuid, buyer_uuid);
 		return res.status(200).end('okay');
 
-		break;
 	case "toWithdraw":
 		
 		status = 'buyer_status';
@@ -74,7 +71,6 @@ const handleStatusUpdate = async(credential, res) => {
 		await sub.setWithdrawBuyer(status, document_uuid, seller_uuid);
 		return res.status(200).end('okay');
 
-		break;
 	case "toTrash":
 	case "toRecreate":
 		
@@ -84,7 +80,6 @@ const handleStatusUpdate = async(credential, res) => {
 		await moveToTrash(status, document_uuid, seller_uuid);
 		return res.status(200).end('okay');
 
-		break;
 	case "toArchive":
 		
 		status = 'buyer_status';
@@ -96,10 +91,8 @@ const handleStatusUpdate = async(credential, res) => {
 		}
 		return res.status(200).end('okay');
 
-		break;
 	default:
 		return res.status(400).end('Invalid message')
-		break;
 	}
 
 }
@@ -109,6 +102,7 @@ const createMessage = async (document_uuid, member_uuid, message, keyPair) => {
 	// 1.
 	// Get issuer information
 
+/*
 	const sql = `
 		SELECT
 			member_uuid AS member_did,
@@ -125,6 +119,18 @@ const createMessage = async (document_uuid, member_uuid, message, keyPair) => {
 			addressCountry AS organization_address_country,
 			addressRegion AS organization_address_region,
 			addressCity AS organization_address_city
+		FROM
+			members
+		WHERE
+			member_uuid = ?
+	`;
+*/
+	const sql = `
+		SELECT
+			member_uuid AS member_did,
+			membername AS member_name,
+			job_title AS member_job_title,
+			work_email AS member_contact_email
 		FROM
 			members
 		WHERE

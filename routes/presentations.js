@@ -29,10 +29,10 @@ module.exports = router
 // Import Libraries
 
 const uuidv4 = require('uuid').v4
-const { verifyPresentation } = require('./sign_your_credentials.js')
-const { handleContactRequest } = require('../modules/contacts_in.js')
-const { handleIncomingInvoice } = require('../modules/invoices_in.js')
-const { handleStatusUpdate } = require('../modules/update_status.js')
+const { verifyPresentation }	= require('../modules/sign_your_credentials.js')
+const { handleContactRequest }	= require('../modules/contacts_in.js')
+const { handleIncomingInvoice }	= require('../modules/invoices_in.js')
+const { handleStatusUpdate }	= require('../modules/update_status.js')
 
 // Global Variable for Storing Challenges
 

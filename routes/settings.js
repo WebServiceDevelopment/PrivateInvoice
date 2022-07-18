@@ -103,8 +103,9 @@ router.post('/setCompanyLogo', async function(req, res) {
 	const logo_uuid = uuidv1();
 
 	// Insert Image Into Database
+	let sql, args, row;
 
-	let sql = `
+	sql = `
 		INSERT INTO organization_img (
 			logo_uuid,
 			img_data
@@ -114,7 +115,7 @@ router.post('/setCompanyLogo', async function(req, res) {
 		)
 	`;
 
-	let args = [
+	args = [
 		logo_uuid,
 		req.body.dataUrl
 	];
@@ -128,6 +129,26 @@ router.post('/setCompanyLogo', async function(req, res) {
 	// Set this in the member's table
 
 	sql = `
+        SELECT
+            organization_uuid,
+        FROM
+            members
+        WHERE
+            member_uuid = ?
+	`;
+
+	args = [
+		req.session.data.member_uuid,
+	];
+
+    try {
+        row = await db.selectOne(sql, args);
+    } catch (err) {
+        throw err;
+    }
+
+/*
+	sql = `
 		UPDATE
 			members
 		SET
@@ -139,6 +160,20 @@ router.post('/setCompanyLogo', async function(req, res) {
 	args = [
 		logo_uuid,
 		req.session.data.member_uuid,
+	];
+*/
+	sql = `
+		UPDATE
+			organizations
+		SET
+			logo_uuid = ?
+		WHERE
+			organization_uuid = ?
+	`;
+
+	args = [
+		logo_uuid,
+		row.organization_uuid
 	];
 
 	// Update the current changes in session object

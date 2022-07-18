@@ -30,7 +30,7 @@ const Web3						= require('web3');
 
 const web3						= new Web3();
 
-const URL						= config.GANACHE_ADDRESS;
+const URL						= process.env.GANACHE_ADDRESS;
 
 web3.setProvider(new web3.providers.HttpProvider(URL));
 

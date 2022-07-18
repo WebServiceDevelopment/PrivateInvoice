@@ -26,7 +26,5 @@
 			"maxAge" : null,
 			"sameSite" : true
 		}
-	},
-	"GANACHE_ADDRESS" : "http://192.168.1.122:9545",
-	"IPFS_ADDRESS" : "http://192.168.1.127:8080"
+	}
 }

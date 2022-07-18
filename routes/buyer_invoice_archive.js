@@ -21,14 +21,14 @@
 "use strict";
 
 // Import sub
-const sub						= require("./invoice_sub.js");
-const tran                      = require("./invoice_sub_transaction.js");
+const sub						= require("../modules/invoice_sub.js");
+const tran                      = require("../modules/invoice_sub_transaction.js");
 
 // Import Router
 const express					= require('express');
 const router					= express.Router();
 module.exports					= router;
-const to_seller                 = require("./buyer_to_seller.js");
+const to_seller                 = require("../modules/buyer_to_seller.js");
 
 // Libraries
 
