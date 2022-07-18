@@ -1,8 +1,8 @@
--- MariaDB dump 10.19  Distrib 10.5.13-MariaDB, for Linux (x86_64)
+-- MariaDB dump 10.19  Distrib 10.5.16-MariaDB, for Linux (x86_64)
 --
--- Host: localhost    Database: 512r_dev
+-- Host: localhost    Database: Buyer_717
 -- ------------------------------------------------------
--- Server version	10.5.13-MariaDB
+-- Server version	10.5.16-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -241,16 +241,7 @@ CREATE TABLE `members` (
   `password_hash` varchar(255) NOT NULL,
   `avatar_uuid` varchar(100) DEFAULT NULL,
   `created_on` datetime NOT NULL DEFAULT current_timestamp(),
-  `logo_uuid` varchar(100) DEFAULT NULL,
-  `organization_name` varchar(255) NOT NULL,
-  `organization_postcode` varchar(255) DEFAULT '',
-  `organization_address` varchar(255) DEFAULT '',
-  `organization_building` varchar(255) DEFAULT '',
-  `organization_department` varchar(255) DEFAULT '',
-  `organization_tax_id` varchar(32) DEFAULT '',
-  `addressCountry` varchar(50) DEFAULT '',
-  `addressRegion` varchar(25) DEFAULT '',
-  `addressCity` varchar(25) DEFAULT '',
+  `organization_uuid` varchar(100) NOT NULL DEFAULT '',
   `wallet_address` varchar(255) DEFAULT '',
   PRIMARY KEY (`member_uuid`) USING BTREE,
   UNIQUE KEY `username` (`membername`) USING BTREE
@@ -269,7 +260,7 @@ CREATE TABLE `mnemonics` (
   `recovery_phrase` text NOT NULL,
   `current_index` int(11) NOT NULL DEFAULT 1,
   `created_on` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`organization_did`)
+  PRIMARY KEY (`organization_did`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -289,6 +280,30 @@ CREATE TABLE `organization_img` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `organizations`
+--
+
+DROP TABLE IF EXISTS `organizations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `organizations` (
+  `organization_uuid` varchar(100) NOT NULL,
+  `organization_name` varchar(255) NOT NULL DEFAULT '',
+  `organization_postcode` varchar(255) NOT NULL DEFAULT '',
+  `organization_address` varchar(255) NOT NULL DEFAULT '',
+  `organization_building` varchar(255) NOT NULL DEFAULT '',
+  `organization_department` varchar(255) NOT NULL DEFAULT '',
+  `organization_tax_id` varchar(32) NOT NULL DEFAULT '',
+  `addressCountry` varchar(50) NOT NULL DEFAULT '',
+  `addressRegion` varchar(25) NOT NULL DEFAULT '',
+  `addressCity` varchar(25) NOT NULL DEFAULT '',
+  `logo_uuid` varchar(100) DEFAULT NULL,
+  `created_on` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`organization_uuid`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `privatekeys`
 --
 
@@ -297,11 +312,14 @@ DROP TABLE IF EXISTS `privatekeys`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `privatekeys` (
   `member_did` varchar(64) NOT NULL,
-  `public_key` text NOT NULL CHECK (json_valid(`public_key`)),
-  `update_key` text NOT NULL CHECK (json_valid(`update_key`)),
-  `recovery_key` text NOT NULL CHECK (json_valid(`recovery_key`)),
+  `public_key` text NOT NULL,
+  `update_key` text NOT NULL,
+  `recovery_key` text NOT NULL,
   `created_on` datetime NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`member_did`)
+  PRIMARY KEY (`member_did`) USING BTREE,
+  CONSTRAINT `public_key` CHECK (json_valid(`public_key`)),
+  CONSTRAINT `update_key` CHECK (json_valid(`update_key`)),
+  CONSTRAINT `recovery_key` CHECK (json_valid(`recovery_key`))
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -478,4 +496,4 @@ CREATE TABLE `seller_status_draft` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-06-13 12:06:31
+-- Dump completed on 2022-07-18  9:14:44

@@ -25,6 +25,7 @@
 const express				= require('express');
 const router				= express.Router();
 module.exports				= router;
+const uniqid				= require("uniqid");
 
 // Libraries
 
@@ -44,8 +45,10 @@ router.post('/create', async function(req, res) {
 
 	const INVITE_TABLE = "invite";
 
+// 1.
 	const invite_code = uniqid.time();
 
+// 2.
 	let args = [
 		invite_code,
 		req.session.data.member_uuid,
@@ -74,9 +77,16 @@ router.post('/create', async function(req, res) {
 	try {
 		await db.insert(sql, args);
 	} catch(err) {
-		throw err;
+		//throw err;
+		console.log("invite create error 2")
+
+		return res.json({
+			err : 2,
+			msg : "Can not inset INVITE_TABLE"
+		});
 	}
 
+// 3.
 	sql = `
 		SELECT
 			*
@@ -98,7 +108,13 @@ router.post('/create', async function(req, res) {
 	try {
 		row = await db.selectOne(sql, args);
 	} catch(err) {
-		throw err;
+		//throw err;
+		console.log("invite create error 3")
+
+		return res.json({
+			err : 3,
+			msg : "Can not select INVITE_TABLE"
+		});
 	}
 
 	//console.log(row);
@@ -140,7 +156,13 @@ router.post('/list', async function(req, res) {
 	try {
 		rows = await db.selectAll(sql, args);
 	} catch(err) {
-		throw err;
+		//throw err;
+		console.log("invite list error 1")
+
+		return res.json({
+			err : 1,
+			msg : "Expired code"
+		});
 	}
 
 	res.json({
@@ -161,6 +183,7 @@ router.post('/submit', async function(req, res) {
 	const INVITE_TABLE = "invite";
 	const CONTACTS_TABLE = "contacts";
 
+// 1.
 	let sql = `
 		SELECT
 			invite_code,
@@ -191,27 +214,40 @@ router.post('/submit', async function(req, res) {
 	try {
 		invite = await db.selectOne(sql, args);
 	} catch (err) {
-		throw err;
+		//throw err;
+		console.log("invite submit error 1")
+
+		return res.status(400).json({
+			err : 1,
+			msg : "Could not select INVITE_TABLE"
+		});
 	}
 
+// 2.
 	if(!invite) {
+		console.log("invite submit error 2")
+
 		return res.json({
-			err : 1,
+			err : 2,
 			msg : "Expired code"
 		});
 	}
 
+// 3.
 	// If the max count has been reached, then we return
 
 	if(invite.max_count && invite.use_count >= invite.max_count) {
+		console.log("invite submit error 3")
+
 		return res.json({
-			err : 1,
+			err : 3,
 			msg : "Use quota filled"
 		});
 	}
 
 	invite.local_member_uuid = invite.local_member_uuid.toString();
 
+// 4.
 	// Then we increment the use count of the invite entry
 
 	sql = `
@@ -228,9 +264,16 @@ router.post('/submit', async function(req, res) {
 	try {
 		bool = await db.update(sql, args);
 	} catch (err) {
-		throw err;
+		//throw err;
+		console.log("invite submit error 4")
+
+		return res.status(400).json({
+			err : 1,
+			msg : "Could not update INVITE_TABLE"
+		});
 	}
 
+// 5.
 	// Then we need to insert into the dat contact
 
 
@@ -254,6 +297,7 @@ router.post('/submit', async function(req, res) {
 	//console.log(invite);
 
 	if(invite.rel_seller) {
+// 6.
 
 		args = [
 			contact_uuid,
@@ -265,10 +309,17 @@ router.post('/submit', async function(req, res) {
 		try {
 			bool = await db.insert(sql, args);
 		} catch (err) {
-			throw err;
+			//throw err;
+			console.log("invite submit error 6")
+
+			return res.status(400).json({
+				err : 6,
+				msg : "Could not insert CONTACT_TABLE"
+			});
 		}
 
 	} else if(invite.rel_buyer) {
+// 7.
 
 		args = [
 			contact_uuid,
@@ -280,7 +331,13 @@ router.post('/submit', async function(req, res) {
 		try {
 			bool = await db.insert(sql, args);
 		} catch (err) {
-			throw err;
+			//throw err;
+			console.log("invite submit error 7")
+
+			return res.status(400).json({
+				err : 7,
+				msg : "Could not insert CONTACT_TABLE"
+			});
 		}
 
 	}
@@ -322,7 +379,6 @@ router.post('/contacts', async function(req, res) {
 			err : 1,
 			msg : "Invalid contact type provided"
 		});
-		break;
 	}
 
 	let sql = `
@@ -349,7 +405,13 @@ router.post('/contacts', async function(req, res) {
 	try {
 		rows = await db.selectAll(sql, args);
 	} catch(err) {
-		throw err;
+		//throw err;
+		console.log("invite contacts error 1")
+
+		return res.status(400).json({
+			err : 1,
+			msg : "Could not select CONTACTS_TABLE"
+		});
 	}
 
 	if(!rows.length) {
@@ -396,7 +458,10 @@ router.post('/status', async function(req, res) {
 	// First we need to get the details of the invite code
 	const INVITE_TABLE = "invite";
 
-	let sql = `
+	let sql, args;
+
+// 1.
+	sql = `
 		SELECT
 			*
 		FROM
@@ -405,7 +470,7 @@ router.post('/status', async function(req, res) {
 			invite_code = ?
 	`;
 
-	let args = [
+	args = [
 		req.body.code
 	];
 
@@ -414,18 +479,29 @@ router.post('/status', async function(req, res) {
 	try {
 		invite = await db.selectOne(sql, args);
 	} catch (err) {
-		throw err;
+		//throw err;
+		console.log("invite status error 2")
+
+		return res.status(400).json({
+			err : 2,
+			msg : "Could not find members"
+		});
 	}
 
+// 2.
 	if(!invite) {
-		return res.json({
+		console.log("invite status error 1")
+
+		return res.status(400).json({
 			err : 1,
 			msg : "Could not find invite"
 		});
 	}
 
+// 3.
 	// Then we need to check for the details of the host
 
+/*
 	sql = `
 		SELECT
 			membername,
@@ -434,6 +510,16 @@ router.post('/status', async function(req, res) {
 			organization_address,
 			organization_building,
 			organization_department
+		FROM
+			members
+		WHERE
+			member_uuid = ?
+	`;
+*/
+	sql = `
+		SELECT
+			membername,
+			organization_uuid,
 		FROM
 			members
 		WHERE
@@ -449,15 +535,64 @@ router.post('/status', async function(req, res) {
 	try {
 		host = await db.selectOne(sql, args);
 	} catch (err) {
-		throw err;
+		//throw err;
+		console.log("invite status error 3")
+
+		return res.status(400).json({
+			err : 3,
+			msg : "Could not find members"
+		});
 	}
 
+// 4.
 	if(!invite) {
-		return res.json({
-			err : 2,
+		console.log("invite status error 3")
+
+		return res.status(400).json({
+			err : 4,
 			msg : "Could not find host"
 		});
 	}
+
+
+// 5.
+	sql = `
+		SELECT
+			organization_name,
+			organization_postcode,
+			organization_address,
+			organization_building,
+			organization_department
+		FROM
+			organizations
+		WHERE
+			organization_uuid = ?
+	`;
+
+	args = [
+		host.organization_uuid
+	];
+
+	let org;
+
+	try {
+		org = await db.selectOne(sql, args);
+	} catch (err) {
+		//throw err;
+		console.log("invite status error 5")
+
+		return res.status(400).json({
+			err : 5,
+			msg : "Could not find organization"
+		});
+	}
+
+// 6.
+	host.organization_name		= org.organization_name;
+	host.organization_postcode	= org.organization_postcode;
+	host.organization_address	= org.organization_address;
+	host.organization_building	= org.organization_building;
+	host.organization_department = org.organization_department;
 
 	// Return the results to the buyer
 
@@ -501,7 +636,13 @@ router.post('/remove', async function(req, res) {
 	try {
 		bool = await db.update(sql, args);
 	} catch(err) {
-		throw err;
+		//throw err;
+		console.log("invite remove error 1")
+
+		return res.status(400).json({
+			err : 1,
+			msg : "Could not remove"
+		});
 	}
 
 	res.json({

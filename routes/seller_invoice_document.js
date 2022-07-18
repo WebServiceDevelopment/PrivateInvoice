@@ -34,13 +34,13 @@ const uniqid 					= require('uniqid');
 const moment 					= require('moment');
 const currency 					= require('currency.js');
 
-const netUtil 					= require('./netUtil.js');
+const netUtil 					= require('../modules/netUtil.js');
 
 // Database 
 
 const config 					= require('../config.json');
 const db 						= require('../database.js');
-const tran                      = require("./invoice_sub_transaction.js");
+const tran                      = require("../modules/invoice_sub_transaction.js");
 
 const SELLER_DRAFT_DOCUMENT	    = "seller_document_draft";
 const SELLER_DRAFT_STATUS		= "seller_status_draft";
@@ -119,7 +119,7 @@ router.post('/update', async function(req, res) {
 		console.log(err2);
 		errno = 2;
 		code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err2, errno);
+		let msg = tran.rollbackAndReturn(conn, code, err2, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
 
@@ -129,7 +129,7 @@ router.post('/update', async function(req, res) {
 		errno = 3;
 		code = 400;
 		const err3 = MESSAGE_AFFECTED_ROWS;
-	    let msg = tran.rollbackAndReturn(conn, code, err3, errno);
+		let msg = tran.rollbackAndReturn(conn, code, err3, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
 
@@ -174,7 +174,7 @@ router.post('/update', async function(req, res) {
 		console.log(err4);
 		errno = 4;
 		code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err4, errno);
+		let msg = tran.rollbackAndReturn(conn, code, err4, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
 
@@ -184,7 +184,7 @@ router.post('/update', async function(req, res) {
 		errno = 5;
 		code = 400;
 		const err5 = MESSAGE_AFFECTED_ROWS;
-	    let msg = tran.rollbackAndReturn(conn, code, err5, errno);
+		let msg = tran.rollbackAndReturn(conn, code, err5, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
 
@@ -196,7 +196,7 @@ router.post('/update', async function(req, res) {
     if (err6 ) {
         errno = 6;
         code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err6, errno);
+		let msg = tran.rollbackAndReturn(conn, code, err6, errno);
 		return res.status(400).json({ err : errno, msg : msg });
     }
 
@@ -500,7 +500,7 @@ router.post('/create', async function(req, res) {
                 "description"       	: "",
                 "contactPoint"      	: "",
                 "address" : {
-                	"type"          	: "PostalAddress",
+					"type"				: "PostalAddress",
                     "streetAddress" 	: "",
                     "addressLocality"	: "",
                     "addressCountry"	: "",
@@ -575,10 +575,11 @@ router.post('/create', async function(req, res) {
 	}
 
 
-	// 5.
+	// 5.1
 	//
-    let  sql, args, row;
+    let  sql, args, row, org;
 
+/*
 	sql = `
         SELECT
             member_uuid as member_uuid,
@@ -598,12 +599,25 @@ router.post('/create', async function(req, res) {
         WHERE
             member_uuid = ?
     `;
+*/
+	sql = `
+        SELECT
+            member_uuid as member_uuid,
+            membername,
+			organization_uuid,
+            wallet_address
+        FROM
+            members
+        WHERE
+            member_uuid = ?
+    `;
 
      args = [req.session.data.member_uuid];
 
      try {
          row = await db.selectOne(sql, args);
      } catch(err) {
+		console.log("Create Error 5.1");
 		res.json({
 			err : 5,
 			msg : "This member_uuid is not found."
@@ -612,6 +626,38 @@ router.post('/create', async function(req, res) {
 
      }
 
+	// 5.2
+	//
+	sql = `
+        SELECT
+            organization_name,
+            organization_address,
+            organization_building,
+            organization_department,
+            organization_tax_id,
+			organization_postcode,
+            addressCountry,
+            addressRegion,
+            addressCity
+        FROM
+            organizations
+        WHERE
+			organization_uuid = ?
+    `;
+
+     args = [row.organization_uuid];
+
+     try {
+         org = await db.selectOne(sql, args);
+     } catch(err) {
+		console.log("Create Error 5.2");
+		res.json({
+			err : 5,
+			msg : "This organization_uuid is not found."
+		});
+		return;
+
+     }
 
 	// 6.
 	//
@@ -623,6 +669,7 @@ router.post('/create', async function(req, res) {
 	console.log(row);
 
 	seller.id						= row.member_uuid;
+/*
 	seller.name						= row.organization_name;
 	seller.taxId					= row.organization_tax_id;
 	seller.description				= row.organization_department;
@@ -633,6 +680,17 @@ router.post('/create', async function(req, res) {
 	seller.address.addressCountry	= row.addressCountry;
 	seller.address.addressRegion	= row.addressRegion;
 	seller.address.addressCity		= row.addressCity;
+*/
+	seller.name						= org.organization_name;
+	seller.taxId					= org.organization_tax_id;
+	seller.description				= org.organization_department;
+
+	seller.address.streetAddress	= org.organization_building;
+	seller.address.addressLocality	= org.organization_address;
+
+	seller.address.addressCountry	= org.addressCountry;
+	seller.address.addressRegion	= org.addressRegion;
+	seller.address.addressCity		= org.addressCity;
 
 	let ip_address = process.env.SERVER_IP_ADDRESS;
 	let port = process.env.SERVER_PORT || DEFAULT_SERVER_PORT;
@@ -654,6 +712,7 @@ router.post('/create', async function(req, res) {
 
 	// 8.
 	let issuer = document_json.issuer;
+/*
 	issuer.name						=  row.organization_name;
 
 	issuer.address.organizationName	= row.organization_name;
@@ -666,6 +725,18 @@ router.post('/create', async function(req, res) {
 	issuer.address.addressCountry	= row.addressCountry;
 	issuer.address.addressRegion	= row.addressRegion;
 	issuer.address.addressCity		= row.addressCity;
+*/
+	issuer.name						= org.organization_name;
+
+	issuer.address.organizationName	= org.organization_name;
+
+	issuer.address.streetAddress	= org.organization_building;
+	issuer.address.addressLocality	= org.organization_address;
+
+	issuer.address.postalCode		= org.organization_postcode;
+
+	issuer.address.addressCountry	= org.addressCountry;
+	issuer.address.addressRegion	= org.addressRegion;
 
     // 9.
     // begin Transaction
@@ -721,7 +792,7 @@ router.post('/create', async function(req, res) {
 		console.log(err8);
 		errno = 10;
 		code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err10.sqlMessage, errno);
+		let msg = tran.rollbackAndReturn(conn, code, err10.sqlMessage, errno);
 		return res.status(400).json({ err : 9, msg : msg });
 	}
 
@@ -731,7 +802,7 @@ router.post('/create', async function(req, res) {
 		errno = 11;
 		code = 400;
 		const err11 = MESSAGE_AFFECTED_ROWS;
-	    let msg = tran.rollbackAndReturn(conn, code, err11, errno);
+		let msg = tran.rollbackAndReturn(conn, code, err11, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
 
@@ -817,7 +888,7 @@ router.post('/create', async function(req, res) {
 	if (err12) {
 		errno = 12;
 		code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err12, errno);
+		let msg = tran.rollbackAndReturn(conn, code, err12, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
 
@@ -827,19 +898,19 @@ router.post('/create', async function(req, res) {
 		errno = 13;
 		code = 400;
 		const err13 = MESSAGE_AFFECTED_ROWS;
-	    let msg = tran.rollbackAndReturn(conn, code, err13, errno);
+		let msg = tran.rollbackAndReturn(conn, code, err13, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
 
     // 14.
     // commit
     //
-    const [ _14, err14 ] = await tran.commit(conn);
+	const [ _14, err14 ] = await tran.commit(conn);
 
     if (err14 ) {
         errno = 14;
         code = 400;
-	    let msg = tran.rollbackAndReturn(conn, code, err14, errno);
+		let msg = tran.rollbackAndReturn(conn, code, err14, errno);
 		return res.status(400).json({ err : errno, msg : msg });
     }
 

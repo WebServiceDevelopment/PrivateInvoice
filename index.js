@@ -41,7 +41,7 @@ require('dotenv').config()
 const config = require('./config.json');
 const db = require('./database.js');
 
-const netUtil = require('./routes/netUtil.js');
+const netUtil = require('./modules/netUtil.js');
 // Create server
 
 const app = express();

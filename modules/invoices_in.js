@@ -21,12 +21,12 @@
 'use strict'
 
 // Table Name
-const BUYER__DOCUMENT = 'buyer_document'
-const BUYER__STATUS = 'buyer_status'
-const CONTACTS = 'contacts'
+const BUYER__DOCUMENT	= 'buyer_document'
+const BUYER__STATUS		= 'buyer_status'
+const CONTACTS			= 'contacts'
 
-const sub = require('../routes/invoice_sub.js')
-const tran = require('../routes/invoice_sub_transaction.js')
+const sub  				= require('./invoice_sub.js')
+const tran 				= require('./invoice_sub_transaction.js')
 
 const handleIncomingInvoice = async (invoiceCert, res) => {
     //console.log("/buyerToSend");
