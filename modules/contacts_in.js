@@ -143,9 +143,9 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
         ''
     )
     
-	const remote_member_uuid = credential.credentialSubject.id
-    // const remote_member_uuid = credential.issuer.id
+    const remote_member_uuid = credential.issuer.id
     const remote_member_name = credential.issuer.name
+	const remote_wallet_address = credential.credentialSubject.wallet_address
 
     const remote_organization = {
         name: credential.credentialSubject.name,
@@ -168,10 +168,12 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 			remote_origin,
 			remote_member_uuid,
 			remote_membername,
+			remote_wallet_address,
 			remote_organization,
 			local_to_remote,
 			remote_to_local
 		) VALUES (
+			?,
 			?,
 			?,
 			?,
@@ -195,6 +197,7 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
         remote_origin,
         remote_member_uuid,
         remote_member_name,
+		remote_wallet_address,
         JSON.stringify(remote_organization),
         relation.local_to_remote,
         relation.remote_to_local,
@@ -206,9 +209,22 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
         return [null, err]
     }
 
-    // TODO: update use_count on invite table
+	const incrementSql = `
+		UPDATE
+			invite
+		SET
+			use_count = use_count + 1
+		WHERE
+			invite_code = ?
+	`;
 
+	const incrementArgs = [
+		invite_code
+	]
+
+	await db.insert(incrementSql, incrementArgs);
     return [true, null]
+
 }
 
 //------------------------------ define endpoints ------------------------------

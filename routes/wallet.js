@@ -301,7 +301,7 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	const METHOD = '/getCurrentBalanceOfBuyer'
 
 	const { document_uuid } = req.body;
-	const { member_uuid } = req.session.data;
+	const { member_uuid, wallet_address } = req.session.data;
 
     // 1.
     // getSellerUuid
@@ -358,7 +358,7 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	// from_accoun
 	//
 
-	const from_account = process.env.ACCOUNT;
+	const from_account = wallet_address;
 	//console.log("from_account ="+from_account)
 
 	// 6.
