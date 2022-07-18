@@ -30,10 +30,9 @@ module.exports				= router;
 
 const uuidv1				= require('uuid').v1;
 const uuidv4				= require('uuid').v4;
-const axios					= require('axios');
 const moment 				= require('moment');
 
-const { signBusinessCard } = require('./sign_your_credentials.js')
+const { signBusinessCard } = require('../modules/sign_your_credentials.js')
 const { makePresentation } = require('../modules/presentations_out.js')
 const { verifyCredential } = require('../modules/verify_utils.js')
 
@@ -51,13 +50,40 @@ const INVITE_TABLE			= 'invite';
 
 const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 
-	const sql = `
+
+	let sql, args, row, org;
+
+	console.log('sql1')
+
+// 1.
+	sql = `
 		SELECT
 			member_uuid AS member_did,
 			membername AS member_name,
 			job_title AS member_job_title,
 			work_email AS member_contact_email,
-			member_uuid AS organization_did,
+			organization_uuid AS organization_did
+		FROM
+			members
+		WHERE
+			member_uuid = ?
+	`;
+
+	args = [
+		member_did
+	];
+
+	try {
+		row = await db.selectOne(sql, args);
+	} catch(err) {
+		return [ null, err ];
+	}
+
+	console.log('sql2')
+// 2.
+
+	sql = `
+		SELECT
 			organization_name AS organization_name,
 			organization_postcode AS organization_postcode,
 			organization_address AS organization_address_line1,
@@ -68,25 +94,31 @@ const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 			addressRegion AS organization_address_region,
 			addressCity AS organization_address_city
 		FROM
-			members
+			organizations
 		WHERE
-			member_uuid = ?
+			organization_uuid = ?
 	`;
 
-	const args = [
-		member_did
+	args = [
+		row.organization_did
 	];
 
-	let row;
 	try {
-		row = await db.selectOne(sql, args);
+		org = await db.selectOne(sql, args);
 	} catch(err) {
 		return [ null, err ];
 	}
 
+	console.log('timestamp')
+
+// 3.
 	const timestamp = moment().toJSON()
 	const issuanceDate = timestamp.split('.').shift() + 'Z';
 	const { controller } = keyPair;
+
+//4.
+
+	console.log('json')
 
 	const credential = {
 		'@context': [
@@ -108,7 +140,6 @@ const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 		],
 		issuanceDate: issuanceDate,
 		issuer : {
-			// id: req.session.data.member_uuid,
 			id: controller,
 			type: 'Person',
 			name: row.member_name,
@@ -118,19 +149,19 @@ const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 		credentialSubject : {
 			id: row.organization_did,
 			type: 'Organization',
-			name: row.organization_name,
+			name: org.organization_name,
 			contactPoint: `${row.member_name}@${req.headers.host}`,
-			department: row.organization_department,
+			department: org.organization_department,
 			address : {
 				type: 'PostalAddress',
-				postalCode: row.organization_postcode,
-				addressLocality: row.organization_address_city,
-				addressRegion: row.organization_address_region,
-				streetAddress: row.organization_address_line1,
-				crossStreet: row.organization_address_line2,
-				addressCountry: row.organization_address_country
+				postalCode: org.organization_postcode,
+				addressLocality: org.organization_address_city,
+				addressRegion: org.organization_address_region,
+				streetAddress: org.organization_address_line1,
+				crossStreet: org.organization_address_line2,
+				addressCountry: org.organization_address_country
 			},
-			taxId: row.organization_tax_id
+			taxId: org.organization_tax_id
 		}
 	}
 
@@ -387,6 +418,7 @@ router.post('/generate', async function(req, res) {
 
 	const invite_code = uuidv4();
 
+/*
 	const args = [
 		invite_code,
 		req.session.data.member_uuid,
@@ -395,11 +427,24 @@ router.post('/generate', async function(req, res) {
 		req.body.uses,
 		req.body.expire
 	];
+*/
+	const args = [
+		invite_code,
+		req.session.data.member_uuid,
+		body.buyer,
+		body.seller,
+		body.uses,
+		body.expire
+	];
 
 	try {
 		await db.insert(sql, args)
 	} catch(err) {
-		throw err;
+		//throw err;
+		return res.json({
+			err: 3,
+			msg: 'could not insert INVITE_TABLE.'
+		});
 	}
 
 	console.log(req.session.data.member_uuid);
@@ -515,7 +560,7 @@ router.post('/add', async function(req, res) {
 	
 	if( local_member_uuid === remote_member_uuid) {
 		return res.json({
-		    err: 0,
+			err: 0,
 			msg : 'okay'
 		});
 	}

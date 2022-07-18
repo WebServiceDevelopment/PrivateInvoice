@@ -19,7 +19,7 @@
 **/
 
 //
-const to_seller					= require("./buyer_to_seller.js");
+const to_seller					= require("../modules/buyer_to_seller.js");
 
 const Tx                        = require('ethereumjs-tx').Transaction;
 

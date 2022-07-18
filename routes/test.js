@@ -29,8 +29,8 @@ module.exports					= router;
 // Import Libraries
 
 const axios						= require('axios');
-const db			 				= require('../database.js');
-const { signPresentation } = require('./sign_your_credentials.js');
+const db			 			= require('../database.js');
+const { signPresentation }		= require('../modules/sign_your_credentials.js');
 
 // Helper functions
 

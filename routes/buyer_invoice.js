@@ -21,12 +21,13 @@
 "use strict";
 
 // Import sub
-const sub						= require("./invoice_sub.js");
-const eth						= require("./web3_eth.js");
-const to_seller					= require("./buyer_to_seller.js");
-const tran					  = require("./invoice_sub_transaction.js");
+const sub						= require("../modules/invoice_sub.js");
+const tran					    = require("../modules/invoice_sub_transaction.js");
+const to_seller					= require("../modules/buyer_to_seller.js");
+const eth						= require("../modules/web3_eth.js");
+
 const Tx						= require('ethereumjs-tx').Transaction;
-const util						= require("./util.js");
+const util						= require("../modules/util.js");
 
 // Import Router
 
@@ -807,7 +808,7 @@ router.post('/makePayment', async function(req, res) {
 
 
 	// IP ADDRESS OF IPFS SERVER
-	const ipfs_address = config.IPFS_ADDRESS;
+	const ipfs_address = process.env.IPFS_ADDRESS;
 
 	//console.log("/makePayment accepted");
 

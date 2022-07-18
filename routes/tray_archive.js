@@ -21,7 +21,7 @@
 "use strict";
 
 // Inport
-const sub					= require("./tray_sub.js");
+const sub					= require("../modules/tray_sub.js");
 
 // Import Router
 

@@ -21,9 +21,9 @@
 "use strict";
 
 // Import sub
-const sub						= require("./invoice_sub.js");
-const to_buyer					= require("./seller_to_buyer.js");
-const tran				  		= require("./invoice_sub_transaction.js");
+const sub						= require("../modules/invoice_sub.js");
+const tran				  		= require("../modules/invoice_sub_transaction.js");
+const to_buyer					= require("../modules/seller_to_buyer.js");
 
 // Import Router
 const express					= require('express');
@@ -46,8 +46,8 @@ const CONTACTS					= "contacts"
 // Import Sign
 
 const db = require("../database.js");
-const sign_your_credentials = require("./sign_your_credentials.js");
-const { makePresentation } = require("../modules/presentations_out.js");
+const sign_your_credentials = require("../modules/sign_your_credentials.js");
+const { makePresentation }  = require("../modules/presentations_out.js");
 const {
     createArchiveMessage,
 } = require("../modules/update_status.js");
