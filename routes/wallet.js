@@ -241,26 +241,26 @@ router.post('/getResentActivityOfWallet', async function(req, res) {
  * getWalletInfo
  */
 
+
+
 router.post('/getWalletInfo', async function(req, res) {
 
-	const { member_uuid } = req.session.data;
+	const { wallet_address, member_uuid } = req.session.data;
 	
-
 	// 1.
 	// 
-	//
+	
 	//console.log("NetworkType="+await web3.eth.net.getNetworkType())
 	//console.log("Chain id="+await web3.eth.getChainId())
 
 	const type = await web3.eth.net.getNetworkType();
 	const id = await web3.eth.getChainId();
-	const account = process.env.ACCOUNT;
+	const account = wallet_address;
 
     // 2.
     // getBalance
-    //
-	const from_account = process.env.ACCOUNT;
-
+	
+	const from_account = wallet_address;
     const [ balanceWei, err2 ] = await  eth.getBalance(web3, from_account) ;
 
     if(err2) {
