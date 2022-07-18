@@ -62,7 +62,8 @@ const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 			membername AS member_name,
 			job_title AS member_job_title,
 			work_email AS member_contact_email,
-			organization_uuid AS organization_did
+			organization_uuid AS organization_did,
+			wallet_address
 		FROM
 			members
 		WHERE
@@ -161,6 +162,7 @@ const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 				crossStreet: org.organization_address_line2,
 				addressCountry: org.organization_address_country
 			},
+			wallet_address: row.wallet_address,
 			taxId: org.organization_tax_id
 		}
 	}
@@ -252,6 +254,7 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 	const remote_origin = link.target.replace('/api/presentations/available', '');
 	const remote_member_uuid = credential.issuer.id;
 	const remote_member_name = credential.issuer.name;
+	const remote_wallet_address = credential.credentialSubject.wallet_address
 
 	const remote_organization = {
 		name: credential.credentialSubject.name,
@@ -274,10 +277,12 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 			remote_origin,
 			remote_member_uuid,
 			remote_membername,
+			remote_wallet_address,
 			remote_organization,
 			local_to_remote,
 			remote_to_local
 		) VALUES (
+			?,
 			?,
 			?,
 			?,
@@ -301,6 +306,7 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 		remote_origin,
 		remote_member_uuid,
 		remote_member_name,
+		remote_wallet_address,
 		JSON.stringify(remote_organization),
 		relation.local_to_remote,
 		relation.remote_to_local
@@ -311,8 +317,6 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 	} catch(err) {
 		return [ null, err ];
 	}
-
-	// TODO: update use_count on invite table
 
 	return [ true, null ];
 

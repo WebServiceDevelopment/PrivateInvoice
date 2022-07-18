@@ -49,7 +49,6 @@ const {
 //  web3.js
 
 const web3						= eth.getWeb3();
-
 web3.eth.transactionConfirmationBlocks = 2;
 
 // Libraries
@@ -59,12 +58,82 @@ const Ipfs_Http_Client		  = ipfs_http_client.create('http://192.168.1.127:5001')
 
 // Database
 
+const db                    = require('../database.js');
 const config					= require('../config.json');
 
 const BUYER_STATUS				= "buyer_status";
 const BUYER_DOCUMENT			= "buyer_document";
 
 const CONTACTS					= "contacts";
+
+// Helper function
+
+const getPrivateKey = async(member_uuid) => {
+
+	const sql = `
+		SELECT
+			wallet_private_key
+		FROM
+			members
+		WHERE
+			member_uuid = ?
+	`;
+
+	const args = [
+		member_uuid
+	];
+
+	let row;
+	try {
+		row = await db.selectOne(sql, args);
+	} catch(err) {
+		throw err;
+	}
+
+	console.log(row.wallet_private_key);
+	const buffer = Buffer.from(row.wallet_private_key.substring(2), 'hex');
+	console.log(buffer);
+	console.log(buffer.length);
+	const privatekey = new Uint8Array(buffer);
+	console.log(privatekey);
+
+	return privatekey;
+
+}
+
+const getSellerAddress = async(seller_uuid, member_uuid) => {
+
+	const sql = `
+		SELECT
+			remote_wallet_address
+		FROM
+			contacts
+		WHERE
+			local_member_uuid = ?
+		AND
+			remote_member_uuid = ?
+	`;
+
+
+	const args = [
+		member_uuid,
+		seller_uuid
+	]
+	
+	console.log(args);
+
+	let row
+	try {
+		row = await db.selectOne(sql, args);
+	} catch(err) {
+		throw err;
+	}
+
+	console.log(row);
+
+	return row.remote_wallet_address;
+
+}
 
 // ------------------------------- End Points -------------------------------
 
@@ -592,7 +661,8 @@ router.post('/makePayment', async function(req, res) {
 	// contract_address 
 	//
 
-	const contract_address = process.env.ACCOUNT;
+	const { wallet_address } = req.session.data;
+	const contract_address = wallet_address;
 
 	//console.log("contract_address ="+contract_address)
 
@@ -603,9 +673,7 @@ router.post('/makePayment', async function(req, res) {
 
 	if( err9 ) {
 		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
-
 		console.log("error 9: getBalance");
-
 		return res.status(400).json(err9);
 		return;
 	}
@@ -613,7 +681,10 @@ router.post('/makePayment', async function(req, res) {
 
 	// 10.
 	// Get seller account
-	//
+	
+	const to_address = await getSellerAddress(seller_uuid, member_uuid);
+	
+	/*
 	const [status10, data10] = await to_seller.getAccountOfSellerWallet(seller_host, seller_uuid, member_uuid) ;
 
 	if(status10 != 200) {
@@ -625,10 +696,10 @@ router.post('/makePayment', async function(req, res) {
 	}
 
 	const msg = (data10.msg);
-
 	const to_address = msg.account;
+	*/
 
-	//console.log("to_address="+to_address);
+	console.log("to_address="+to_address);
 
 
 	// 11.
@@ -663,9 +734,10 @@ router.post('/makePayment', async function(req, res) {
 
 	// 13. 
 	// privateKey.
-	//
-	const PrivateKey = process.env.PRIVATE_KEY;
+	
 
+	// const PrivateKey = process.env.PRIVATE_KEY;
+	const PrivateKey = await getPrivateKey(member_uuid);
 
 	// 14. 
 	// sendTransaction
