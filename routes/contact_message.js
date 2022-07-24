@@ -55,7 +55,7 @@ const checkInviteCodeValid = async(local_uuid, invite_code) => {
 		FROM
 			invite
 		WHERE
-			local_member_uuid = ?
+			local_member_did = ?
 		AND
 			invite_code = ?
 	`;
@@ -91,9 +91,9 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 		FROM
 			contacts
 		WHERE
-			local_member_uuid = ?
+			local_member_did = ?
 		AND
-			remote_member_uuid = ?
+			remote_member_did = ?
 		AND
 			removed_on IS NULL
 	`;
@@ -112,7 +112,7 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 /*
  * insertNewContact
  */
-const insertNewContact = async (invite_code, local_member_uuid, credential) => {
+const insertNewContact = async (invite_code, local_member_did, credential) => {
 
 	// Get local username
 
@@ -122,11 +122,11 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 		FROM
 			members
 		WHERE
-			member_uuid = ?
+			member_did = ?
 	`;
 
 	const myArgs = [
-		local_member_uuid
+		local_member_did
 	];
 
 	let row;
@@ -163,7 +163,7 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 	}
 
 	const remote_origin = link.target.replace('/presentations/available', '')
-	const remote_member_uuid = credential.issuer.id;
+	const remote_member_did = credential.issuer.id;
 	const remote_member_name = credential.issuer.name;
 
 	const remote_organization = {
@@ -182,10 +182,10 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 		INSERT INTO contacts (
 			_id,
 			invite_code,
-			local_member_uuid,
+			local_member_did,
 			local_membername,
 			remote_origin,
-			remote_member_uuid,
+			remote_member_did,
 			remote_membername,
 			remote_organization,
 			local_to_remote,
@@ -209,10 +209,10 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 	const args = [
 		_id,
 		invite_code,
-		local_member_uuid,
+		local_member_did,
 		local_member_name,
 		remote_origin,
-		remote_member_uuid,
+		remote_member_did,
 		remote_member_name,
 		JSON.stringify(remote_organization),
 		relation.local_to_remote,
@@ -248,24 +248,24 @@ router.all('/contactRequest', async(req, res) => {
 	const [ linkRelationship ] = body.relatedLink.filter( (link) => {
 		return link.linkRelationship === 'Invite';
 	});
-	const local_member_uuid = linkRelationship.target;
+	const local_member_did = linkRelationship.target;
 
-	const [ invite, inviteEr ] = await checkInviteCodeValid(local_member_uuid, invite_code);
+	const [ invite, inviteEr ] = await checkInviteCodeValid(local_member_did, invite_code);
 	if(inviteEr) {
 		return res.status(400).end(inviteEr.toString());
 	}
 
 	// Then we see if the contact already exists
 	
-	const remote_member_uuid = body.issuer.id;
-	const exists = await checkForExistingContact(local_member_uuid, remote_member_uuid);
+	const remote_member_did = body.issuer.id;
+	const exists = await checkForExistingContact(local_member_did, remote_member_did);
 	if(exists) {
 		return res.status(400).end('Contact already exists');
 	}
 
 	// Then we try to insert the contact
 	
-	const [ created, createErr ] = await insertNewContact(invite_code, local_member_uuid, body);
+	const [ created, createErr ] = await insertNewContact(invite_code, local_member_did, body);
 	if(createErr) {
 		return res.status(400).end(creatErr.toString());
 	}

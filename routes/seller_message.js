@@ -65,11 +65,11 @@ function check_ipadder (req_ip , seller_host) {
  */
 router.post('/tellMeYourWalletAccount', async function(req, res) {
 
-    const { seller_uuid, buyer_uuid } = req.body;
+    const { seller_did, buyer_did } = req.body;
 
     // 1.
     //
-    const [ seller_host, err1 ] = await sub.getBuyerHost(CONTACTS, seller_uuid, buyer_uuid);
+    const [ seller_host, err1 ] = await sub.getBuyerHost(CONTACTS, seller_did, buyer_did);
     if(err1) {
         console.log("Error 1 status = 400 err="+err1);
         return res.status(400).end(err1);
@@ -100,11 +100,11 @@ router.post('/tellMeYourWalletAccount', async function(req, res) {
  */
 router.post('/sellerToConnect', async (req, res) => {
 
-	const { document_uuid, buyer_uuid } = req.body;
+	const { document_uuid, buyer_did } = req.body;
 
 	// 1.
 	//
-	const [ seller_host, err1 ] = await sub.getSellerHost(CONTACTS, document_uuid, buyer_uuid);
+	const [ seller_host, err1 ] = await sub.getSellerHost(CONTACTS, document_uuid, buyer_did);
 
 	if(err1) {
 		console.log(err1);
@@ -131,10 +131,10 @@ router.post('/sellerToConnect', async (req, res) => {
  */
 router.post('/sellerToConfirm', async (req, res) => {
 
-	const { document_uuid, buyer_uuid } = req.body;
+	const { document_uuid, buyer_did } = req.body;
 
 
-	const [ _, err] = await sub.setConfirm(SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _, err] = await sub.setConfirm(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
 		console.log(err);
@@ -152,10 +152,10 @@ router.post('/sellerToConfirm', async (req, res) => {
  */
 router.post('/sellerToUnconfirm', async (req, res) => {
 
-	const { document_uuid, buyer_uuid } = req.body;
+	const { document_uuid, buyer_did } = req.body;
 
 
-	const [ _, err] = await sub.setUnconfirm(SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _, err] = await sub.setUnconfirm(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
 		console.log(err);
@@ -172,10 +172,10 @@ router.post('/sellerToUnconfirm', async (req, res) => {
  */
 router.post('/sellerToReturn', async (req, res) => {
 
-	const { document_uuid, buyer_uuid } = req.body;
+	const { document_uuid, buyer_did } = req.body;
 
 
-	const [_, err] = await sub.setReturn(SELLER_STATUS, document_uuid, buyer_uuid);
+	const [_, err] = await sub.setReturn(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
 		console.log(err);
@@ -193,7 +193,7 @@ router.post('/sellerToReturn', async (req, res) => {
  */
 router.post('/sellerToMakePayment', async (req, res) => {
 
-	const { document_uuid, buyer_uuid , hash} = req.body;
+	const { document_uuid, buyer_did , hash} = req.body;
 
 	// 1.
 	// Check the transaction receipt.
@@ -235,12 +235,6 @@ router.post('/sellerToMakePayment', async (req, res) => {
 
 	let wk = '0';
 	if( totalPaymentDue != null && totalPaymentDue.price != null) {
-/*
-		if( totalPaymentDue.price.indexOf(" ") !== -1) {
-			wk =  totalPaymentDue.price.split(" ")[0]
-			wk = wk.replace(/,/g,'');
-		}
-*/
 		wk = totalPaymentDue.price;
 	}
 	const total = web3.utils.toWei(wk , 'Gwei');
@@ -270,7 +264,7 @@ router.post('/sellerToMakePayment', async (req, res) => {
 	
 	// 6.
 	//
-	const [ _6, err6] = await tran.setMakePayment_status(conn, SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _6, err6] = await tran.setMakePayment_status(conn, SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err6) {
 		console.log(err6);
@@ -316,10 +310,10 @@ router.post('/sellerToMakePayment', async (req, res) => {
  */
 router.post('/sellerToPaymentReservation', async (req, res) => {
 
-	const { document_uuid, buyer_uuid } = req.body;
+	const { document_uuid, buyer_did } = req.body;
 
 
-	const [ _, err] = await sub.setPaymentReservation(SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _, err] = await sub.setPaymentReservation(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
 		console.log(err);
@@ -336,10 +330,10 @@ router.post('/sellerToPaymentReservation', async (req, res) => {
  */
 router.post('/sellerToCancelPaymentReservation', async (req, res) => {
 
-	const { document_uuid, buyer_uuid } = req.body;
+	const { document_uuid, buyer_did } = req.body;
 
 
-	const [ _, err] = await sub.resetPaymentReservation(SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _, err] = await sub.resetPaymentReservation(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
 		console.log(err);
@@ -356,10 +350,10 @@ router.post('/sellerToCancelPaymentReservation', async (req, res) => {
  */
 router.post('/sellerRollbackReturnToSent', async (req, res) => {
 
-	const { document_uuid, buyer_uuid } = req.body;
+	const { document_uuid, buyer_did } = req.body;
 
 
-	const [ _, err] = await sub.rollbackReturnToSent(SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _, err] = await sub.rollbackReturnToSent(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
 		console.log(err);
@@ -376,10 +370,10 @@ router.post('/sellerRollbackReturnToSent', async (req, res) => {
  */
 router.post('/sellerRollbackConfirmToSent', async (req, res) => {
 
-	const { document_uuid, buyer_uuid } = req.body;
+	const { document_uuid, buyer_did } = req.body;
 
 
-	const [ _, err] = await sub.rollbackConfirmToSent(SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _, err] = await sub.rollbackConfirmToSent(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
 		console.log(err);
@@ -397,10 +391,10 @@ router.post('/sellerRollbackConfirmToSent', async (req, res) => {
  */
 router.post('/sellerRollbackSentToConfirm', async (req, res) => {
 
-	const { document_uuid, buyer_uuid } = req.body;
+	const { document_uuid, buyer_did } = req.body;
 
 
-	const [ _, err] = await sub.rollbackSentToConfirm(SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _, err] = await sub.rollbackSentToConfirm(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
 		console.log(err);
@@ -417,10 +411,10 @@ router.post('/sellerRollbackSentToConfirm', async (req, res) => {
  */
 router.post('/sellerRollbackPaidToConfirm', async (req, res) => {
 
-	const { document_uuid, buyer_uuid } = req.body;
+	const { document_uuid, buyer_did } = req.body;
 
 
-	const [ _, err] = await sub.rollbackPaidToConfirm(SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _, err] = await sub.rollbackPaidToConfirm(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
 		console.log(err);

@@ -169,8 +169,8 @@ router.post('/trashDraft', async function(req, res) {
 	//old_status.seller_archived  = 1;
 	//old_status.buyer_archived  = 1;
 
-	// Because SELLER_ARCHIVE_DOCUMEN buyer_uuid do not accept null.
-	old_status.buyer_uuid  = "";
+	// Because SELLER_ARCHIVE_DOCUMEN buyer_did do not accept null.
+	old_status.buyer_did  = "";
 
 	// 8.
 	//
@@ -249,14 +249,14 @@ router.post('/trash', async function(req, res) {
 	let start = Date.now();
 
 	const { document_uuid } = req.body;
-	const { member_uuid } = req.session.data;
+	const { member_did } = req.session.data;
 
 	const USE_PRESENTATION = true;
 
 	let err , errno, code;
 
 	// 1.
-	const [ buyer_uuid, err1 ] = await sub.getBuyerUuid(SELLER_STATUS, document_uuid, member_uuid);
+	const [ buyer_did, err1 ] = await sub.getBuyerDid(SELLER_STATUS, document_uuid, member_did);
 	if(err1) {
 		console.log("Error 1 status = 400 err="+err1);
 
@@ -264,7 +264,7 @@ router.post('/trash', async function(req, res) {
 	}
 
 	// 2
-	const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_uuid, buyer_uuid);
+	const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_did, buyer_did);
 	if(err2) {
 		console.log("Error 2 status = 400 err="+err2);
 		return res.status(400).end(err2);
@@ -272,8 +272,10 @@ router.post('/trash', async function(req, res) {
 
 	//3. buyer connect check
 	
-	if(!USE_PRESENTATION) {
-		const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
+/*
+*	if(!USE_PRESENTATION) {
+*/
+		const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
 		if(code3 !== 200) {
 			let msg;
 			if(code == 500) {
@@ -290,7 +292,9 @@ router.post('/trash', async function(req, res) {
 			}
 			return res.status(400).json(msg);
 		}
-	}
+/*
+*	}
+*/
 
 	// 4.
 	// STATUS
@@ -398,7 +402,7 @@ router.post('/trash', async function(req, res) {
 	//
 	
 	if(!USE_PRESENTATION) {
-		const [ code14, err14 ] = await to_buyer.trash(buyer_host, old_status.document_uuid, old_status.seller_uuid);
+		const [ code14, err14 ] = await to_buyer.trash(buyer_host, old_status.document_uuid, old_status.seller_did);
 
 		if(code14 !== 200) {
 			errno = 14;
@@ -407,13 +411,13 @@ router.post('/trash', async function(req, res) {
 
 	} else {
 
-		const [keyPair, err] = await getPrivateKeys(member_uuid);
+		const [keyPair, err] = await getPrivateKeys(member_did);
 		if(err) {
 			throw err;
 		}
 
 		const url = `${buyer_host}/api/presentations/available`
-		const credential = await createTrashMessage(document_uuid,member_uuid, keyPair);
+		const credential = await createTrashMessage(document_uuid,member_did, keyPair);
 		const [ sent, err14 ] = await makePresentation(url, keyPair, credential);
 		if(err14) {
 			return res.status(400).json(tran.rollbackAndReturn(conn, 'code14', err14, 14));

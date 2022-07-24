@@ -71,20 +71,20 @@ const { getPrivateKeys } = require('../modules/verify_utils.js');
  * send
  */
 
-router.post("/send", async function (req, res) {
+router.post("/sendInvoice", async function (req, res) {
 	const start = Date.now();
 
 	const { document_uuid } = req.body;
-	const { member_uuid } = req.session.data;
+	const { member_did } = req.session.data;
 
 	let code, errno;
 	const USE_PRESENTATION = true;
 
 	// 1.
-	const [buyer_uuid, err1] = await sub.getBuyerUuidForDraft(
+	const [buyer_did, err1] = await sub.getBuyerDidForDraft(
 		SELLER_DRAFT_STATUS,
 		document_uuid,
-		member_uuid
+		member_did
 	);
 	if (err1) {
 		console.log(
@@ -93,32 +93,38 @@ router.post("/send", async function (req, res) {
 				":" +
 				document_uuid +
 				":" +
-				member_uuid
+				member_did
 		);
 
 		return res.status(400).json(err1);
 	}
-	if (buyer_uuid == null) {
-		console.log("Error 1.2 :" + document_uuid + ":" + member_uuid);
-		return res.status(400).json({ err: 1, msg: "buyer_uuid is not found" });
+	if (buyer_did == null) {
+		console.log("Error 1.2 :" + document_uuid + ":" + member_did);
+		return res
+				.status(400)
+				.json({ err: 1, msg: "buyer_did is not found" });
 	}
 
 	// 2.
 	const [buyer_host, err2] = await sub.getBuyerHost(
 		CONTACTS,
-		member_uuid,
-		buyer_uuid
+		member_did,
+		buyer_did
 	);
 	if (err2) {
 		console.log(
-			"Error 2 status = 400 err=" + err2 + ":" + member_uuid + ":" + buyer_uuid
+			"Error 2 status = 400 err=" + err2 + ":" + member_did + ":" + buyer_did
 		);
-		return res.status(400).json(err2);
+		return res
+			.status(400)
+			.json(err2);
 	}
 
-	if(!USE_PRESENTATION) {
+/*
+*	if(!USE_PRESENTATION) {
+*/
 		//3. buyer connect check
-		const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
+		const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
 
 		if(code3 !== 200) {
 			console.log("Error 3 code="+code3+":err="+err3);
@@ -137,7 +143,9 @@ router.post("/send", async function (req, res) {
 			}
 			return res.status(400).json(msg);
 		}
-	}
+/*
+*	}
+*/
 
 	// 4.
 	// DRAFT_STATUS
@@ -174,14 +182,14 @@ router.post("/send", async function (req, res) {
 		return;
 	}
 
-	document.seller_uuid = member_uuid;
-	document.buyer_uuid = buyer_uuid;
+	document.seller_did = member_did;
+	document.buyer_did = buyer_did;
 
 	// 7.
 	// signInvoice
 	//
 
-	const [ keyPair ] = await getPrivateKeys(member_uuid);
+	const [ keyPair ] = await getPrivateKeys(member_did);
 	const signedCredential = await sign_your_credentials.signInvoice(
 		document.document_uuid,
 		document.document_json,
@@ -205,7 +213,9 @@ router.post("/send", async function (req, res) {
 	if (err8) {
 		errno = 8;
 		console.log("Error: " + errno);
-		return res.status(400).json({ err: errno, msg: err8 });
+		return res
+			.status(400)
+			.json({ err: errno, msg: err8 });
 	}
 
 	// 9.
@@ -215,7 +225,9 @@ router.post("/send", async function (req, res) {
 	if (err9) {
 		errno = 9;
 		console.log("Error: " + errno);
-		return res.status(400).json({ err: errno, msg: err9 });
+		return res
+			.status(400)
+			.json({ err: errno, msg: err9 });
 	}
 
 	// 10.
@@ -289,23 +301,16 @@ router.post("/send", async function (req, res) {
 	// 15.
 	// Send 'send' message to buyer.
 	
-	if(!USE_PRESENTATION) {
-		const [ code15, err15 ] = await to_buyer.sendInvoice(buyer_host, document, status);
-		if(parseInt(code15) !== 200) {
-			errno = 15;
-			return res.status(400).json(tran.rollbackAndReturn(conn, code15, err15, errno));
-		}
+	const presenationSlug = "/api/presentations/available";
+	const url = buyer_host + presenationSlug;
 
-	} else {
-		const presenationSlug = "/api/presentations/available";
-		const url = buyer_host + presenationSlug;
-
-		const vc = JSON.parse(document.document_json);
-		const [ code15, err15 ] = await makePresentation(url, keyPair, vc);
+	const vc = JSON.parse(document.document_json);
+	const [ code15, err15 ] = await makePresentation(url, keyPair, vc);
 		
-		if (err15) {
-			return res.status(400).json(tran.rollbackAndReturn(conn, code15, 15, errno));
-		}
+	if (err15) {
+		return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code15, 15, errno));
 	}
 
 	// 16.
@@ -346,7 +351,7 @@ router.post("/recreate", async function (req, res) {
 	let start = Date.now();
 
 	const { document_uuid } = req.body;
-	const { member_uuid } = req.session.data;
+	const { member_did } = req.session.data;
 
 	let errno, code;
 	let status, document;
@@ -354,10 +359,10 @@ router.post("/recreate", async function (req, res) {
 
 	// 1.
 	//
-	const [buyer_uuid, err1] = await sub.getBuyerUuid(
+	const [buyer_did, err1] = await sub.getBuyerDid(
 		SELLER_STATUS,
 		document_uuid,
-		member_uuid
+		member_did
 	);
 	if (err1) {
 		console.log("Error 1.1 status = 400 err=" + err1);
@@ -369,8 +374,8 @@ router.post("/recreate", async function (req, res) {
 	//
 	const [buyer_host, err2] = await sub.getBuyerHost(
 		CONTACTS,
-		member_uuid,
-		buyer_uuid
+		member_did,
+		buyer_did
 	);
 	if (err2) {
 		console.log("Error 1.2 status = 400 err=" + err2);
@@ -383,8 +388,8 @@ router.post("/recreate", async function (req, res) {
 	if(!USE_PRESENTATION) {
 		const [code3, err3] = await to_buyer.connect(
 			buyer_host,
-			member_uuid,
-			buyer_uuid
+			member_did,
+			buyer_did
 		);
 
 		if (code3 !== 200) {
@@ -502,9 +507,9 @@ router.post("/recreate", async function (req, res) {
 	};
 	document.currency_options = JSON.stringify(currency_options);
 
-	// 7.6 seller_uuid
+	// 7.6 seller_did
 	//
-	document.seller_uuid = old_status.seller_uuid;
+	document.seller_did = old_status.seller_did;
 
 	// 7.7 seller_details
 	//
@@ -527,9 +532,9 @@ router.post("/recreate", async function (req, res) {
 		document_json.credentialSubject.seller.contactPoint.split("@")[0];
 	document.seller_membername = seller_membername;
 
-	// 7.9 buyer_uuid
+	// 7.9 buyer_did
 	//
-	document.buyer_uuid = old_status.buyer_uuid;
+	document.buyer_did = old_status.buyer_did;
 
 	// 7.10 buyer_details
 	//
@@ -743,37 +748,21 @@ router.post("/recreate", async function (req, res) {
 	// 17.
 	// Send 'recreate' message to buyer.
 	//
+    // Get private keys to sign credential
 
-	if(!USE_PRESENTATION) {
-		const [code17, err17] = await to_buyer.recreate(
-			buyer_host,
-			old_status.document_uuid,
-			old_status.seller_uuid
-		);
+    const [keyPair, err] = await getPrivateKeys(member_did);
+    if(err) {
+        throw err;
+    }
 
-		if (parseInt(code17) !== 200) {
-			errno = 17;
-			return res
-				.status(400)
-				.json(tran.rollbackAndReturn(conn, code17, err17, errno));
-		}
-	} else {
-
-        // Get private keys to sign credential
-
-        const [keyPair, err] = await getPrivateKeys(member_uuid);
-        if(err) {
-            throw err;
-        }
-
-        const url = `${buyer_host}/api/presentations/available`
-        const credential = await createRecreateMessage(document_uuid,member_uuid, keyPair);
-        const [ sent, err17 ] = await makePresentation(url, keyPair, credential);
-        if(err17) {
-            return res.status(400).json(tran.rollbackAndReturn(conn, 'code17', err17, 17));
-        }
-
-	}
+    const url = `${buyer_host}/api/presentations/available`
+    const credential = await createRecreateMessage(document_uuid,member_did, keyPair);
+    const [ sent, err17 ] = await makePresentation(url, keyPair, credential);
+    if(err17) {
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, 'code17', err17, 17));
+    }
 
 	// 18.
 	// commit
@@ -812,45 +801,51 @@ router.post("/withdraw", async function (req, res) {
 	let start = Date.now();
 
 	const { document_uuid, document_folder } = req.body;
-	const { member_uuid } = req.session.data;
+	const { member_did } = req.session.data;
 
 	const USE_PRESENTATION = true;
 	let errno, code;
 
 	// 1.
 	//
-	const [buyer_uuid, err1] = await sub.getBuyerUuid(
+	const [buyer_did, err1] = await sub.getBuyerDid(
 		SELLER_STATUS,
 		document_uuid,
-		member_uuid
+		member_did
 	);
 
 	if (err1) {
 		console.log("Error 1 status = 400 err=" + err1);
 
-		return res.status(400).json(err1);
+		return res
+			.status(400)
+			.json(err1);
 	}
 
 	// 2.
 	const [buyer_host, err2] = await sub.getBuyerHost(
 		CONTACTS,
-		member_uuid,
-		buyer_uuid
+		member_did,
+		buyer_did
 	);
 
 	if (err2) {
 		console.log("Error 2 status = 400 err=" + err2);
-		return res.status(400).json(err2);
+		return res
+			.status(400)
+			.json(err2);
 	}
 
 	//3. buyer connect check
 	
-	if(!USE_PRESENTATION) {
+/*
+*	if(!USE_PRESENTATION) {
+*/
 
 		const [code3, err3] = await to_buyer.connect(
 			buyer_host,
-			member_uuid,
-			buyer_uuid
+			member_did,
+			buyer_did
 		);
 
 		if (code3 !== 200) {
@@ -868,10 +863,14 @@ router.post("/withdraw", async function (req, res) {
 						break;
 				}
 			}
-			return res.status(400).json(msg);
+			return res
+				.status(400)
+				.json(msg);
 		}
 
-	}
+/*
+*	}
+*/
 
 	// 4
 	// STATUS
@@ -897,7 +896,9 @@ router.post("/withdraw", async function (req, res) {
 	if (err5) {
 		console.log("Error 5 status = 400 code=" + err5);
 		errno = 5;
-		return res.status(400).json({ err: err5, code: errno });
+		return res
+			.status(400)
+			.json({ err: err5, code: errno });
 	}
 
 	// 6.
@@ -908,7 +909,9 @@ router.post("/withdraw", async function (req, res) {
 	if (err6) {
 		console.log("Error 6 status = 400 code=" + err6);
 		errno = 6;
-		return res.status(400).json({ err: err6, code: errno });
+		return res
+			.status(400)
+			.json({ err: err6, code: errno });
 	}
 
 	// 7.
@@ -925,7 +928,7 @@ router.post("/withdraw", async function (req, res) {
 		conn,
 		SELLER_STATUS,
 		document_uuid,
-		member_uuid,
+		member_did,
 		document_folder
 	);
 
@@ -941,41 +944,21 @@ router.post("/withdraw", async function (req, res) {
 	// 9.
 	// Send 'withdraw" message to buyer.
 	//
+    // Get private keys to sign credential
 
-	if(!USE_PRESENTATION) {
+    const [keyPair, err] = await getPrivateKeys(member_did);
+    if(err) {
+        throw err;
+    }
 
-		const [code9, err9] = await to_buyer.withdraw(
-			buyer_host,
-			old_status.document_uuid,
-			old_status.buyer_uuid,
-			document_folder
-		);
-
-		if (code9 !== 200) {
-			console.log("Error 9 status = 400 code=" + err9);
-			errno = 9;
-			return res
-				.status(400)
-				.json(tran.rollbackAndReturn(conn, code9, err9, errno));
-		}
-
-	} else {
-
-        // Get private keys to sign credential
-
-        const [keyPair, err] = await getPrivateKeys(member_uuid);
-        if(err) {
-            throw err;
-        }
-
-        const url = `${buyer_host}/api/presentations/available`
-        const credential = await createWithdrawMessage(document_uuid,member_uuid, keyPair);
-        const [ sent, err9 ] = await makePresentation(url, keyPair, credential);
-        if(err9) {
-            return res.status(400).json(tran.rollbackAndReturn(conn, 'code9', err9, 9));
-        }
-
-	}
+    const url = `${buyer_host}/api/presentations/available`
+    const credential = await createWithdrawMessage(document_uuid,member_did, keyPair);
+    const [ sent, err9 ] = await makePresentation(url, keyPair, credential);
+    if(err9) {
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, 'code9', err9, 9));
+    }
 
 	// 10
 	// commit
@@ -992,21 +975,23 @@ router.post("/withdraw", async function (req, res) {
 		//
 		const [seller_host, err11] = await sub.getSellerHost(
 			CONTACTS,
-			member_uuid,
-			buyer_uuid
+			member_did,
+			buyer_did
 		);
 
 		if (err11) {
 			console.log("Error 11 status = 400 err=" + err11);
-			return res.status(400).json(err11);
+			return res
+				.status(400)
+				.json(err11);
 		}
 
 		// 12.
 		//
 		const [code12, err12] = await to_buyer.rollbackReturnToSent(
 			seller_host,
-			buyer_uuid,
-			member_uuid
+			buyer_did,
+			member_did
 		);
 
 		if (code12 !== 200) {
@@ -1018,7 +1003,9 @@ router.post("/withdraw", async function (req, res) {
 			}
 		}
 
-		return res.status(400).json(msg);
+		return res
+			.status(400)
+			.json(msg);
 	}
 
 	// 13.

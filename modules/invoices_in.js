@@ -34,22 +34,22 @@ const handleIncomingInvoice = async (invoiceCert, res) => {
     const { credentialSubject } = invoiceCert
     const { totalPaymentDue } = credentialSubject
     const document_uuid = credentialSubject.identifier
-    const seller_uuid = credentialSubject.seller.id
-    const buyer_uuid = credentialSubject.buyer.id
+    const seller_did = credentialSubject.seller.id
+    const buyer_did = credentialSubject.buyer.id
     const document_json = JSON.stringify(invoiceCert)
 
     const status = {
         document_uuid,
         document_type: 'invoice',
         document_number: credentialSubject.invoiceNumber,
-        seller_uuid,
+        seller_did,
         seller_membername: credentialSubject.seller.contactPoint
             .split('@')
             .shift(),
         seller_organization: credentialSubject.seller.name,
         seller_archived: 0,
         seller_last_action: new Date(),
-        buyer_uuid,
+        buyer_did,
         buyer_membername: credentialSubject.buyer.contactPoint
             .split('@')
             .shift(),
@@ -72,14 +72,14 @@ const handleIncomingInvoice = async (invoiceCert, res) => {
 
     // 1.
 
-    //console.log("/buyerToSend:"+CONTACTS+":"+ seller_uuid+":"+ buyer_uuid);
+    //console.log("/buyerToSend:"+CONTACTS+":"+ seller_did+":"+ buyer_did);
 
     // 2.
     // Second we check to see if there is any contact information
     const [_2, err2] = await sub.getSellerHost(
         CONTACTS,
-        seller_uuid,
-        buyer_uuid
+        seller_did,
+        buyer_did
     )
 
     if (err2) {

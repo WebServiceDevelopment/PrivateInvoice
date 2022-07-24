@@ -91,14 +91,14 @@ router.post('/sellerArchive', async function(req, res) {
 	const FOLDER  = 'paid';
  
 	const { document_uuid } = req.body;
-	const { member_uuid } = req.session.data;
+	const { member_did } = req.session.data;
 
 	const USE_PRESENTATION = true;
 	let err, errno, code;
 
 	// 1.
 	//
-	const [ buyer_uuid, err1 ] = await sub.getBuyerUuid(SELLER_STATUS, document_uuid, member_uuid);
+	const [ buyer_did, err1 ] = await sub.getBuyerDid(SELLER_STATUS, document_uuid, member_did);
 
 	if(err1) {
 		console.log("Error 1 status = 400 err="+err1);
@@ -108,7 +108,7 @@ router.post('/sellerArchive', async function(req, res) {
 
 	// 2.
 	//
-	const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_uuid, buyer_uuid);
+	const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_did, buyer_did);
 
 	if(err2) {
 		console.log("Error 2.status = 400 err="+err2);
@@ -119,9 +119,11 @@ router.post('/sellerArchive', async function(req, res) {
 	// 3.
 	// buyer connect check
 	
-	if(!USE_PRESENTATION) {
+/*
+*	if(!USE_PRESENTATION) {
+*/
 
-	   	const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_uuid, buyer_uuid);
+	   	const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
 
 		if(code3 !== 200) {
 			//console.log("Error 3 status = 400 code="+code3);
@@ -140,7 +142,9 @@ router.post('/sellerArchive', async function(req, res) {
 			}
 			return res.status(400).json(msg);
 		}
-	}
+/*
+*	}
+*/
 
 	// 4.
 	// STATUS
@@ -248,47 +252,42 @@ router.post('/sellerArchive', async function(req, res) {
 
 
 	// 13.
-	
-	if(!USE_PRESENTATION) {
-
-		const [ code13, err13 ] = await to_buyer.archive(buyer_host, document_uuid, buyer_uuid);
-		if(code13 !== 200) {
-			errno = 12;
-			return res.status(400).json(tran.rollbackAndReturn(conn, code13, err13, errno));
-		}
-
-	} else {
-
-        const [keyPair, err] = await getPrivateKeys(member_uuid);
-        if(err) {
-            throw err;
-        }
-
-        const url = `${buyer_host}/api/presentations/available`
-        const credential = await createArchiveMessage(document_uuid,member_uuid, keyPair);
-        const [ sent, err13 ] = await makePresentation(url, keyPair, credential);
-        if(err13) {
-            return res.status(400).json(tran.rollbackAndReturn(conn, 'code13', err13, 13));
-        }
-
-	}
+	//
+    const [keyPair, err13] = await getPrivateKeys(member_did);
+    if(err13) {
+        throw err;
+    }
 
 	// 14.
-	// commit
 	//
-	const [ _14 , err14 ] = await tran.commit(conn);
-
-	if(err14) {
-		errno = 14;
-		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err14, errno));
-	}
+    const url = `${buyer_host}/api/presentations/available`
+    const credential = await createArchiveMessage(document_uuid,member_did, keyPair);
+    const [ sent, err14 ] = await makePresentation(url, keyPair, credential);
+    if(err14) {
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, 'code14', err14, 14));
+    }
 
 	// 15.
+	// commit
+	//
+	const [ _15 , err15 ] = await tran.commit(conn);
+
+	if(err14) {
+		errno = 15;
+		code = 400;
+		return res.status(400).json(tran.rollbackAndReturn(conn, code, err15, errno));
+	}
+
+	// 16.
 	//
 	conn.end();
 
 	//console.log("/sellerArchive accepted");
+
+	// 17.
+	//
 
 	res.json({
 		err : 0,

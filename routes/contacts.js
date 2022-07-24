@@ -58,15 +58,16 @@ const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 // 1.
 	sql = `
 		SELECT
-			member_uuid AS member_did,
+			member_did AS member_did,
 			membername AS member_name,
 			job_title AS member_job_title,
 			work_email AS member_contact_email,
-			organization_uuid AS organization_did
+			organization_uuid AS organization_did,
+			wallet_address
 		FROM
 			members
 		WHERE
-			member_uuid = ?
+			member_did = ?
 	`;
 
 	args = [
@@ -161,6 +162,7 @@ const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 				crossStreet: org.organization_address_line2,
 				addressCountry: org.organization_address_country
 			},
+			wallet_address: row.wallet_address,
 			taxId: org.organization_tax_id
 		}
 	}
@@ -177,9 +179,9 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 		FROM 
 			contacts 
 		WHERE
-			local_member_uuid = ?
+			local_member_did = ?
 		AND
-			remote_member_uuid = ?
+			remote_member_did = ?
 		AND
 			removed_on IS NULL
 	`;
@@ -199,7 +201,7 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
  * insertNewContact
  */
 
-const insertNewContact = async (invite_code, local_member_uuid, credential) => {
+const insertNewContact = async (invite_code, local_member_did, credential) => {
 
 	// Get local username
 
@@ -209,11 +211,11 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 		FROM
 			members
 		WHERE
-			member_uuid = ?
+			member_did = ?
 	`;
 
 	const myArgs = [
-		local_member_uuid
+		local_member_did
 	];
 
 	let row;
@@ -250,8 +252,9 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 	}
 
 	const remote_origin = link.target.replace('/api/presentations/available', '');
-	const remote_member_uuid = credential.issuer.id;
+	const remote_member_did = credential.issuer.id;
 	const remote_member_name = credential.issuer.name;
+	const remote_wallet_address = credential.credentialSubject.wallet_address
 
 	const remote_organization = {
 		name: credential.credentialSubject.name,
@@ -269,15 +272,17 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 		INSERT INTO contacts (
 			_id,
 			invite_code,
-			local_member_uuid,
+			local_member_did,
 			local_membername,
 			remote_origin,
-			remote_member_uuid,
+			remote_member_did,
 			remote_membername,
+			remote_wallet_address,
 			remote_organization,
 			local_to_remote,
 			remote_to_local
 		) VALUES (
+			?,
 			?,
 			?,
 			?,
@@ -296,11 +301,12 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 	const args = [
 		_id,
 		invite_code,
-		local_member_uuid,
+		local_member_did,
 		local_member_name,
 		remote_origin,
-		remote_member_uuid,
+		remote_member_did,
 		remote_member_name,
+		remote_wallet_address,
 		JSON.stringify(remote_organization),
 		relation.local_to_remote,
 		relation.remote_to_local
@@ -312,8 +318,6 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 		return [ null, err ];
 	}
 
-	// TODO: update use_count on invite table
-
 	return [ true, null ];
 
 }
@@ -322,12 +326,12 @@ const insertNewContact = async (invite_code, local_member_uuid, credential) => {
 /*
  * getContacts
  */
-const getContacts = async (member_uuid) => {
+const getContacts = async (member_did) => {
 
 	const sql = `
 		SELECT
 			remote_origin,
-			remote_member_uuid,
+			remote_member_did,
 			remote_membername,
 			remote_organization,
 			local_to_remote,
@@ -336,11 +340,11 @@ const getContacts = async (member_uuid) => {
 		FROM
 			contacts
 		WHERE
-			local_member_uuid = ?
+			local_member_did = ?
 	`;
 
 	const args = [
-		member_uuid
+		member_did
 	];
 
 	const rows = await db.selectAll(sql, args);
@@ -398,10 +402,14 @@ router.post('/generate', async function(req, res) {
 
 	const { body } = req;
 
+// 1.1
+	const invite_code = uuidv4();
+
+// 1.2
 	const sql = `
 		INSERT INTO ${INVITE_TABLE} (
 			invite_code,
-			local_member_uuid,
+			local_member_did,
 			rel_buyer,
 			rel_seller,
 			max_count,
@@ -416,27 +424,17 @@ router.post('/generate', async function(req, res) {
 		)
 	`;
 
-	const invite_code = uuidv4();
 
-/*
 	const args = [
 		invite_code,
-		req.session.data.member_uuid,
-		req.body.buyer,
-		req.body.seller,
-		req.body.uses,
-		req.body.expire
-	];
-*/
-	const args = [
-		invite_code,
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 		body.buyer,
 		body.seller,
 		body.uses,
 		body.expire
 	];
 
+// 1.3
 	try {
 		await db.insert(sql, args)
 	} catch(err) {
@@ -447,29 +445,33 @@ router.post('/generate', async function(req, res) {
 		});
 	}
 
-	console.log(req.session.data.member_uuid);
+	console.log(req.session.data.member_did);
 
+// 1.4
 	console.log('--- aaa ---');
-	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_uuid);
-	if(err2) {
+	const [ keyPair, err4 ] = await getPrivateKeys(req.session.data.member_did);
+	if(err4) {
 		return res.json({
-			err: 2,
+			err: 4,
 			msg: 'could not get private keys'
 		});
 	}
 
+// 1.5
 	console.log('--- bbb ---');
-	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code, keyPair);
-	if(err1) {
+	const [ credential, err5 ] = await createBusinessCard(req, req.session.data.member_did, invite_code, keyPair);
+	if(err5) {
 		return res.json({
-			err: 1,
+			err: 5,
 			msg: 'could not create business card'
 		});
 	}
 	
+// 1.6
 	console.log('--- ccc ---');
 	const vbc = await signBusinessCard(credential, keyPair);
 	
+// 1.7
 	console.log('--- eee ---');
 	res.json(vbc);
 
@@ -490,23 +492,23 @@ router.post('/add', async function(req, res) {
 		return res.status(400).end('Contact did not verify')
 	}
 
-	// 1.1 
+	// 2.1 
 	// First we need to check if the contact already exists
 
 	console.log('1.1');
 
-	const local_member_uuid = req.session.data.member_uuid;
-	const remote_member_uuid = body.issuer.id;
-	// const remote_member_uuid = body.credentialSubject.id;
+	const local_member_did = req.session.data.member_did;
+	const remote_member_did = body.issuer.id;
+	// const remote_member_did = body.credentialSubject.id;
 
-	const exists = await checkForExistingContact(local_member_uuid, remote_member_uuid)
+	const exists = await checkForExistingContact(local_member_did, remote_member_did)
 	if(exists) {
 		return res.status(400).end('Contact already exists')
 	}
 
 	// Keypair
 
-	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_uuid);
+	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_did);
 	if(err2) {
 		return res.json({
 			err: 2,
@@ -514,14 +516,14 @@ router.post('/add', async function(req, res) {
 		});
 	}
 
-	// 1.2 
+	// 2.2 
 	// Then we need to try and contact the remote host
 	// We start by creating our own verifiable business card
 
 	console.log('1.2');
 	const invite_code = body.id.split(':').pop();
 
-	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_uuid, invite_code, keyPair);
+	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_did, invite_code, keyPair);
 	if(err1) {
 		return res.json({
 			err: 1,
@@ -531,13 +533,13 @@ router.post('/add', async function(req, res) {
 
 	credential.relatedLink.push({
 		type: 'LinkRole',
-		target: remote_member_uuid,
+		target: remote_member_did,
 		linkRelationship: 'Invite'
 	});
 
 	const vbc = await signBusinessCard(credential, keyPair);
 	
-	// 1.3
+	// 2.3
 	// Then we need to send our verifiable business card to the other
 	// party
 	
@@ -553,23 +555,23 @@ router.post('/add', async function(req, res) {
 		});
 	}
 	
-	// 1.4
+	// 2.4
 	// For debug purposes, if we add ourselves as a contact, then the
 	// entry has already been made as a result of the presentation
 	// on our server
 	
-	if( local_member_uuid === remote_member_uuid) {
+	if( local_member_did === remote_member_did) {
 		return res.json({
 			err: 0,
 			msg : 'okay'
 		});
 	}
 
-	// 1.5
+	// 2.5
 	// If we get a successful response from the presentation,
 	// then we need to add a contact on our own server
 
-	const [ created, creatErr ] = await insertNewContact(invite_code, local_member_uuid, body);
+	const [ created, creatErr ] = await insertNewContact(invite_code, local_member_did, body);
 	if(creatErr) {
 		return res.status(400).end(creatErr.toString());
 	}
@@ -589,8 +591,8 @@ router.post('/add', async function(req, res) {
  */
 router.get('/getContactList', async function(req, res) {
 
-	const { member_uuid } = req.session.data;
-	const contacts = await getContacts(member_uuid);
+	const { member_did } = req.session.data;
+	const contacts = await getContacts(member_did);
 	console.log('--- Getting contacts ---');
 	console.log(contacts);
 	res.json(contacts);

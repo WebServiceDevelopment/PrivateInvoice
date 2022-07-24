@@ -33,16 +33,6 @@ module.exports				= router;
 
 const SELLER_DRAFT_STATUS	= "seller_status_draft";
 
-/*
- * count
- */
-/*
- * router.post('/count', async function(req, res) {
- * 
- *     sub.count (req, res, SELLER_DRAFT_STATUS);
- * 
- * });
- */
 
 // ------------------------------- End Points -------------------------------
 

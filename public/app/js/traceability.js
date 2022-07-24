@@ -218,7 +218,7 @@ function  Traceability_class () {
  *
  * getSign (document)
  *
- * Add buyer_uuid and buyer_membername information to
+ * Add buyer_did and buyer_membername information to
  * DocumentWidget.MEM.document.buyer_details
  *
  *
@@ -250,7 +250,7 @@ function  Traceability_class () {
 		doc.seller_details				= get.seller();
 		doc.buyer_details				= get.buyer();
 
-		doc.buyer_details.member_uuid	= document.buyer_uuid;
+		doc.buyer_details.member_did	= document.buyer_did;
 		doc.buyer_details.membername	= document.buyer_membername;
 
         doc.document_meta.taxId			= document.document_json.credentialSubject.seller.taxId;
@@ -399,7 +399,7 @@ function  Traceability_class () {
 
 		seller.contactPoint = details.contactPoint 
 
-		seller.id = details.member_uuid;
+		seller.id = details.member_did;
 	}
 
 	function get_seller () {
@@ -423,7 +423,7 @@ function  Traceability_class () {
 
 		obj.contactPoint = seller.contactPoint;
 
-		obj.member_uuid = seller.id ;
+		obj.member_did = seller.id ;
 
 		return obj;
 
@@ -452,7 +452,7 @@ function  Traceability_class () {
 
 		buyer.contactPoint = details.contactPoint 
 
-		buyer.id = details.member_uuid;
+		buyer.id = details.member_did;
 	}
 
 	function get_buyer () {
@@ -476,7 +476,7 @@ function  Traceability_class () {
 
 		obj.contactPoint = buyer.contactPoint;
 
-		obj.member_uuid = buyer.id ;
+		obj.member_did = buyer.id ;
 
 		return obj;
 

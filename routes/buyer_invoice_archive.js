@@ -92,21 +92,23 @@ router.post('/buyerToArchive', async function(req, res) {
 
 
     // 3.
-    // seller_uuid in old_status.
-    // member_uuid in old_status.
+    // seller_did in old_status.
+    // member_did in old_status.
     //
-    const seller_uuid = old_status.seller_uuid;
-    const member_uuid = old_status.buyer_uuid;
+    const seller_did = old_status.seller_did;
+    const member_did = old_status.buyer_did;
 
-    //console.log(" seller_uuid="+ seller_uuid+":member_uuid="+ member_uuid);
+    //console.log(" seller_did="+ seller_did+":member_did="+ member_did);
 
     // 4.
     // getSellerHost
     //
-    const [ seller_host, err4 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
+    const [ seller_host, err4 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
     if(err4) {
         console.log("Error 4 status = 400 err="+err4 +":NO="+_NO);
-        return res.status(400).json(err4);
+        return res
+			.status(400)
+			.json(err4);
     }
 
     // 5.
@@ -116,7 +118,9 @@ router.post('/buyerToArchive', async function(req, res) {
     if(!check_ipadder(req.ip , seller_host)) {
         console.log("invalid request : req.ip="+req.ip+":seller_host="+seller_host);
 		let err5 = {err:"invalid host"};
-        return res.status(400).json(err5);
+        return res
+			.status(400)
+			.json(err5);
     }
 
 	// 6.
@@ -125,7 +129,9 @@ router.post('/buyerToArchive', async function(req, res) {
 	const [ bool6, err6 ] = await sub.notexist_check( BUYER_ARCHIVE_STATUS, req.body.document_uuid)
 
 	if ( bool6 == false) {
-        return res.status(400).json(err6);
+        return res
+			.status(400)
+			.json(err6);
 	}
 
 	// 7.
@@ -134,7 +140,9 @@ router.post('/buyerToArchive', async function(req, res) {
 	const [ bool7, err7 ] = await sub.notexist_check( BUYER_ARCHIVE_DOCUMENT, req.body.document_uuid)
 
 	if ( bool7 == false) {
-        return res.status(400).json(err7);
+        return res
+			.status(400)
+			.json(err7);
 	}
 
 
@@ -160,7 +168,9 @@ router.post('/buyerToArchive', async function(req, res) {
 	if(err10) {
 		errno = 10;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err10, errno));
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err10, errno));
     }
 
 	// 11.
@@ -171,7 +181,9 @@ router.post('/buyerToArchive', async function(req, res) {
 	if(err11) {
 		errno = 11;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err11, errno));
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err11, errno));
     }
 
 	// 12.
@@ -182,7 +194,9 @@ router.post('/buyerToArchive', async function(req, res) {
 	if(err11) {
 		errno = 12;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err12, errno));
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err12, errno));
     }
 
 	// 13.
@@ -193,7 +207,9 @@ router.post('/buyerToArchive', async function(req, res) {
 	if(err13) {
 		errno = 13;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err13, errno));
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err13, errno));
     }
 
 
@@ -205,7 +221,9 @@ router.post('/buyerToArchive', async function(req, res) {
 	if (err14) {
 		errno = 14;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err14, errno));
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err14, errno));
 	}
 
 	// 15.
@@ -231,7 +249,7 @@ router.post('/buyerToArchive', async function(req, res) {
 router.post('/buyerToRecreate', async function(req, res) {
 	const _NO = "091";
 
-	const { document_uuid, seller_uuid } = req.body;
+	const { document_uuid, seller_did } = req.body;
 
 	const FOLDER = 'trash';
 
@@ -272,18 +290,20 @@ router.post('/buyerToRecreate', async function(req, res) {
 
 
     // 3.
-    // member_uuid
+    // member_did
     //
-    const member_uuid = old_status.buyer_uuid;
+    const member_did = old_status.buyer_did;
     
 
     // 4.
     // getSellerHost
     //
-    const [ seller_host, err4 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
+    const [ seller_host, err4 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
     if(err4) {
         console.log("Error 4 status = 400 err="+err4+":NO"+_NO);
-        return res.status(400).json(err4);
+        return res
+			.status(400)
+			.json(err4);
     }
 
     // 5.
@@ -292,7 +312,9 @@ router.post('/buyerToRecreate', async function(req, res) {
     if(!check_ipadder(req.ip , seller_host)) {
         console.log("invalid request : req.ip="+req.ip+":seller_host="+seller_host);
 		let err5 = {err:"invalid host"};
-        return res.status(400).json(err5);
+        return res
+			.status(400)
+			.json(err5);
     }
 
 	// 6.
@@ -343,7 +365,9 @@ router.post('/buyerToRecreate', async function(req, res) {
 	if(err10) {
 		errno = 10;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err10, errno));
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err10, errno));
     }
 
 	// 11. 
@@ -353,7 +377,9 @@ router.post('/buyerToRecreate', async function(req, res) {
 	if(err11) {
 		errno = 11;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err11, errno));
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err11, errno));
     }
 
 	// 12.
@@ -363,7 +389,9 @@ router.post('/buyerToRecreate', async function(req, res) {
 	if(err12) {
 		errno = 12;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err12, errno));
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err12, errno));
     }
 
 	// 13.
@@ -373,7 +401,9 @@ router.post('/buyerToRecreate', async function(req, res) {
 	if(err13) {
 		errno = 13;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err13, errno));
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err13, errno));
     }
 
     // 14.
@@ -384,7 +414,9 @@ router.post('/buyerToRecreate', async function(req, res) {
 	if (err14) {
         errno = 14;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err14, errno));
+        return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err14, errno));
 	}
 
 	// 15.

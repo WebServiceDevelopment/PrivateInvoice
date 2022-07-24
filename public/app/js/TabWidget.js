@@ -24,13 +24,15 @@ const TabWidget = (function() {
 
 	this.MEM = {}
 
+    const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
 		tab : {
-			settings : document.getElementById('TabWidget.tab.settings'),
+			settings : Elem('TabWidget.tab.settings'),
 		},
 		section : {
-			supplier : document.getElementById('TabWidget.section.seller'),
-			settings : document.getElementById('TabWidget.section.settings')
+			supplier : Elem('TabWidget.section.seller'),
+			settings : Elem('TabWidget.section.settings')
 		}
 	}
 

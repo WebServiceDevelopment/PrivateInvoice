@@ -1,8 +1,8 @@
--- MariaDB dump 10.19  Distrib 10.5.16-MariaDB, for Linux (x86_64)
+-- MariaDB dump 10.19  Distrib 10.5.13-MariaDB, for Linux (x86_64)
 --
--- Host: localhost    Database: Buyer_717
+-- Host: localhost    Database: 615_dev
 -- ------------------------------------------------------
--- Server version	10.5.16-MariaDB
+-- Server version	10.5.13-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -166,6 +166,7 @@ CREATE TABLE `contacts` (
   `remote_origin` varchar(255) NOT NULL,
   `remote_member_uuid` varchar(64) NOT NULL,
   `remote_membername` varchar(255) NOT NULL,
+  `remote_wallet_address` varchar(255) NOT NULL,
   `remote_organization` text NOT NULL,
   `local_to_remote` tinyint(4) NOT NULL,
   `remote_to_local` tinyint(4) NOT NULL,
@@ -243,6 +244,7 @@ CREATE TABLE `members` (
   `created_on` datetime NOT NULL DEFAULT current_timestamp(),
   `organization_uuid` varchar(100) NOT NULL DEFAULT '',
   `wallet_address` varchar(255) DEFAULT '',
+  `wallet_private_key` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`member_uuid`) USING BTREE,
   UNIQUE KEY `username` (`membername`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -496,4 +498,4 @@ CREATE TABLE `seller_status_draft` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-07-18  9:14:44
+-- Dump completed on 2022-07-18 11:49:31
