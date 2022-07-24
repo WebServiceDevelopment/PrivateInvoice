@@ -15,6 +15,15 @@ info:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 
+components:
+  securitySchemes:
+    basicAuth: 
+      type: http
+      scheme: basic
+
+security:
+  - basicAuth: []
+
 tags:
   - name: "Contacts"
     description: "Paths related to handling contacts"
@@ -38,9 +47,7 @@ tags:
     description: "Paths related to handling wallets"
 
 servers:
-  # - url: 'http://petstore.swagger.io/api'
-  - url: 'http://192.168.1.125:3000'
-  - url: 'http://192.168.1.125:3001'
+  - url: 'http://localhost:3000'
 
 paths:
   #1.1 /api/contacts
@@ -49,7 +56,17 @@ paths:
   #1.1.1
   /api/contacts/generate:
     post:
-      description: \#1.1.1 contacts generate
+      description: >-
+        \#1.1.1 This end point will generate a Verifiable Business Card
+        that is signed with your contact details for the current date and
+        time. This Verifiable Business Card will be returned as a JSON
+        file that can be given to someone else to add to their Private Invoice
+        contacts.
+
+        The parameters to this end point provide the context of what relationship
+        will be included in the Verifiable Business Card for contact details.
+        These include where the contact will be a Buyer, Seller, or a Partner,
+        the number of uses, and then expiration date for the Verifiable Business Card.
       operationId: contacts_generate
       tags:
         - "Contacts"
@@ -70,7 +87,12 @@ paths:
   #1.1.2
   /api/contacts/add:
     post:
-      description: \#1.1.2 contacts add
+      description: >-
+        \#1.1.2 This end point will add a contact to your database
+        when provided with a Verifiable Business Card. For example
+        Alice exports a Verifiable Business Card and sends it to Bob.
+        This end point is intended for Bob to POST the contents of the
+        Verifiable Business Card to his node to add Alice as a contact.
       operationId: contacts_add
       tags:
         - "Contacts"
@@ -269,6 +291,7 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/invoice/schemas/Responses_getDocumentBuyer'
 
   #2.2.3
   /api/invoice/getArchiveDocumentBuyer:
@@ -311,6 +334,7 @@ paths:
           content:
             application/json:
               schema:
+                $ref: '#/invoice/schemas/Responses_getArchiveDocumentBuyer'
 
 
   #2.3
@@ -830,10 +854,11 @@ paths:
 
   #5.1
   #require('./routes/presentations.js');
-  /api/presentations:
+  /api/presentations/available:
     post:
       tags:
         - "Trace"
+      security: {}
 
 
   #6.1
@@ -841,17 +866,11 @@ paths:
 
   #6.1.1
   /api/session/logout:
-    post:
+    get:
       description: \#6.1.1 session logout
       operationId: session_logout
       tags:
         - "Session"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/session/schemas/Request_logout'
       responses:
         307:
           description: Redirect
@@ -885,15 +904,16 @@ paths:
 
   #6.1.2
   /api/session/check:
-    post:
+    get:
+      description: >-
+        The purpose of this end point is to provide a server-side call that will
+        allow the client to get information about what session information is availble.
       tags:
         - "Session"
-      parameters:
-        - in: "body"
-          name: "body"
       responses:
         '200':
-          description: check response
+          description: >-
+            If you have an active session, the response will show your session details
           content:
             application/json:
               schema:
@@ -962,6 +982,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/session/schemas/Responses_login'
+      security: {}
 
   #6.1.6
   /api/session/signup:
@@ -989,6 +1010,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/session/schemas/Error_signup'
+      security: {}
 
 
   #7.1
@@ -1081,8 +1103,8 @@ paths:
 
   #8.1
   #require('./routes/test.js');
-  /api/test:
-    post:
+  #/api/test:
+  #  post:
 
 
   #9.1
