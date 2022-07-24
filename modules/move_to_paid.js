@@ -34,9 +34,9 @@ const SELLER_STATUS			    = "seller_status";
 const SELLER_DOCUMENT		    = "seller_document";
 const CONTACTS				    = "contacts";
 
-const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
+const moveToPaid = async (document_uuid, buyer_did, hash) => {
 
-	const [ _, err] = await sub.setPaymentReservation(SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _, err] = await sub.setPaymentReservation(SELLER_STATUS, document_uuid, buyer_did);
 
 	// 1.
 	// Check the transaction receipt.
@@ -78,12 +78,6 @@ const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
 
 	let wk = '0';
 	if( totalPaymentDue != null && totalPaymentDue.price != null) {
-/*
-		if( totalPaymentDue.price.indexOf(" ") !== -1) {
-			wk =  totalPaymentDue.price.split(" ")[0]
-			wk = wk.replace(/,/g,'');
-		}
-*/
 		wk = totalPaymentDue.price;
 	}
 	const total = web3.utils.toWei(wk , 'Gwei');
@@ -113,7 +107,7 @@ const moveToPaid = async (document_uuid, buyer_uuid, hash) => {
 
 	// 6.
 	//
-	const [ _6, err6] = await tran.setMakePayment_status(conn, SELLER_STATUS, document_uuid, buyer_uuid);
+	const [ _6, err6] = await tran.setMakePayment_status(conn, SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err6) {
 		console.log(err6);

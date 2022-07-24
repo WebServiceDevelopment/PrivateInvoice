@@ -40,10 +40,12 @@ const ContactWidget = (function() {
 		initSaveTimeout : () => this.MEM.saveTimeout = null,
 	}
 
+    const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
-		line : document.getElementById('ContactWidget.line'),
-		input : document.getElementById('ContactWidget.input'),
-		list : document.getElementById('ContactWidget.list')
+		line : Elem('ContactWidget.line'),
+		input : Elem('ContactWidget.input'),
+		list : Elem('ContactWidget.list')
 	}
 
 	this.EVT = {
@@ -89,7 +91,7 @@ const ContactWidget = (function() {
 		let session = SessionWidget.API.getSessionMemory();
 
 /*
-*		if(session.member_uuid === doc.seller_uuid) {
+*		if(session.member_did === doc.seller_did) {
 *
 *			if(doc.buyer_membername != null) {
 *				this.DOM.input.value = doc.buyer_membername;

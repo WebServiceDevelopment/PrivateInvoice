@@ -71,18 +71,18 @@ const moveToArchive = async (document_uuid) => {
 
 
     // 3.
-    // seller_uuid in old_status.
-    // member_uuid in old_status.
+    // seller_did in old_status.
+    // member_did in old_status.
     //
-    const seller_uuid = old_status.seller_uuid;
-    const member_uuid = old_status.buyer_uuid;
+    const seller_did = old_status.seller_did;
+    const member_did = old_status.buyer_did;
 
-    //console.log(" seller_uuid="+ seller_uuid+":member_uuid="+ member_uuid);
+    //console.log(" seller_did="+ seller_did+":member_did="+ member_did);
 
     // 4.
     // getSellerHost
     //
-    const [ seller_host, err4 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
+    const [ seller_host, err4 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
     if(err4) {
         console.log("Error 4 status = 400 err="+err4 +":NO="+_NO);
 		return 4;
@@ -190,7 +190,7 @@ const moveToArchive = async (document_uuid) => {
     // 15.
     
 	conn.end();
-    console.log("buyerToArchive accepted");
+    console.log("moveToArchive accepted");
 
 }
 

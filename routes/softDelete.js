@@ -48,7 +48,7 @@ router.post('/softDeleteSeller', async function(req, res) {
 
 	const METHOD = '/softDeleteSeller';
 
-	const member_uuid			= "seller_uuid";
+	const member_did			= "seller_did";
 	const archive				= "seller_archived";
 	const table					= SELLER_ARCHIVE_STATUS;
 
@@ -58,7 +58,7 @@ router.post('/softDeleteSeller', async function(req, res) {
 		SET
 			${archive} = 1
 		WHERE
-			${member_uuid} = ?
+			${member_did} = ?
 		AND
 			document_uuid = ?
 		AND
@@ -68,7 +68,7 @@ router.post('/softDeleteSeller', async function(req, res) {
 	`;
 
 	let args = [
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 		req.body.document_uuid
 	];
 
@@ -106,7 +106,7 @@ router.post('/softDeleteBuyer', async function(req, res) {
 
 	const METHOD = '/softDeleteBuyer';
 
-	const member_uuid		= "buyer_uuid";
+	const member_did		= "buyer_did";
 	const archive			= "buyer_archived";
 	const table				= BUYER__ARCHIVE_STATUS;
 
@@ -116,7 +116,7 @@ router.post('/softDeleteBuyer', async function(req, res) {
 		SET
 			${archive} = 1
 		WHERE
-			${member_uuid} = ?
+			${member_did} = ?
 		AND
 			document_uuid = ?
 		AND
@@ -126,7 +126,7 @@ router.post('/softDeleteBuyer', async function(req, res) {
 	`;
 
 	let args = [
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 		req.body.document_uuid
 	];
 

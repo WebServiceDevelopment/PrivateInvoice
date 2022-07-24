@@ -24,37 +24,39 @@ const SettingsProfile = (function() {
 
 	this.MEM = {}
 
+    const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
 		profile : {
-			img : document.getElementById('SettingsProfile.profile.img'),
-			file : document.getElementById('SettingsProfile.profile.file'),
-			membername : document.getElementById('SettingsProfile.profile.membername'),
-			member_uuid : document.getElementById('SettingsProfile.profile.member_uuid'),
-			job_title : document.getElementById('SettingsProfile.profile.job_title'),
-			work_email : document.getElementById('SettingsProfile.profile.work_email'),
-			edit : document.getElementById('SettingsProfile.profile.edit'),
-			cancel : document.getElementById('SettingsProfile.profile.cancel'),
-			save : document.getElementById('SettingsProfile.profile.save')
+			img : Elem('SettingsProfile.profile.img'),
+			file : Elem('SettingsProfile.profile.file'),
+			membername : Elem('SettingsProfile.profile.membername'),
+			member_did : Elem('SettingsProfile.profile.member_did'),
+			job_title : Elem('SettingsProfile.profile.job_title'),
+			work_email : Elem('SettingsProfile.profile.work_email'),
+			edit : Elem('SettingsProfile.profile.edit'),
+			cancel : Elem('SettingsProfile.profile.cancel'),
+			save : Elem('SettingsProfile.profile.save')
 		},
 		organization : {
-			organization_name : document.getElementById('SettingsProfile.organization.organization_name'),
-			organization_postcode : document.getElementById('SettingsProfile.organization.organization_postcode'),
-			organization_address : document.getElementById('SettingsProfile.organization.organization_address'),
-			organization_building : document.getElementById('SettingsProfile.organization.organization_building'),
-			organization_department : document.getElementById('SettingsProfile.organization.organization_department'),
-			organization_tax_id : document.getElementById('SettingsProfile.organization.organization_tax_id'),
-			addressCountry: document.getElementById('SettingsProfile.organization.addressCountry'),
-			addressRegion : document.getElementById('SettingsProfile.organization.addressRegion'),
-			addressCity : document.getElementById('SettingsProfile.organization.addressCity'),
-			edit : document.getElementById('SettingsProfile.organization.edit'),
-			save : document.getElementById('SettingsProfile.organization.save'), 
-			cancel : document.getElementById('SettingsProfile.organization.cancel')
+			organization_name : Elem('SettingsProfile.organization.organization_name'),
+			organization_postcode : Elem('SettingsProfile.organization.organization_postcode'),
+			organization_address : Elem('SettingsProfile.organization.organization_address'),
+			organization_building : Elem('SettingsProfile.organization.organization_building'),
+			organization_department : Elem('SettingsProfile.organization.organization_department'),
+			organization_tax_id : Elem('SettingsProfile.organization.organization_tax_id'),
+			addressCountry: Elem('SettingsProfile.organization.addressCountry'),
+			addressRegion : Elem('SettingsProfile.organization.addressRegion'),
+			addressCity : Elem('SettingsProfile.organization.addressCity'),
+			edit : Elem('SettingsProfile.organization.edit'),
+			save : Elem('SettingsProfile.organization.save'), 
+			cancel : Elem('SettingsProfile.organization.cancel')
 		},
 		logo : {
-			img : document.getElementById('SettingsProfile.logo.img'),
-			file : document.getElementById('SettingsProfile.logo.file'), 
-			submit : document.getElementById('SettingsProfile.logo.submit'), 
-			cancel : document.getElementById('SettingsProfile.logo.cancel')
+			img : Elem('SettingsProfile.logo.img'),
+			file : Elem('SettingsProfile.logo.file'), 
+			submit : Elem('SettingsProfile.logo.submit'), 
+			cancel : Elem('SettingsProfile.logo.cancel')
 		}
 	}
 
@@ -305,7 +307,7 @@ const SettingsProfile = (function() {
 		profile.edit.classList.add('disabled');
 
 		profile.membername.removeAttribute("readonly");
-		profile.member_uuid.removeAttribute("readonly");
+		profile.member_did.removeAttribute("readonly");
 		profile.job_title.removeAttribute("readonly");
 		profile.work_email.removeAttribute("readonly");
 
@@ -326,12 +328,12 @@ const SettingsProfile = (function() {
 		profile.edit.classList.remove('disabled');
 
 		profile.membername.value		= memberData.membername;
-		profile.member_uuid.value		= memberData.member_uuid;
+		profile.member_did.value		= memberData.member_did;
 		profile.job_title.value			= memberData.job_title;
 		profile.work_email.value		= memberData.work_email;
 
 		profile.membername.setAttribute("readonly", "readonly");
-		profile.member_uuid.setAttribute("readonly", "readonly");
+		profile.member_did.setAttribute("readonly", "readonly");
 		profile.job_title.setAttribute("readonly", "readonly");
 		profile.work_email.setAttribute("readonly", "readonly");
 	}
@@ -346,12 +348,12 @@ const SettingsProfile = (function() {
 		profile.edit.classList.remove('disabled');
 
 		memberData.membername	= profile.membername.value;
-		memberData.member_uuid	= profile.member_uuid.value;
+		memberData.member_did	= profile.member_did.value;
 		memberData.job_title	= profile.job_title.value;
 		memberData.work_email	= profile.work_email.value;
 
 		profile.membername.setAttribute("readonly", "readonly");
-		profile.member_uuid.setAttribute("readonly", "readonly");
+		profile.member_did.setAttribute("readonly", "readonly");
 		profile.job_title.setAttribute("readonly", "readonly");
 		profile.work_email.setAttribute("readonly", "readonly");
 
@@ -367,7 +369,7 @@ const SettingsProfile = (function() {
 
 		const args = {
 			membername : memberData.membername,
-			member_uuid : memberData.member_uuid,
+			member_did : memberData.member_did,
 			job_title : memberData.job_title,
 			work_email : memberData.work_email,
 		}
@@ -393,12 +395,12 @@ const SettingsProfile = (function() {
 		// Profile 
 
 		this.DOM.profile.membername.value = memberData.membername;
-		this.DOM.profile.member_uuid.value = memberData.member_uuid;
+		this.DOM.profile.member_did.value = memberData.member_did;
 		this.DOM.profile.job_title.value = memberData.job_title;
 		this.DOM.profile.work_email.value = memberData.work_email;
 
 		this.DOM.profile.membername.setAttribute("readonly", "readonly");
-		this.DOM.profile.member_uuid.setAttribute("readonly", "readonly");
+		this.DOM.profile.member_did.setAttribute("readonly", "readonly");
 		this.DOM.profile.job_title.setAttribute("readonly", "readonly");
 		this.DOM.profile.work_email.setAttribute("readonly", "readonly");
 

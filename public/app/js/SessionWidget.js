@@ -28,12 +28,14 @@ const SessionWidget = (function() {
         getSession : () => this.MEM.session,
 	}
 
+	const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
 		menu : {
-			toggle : document.getElementById('SessionWidget.menu.toggle'),
-			body : document.getElementById('SessionWidget.menu.body'),
-			membername : document.getElementById('SessionWidget.menu.membername'),
-			signout : document.getElementById('SessionWidget.menu.signout')
+			toggle : Elem('SessionWidget.menu.toggle'),
+			body : Elem('SessionWidget.menu.body'),
+			membername : Elem('SessionWidget.menu.membername'),
+			signout : Elem('SessionWidget.menu.signout')
 		}
 	}
 

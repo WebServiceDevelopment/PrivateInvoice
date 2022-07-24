@@ -45,8 +45,10 @@ router.post('/available', async (req, res) => {
     console.log(req.body)
 
     // Create a challenge
-    const domain = process.env.DOMAIN
+    const domain = process.env.DOMAIN || `${process.env.SERVER_IP_ADDRESS}:${process.env.SERVER_PORT}`
     const challenge = uuidv4()
+
+	console.log("domain ="+domain);
 
     // Store it in Redis with a expiration timer of 10 seconds
     challenges[challenge] = 1

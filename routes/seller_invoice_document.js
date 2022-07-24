@@ -83,7 +83,7 @@ router.post('/update', async function(req, res) {
 			document_totals = ?,
 			document_meta = ?,
 			subject_line = ?,
-			buyer_uuid = ?,
+			buyer_did = ?,
 			buyer_membername = ?,
 			buyer_details = ?,
 			document_json = ?
@@ -100,7 +100,7 @@ router.post('/update', async function(req, res) {
 
 
 	if(req.body.buyer_details) {
-		args.push(req.body.buyer_details.member_uuid);
+		args.push(req.body.buyer_details.member_did);
 		args.push(req.body.buyer_details.membername);
 		args.push(JSON.stringify(req.body.buyer_details));
 	} else {
@@ -143,7 +143,7 @@ router.post('/update', async function(req, res) {
 			subject_line = ?,
 			amount_due = ?,
 			due_by = ?,
-			buyer_uuid = ?,
+			buyer_did = ?,
 			buyer_membername = ?,
 			buyer_organization = ?
 		WHERE
@@ -157,7 +157,7 @@ router.post('/update', async function(req, res) {
 	];
 
 	if(req.body.buyer_details) {
-		args.push(req.body.buyer_details.member_uuid);
+		args.push(req.body.buyer_details.member_did);
 		args.push(req.body.buyer_details.membername);
 		args.push(req.body.buyer_details.organization_name);
 	} else {
@@ -227,10 +227,10 @@ router.post('/getDraftDocument', async function(req, res) {
 			document_type,
 			subject_line,
 			currency_options,
-			seller_uuid,
+			seller_did,
 			seller_membername,
 			seller_details,
-			buyer_uuid,
+			buyer_did,
 			buyer_membername,
 			buyer_details,
 			created_on,
@@ -241,14 +241,14 @@ router.post('/getDraftDocument', async function(req, res) {
 		FROM
 			${SELLER_DRAFT_DOCUMENT}
 		WHERE
-			(seller_uuid = ? OR buyer_uuid = ?)
+			(seller_did = ? OR buyer_did = ?)
 		AND
 			document_uuid = ?
 	`;
 
 	let args = [
-		req.session.data.member_uuid,
-		req.session.data.member_uuid,
+		req.session.data.member_did,
+		req.session.data.member_did,
 		req.body.document_uuid
 	];
 
@@ -579,40 +579,19 @@ router.post('/create', async function(req, res) {
 	//
     let  sql, args, row, org;
 
-/*
 	sql = `
         SELECT
-            member_uuid as member_uuid,
-            membername,
-            organization_name,
-            organization_address,
-            organization_building,
-            organization_department,
-            organization_tax_id,
-			organization_postcode,
-            addressCountry,
-            addressRegion,
-            addressCity,
-            wallet_address
-        FROM
-            members
-        WHERE
-            member_uuid = ?
-    `;
-*/
-	sql = `
-        SELECT
-            member_uuid as member_uuid,
+            member_did as member_did,
             membername,
 			organization_uuid,
             wallet_address
         FROM
             members
         WHERE
-            member_uuid = ?
+            member_did = ?
     `;
 
-     args = [req.session.data.member_uuid];
+     args = [req.session.data.member_did];
 
      try {
          row = await db.selectOne(sql, args);
@@ -620,7 +599,7 @@ router.post('/create', async function(req, res) {
 		console.log("Create Error 5.1");
 		res.json({
 			err : 5,
-			msg : "This member_uuid is not found."
+			msg : "This member_did is not found."
 		});
 		return;
 
@@ -663,24 +642,12 @@ router.post('/create', async function(req, res) {
 	//
 	let seller = credentialSubject.seller;
 
-	console.log(req.session.data.member_uuid);
+	console.log(req.session.data.member_did);
 	console.log('---- seller ---- ');
 	console.log(seller);
 	console.log(row);
 
-	seller.id						= row.member_uuid;
-/*
-	seller.name						= row.organization_name;
-	seller.taxId					= row.organization_tax_id;
-	seller.description				= row.organization_department;
-
-	seller.address.streetAddress	= row.organization_building;
-	seller.address.addressLocality	= row.organization_address;
-
-	seller.address.addressCountry	= row.addressCountry;
-	seller.address.addressRegion	= row.addressRegion;
-	seller.address.addressCity		= row.addressCity;
-*/
+	seller.id						= row.member_did;
 	seller.name						= org.organization_name;
 	seller.taxId					= org.organization_tax_id;
 	seller.description				= org.organization_department;
@@ -712,20 +679,7 @@ router.post('/create', async function(req, res) {
 
 	// 8.
 	let issuer = document_json.issuer;
-/*
-	issuer.name						=  row.organization_name;
 
-	issuer.address.organizationName	= row.organization_name;
-
-	issuer.address.streetAddress	= row.organization_building;
-	issuer.address.addressLocality	= row.organization_address;
-
-	issuer.address.postalCode		= row.organization_postcode;
-
-	issuer.address.addressCountry	= row.addressCountry;
-	issuer.address.addressRegion	= row.addressRegion;
-	issuer.address.addressCity		= row.addressCity;
-*/
 	issuer.name						= org.organization_name;
 
 	issuer.address.organizationName	= org.organization_name;
@@ -752,7 +706,7 @@ router.post('/create', async function(req, res) {
 			document_type,
 			document_number,
 			document_folder,
-			seller_uuid,
+			seller_did,
 			seller_membername,
 			seller_organization,
 			seller_last_action,
@@ -779,7 +733,7 @@ router.post('/create', async function(req, res) {
 		document_type,
 		document_number,
 		document_folder,
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 		req.session.data.membername,
 		member_data.organization_name,
 		due_by,
@@ -817,7 +771,7 @@ router.post('/create', async function(req, res) {
 
 			currency_options,
 
-			seller_uuid,
+			seller_did,
 			seller_membername,
 			seller_details,
 			document_meta,
@@ -863,7 +817,7 @@ router.post('/create', async function(req, res) {
 		total : currency(0, config.CURRENCY).format(true)
 	};
 
-	//console.log("req.session.data.member_uuid="+req.session.data.member_uuid);
+	//console.log("req.session.data.member_did="+req.session.data.member_did);
 
 	args = [
 		document_uuid,
@@ -872,7 +826,7 @@ router.post('/create', async function(req, res) {
 
 		JSON.stringify(config.CURRENCY),
 
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 		req.session.data.membername,
 		JSON.stringify(member_data),
 		JSON.stringify(document_meta),

@@ -43,7 +43,7 @@ module.exports = {
  */
 async function api_getTotal (req, res, table) {
 
-	let member_uuid, archive;
+	let member_did, archive;
 
 	if(req.body.archive == null) {
 		res.json({ err : 8, msg : null });
@@ -65,13 +65,13 @@ async function api_getTotal (req, res, table) {
 	switch(req.body.role) {
 	case 'seller':
 
-		member_uuid = "seller_uuid";
+		member_did = "seller_did";
 		archive = "seller_archived";
 
 		break;
 	case 'buyer':
 
-		member_uuid = "buyer_uuid";
+		member_did = "buyer_did";
 		archive = "buyer_archived";
 
 		break;
@@ -87,7 +87,7 @@ async function api_getTotal (req, res, table) {
 		FROM
 			${table}
 		WHERE
-			${member_uuid} = ?
+			${member_did} = ?
 		AND
 			document_type = ?
 		AND
@@ -99,7 +99,7 @@ async function api_getTotal (req, res, table) {
 	`;
 
 	let args = [
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 		req.body.type,
 		req.body.folder,
 		req.body.archive
@@ -189,18 +189,18 @@ async function api_getCount(req, res, table) {
 
 	for(let i = 0; i < req.body.length; i++) {
 
-		let member_uuid, archive;
+		let member_did, archive;
 
 		switch(req.body[i].role) {
 		case 'seller':
 
-			member_uuid = "seller_uuid";
+			member_did = "seller_did";
 			archive = "seller_archived";
 
 			break;
 		case 'buyer':
 
-			member_uuid = "buyer_uuid";
+			member_did = "buyer_did";
 			archive = "buyer_archived";
 
 			break;
@@ -215,7 +215,7 @@ async function api_getCount(req, res, table) {
 			FROM
 				${table}
 			WHERE
-				${member_uuid} = ?
+				${member_did} = ?
 			AND
 				document_type = ?
 			AND
@@ -242,13 +242,13 @@ async function api_getCount(req, res, table) {
 		}
 
 			try {
-				member_uuid = req.session.data.member_uuid|| null;
+				member_did = req.session.data.member_did|| null;
 		} catch(e) {
-				member_uuid = null;
+				member_did = null;
 			}
 	
 		let args = [
-			member_uuid,
+			member_did,
 			req.body[i].type,
 			req.body[i].folder,
 			req.body[i].archive
@@ -290,14 +290,14 @@ async function api_count (req, res, table) {
 
 			// Here is where we query the database
 
-			let member_uuid, archive;
+			let member_did, archive;
 			switch(req.body[key].type) {
 			case "seller":
-				member_uuid = "seller_uuid";
+				member_did = "seller_did";
 				archive = "seller_archived";
 				break;
 			case "buyer":
-				member_uuid = "buyer_uuid";
+				member_did = "buyer_did";
 				archive = "buyer_archived";
 				break;
 			default:
@@ -313,7 +313,7 @@ async function api_count (req, res, table) {
 				FROM
 					${table}
 				WHERE
-					${member_uuid} = ?
+					${member_did} = ?
 				AND
 					document_type = ?
 				AND
@@ -325,7 +325,7 @@ async function api_count (req, res, table) {
 			`;
 
 			let args = [
-				req.session.data.member_uuid,
+				req.session.data.member_did,
 				key,
 				req.body[key].folders[i]
 			];
@@ -356,19 +356,19 @@ async function api_count (req, res, table) {
  * getFolder
  */
 async function api_getFolder(req, res, table) {
-	let member_uuid, archive, sort_rule;
+	let member_did, archive, sort_rule;
 
 	switch(req.body.role) {
 	case "seller":
 
-		member_uuid = "seller_uuid";
+		member_did = "seller_did";
 		archive = "seller_archived";
 		sort_rule = " seller_last_action DESC ";
 
 		break;
 	case "buyer":
 
-		member_uuid = "buyer_uuid";
+		member_did = "buyer_did";
 		archive = "buyer_archived";
 		sort_rule = " seller_last_action DESC ";
 
@@ -397,12 +397,12 @@ async function api_getFolder(req, res, table) {
 			document_type,
 			document_number,
 			document_folder,
-			seller_uuid,
+			seller_did,
 			seller_membername,
 			seller_organization,
 			seller_archived,
 			DATE_FORMAT(seller_last_action,'%Y-%m-%d %H:%i:%s') AS seller_last_action,
-			buyer_uuid,
+			buyer_did,
 			buyer_membername,
 			buyer_organization,
 			buyer_archived,
@@ -417,7 +417,7 @@ async function api_getFolder(req, res, table) {
 		FROM
 			${table}
 		WHERE
-			${member_uuid} = ?
+			${member_did} = ?
 		AND
 			document_type = ?
 		AND
@@ -436,7 +436,7 @@ async function api_getFolder(req, res, table) {
 	`;
 
 	let args = [
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 		req.body.type,
 		req.body.folder,
 		req.body.archive

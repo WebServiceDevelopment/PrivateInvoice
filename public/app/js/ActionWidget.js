@@ -1286,6 +1286,8 @@ const ActionWidget = (function() {
 		const button = this.DOM.invoice.removeDraft;
 		this.BUTTON.disabled(button);
 
+		this.SENDING_WRAP.visible();
+
 		const doc = DocumentWidget.API.getDocument();
 
 		const params = {
@@ -1329,6 +1331,8 @@ const ActionWidget = (function() {
 			alert("[ Move to Trash ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
+
+		this.SENDING_WRAP.hidden();
 	}
 
 
@@ -1629,6 +1633,8 @@ const ActionWidget = (function() {
 		const button = this.DOM.invoice.withdrawSent;
 		this.BUTTON.disabled(button);
 
+		this.SENDING_WRAP.visible();
+
 		const doc = DocumentWidget.API.getDocument();
 
 		const params = {
@@ -1675,6 +1681,8 @@ const ActionWidget = (function() {
 		}
 		this.BUTTON.enabled(button);
 
+		this.SENDING_WRAP.hidden();
+
 	}
 	
 /*
@@ -1684,6 +1692,8 @@ const ActionWidget = (function() {
 
 		const button = this.DOM.invoice.moveToTrash;
 		this.BUTTON.disabled(button);
+
+		this.SENDING_WRAP.visible();
 
 		const doc = DocumentWidget.API.getDocument();
 
@@ -1725,6 +1735,8 @@ const ActionWidget = (function() {
 			alert("[ Move to Trash ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
+
+		this.SENDING_WRAP.hidden();
 	}
 
 /*
@@ -1786,6 +1798,8 @@ const ActionWidget = (function() {
 		const button = this.DOM.invoice.recreate;
 		this.BUTTON.disabled(button);
 
+		this.SENDING_WRAP.visible();
+
 		const doc = DocumentWidget.API.getDocument();
 
 		const params = {
@@ -1827,6 +1841,8 @@ const ActionWidget = (function() {
 			alert("[ Move to Draft ]\n"+res.err);
 		}
 		this.BUTTON.enabled(button);
+
+		this.SENDING_WRAP.hidden();
 
 	}
 
@@ -1976,10 +1992,6 @@ const ActionWidget = (function() {
 
 		this.API.submit.readonly();
 
-/*
-		console.log("Contact="+ ContactWidget.API.checkSaveTimeout() +":"+
-			"Document="+DocumentWidget.API.checkSaveTimeout() ) ;
-*/
 		this.SENDING_WRAP.visible();
 
 
@@ -2017,7 +2029,7 @@ const ActionWidget = (function() {
 			document_uuid : doc.document_uuid
 		};
 
-		const url = '/api/invoice/send';
+		const url = '/api/invoice/sendInvoice';
 
 		const ajax = new XMLHttpRequest();
 		ajax.open('POST', url);

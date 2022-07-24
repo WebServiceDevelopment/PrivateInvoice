@@ -209,8 +209,8 @@ router.post('/present', async (req, res) => {
 	// First we get the key pair for the user initializing the
 	// presentation
 
-	const { member_uuid } = req.session.data;
-	const [ keyPair, _err1 ] = await getPrivateKeys(member_uuid);
+	const { member_did } = req.session.data;
+	const [ keyPair, _err1 ] = await getPrivateKeys(member_did);
 	if(_err1) {
 		return res.json({
 			err: 1,
