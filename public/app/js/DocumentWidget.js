@@ -49,67 +49,69 @@ const DocumentWidget = (function() {
 		},
 	};
 
+    const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
 
 		meta : {
-			document_number : document.getElementById('DocumentWidget.meta.document_number'),
-			created_on : document.getElementById('DocumentWidget.meta.created_on'), 
-			taxId : document.getElementById('DocumentWidget.meta.taxId'),
-			due_by : document.getElementById('DocumentWidget.meta.due_by'),
+			document_number : Elem('DocumentWidget.meta.document_number'),
+			created_on : Elem('DocumentWidget.meta.created_on'), 
+			taxId : Elem('DocumentWidget.meta.taxId'),
+			due_by : Elem('DocumentWidget.meta.due_by'),
 		},
 
 		label : {
-			doc_type : document.getElementById('DocumentWidget.label.doc_type'),
-			due_by : document.getElementById('DocumentWidget.label.due_by'),
-			bill_to : document.getElementById('DocumentWidget.label.bill_to'),
-			created_on : document.getElementById('DocumentWidget.label.created_on'),
-			to_from : document.getElementById('DocumentWidget.label.to_from'),
+			doc_type : Elem('DocumentWidget.label.doc_type'),
+			due_by : Elem('DocumentWidget.label.due_by'),
+			bill_to : Elem('DocumentWidget.label.bill_to'),
+			created_on : Elem('DocumentWidget.label.created_on'),
+			to_from : Elem('DocumentWidget.label.to_from'),
 		},
 
 		from : {
-			organization_name : document.getElementById('DocumentWidget.from.organization_name'),
-			organization_address : document.getElementById('DocumentWidget.from.organization_address'),
-			organization_building : document.getElementById('DocumentWidget.from.organization_building'),
-			organization_department : document.getElementById('DocumentWidget.from.organization_department'),
-			addressRegion : document.getElementById('DocumentWidget.from.addressRegion'),
-			addressCity : document.getElementById('DocumentWidget.from.addressCity'),
-			addressCountry : document.getElementById('DocumentWidget.from.addressCountry')
+			organization_name : Elem('DocumentWidget.from.organization_name'),
+			organization_address : Elem('DocumentWidget.from.organization_address'),
+			organization_building : Elem('DocumentWidget.from.organization_building'),
+			organization_department : Elem('DocumentWidget.from.organization_department'),
+			addressRegion : Elem('DocumentWidget.from.addressRegion'),
+			addressCity : Elem('DocumentWidget.from.addressCity'),
+			addressCountry : Elem('DocumentWidget.from.addressCountry')
 		},
 
 		to : {
-			organization_name : document.getElementById('DocumentWidget.to.organization_name'),
-			organization_address : document.getElementById('DocumentWidget.to.organization_address'),
-			organization_building : document.getElementById('DocumentWidget.to.organization_building'),
-			organization_department : document.getElementById('DocumentWidget.to.organization_department'),
-			addressRegion : document.getElementById('DocumentWidget.to.addressRegion'),
-			addressCity : document.getElementById('DocumentWidget.to.addressCity'),
-			addressCountry : document.getElementById('DocumentWidget.to.addressCountry')
+			organization_name : Elem('DocumentWidget.to.organization_name'),
+			organization_address : Elem('DocumentWidget.to.organization_address'),
+			organization_building : Elem('DocumentWidget.to.organization_building'),
+			organization_department : Elem('DocumentWidget.to.organization_department'),
+			addressRegion : Elem('DocumentWidget.to.addressRegion'),
+			addressCity : Elem('DocumentWidget.to.addressCity'),
+			addressCountry : Elem('DocumentWidget.to.addressCountry')
 		},
 
 		inputs : {
-			subject : document.getElementById('DocumentWidget.inputs.subject'),
-			body : document.getElementById('DocumentWidget.inputs.body'),
-			save : document.getElementById('DocumentWidget.inputs.save'),
-			dragarea : document.getElementById('DocumentWidget.inputs.dragarea'),
+			subject : Elem('DocumentWidget.inputs.subject'),
+			body : Elem('DocumentWidget.inputs.body'),
+			save : Elem('DocumentWidget.inputs.save'),
+			dragarea : Elem('DocumentWidget.inputs.dragarea'),
 
 			getSubject : () =>  this.DOM.inputs.subject.value,
 
 		},
 
 		textarea : {
-			comments :  document.getElementById('DocumentWidget.textarea.comments'),
+			comments :  Elem('DocumentWidget.textarea.comments'),
 		},
 
 		contact : {
-			input : document.getElementById('ContactWidget.input'),
+			input : Elem('ContactWidget.input'),
 		},
 
 		totals : {
-			table : document.getElementById('DocumentWidget.totals.table'),
-			subtotal : document.getElementById('DocumentWidget.totals.subtotal'),
-			total : document.getElementById('DocumentWidget.totals.total'),
-			details : document.getElementById('DocumentWidget.totals.details'),
-			display : document.getElementById('DocumentWidget.totals.display'),
+			table : Elem('DocumentWidget.totals.table'),
+			subtotal : Elem('DocumentWidget.totals.subtotal'),
+			total : Elem('DocumentWidget.totals.total'),
+			details : Elem('DocumentWidget.totals.details'),
+			display : Elem('DocumentWidget.totals.display'),
 		}
 	};
 
@@ -328,7 +330,7 @@ const DocumentWidget = (function() {
 	function api_updateToInfo(memberData) {
 		
 		if(memberData) {
-			this.MEM.document.buyer_uuid = memberData.member_uuid;
+			this.MEM.document.buyer_did = memberData.member_did;
 
 			this.DOM.to.organization_name.value = memberData.organization_name || "";
 			this.DOM.to.organization_address.value = memberData.organization_address || "";
@@ -338,7 +340,7 @@ const DocumentWidget = (function() {
 			this.DOM.to.addressCity.value = memberData.addressCity || "";
 			this.DOM.to.addressCountry.value = memberData.addressCountry || "";
 		} else {
-			this.MEM.document.buyer_uuid = null;
+			this.MEM.document.buyer_did = null;
 			this.DOM.to.organization_name.value = "";
 			this.DOM.to.organization_address.value = "";
 			this.DOM.to.organization_building.value = "";
@@ -1221,15 +1223,19 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 
 		Traceability.API.setCredential (res.msg.document_json);
 
-		Traceability.API.setCredentialSubject(res.msg.document_json.credentialSubject);
+		if(res.msg.document_json.credentialSubject != null) {
+			Traceability.API.setCredentialSubject(res.msg.document_json.credentialSubject);
+		} else {
+			alert("res.msg.document_json.credentialSubject is null.");
+		}
 /*
  *
  * Traceability.API.getSign (res.msg)
  *
- * Add buyer_uuid and buyer_membername information to 
+ * Add buyer_did and buyer_membername information to 
  * this.MEM.document.buyer_details
  *
- * If buyer_uuid and buyer_membername information is insufficient,
+ * If buyer_did and buyer_membername information is insufficient,
  * Send operation will result in an error.
  */
 		let doc =  Traceability.API.getSign (res.msg);

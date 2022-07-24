@@ -33,11 +33,11 @@ module.exports = {
 	getDocument				: _getDocument,
 	getStatus				: _getStatus,
 
-	getBuyerUuid 			: _getBuyerUuid,
-	getBuyerUuidForDraft 	: _getBuyerUuidForDraft,
+	getBuyerDid 			: _getBuyerDid,
+	getBuyerDidForDraft 	: _getBuyerDidForDraft,
 	getBuyerHost 			: _getBuyerHost,
 
-	getSellerUuid    		: _getSellerUuid,
+	getSellerDid    		: _getSellerDid,
 	getSellerHost			: _getSellerHost,
 
 	insertStatus			: _insertStatus,
@@ -242,10 +242,10 @@ async function _getDraftDocument(table, uuid) {
 			document_type,
 			subject_line,
 			currency_options,
-			seller_uuid,
+			seller_did,
 			seller_membername,
 			seller_details,
-			buyer_uuid,
+			buyer_did,
 			buyer_membername,
 			buyer_details,
 			created_on,
@@ -325,12 +325,12 @@ async function _getStatus(table, uuid) {
 			document_uuid,
 			document_type,
 			document_number,
-			seller_uuid,
+			seller_did,
 			seller_membername,
 			seller_organization,
 			seller_archived,
 			seller_last_action,
-			buyer_uuid,
+			buyer_did,
 			buyer_membername,
 			buyer_organization,
 			buyer_archived,
@@ -364,35 +364,35 @@ async function _getStatus(table, uuid) {
 }
 
 /*
- * getBuyerUuid
+ * getBuyerDid
  */
-async function _getBuyerUuid (table, document_uuid, seller_uuid) {
+async function _getBuyerDid (table, document_uuid, seller_did) {
 
 	let result;
 
     const sql = `
         SELECT
-            buyer_uuid
+            buyer_did
         FROM
             ${table}
         WHERE
             document_uuid = ?
         AND
-            seller_uuid = ?
+            seller_did = ?
     `;
 
     const args = [
         document_uuid,
-        seller_uuid
+        seller_did
     ];
 
     try {
         result = await db.selectOne(sql, args);
         if(!result) {
-            return [ null, new Error('buyer_uuid not found for document_uuid') ];
+            return [ null, new Error('buyer_did not found for document_uuid') ];
         }
-        const { buyer_uuid } = result;
-        return [ buyer_uuid, null ];
+        const { buyer_did } = result;
+        return [ buyer_did, null ];
 
     } catch(err) {
         return [ null, err ];
@@ -402,35 +402,35 @@ async function _getBuyerUuid (table, document_uuid, seller_uuid) {
 
 
 /*
- * getBuyerUuidForDraft
+ * getBuyerDidForDraft
  */
-async function _getBuyerUuidForDraft (table, document_uuid, seller_uuid) {
+async function _getBuyerDidForDraft (table, document_uuid, seller_did) {
 
 	let result;
 
     const sql = `
         SELECT
-            buyer_uuid
+            buyer_did
         FROM
 			${table}
         WHERE
             document_uuid = ?
 		AND
-			seller_uuid = ?
+			seller_did = ?
     `;
 
     const args = [
         document_uuid,
-		seller_uuid
+		seller_did
     ];
 
     try {
         result = await db.selectOne(sql, args);
         if(!result) {
-            return [ null, new Error('buyer_uuid not found for document_uuid') ];
+            return [ null, new Error('buyer_did not found for document_uuid') ];
         }
-        const { buyer_uuid } = result;
-        return [ buyer_uuid, null ];
+        const { buyer_did } = result;
+        return [ buyer_did, null ];
 
     } catch(err) {
         return [ null, err ];
@@ -440,26 +440,26 @@ async function _getBuyerUuidForDraft (table, document_uuid, seller_uuid) {
 
 
 /*
- * getSellerUuid
+ * getSellerDid
  */
-async function _getSellerUuid (table, document_uuid, buyer_uuid) {
+async function _getSellerDid (table, document_uuid, buyer_did) {
 
 	let result;
 
     const sql = `
         SELECT
-            seller_uuid
+            seller_did
         FROM
             ${table}
         WHERE
             document_uuid = ?
         AND
-            buyer_uuid = ?
+            buyer_did = ?
     `;
 
     const args = [
         document_uuid,
-        buyer_uuid
+        buyer_did
     ];
 
     try {
@@ -469,17 +469,17 @@ async function _getSellerUuid (table, document_uuid, buyer_uuid) {
     }
 
 	if(!result) {
-		return [ null, new Error('seller_uuid not found for document_uuid') ];
+		return [ null, new Error('seller_did not found for document_uuid') ];
     }
-    const { seller_uuid } = result;
-    return [ seller_uuid, null ];
+    const { seller_did } = result;
+    return [ seller_did, null ];
 
 }
 
 /*
  * getSellerHost
  */
-async function _getSellerHost (table,  seller_uuid, buyer_uuid) {
+async function _getSellerHost (table,  seller_did, buyer_did) {
 	//console.log("getSellerHost");
 
 	let result, err;
@@ -490,16 +490,16 @@ async function _getSellerHost (table,  seller_uuid, buyer_uuid) {
         FROM
             ${table}
         WHERE
-            remote_member_uuid = ?
+            remote_member_did = ?
         AND
-            local_member_uuid = ?
+            local_member_did = ?
 		AND
 			remote_to_local = 1
     `;
 
     const args = [
-        seller_uuid,
-        buyer_uuid
+        seller_did,
+        buyer_did
     ];
 
     try {
@@ -510,7 +510,7 @@ async function _getSellerHost (table,  seller_uuid, buyer_uuid) {
 	}
 
     if(!result) {
-     	err = {msg:'seller_host not found for seller_uuid:'+seller_uuid+":"+buyer_uuid};
+     	err = {msg:'seller_host not found for seller_did:'+seller_did+":"+buyer_did};
         return [ null, err ];
     }
 
@@ -522,7 +522,7 @@ async function _getSellerHost (table,  seller_uuid, buyer_uuid) {
 /*
  * getBuyerHost
  */
-async function _getBuyerHost (table,  seller_uuid, buyer_uuid) {
+async function _getBuyerHost (table,  seller_did, buyer_did) {
 	//console.log("getBuyerHost");
 
 	let result, err;
@@ -533,16 +533,16 @@ async function _getBuyerHost (table,  seller_uuid, buyer_uuid) {
         FROM
             ${table}
         WHERE
-            local_member_uuid = ?
+            local_member_did = ?
         AND
-            remote_member_uuid = ?
+            remote_member_did = ?
 		AND
 			local_to_remote = 1
     `;
 
     const args = [
-        seller_uuid,
-        buyer_uuid
+        seller_did,
+        buyer_did
     ];
 
 	try {
@@ -552,7 +552,7 @@ async function _getBuyerHost (table,  seller_uuid, buyer_uuid) {
 		return [ null, err ];
 	}
 	if(!result) {
-     	err = {msg:'buyer_host not found for buyer_uuid:'+seller_uuid+":"+buyer_uuid};
+     	err = {msg:'buyer_host not found for buyer_did:'+seller_did+":"+buyer_did};
       	return [ null, err ];
    	}
 
@@ -577,7 +577,7 @@ async function _insertDraftDocument(table, document) {
 			subject_line,
 			currency_options,
 
-			seller_uuid,
+			seller_did,
 			seller_membername,
 			seller_details,
 
@@ -585,7 +585,7 @@ async function _insertDraftDocument(table, document) {
 			document_body,
 			document_totals,
 
-			buyer_uuid,
+			buyer_did,
 			buyer_membername,
 			buyer_details
 
@@ -617,7 +617,7 @@ async function _insertDraftDocument(table, document) {
 		document.subject_line,
 		document.currency_options,
 
-		document.seller_uuid,
+		document.seller_did,
 		document.seller_membername,
 		document.seller_details,
 
@@ -625,7 +625,7 @@ async function _insertDraftDocument(table, document) {
 		document.document_body,
 		document.document_totals,
 
-		document.buyer_uuid,
+		document.buyer_did,
 		document.buyer_membername,
 		document.buyer_details
 	];
@@ -738,12 +738,12 @@ async function _insertStatus(table, status) {
 			document_number,
 			document_folder,
 
-			seller_uuid,
+			seller_did,
 			seller_membername,
 			seller_organization,
 			seller_last_action,
 
-			buyer_uuid,
+			buyer_did,
 			buyer_membername,
 			buyer_organization,
 
@@ -777,10 +777,10 @@ async function _insertStatus(table, status) {
 		status.document_type,
 		status.document_number,
 		status.document_folder,
-		status.seller_uuid,
+		status.seller_did,
 		status.seller_membername,
 		status.seller_organization,
-		status.buyer_uuid,
+		status.buyer_did,
 		status.buyer_membername,
 		status.buyer_organization,
 		status.subject_line,
@@ -820,14 +820,14 @@ async function _insertArchiveStatus(table, status) {
 			document_number,
 			document_folder,
 
-			seller_uuid,
+			seller_did,
 			seller_membername,
 			seller_organization,
 
 			seller_archived,
 			seller_last_action,
 
-			buyer_uuid,
+			buyer_did,
 			buyer_membername,
 			buyer_organization,
 
@@ -864,11 +864,11 @@ async function _insertArchiveStatus(table, status) {
 		status.document_type,
 		status.document_number,
 		status.document_folder,
-		status.seller_uuid,
+		status.seller_did,
 		status.seller_membername,
 		status.seller_organization,
 		status.seller_archived,
-		status.buyer_uuid,
+		status.buyer_did,
 		status.buyer_membername,
 		status.buyer_organization,
 		status.buyer_archived,
@@ -964,7 +964,7 @@ async function _deleteDocument(table, status) {
 /*
 * sent to confirm
 */
-async function _setConfirm (table, document_uuid , buyer_uuid) {
+async function _setConfirm (table, document_uuid , buyer_did) {
 
 	let err;
 
@@ -974,7 +974,7 @@ async function _setConfirm (table, document_uuid , buyer_uuid) {
         SET
             document_folder = 'confirmed'
         WHERE
-            buyer_uuid = ?
+            buyer_did = ?
         AND
             document_uuid = ?
         AND
@@ -984,7 +984,7 @@ async function _setConfirm (table, document_uuid , buyer_uuid) {
     `;
 
     let args = [
-        buyer_uuid,
+        buyer_did,
         document_uuid
     ];
 
@@ -1008,7 +1008,7 @@ async function _setConfirm (table, document_uuid , buyer_uuid) {
 /*
  * setUnconfirm
  */
-async function _setUnconfirm (table, document_uuid , buyer_uuid) {
+async function _setUnconfirm (table, document_uuid , buyer_did) {
 
 	let err;
 
@@ -1018,7 +1018,7 @@ async function _setUnconfirm (table, document_uuid , buyer_uuid) {
         SET
             document_folder = 'sent'
         WHERE
-            buyer_uuid = ?
+            buyer_did = ?
         AND
             document_uuid = ?
         AND
@@ -1028,7 +1028,7 @@ async function _setUnconfirm (table, document_uuid , buyer_uuid) {
     `;
 
     let args = [
-        buyer_uuid,
+        buyer_did,
         document_uuid
     ];
 
@@ -1051,7 +1051,7 @@ async function _setUnconfirm (table, document_uuid , buyer_uuid) {
 /*
  * setPaymentReservation
  */
-async function _setPaymentReservation (table, document_uuid , buyer_uuid) {
+async function _setPaymentReservation (table, document_uuid , buyer_did) {
 
 	const RESERVATION = 8;
 	const RESERVATION_1 = 0;
@@ -1066,7 +1066,7 @@ async function _setPaymentReservation (table, document_uuid , buyer_uuid) {
         SET
             opened = opened + ${RESERVATION} 
         WHERE
-            buyer_uuid = ?
+            buyer_did = ?
         AND
             document_uuid = ?
         AND
@@ -1078,7 +1078,7 @@ async function _setPaymentReservation (table, document_uuid , buyer_uuid) {
     `;
 
     let args = [
-        buyer_uuid,
+        buyer_did,
         document_uuid
     ];
 
@@ -1101,7 +1101,7 @@ async function _setPaymentReservation (table, document_uuid , buyer_uuid) {
 /*
  * resetPaymentReservation
  */
-async function _resetPaymentReservation (table, document_uuid , buyer_uuid) {
+async function _resetPaymentReservation (table, document_uuid , buyer_did) {
 
 	const RESERVATION = 8;
 	const RESERVATION_1 = 8;
@@ -1116,7 +1116,7 @@ async function _resetPaymentReservation (table, document_uuid , buyer_uuid) {
         SET
             opened = opened - ${RESERVATION} 
         WHERE
-            buyer_uuid = ?
+            buyer_did = ?
         AND
             document_uuid = ?
         AND
@@ -1128,7 +1128,7 @@ async function _resetPaymentReservation (table, document_uuid , buyer_uuid) {
     `;
 
     let args = [
-        buyer_uuid,
+        buyer_did,
         document_uuid
     ];
 
@@ -1151,7 +1151,7 @@ async function _resetPaymentReservation (table, document_uuid , buyer_uuid) {
 /*
  * setMakePayment_status
  */
-async function _setMakePayment_status (table, document_uuid , buyer_uuid) {
+async function _setMakePayment_status (table, document_uuid , buyer_did) {
 
 	const RESERVATION = 0;
 	const RESERVATION_1 = 8;
@@ -1166,7 +1166,7 @@ async function _setMakePayment_status (table, document_uuid , buyer_uuid) {
             document_folder = 'paid',
 			opened = ${RESERVATION}
         WHERE
-            buyer_uuid = ?
+            buyer_did = ?
         AND
             document_uuid = ?
         AND
@@ -1178,7 +1178,7 @@ async function _setMakePayment_status (table, document_uuid , buyer_uuid) {
     `;
 
     let args = [
-        buyer_uuid,
+        buyer_did,
         document_uuid
     ];
 
@@ -1239,7 +1239,7 @@ async function _setMakePayment_document (table, document_uuid , hash) {
 /*
  * setWithdrawSeller
  */
-async function _setWithdrawSeller (table, document_uuid , seller_uuid, document_folder) {
+async function _setWithdrawSeller (table, document_uuid , seller_did) {
 
 	let err;
 
@@ -1249,19 +1249,16 @@ async function _setWithdrawSeller (table, document_uuid , seller_uuid, document_
         SET
             document_folder = 'returned'
         WHERE
-            seller_uuid = ?
+            seller_did = ?
         AND
             document_uuid = ?
-        AND
-            document_folder = ?
         AND
             document_type = 'invoice'
     `;
 
     let args = [
-        seller_uuid,
-        document_uuid,
-        document_folder
+        seller_did,
+        document_uuid
     ];
 
     let result;
@@ -1284,7 +1281,7 @@ async function _setWithdrawSeller (table, document_uuid , seller_uuid, document_
 /*
  * setWithdrawBuyer
  */
-async function _setWithdrawBuyer (table, document_uuid , buyer_uuid) {
+async function _setWithdrawBuyer (table, document_uuid , buyer_did) {
 
 	let err;
 
@@ -1294,7 +1291,7 @@ async function _setWithdrawBuyer (table, document_uuid , buyer_uuid) {
         SET
             document_folder = 'returned'
         WHERE
-            buyer_uuid = ?
+            buyer_did = ?
         AND
             document_uuid = ?
         AND
@@ -1302,7 +1299,7 @@ async function _setWithdrawBuyer (table, document_uuid , buyer_uuid) {
     `;
 
     let args = [
-        buyer_uuid,
+        buyer_did,
         document_uuid
     ];
 
@@ -1325,7 +1322,7 @@ async function _setWithdrawBuyer (table, document_uuid , buyer_uuid) {
 /*
  * setReturn
  */
-async function _setReturn (table, document_uuid , buyer_uuid) {
+async function _setReturn (table, document_uuid , buyer_did) {
 
     let sql = `
         UPDATE
@@ -1333,7 +1330,7 @@ async function _setReturn (table, document_uuid , buyer_uuid) {
         SET
             document_folder = 'returned'
         WHERE
-            buyer_uuid = ?
+            buyer_did = ?
         AND
             document_uuid = ?
         AND
@@ -1343,7 +1340,7 @@ async function _setReturn (table, document_uuid , buyer_uuid) {
     `;
 
     let args = [
-        buyer_uuid,
+        buyer_did,
         document_uuid
     ];
 
@@ -1366,7 +1363,7 @@ async function _setReturn (table, document_uuid , buyer_uuid) {
 /*
 * rollbanck returnd to sent
 */
-async function _rollbackReturnToSent (table, document_uuid , buyer_uuid) {
+async function _rollbackReturnToSent (table, document_uuid , buyer_did) {
 
     let sql = `
         UPDATE
@@ -1374,7 +1371,7 @@ async function _rollbackReturnToSent (table, document_uuid , buyer_uuid) {
         SET
             document_folder = 'sent'
         WHERE
-            buyer_uuid = ?
+            buyer_did = ?
         AND
             document_uuid = ?
         AND
@@ -1384,7 +1381,7 @@ async function _rollbackReturnToSent (table, document_uuid , buyer_uuid) {
     `;
 
     let args = [
-        buyer_uuid,
+        buyer_did,
         document_uuid
     ];
 
@@ -1407,25 +1404,25 @@ async function _rollbackReturnToSent (table, document_uuid , buyer_uuid) {
 /*
 * rollbanck confirm to sent
 */
-async function _rollbackConfirmToSent (table, document_uuid , buyer_uuid) {
+async function _rollbackConfirmToSent (table, document_uuid , buyer_did) {
 
-	return this.setUnconfirm (table, document_uuid , buyer_uuid);
+	return this.setUnconfirm (table, document_uuid , buyer_did);
 	
 }
 
 /*
 * rollbanck sent to confirm 
 */
-async function _rollbackSentToConfirm (table, document_uuid , buyer_uuid) {
+async function _rollbackSentToConfirm (table, document_uuid , buyer_did) {
 
-	return this.setConfirm (table, document_uuid , buyer_uuid);
+	return this.setConfirm (table, document_uuid , buyer_did);
 	
 }
 
 /*
 * rollbanck paid to confirm 
 */
-async function _rollbackPaidToConfirm (table, document_uuid , buyer_uuid) {
+async function _rollbackPaidToConfirm (table, document_uuid , buyer_did) {
 
 	let err;
 
@@ -1435,7 +1432,7 @@ async function _rollbackPaidToConfirm (table, document_uuid , buyer_uuid) {
         SET
 			document_folder = 'confirmed'
         WHERE
-            buyer_uuid = ?
+            buyer_did = ?
         AND
             document_uuid = ?
         AND
@@ -1445,7 +1442,7 @@ async function _rollbackPaidToConfirm (table, document_uuid , buyer_uuid) {
     `;
 
     let args = [
-        buyer_uuid,
+        buyer_did,
         document_uuid
     ];
 

@@ -28,43 +28,45 @@ const SettingsMenu = (function() {
 		getLeaf : () => this.MEM.leaf,
 	}
 
+    const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
 		area : {
-			back : document.getElementById('SettingsMenu.area.back'),
-			menu : document.getElementById('SettingsMenu.area.menu')
+			back : Elem('SettingsMenu.area.back'),
+			menu : Elem('SettingsMenu.area.menu')
 		},
 		menu : {
-			organization : document.getElementById('SettingsMenu.menu.organization'),
-			profile : document.getElementById('SettingsMenu.menu.profile'),
-			groups : document.getElementById('SettingsMenu.menu.groups'),
-			security : document.getElementById('SettingsMenu.menu.security'),
-			contacts : document.getElementById('SettingsMenu.menu.contacts'),
-			directory : document.getElementById('SettingsMenu.menu.directory'),
-			wallet : document.getElementById('SettingsMenu.menu.wallet'),
-			activity : document.getElementById('SettingsMenu.menu.activity'),
-			statement : document.getElementById('SettingsMenu.menu.statement'),
-			invite : document.getElementById('SettingsMenu.menu.invite'),
-			api : document.getElementById('SettingsMenu.menu.api'),
-			pro : document.getElementById('SettingsMenu.menu.pro')
+			organization : Elem('SettingsMenu.menu.organization'),
+			profile : Elem('SettingsMenu.menu.profile'),
+			groups : Elem('SettingsMenu.menu.groups'),
+			security : Elem('SettingsMenu.menu.security'),
+			contacts : Elem('SettingsMenu.menu.contacts'),
+			directory : Elem('SettingsMenu.menu.directory'),
+			wallet : Elem('SettingsMenu.menu.wallet'),
+			activity : Elem('SettingsMenu.menu.activity'),
+			statement : Elem('SettingsMenu.menu.statement'),
+			invite : Elem('SettingsMenu.menu.invite'),
+			api : Elem('SettingsMenu.menu.api'),
+			pro : Elem('SettingsMenu.menu.pro')
 		},
 		pages : {
-			organization : document.getElementById('SettingsMenu.pages.organization'),
-			profile : document.getElementById('SettingsMenu.pages.profile'),
-			groups : document.getElementById('SettingsMenu.pages.groups'),
-			security : document.getElementById('SettingsMenu.pages.security'),
-			contacts : document.getElementById('SettingsMenu.pages.contacts'),
-			directory : document.getElementById('SettingsMenu.pages.directory'),
-			wallet : document.getElementById('SettingsMenu.pages.wallet'),
-			activity : document.getElementById('SettingsMenu.pages.activity'),
-			statement : document.getElementById('SettingsMenu.pages.statement'),
-			invite : document.getElementById('SettingsMenu.pages.invite'),
-			api : document.getElementById('SettingsMenu.pages.api'),
-			api_details : document.getElementById('SettingsMenu.pages.api_details'),
-			pro : document.getElementById('SettingsMenu.pages.pro')
+			organization : Elem('SettingsMenu.pages.organization'),
+			profile : Elem('SettingsMenu.pages.profile'),
+			groups : Elem('SettingsMenu.pages.groups'),
+			security : Elem('SettingsMenu.pages.security'),
+			contacts : Elem('SettingsMenu.pages.contacts'),
+			directory : Elem('SettingsMenu.pages.directory'),
+			wallet : Elem('SettingsMenu.pages.wallet'),
+			activity : Elem('SettingsMenu.pages.activity'),
+			statement : Elem('SettingsMenu.pages.statement'),
+			invite : Elem('SettingsMenu.pages.invite'),
+			api : Elem('SettingsMenu.pages.api'),
+			api_details : Elem('SettingsMenu.pages.api_details'),
+			pro : Elem('SettingsMenu.pages.pro')
 		},
 		btns : {
-			createApi : document.getElementById('SettingsMenu.btns.createApi'),	
-			cancelApi : document.getElementById('SettingsMenu.btns.cancelApi')
+			createApi : Elem('SettingsMenu.btns.createApi'),	
+			cancelApi : Elem('SettingsMenu.btns.cancelApi')
 		}
 	}
 

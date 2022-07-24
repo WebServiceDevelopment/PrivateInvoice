@@ -48,7 +48,7 @@ const BUYER_ARCHIVE_STATUS      = "buyer_status_archive";
  * Execution of'Move to Trash'when folder is draft.
 */
 
-const moveToTrash = async (status, document_uuid, seller_uuid) => {
+const moveToTrash = async (status, document_uuid, seller_did) => {
 
     // 1.
     // STATUS

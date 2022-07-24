@@ -28,14 +28,16 @@ const SettingsInvite = (function() {
         getReady : () => this.MEM.ready,
 	}
 
+    const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
 		form : {
-			count : document.getElementById('SettingsInvite.form.count'),
-			minutes : document.getElementById('SettingsInvite.form.minutes'),
-			buyer : document.getElementById('SettingsInvite.form.buyer'),
-			seller : document.getElementById('SettingsInvite.form.seller'),
-			submit : document.getElementById('SettingsInvite.form.submit'),
-			list: document.getElementById('SettingsInvite.form.list')
+			count : Elem('SettingsInvite.form.count'),
+			minutes : Elem('SettingsInvite.form.minutes'),
+			buyer : Elem('SettingsInvite.form.buyer'),
+			seller : Elem('SettingsInvite.form.seller'),
+			submit : Elem('SettingsInvite.form.submit'),
+			list: Elem('SettingsInvite.form.list')
 		}
 	}
 

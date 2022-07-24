@@ -60,9 +60,9 @@ function _toReturnError(err , code, method_no) {
 /*
  * cancelPaymentReservation
  */
-async function _cancelPaymentReservation(seller_host, document_uuid, member_uuid){
+async function _cancelPaymentReservation(seller_host, document_uuid, member_did){
 
-	const [ _r, _e ] = await to_seller.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
+	const [ _r, _e ] = await to_seller.cancelPaymentReservation(seller_host, document_uuid, member_did);
 	if( _e == null) {
 		console.log("cancelPaymentReservation id success.");
 	}

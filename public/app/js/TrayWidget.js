@@ -38,28 +38,30 @@ const TrayWidget = (function() {
 
 	}
 
+    const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
 		header : {
-			select : document.getElementById('TrayWidget.header.select'),
-			batch : document.getElementById('TrayWidget.header.batch'),
+			select : Elem('TrayWidget.header.select'),
+			batch : Elem('TrayWidget.header.batch'),
 
 		},
 		tray : {
-			body : document.getElementById('TrayWidget.tray.body')
+			body : Elem('TrayWidget.tray.body')
 		},
 		showing : {
-			start : document.getElementById('TrayWidget.Showing.start'),
-			end : document.getElementById('TrayWidget.Showing.end'),
-			all : document.getElementById('TrayWidget.Showing.all'),
-			currentPage : document.getElementById('TrayWidget.Showing.currentPage'),
-			maxPage : document.getElementById('TrayWidget.Showing.maxPage'),
-			total : document.getElementById('TrayWidget.Showing.total'),
-			label_total : document.getElementById('TrayWidget.Showing.label_total'),
+			start : Elem('TrayWidget.Showing.start'),
+			end : Elem('TrayWidget.Showing.end'),
+			all : Elem('TrayWidget.Showing.all'),
+			currentPage : Elem('TrayWidget.Showing.currentPage'),
+			maxPage : Elem('TrayWidget.Showing.maxPage'),
+			total : Elem('TrayWidget.Showing.total'),
+			label_total : Elem('TrayWidget.Showing.label_total'),
 
-			left : document.getElementById('TrayWidget.Showing.left'),
-			double_left : document.getElementById('TrayWidget.Showing.double_left'),
-			right : document.getElementById('TrayWidget.Showing.right'),
-			double_right : document.getElementById('TrayWidget.Showing.double_right'),
+			left : Elem('TrayWidget.Showing.left'),
+			double_left : Elem('TrayWidget.Showing.double_left'),
+			right : Elem('TrayWidget.Showing.right'),
+			double_right : Elem('TrayWidget.Showing.double_right'),
 
 			getStart	: () => this.DOM.showing.start.innerText,
 			setStart	: (n) => this.DOM.showing.start.innerText = n,
@@ -175,10 +177,6 @@ const TrayWidget = (function() {
 
 	}
 
-/*
-* add 20220407 k.ogawa
-*/
-
 	function showing_leftClick() {
 
 		let start = parseInt(this.DOM.showing.getStart());
@@ -277,9 +275,6 @@ const TrayWidget = (function() {
 		this.API.movePage(role, type, folder, archive, start-1) ;
 	}
 
-/*
-* add 20220407 k.ogawa
-*/
 	function api_displayShowingTotal(total) {
 			//console.log("displayShowingTotal total="+total);
 
@@ -515,7 +510,7 @@ const TrayWidget = (function() {
 				cell_a0.textContent = "Company Name";
 			} else {
 
-				if(session.member_uuid === doc.seller_uuid) {
+				if(session.member_did === doc.seller_did) {
 					cell_a0.textContent = doc.buyer_organization || "";
 				} else {
 					cell_a0.textContent = doc.seller_organization || "";
@@ -602,7 +597,6 @@ const TrayWidget = (function() {
 	}
 
 /*
-* add 20220406 k.ogawa
 * Showing
 */
 	function showing_render(count) {
@@ -764,7 +758,6 @@ const TrayWidget = (function() {
 	}
 
 /*
-* add 20220405,20220411  k.ogawa
 * When you create a new Document, first display it on Draft Tray.
 * Next, select the created Document.
 */
@@ -802,7 +795,6 @@ const TrayWidget = (function() {
 	}
 
 /*
- * add 20220405
  * When you create a new Document, Simulate clicking on Draft Try List.
 */
 

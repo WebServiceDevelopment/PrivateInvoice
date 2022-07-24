@@ -34,12 +34,9 @@ const axios                 = require('axios')
 // Exports
 module.exports = {
 	connect					: seller_connect,
-	confirm 				: seller_confirm,
 	unconfirm				: seller_unconfirm,
 	paymentReservation		: seller_paymentReservation,
 	cancelPaymentReservation: seller_cancelPaymentReservation,
-	makePayment				: seller_makePayment,
-	return					: seller_return,
 
 	rollbackReturnToSent	: seller_rollbackReturnToSent,
 	rollbackConfirmToSent	: seller_rollbackConfirmToSent,
@@ -54,7 +51,7 @@ module.exports = {
 /*
  * getAccountOfSellerWallet
  */
-async function _getAccountOfSellerWallet(seller_host, seller_uuid, buyer_uuid) {
+async function _getAccountOfSellerWallet(seller_host, seller_did, buyer_did) {
 
     const  url = `${seller_host}/api/message/tellMeYourWalletAccount`;
 
@@ -62,8 +59,8 @@ async function _getAccountOfSellerWallet(seller_host, seller_uuid, buyer_uuid) {
         method : 'post',
         url : url,
         data : {
-            seller_uuid,
-            buyer_uuid
+            seller_did,
+            buyer_did
         }
     };
 
@@ -99,7 +96,7 @@ async function _getAccountOfSellerWallet(seller_host, seller_uuid, buyer_uuid) {
 /*
  * seller_connect
  */
-async function seller_connect(seller_host, document_uuid, buyer_uuid) {
+async function seller_connect(seller_host, document_uuid, buyer_did) {
 
     const  url = `${seller_host}/api/message/sellerToConnect`;
 
@@ -108,7 +105,7 @@ async function seller_connect(seller_host, document_uuid, buyer_uuid) {
         url : url,
         data : {
             document_uuid,
-            buyer_uuid
+            buyer_did
         }
     };
 
@@ -142,50 +139,9 @@ async function seller_connect(seller_host, document_uuid, buyer_uuid) {
 }
 
 /*
-* sent to confirm
-*/
-async function seller_confirm(seller_host, document_uuid, buyer_uuid) {
-
-    const url = `${seller_host}/api/message/sellerToConfirm`;
-
-    const params = {
-        method : 'post',
-        url : url,
-        data : {
-            document_uuid,
-            buyer_uuid
-        }
-    };
-
-    let response;
-    try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
-            response = {
-                status : 500,
-                data : 'ECONNRESET'
-            }
-        } else {
-            response = err.response;
-        }
-    }
-
-    if ( response == null) {
-		let msg = "Not Found."
-		response = {
-			status : 404,
-			data : msg
-		}
-    }
-    return [ response.status, response.data ];
-
-}
-
-/*
  * seller_unconfirm
  */
-async function seller_unconfirm(seller_host, document_uuid, buyer_uuid) {
+async function seller_unconfirm(seller_host, document_uuid, buyer_did) {
 
     const url = `${seller_host}/api/message/sellerToUnconfirm`;
 
@@ -194,7 +150,7 @@ async function seller_unconfirm(seller_host, document_uuid, buyer_uuid) {
         url : url,
         data : {
             document_uuid,
-            buyer_uuid
+            buyer_did
         }
     };
 
@@ -215,48 +171,6 @@ async function seller_unconfirm(seller_host, document_uuid, buyer_uuid) {
     if ( response == null) {
 		let msg = "Not Found."
 		response = {
-			status : 404,
-			data : msg
-		}
-    }
-    return [ response.status, response.data ];
-
-}
-
-/*
- * seller_makePayment
- */
-async function seller_makePayment(seller_host, document_uuid, buyer_uuid, hash) {
-
-    const url = `${seller_host}/api/message/sellerToMakePayment`;
-
-    const params = {
-        method : 'post',
-        url : url,
-        data : {
-            document_uuid,
-            buyer_uuid,
-			hash
-        }
-    };
-
-    let response;
-    try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
-            response = {
-                status : 500,
-                data : 'ECONNRESET'
-            }
-        } else {
-            response = err.response;
-        }
-    }
-
-    if ( response == null) {
-		let msg = "Not Found."
-        response = {
 			status : 404,
 			data : msg
 		}
@@ -268,7 +182,7 @@ async function seller_makePayment(seller_host, document_uuid, buyer_uuid, hash) 
 /*
 * paymentReservation
 */
-async function seller_paymentReservation(seller_host, document_uuid, buyer_uuid) {
+async function seller_paymentReservation(seller_host, document_uuid, buyer_did) {
 
     const url = `${seller_host}/api/message/sellerToPaymentReservation`;
 
@@ -277,7 +191,7 @@ async function seller_paymentReservation(seller_host, document_uuid, buyer_uuid)
         url : url,
         data : {
             document_uuid,
-            buyer_uuid
+            buyer_did
         }
     };
 
@@ -309,7 +223,7 @@ async function seller_paymentReservation(seller_host, document_uuid, buyer_uuid)
 /*
 * cancelPaymentReservation
 */
-async function seller_cancelPaymentReservation(seller_host, document_uuid, buyer_uuid) {
+async function seller_cancelPaymentReservation(seller_host, document_uuid, buyer_did) {
 
     const url = `${seller_host}/api/message/sellerToCancelPaymentReservation`;
 
@@ -318,7 +232,7 @@ async function seller_cancelPaymentReservation(seller_host, document_uuid, buyer
         url : url,
         data : {
             document_uuid,
-            buyer_uuid
+            buyer_did
         }
     };
 
@@ -348,50 +262,9 @@ async function seller_cancelPaymentReservation(seller_host, document_uuid, buyer
 }
 
 /*
-* sent to return
-*/
-async function seller_return(seller_host, document_uuid, buyer_uuid) {
-
-    const url = `${seller_host}/api/message/sellerToReturn`;
-
-    const params = {
-        method : 'post',
-        url : url,
-        data : {
-            document_uuid,
-            buyer_uuid
-        }
-    };
-
-    let response;
-    try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
-            response = {
-                status : 500,
-                data : 'ECONNRESET'
-            }
-        } else {
-            response = err.response;
-        }
-    }
-    if ( response == null) {
-        let msg = "Not Found."
-        response = {
-            status : 404,
-            data : msg
-        }
-    }
-
-    return [ response.status, response.data ];
-
-}
-
-/*
 *  return to sent
 */
-async function seller_rollbackReturnToSent(seller_host, document_uuid, buyer_uuid) {
+async function seller_rollbackReturnToSent(seller_host, document_uuid, buyer_did) {
 
     const url = `${seller_host}/api/message/sellerRollbackReturnToSent`;
 
@@ -400,7 +273,7 @@ async function seller_rollbackReturnToSent(seller_host, document_uuid, buyer_uui
         url : url,
         data : {
             document_uuid,
-            buyer_uuid
+            buyer_did
         }
     };
 
@@ -432,7 +305,7 @@ async function seller_rollbackReturnToSent(seller_host, document_uuid, buyer_uui
 /*
 * confirm to sent
 */
-async function seller_rollbackConfirmToSent(seller_host, document_uuid, buyer_uuid) {
+async function seller_rollbackConfirmToSent(seller_host, document_uuid, buyer_did) {
 
     const url = `${seller_host}/api/message/sellerRollbackConfirmToSent`;
 
@@ -441,7 +314,7 @@ async function seller_rollbackConfirmToSent(seller_host, document_uuid, buyer_uu
         url : url,
         data : {
             document_uuid,
-            buyer_uuid
+            buyer_did
         }
     };
 
@@ -473,7 +346,7 @@ async function seller_rollbackConfirmToSent(seller_host, document_uuid, buyer_uu
 /*
 * sent to confirm
 */
-async function seller_rollbackSentToConfirm(seller_host, document_uuid, buyer_uuid) {
+async function seller_rollbackSentToConfirm(seller_host, document_uuid, buyer_did) {
 
     const url = `${seller_host}/api/message/sellerRollbackSentToConfirm`;
 
@@ -482,7 +355,7 @@ async function seller_rollbackSentToConfirm(seller_host, document_uuid, buyer_uu
         url : url,
         data : {
             document_uuid,
-            buyer_uuid
+            buyer_did
         }
     };
 
@@ -514,7 +387,7 @@ async function seller_rollbackSentToConfirm(seller_host, document_uuid, buyer_uu
 /*
 * paid to confirm
 */
-async function seller_rollbackPaidToConfirm(seller_host, document_uuid, buyer_uuid) {
+async function seller_rollbackPaidToConfirm(seller_host, document_uuid, buyer_did) {
 
     const url = `${seller_host}/api/message/sellerRollbackPaidToConfirm`;
 
@@ -523,7 +396,7 @@ async function seller_rollbackPaidToConfirm(seller_host, document_uuid, buyer_uu
         url : url,
         data : {
             document_uuid,
-            buyer_uuid
+            buyer_did
         }
     };
 
