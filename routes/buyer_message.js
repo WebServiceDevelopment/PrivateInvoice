@@ -45,14 +45,14 @@ const CONTACTS					= "contacts";
  */
 router.post('/buyerToConnect', async (req, res) => {
 
-	//console.log(seller_uuid);
-	//console.log(buyer_uuid);
+	//console.log(seller_did);
+	//console.log(buyer_did);
 
-	const { seller_uuid, buyer_uuid } = req.body;
+	const { seller_did, buyer_did } = req.body;
 
 	// 1.
 	//
-	const [ seller_host, err ] = await sub.getSellerHost(CONTACTS, seller_uuid, buyer_uuid);
+	const [ seller_host, err ] = await sub.getSellerHost(CONTACTS, seller_did, buyer_did);
 	if(err) {
         console.log("Error getSellerHost");
 		return res.status(400).json(err);
@@ -64,12 +64,6 @@ router.post('/buyerToConnect', async (req, res) => {
         console.log("invalid request : req.ip="+req.ip+":seller_host="+seller_host);
         return res.status(400).json(err);
     }
-
-/*
-	console.log("/buyerToConnect accepted");
-	console.log(req.socket.localPort);
-	console.log(req.socket.remotePort);
-*/
 
 	return res.status(200).end('accepted');
 
@@ -95,18 +89,18 @@ router.post('/buyerToSend', async (req, res) => {
 	//console.log("/buyerToSend");
 
 	const { document, status } = req.body;
-	const { document_uuid, seller_uuid, buyer_uuid, document_json} = document;
+	const { document_uuid, seller_did, buyer_did, document_json} = document;
 
 	//console.log(document);
 	let errno, code;
 
 	// 1.
 
-	//console.log("/buyerToSend:"+CONTACTS+":"+ seller_uuid+":"+ buyer_uuid);
+	//console.log("/buyerToSend:"+CONTACTS+":"+ seller_did+":"+ buyer_did);
 
 	// 2. 
 	// Second we check to see if there is any contact information
-	const [ _2 , err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, buyer_uuid);
+	const [ _2 , err2 ] = await sub.getSellerHost(CONTACTS, seller_did, buyer_did);
 
 	if(err2) {
 		console.log("/buyerToSend:err 2");
@@ -172,7 +166,8 @@ router.post('/buyerToSend', async (req, res) => {
 	// 9.
 	//
    	conn.end();
-res.status(200).end('accepted');
+
+	res.status(200).end('accepted');
 
 	console.log("/buyerToSend accepted");
 });
@@ -184,7 +179,7 @@ res.status(200).end('accepted');
  */
 router.post('/buyerToWithdraw', async (req, res) => {
 
-	const { document_uuid, buyer_uuid, document_folder} = req.body;
+	const { document_uuid, buyer_did, document_folder} = req.body;
 
     // 1.
 	// STATUS
@@ -214,7 +209,7 @@ router.post('/buyerToWithdraw', async (req, res) => {
     }
 
 	// 3.
-	const [ _3, err3] = await sub.setWithdrawBuyer(BUYER__STATUS, document_uuid , buyer_uuid, document_folder );
+	const [ _3, err3] = await sub.setWithdrawBuyer(BUYER__STATUS, document_uuid , buyer_did, document_folder );
 	if(err3) {
 		console.log('/buyerToWithdraw err='+err3);
 		if(err3 == null) {
@@ -234,7 +229,7 @@ router.post('/buyerToWithdraw', async (req, res) => {
  */
 router.post('/buyerRollbackReturnToSent', async (req, res) => {
 
-	const { document_uuid, buyer_uuid, document_folder} = req.body;
+	const { document_uuid, buyer_did, document_folder} = req.body;
 
     // 1.
 	// STATUS
@@ -264,7 +259,7 @@ router.post('/buyerRollbackReturnToSent', async (req, res) => {
     }
 
 	// 3.
-	const [ _3, err3] = await sub.rollbackReturnToSent(BUYER__STATUS, document_uuid , buyer_uuid, document_folder );
+	const [ _3, err3] = await sub.rollbackReturnToSent(BUYER__STATUS, document_uuid , buyer_did, document_folder );
 	if(err3) {
 		console.log('/rollbackReturnToSent err='+err3);
 

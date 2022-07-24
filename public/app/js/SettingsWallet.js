@@ -29,17 +29,19 @@ const SettingsWallet = (function() {
 
 	this.MEM = {}
 
+    const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
 		balance : {
-			gwei : document.getElementById('SettingsWallet.balance.balanceGwei'),
-			wei : document.getElementById('SettingsWallet.balance.balanceWei'),
+			gwei : Elem('SettingsWallet.balance.balanceGwei'),
+			wei : Elem('SettingsWallet.balance.balanceWei'),
 		},
 		deposit : {
-			accountAddress : document.getElementById('SettingsWallet.deposit.accountAddress'),
-			networkType : document.getElementById('SettingsWallet.deposit.networkType'),
-			chainId : document.getElementById('SettingsWallet.deposit.chainId'),
+			accountAddress : Elem('SettingsWallet.deposit.accountAddress'),
+			networkType : Elem('SettingsWallet.deposit.networkType'),
+			chainId : Elem('SettingsWallet.deposit.chainId'),
 		},
-		RecentActivity : document.getElementById('SettingsWallet.RecentActivity.tbody'),
+		RecentActivity : Elem('SettingsWallet.RecentActivity.tbody'),
 	}
 
 	this.EVT = {
@@ -89,10 +91,13 @@ const SettingsWallet = (function() {
  * api_getResentActivityOfWallet
  */
     async function api_getResentActivityOfWallet() {
+		const LIST_MAX = 20;
 
 		const url = '/api/wallet/getResentActivityOfWallet';
 
         const params = {
+			"list_max": LIST_MAX,
+			"start_position":1
         }
 
 		const opts = {
@@ -132,6 +137,15 @@ const SettingsWallet = (function() {
 
 /*
  * api_renderResentActivity
+ *
+ * View Recent Activity
+ *
+ * Date				: activity[i].settlement_time	
+ * Type				: activity[i].type = [Sale , Purchase]
+ * Transaction Hash : activity[i].settlement_hash
+ * Receipt			: this.EVT.download_receipt
+ * Inviuce			: this.EVT.download_invoice
+ * Amount			: activity[i].amount;
  */
 	function api_renderResentActivity(activity) {
 
@@ -145,7 +159,7 @@ const SettingsWallet = (function() {
 			}
 
 		
-			json = JSON.stringify(JSON.parse(activity[i].document_json).credentialSubject);
+			json = JSON.stringify(activity[i].credentialSubject);
 
 			tr = this.DOM.RecentActivity.insertRow();
 
@@ -178,6 +192,20 @@ const SettingsWallet = (function() {
 			type.innerText = activity[i].type;
 			transaction_hash.innerText = activity[i].settlement_hash;
 			amount.innerText = activity[i].amount;
+
+			switch (activity[i].type) {
+			case "Sale":
+				date.title = activity[i].buyer_name;
+				transaction_hash.title = activity[i].buyer_id;
+			break;
+			case "Purchase":
+				date.title = activity[i].seller_name;
+				transaction_hash.title = activity[i].seller_id;
+			break;
+			default:
+				console.log("Error:renderResentActivity type="+activity[i].type);
+			break;
+			}
 
 		}
 	}
@@ -315,7 +343,10 @@ const SettingsWallet = (function() {
 		let wei = '0.'+balance[1];
 
 		this.DOM.balance.gwei.innerText = gwei.toLocaleString();
-		this.DOM.balance.wei.innerText = wei;
+
+		if(balance[1] != null )  {
+			this.DOM.balance.wei.innerText = wei;
+		}
 
 		let deposit  = this.DOM.deposit;
 		deposit.accountAddress.innerText = accountAddress;

@@ -35,7 +35,7 @@ const TEST_DATA = {
     "department": "Company Department"
   },
   "member": {
-    "member_uuid": "7738b330-c374-11ec-9a98-e1e3cbe42378",
+    "member_did": "7738b330-c374-11ec-9a98-e1e3cbe42378",
     "membername": "sonny",
     "work_email": "sonny@example.com"
   }
@@ -47,43 +47,45 @@ const SettingsContacts = (function() {
 		details : TEST_DATA
 	}
 
+    const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
 		table : {
-			page: document.getElementById('SettingsContacts.table.page')
+			page: Elem('SettingsContacts.table.page')
 		},
 		exportDetails : {
-			uses : document.getElementById('SettingsContacts.exportDetails.uses'),
-			partner : document.getElementById('SettingsContacts.exportDetails.partner'),
-			seller : document.getElementById('SettingsContacts.exportDetails.seller'),
-			buyer : document.getElementById('SettingsContacts.exportDetails.buyer'),
-			expire : document.getElementById('SettingsContacts.exportDetails.expire'),
-			submit : document.getElementById('SettingsContacts.exportDetails.submit')
+			uses : Elem('SettingsContacts.exportDetails.uses'),
+			partner : Elem('SettingsContacts.exportDetails.partner'),
+			seller : Elem('SettingsContacts.exportDetails.seller'),
+			buyer : Elem('SettingsContacts.exportDetails.buyer'),
+			expire : Elem('SettingsContacts.exportDetails.expire'),
+			submit : Elem('SettingsContacts.exportDetails.submit')
 		},
 		importDetails : {
-			file : document.getElementById('SettingsContacts.importDetails.file'),
-			area : document.getElementById('SettingsContacts.importDetails.area'),
-			select : document.getElementById('SettingsContacts.importDetails.select')
+			file : Elem('SettingsContacts.importDetails.file'),
+			area : Elem('SettingsContacts.importDetails.area'),
+			select : Elem('SettingsContacts.importDetails.select')
 		},
 		modal : {
-			body : document.getElementById('SettingsContacts.modal.body'),
-			close : document.getElementById('SettingsContacts.modal.close'), 
-			cancel : document.getElementById('SettingsContacts.modal.cancel'),
-			submit : document.getElementById('SettingsContacts.modal.submit')
+			body : Elem('SettingsContacts.modal.body'),
+			close : Elem('SettingsContacts.modal.close'), 
+			cancel : Elem('SettingsContacts.modal.cancel'),
+			submit : Elem('SettingsContacts.modal.submit')
 		},
 		form : {
-			origin : document.getElementById('SettingsContacts.form.origin'),
-			membername : document.getElementById('SettingsContacts.form.membername'),
-			work_email : document.getElementById('SettingsContacts.form.work_email'),
-			organization_name : document.getElementById('SettingsContacts.form.organization_name'),
-			organization_country : document.getElementById('SettingsContacts.form.organization_country'),
+			origin : Elem('SettingsContacts.form.origin'),
+			membername : Elem('SettingsContacts.form.membername'),
+			work_email : Elem('SettingsContacts.form.work_email'),
+			organization_name : Elem('SettingsContacts.form.organization_name'),
+			organization_country : Elem('SettingsContacts.form.organization_country'),
 
-			organization_postcode : document.getElementById('SettingsContacts.form.organization_postcode'),
-			organization_region : document.getElementById('SettingsContacts.form.organization_region'),
-			organization_city : document.getElementById('SettingsContacts.form.organization_city'),
-			organization_address : document.getElementById('SettingsContacts.form.organization_address'),
-			organization_building : document.getElementById('SettingsContacts.form.organization_building'),
-			organization_department : document.getElementById('SettingsContacts.form.organization_department'),
-			organization_tax_id : document.getElementById('SettingsContacts.form.organization_tax_id')
+			organization_postcode : Elem('SettingsContacts.form.organization_postcode'),
+			organization_region : Elem('SettingsContacts.form.organization_region'),
+			organization_city : Elem('SettingsContacts.form.organization_city'),
+			organization_address : Elem('SettingsContacts.form.organization_address'),
+			organization_building : Elem('SettingsContacts.form.organization_building'),
+			organization_department : Elem('SettingsContacts.form.organization_department'),
+			organization_tax_id : Elem('SettingsContacts.form.organization_tax_id')
 		}
 	}
 

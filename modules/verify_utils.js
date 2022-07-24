@@ -20,11 +20,11 @@
 
 // Libraries
 
-const axios								 = require('axios')
-const moment										= require('moment');
+const axios							= require('axios')
+const moment						= require('moment');
 
 // Sign
-const transmute								 = require('@transmute/vc.js');
+const transmute						= require('@transmute/vc.js');
 
 const {
 		Ed25519Signature2018,
@@ -41,7 +41,7 @@ const { resolve } = require('@transmute/did-key.js');
 
 // Database
 
-const db = require('../database.js');
+const db 							= require('../database.js');
 
 
 const documentLoader = async (iri) => {

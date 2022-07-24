@@ -210,7 +210,7 @@ const insertMember = async (member_did, body, eth_address, privatekey) => {
 	
 	sql = `
 		INSERT INTO members (
-			member_uuid,
+			member_did,
 			membername,
 			job_title,
 			work_email,
@@ -309,7 +309,7 @@ const getSessionData = async(member_did) => {
 	// 1.
 	sql = `
 		SELECT
-			member_uuid,
+			member_did,
 			membername,
 			job_title,
 			work_email,
@@ -319,7 +319,7 @@ const getSessionData = async(member_did) => {
 		FROM
 			members
 		WHERE
-			member_uuid = ?
+			member_did = ?
 	`;
 
 	let member_data;
@@ -415,11 +415,11 @@ router.post('/updateCompany', async function(req, res) {
         FROM
             members
         WHERE
-            member_uuid = ?
+            member_did = ?
     `;
 
     args = [
-        req.session.data.member_uuid,
+        req.session.data.member_did,
     ];
 
     try {
@@ -429,37 +429,6 @@ router.post('/updateCompany', async function(req, res) {
     }
 
 	// Step 2 : Update members table
-/*
-	let sql = `
-		UPDATE
-			${MEMBERS_TABLE}
-		SET
-			organization_name = ?,
-			organization_postcode = ?,
-			organization_address = ?,
-			organization_building = ?,
-			organization_department = ?,
-			organization_tax_id = ?,
-			addressCountry = ?,
-			addressRegion = ?,
-			addressCity = ?
-		WHERE
-			member_uuid = ?
-	`;
-
-	let args = [
-		req.body.organization_name,
-		req.body.organization_postcode,
-		req.body.organization_address,
-		req.body.organization_building,
-		req.body.organization_department,
-		req.body.organization_tax_id,
-		req.body.addressCountry,
-		req.body.addressRegion,
-		req.body.addressCity,
-		req.session.data.member_uuid
-	];
-*/
 
 	sql = `
 		UPDATE
@@ -530,20 +499,20 @@ router.post('/updateProfile', async function(req, res) {
 		UPDATE
 			${MEMBERS_TABLE}
 		SET
-			member_uuid = ?,
+			member_did = ?,
 			membername = ?,
 			job_title = ?,
 			work_email = ?
 		WHERE
-			member_uuid = ?
+			member_did = ?
 	`;
 
 	let args = [
-		req.body.member_uuid,
+		req.body.member_did,
 		req.body.membername,
 		req.body.job_title,
 		req.body.work_email,
-		req.session.data.member_uuid
+		req.session.data.member_did
 	];
 
 	// Step 2 : Write Changes to log database
@@ -563,7 +532,7 @@ router.post('/updateProfile', async function(req, res) {
 
 	// Step 3 : Update Current Reddis Session
 
-	req.session.data.member_uuid = req.body.member_uuid;
+	req.session.data.member_did = req.body.member_did;
 	req.session.data.membername = req.body.membername;
 	req.session.data.job_title = req.body.job_title;
 	req.session.data.work_email = req.body.work_email;
@@ -586,7 +555,7 @@ router.post('/login', async function(req, res) {
 	let sql;
 	sql = `
 		SELECT
-			member_uuid,
+			member_did,
 			membername,
 			job_title,
 			work_email,
@@ -671,7 +640,7 @@ router.post('/login', async function(req, res) {
 
 // 5.
 	delete member_data.password_hash;
-	member_data.member_uuid = member_data.member_uuid.toString();
+	member_data.member_did = member_data.member_did.toString();
 
 	if( member_data.avatar_uuid != null) {
 		member_data.avatar_uuid = member_data.avatar_uuid.toString();

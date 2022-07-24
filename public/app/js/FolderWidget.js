@@ -41,31 +41,33 @@ const FolderWidget = (function() {
 
 	}
 
+	const Elem = (id) => document.getElementById(id);
+
 	this.DOM = {
 		create : {
-			invoice : document.getElementById('FolderWidget.create.invoice'),
+			invoice : Elem('FolderWidget.create.invoice'),
 			display : () => this.DOM.create.invoice.display = "",
 			nondisplay : () => this.DOM.create.invoice.display = "none",
 		},
 		groups : {
-			invoice_out : document.getElementById('FolderWidget.groups.invoice_out'),
-			invoice_in : document.getElementById('FolderWidget.groups.invoice_in'),
-			draft : document.getElementById('FolderWidget.groups.draft'),
+			invoice_out : Elem('FolderWidget.groups.invoice_out'),
+			invoice_in : Elem('FolderWidget.groups.invoice_in'),
+			draft : Elem('FolderWidget.groups.draft'),
 		},
 		c : {
-			draft : document.getElementById('FolderWidget.c.draft'),
-			sent : document.getElementById('FolderWidget.c.sent'),
-			returned : document.getElementById('FolderWidget.c.returned'),
-			confirmed : document.getElementById('FolderWidget.c.confirmed'),
-			paid : document.getElementById('FolderWidget.c.paid'),
-			complete : document.getElementById('FolderWidget.c.complete')
+			draft : Elem('FolderWidget.c.draft'),
+			sent : Elem('FolderWidget.c.sent'),
+			returned : Elem('FolderWidget.c.returned'),
+			confirmed : Elem('FolderWidget.c.confirmed'),
+			paid : Elem('FolderWidget.c.paid'),
+			complete : Elem('FolderWidget.c.complete')
 		},
 		d : {
-			sent : document.getElementById('FolderWidget.d.sent'),
-			returned : document.getElementById('FolderWidget.d.returned'),
-			confirmed : document.getElementById('FolderWidget.d.confirmed'),
-			paid : document.getElementById('FolderWidget.d.paid'),
-			complete : document.getElementById('FolderWidget.d.complete')
+			sent : Elem('FolderWidget.d.sent'),
+			returned : Elem('FolderWidget.d.returned'),
+			confirmed : Elem('FolderWidget.d.confirmed'),
+			paid : Elem('FolderWidget.d.paid'),
+			complete : Elem('FolderWidget.d.complete')
 		}
 	}
 

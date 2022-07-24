@@ -91,41 +91,39 @@ router.post('/getReceiptInResentActivity', async function(req, res) {
  */
 router.post('/getResentActivityOfWallet', async function(req, res) {
 
-	const LIST_MAX = 20;
+	const OFFSET	= (req.body.start_position || 1) -1;
+	const LIST_MAX 	= (req.body.list_max|| 20)+OFFSET;
 
-	let len1, len2, len3, len4, len5, len6;
+	const SALE 		= "Sale";
+	const PURCHASE 	= "Purchase";
+
 	let Activity = [];
 	let Activity1 = [];
 	let Activity2 = [];
+
+
 	// 1.
-	// 
-	const a1 = await wallet_sub.getRecentActivity(SELLER_DOCUMENT, LIST_MAX);
-	const a2 = await wallet_sub.getRecentActivity(SELLER_DOCUMENT_ARCHIVE, LIST_MAX);
-	const a3 = await wallet_sub.getRecentActivity(BUYER_DOCUMENT, LIST_MAX);
-	const a4 = await wallet_sub.getRecentActivity(BUYER_DOCUMENT_ARCHIVE, LIST_MAX);
+	// Extract RecentActivity from each table and set Type (Sales, Purchase).
+	// In addition, _extract() extracts:
+	// - Amount
+	// - Buyer_name
+	// - Buyer_id
+	// - CredentialSubject
+    // 
+	const act = wallet_sub.getRecentActivity;
+
+	const 
+	[a1, len1] = _extract( await act(SELLER_DOCUMENT, LIST_MAX), SALE),
+	[a2, len2] = _extract( await act(SELLER_DOCUMENT_ARCHIVE, LIST_MAX), SALE),
+	[a3, len3] = _extract( await act(BUYER_DOCUMENT, LIST_MAX), PURCHASE),
+	[a4, len4] = _extract( await act(BUYER_DOCUMENT_ARCHIVE, LIST_MAX), PURCHASE);
+
 
 	// 2.
-	//
-	let json;
-
-	len1 = a1.length;
-	for(let i =0; i<len1; i++){
-		a1[i].type = "Sale";
-		json = JSON.parse(a1[i].document_json);
-		a1[i].amount = "+"+json.credentialSubject.totalPaymentDue.price +" "+ json.credentialSubject.totalPaymentDue.priceCurrency;
-	}
-
-	len2 = a2.length;
-	for(let i =0; i<len2; i++){
-		a2[i].type = "Sale";
-		json = JSON.parse(a2[i].document_json);
-		a2[i].amount = "+"+json.credentialSubject.totalPaymentDue.price +" "+ json.credentialSubject.totalPaymentDue.priceCurrency;
-	}
-
-	// 3.
+	// Sort by settlement_time in descending order.
 	//
 	let k = 0;
-	for( let i=0, j=0 ; i< len1 || j < len2; ) {
+	for( let i=0, j=0 ; i< len1 || j < len2; k++) {
 		if(i == len1) {
 			for(;j < len2;j++,k++) {
 				Activity1[k] = {...a2[j]};
@@ -145,31 +143,14 @@ router.post('/getResentActivityOfWallet', async function(req, res) {
 				Activity1[k] = {...a2[j]};
 				j++;
 		}
-
 	}
-	len5 = k;
+	const len5 = k;
 
-
-	// 4.
-	//
-	len3 = a3.length;
-	for(let i =0; i<len3; i++){
-		a3[i].type = "Purchase";
-		json = JSON.parse(a3[i].document_json);
-		a3[i].amount = "-"+json.credentialSubject.totalPaymentDue.price +" "+ json.credentialSubject.totalPaymentDue.priceCurrency;
-	}
-
-	len4 = a4.length;
-	for(let i =0; i<len4; i++){
-		a4[i].type = "Purchase";
-		json = JSON.parse(a4[i].document_json);
-		a4[i].amount = "-"+json.credentialSubject.totalPaymentDue.price +" "+ json.credentialSubject.totalPaymentDue.priceCurrency;
-	}
-
-	// 5.
+	// 3.
+	// Sort by settlement_time in descending order.
 	//
 	k = 0;
-	for( let i=0, j=0 ; i< len3 || j < len4; ) {
+	for( let i=0, j=0 ; i< len3 || j < len4; k++) {
 		if(i == len3) {
 			for(;j < len4;j++,k++) {
 				Activity2[k] = {...a4[j]};
@@ -189,40 +170,48 @@ router.post('/getResentActivityOfWallet', async function(req, res) {
 				Activity2[k] = {...a4[j]};
 				j++;
 		}
-		k++;
-
 	}
-	len6 = k;
+	const len6 = k;
 
-
-	// 6.
+	// 4.
+	// Sort by settlement_time in descending order, limited to 20.
 	//
+
 	k = 0;
-	for( let i=0, j=0 ; i< len5 || j < len6; ) {
+	for( let i=0, j=0 ; i< len5 || j < len6 ; k++) {
+
+		if( k >= LIST_MAX) {
+			break;
+		}
+
 		if(i == len5) {
 			for(;j < len6 &&  k < LIST_MAX;j++,k++) {
-				Activity[k] = {...Activity2[j]};
+				if(k >= OFFSET) {
+					Activity[k-OFFSET] = {...Activity2[j]};
+				}
 			}
 			break;
 		}
 		if(j == len6) {
 			for(;i < len5 && k < LIST_MAX ;i++,k++) {
-				Activity[k] = {...Activity1[i]};
+				if(k >= OFFSET) {
+					Activity[k-OFFSET] = {...Activity1[i]};
+				}
 			}
 			break;
 		}
 		if(Activity1[i].settlement_time >= Activity2[j].settlement_time) {
-				Activity[k] = {...Activity1[i]};
+				if(k >= OFFSET) {
+					Activity[k-OFFSET] = {...Activity1[i]};
+				}
 				i++;
 		} else {
-				Activity[k] = {...Activity2[j]};
+				if(k >= OFFSET) {
+					Activity[k-OFFSET] = {...Activity2[j]};
+				}
 				j++;
 		}
 
-		k++;
-		if( k >= LIST_MAX) {
-			break;
-		}
 	}
 
 	res.json({
@@ -233,6 +222,43 @@ router.post('/getResentActivityOfWallet', async function(req, res) {
 	});
 
 	return;
+
+	function _extract (row, type) {
+		let len = row.length;
+		let json;
+		const PLAS_MINUS = ((type) => {
+					switch(type) {
+					case SALE:
+						return "+";
+					case PURCHASE:
+						return "-";
+					default:
+						return "";
+					}
+				})(type);
+
+		for(let i =0; i<len; i++){
+			json = JSON.parse(row[i].document_json);
+
+			row[i].type = type;
+			row[i].amount = PLAS_MINUS+json.credentialSubject.totalPaymentDue.price +" "+ json.credentialSubject.totalPaymentDue.priceCurrency;
+			switch(type) {
+			case SALE:
+				row[i].buyer_name = `Buyer : ${json.credentialSubject.buyer.name}`;
+				row[i].buyer_id = `Buyer : ${json.credentialSubject.buyer.id}`;
+			break;
+			case PURCHASE:
+				row[i].seller_name = `seller : ${json.credentialSubject.buyer.name}`;
+				row[i].seller_id = `seller : ${json.credentialSubject.buyer.id}`;
+			break;
+			}
+			row[i].credentialSubject = json.credentialSubject;
+
+			delete(row[i].document_json)
+		}
+
+		return [row, len];
+	}
 
 });
 
@@ -245,7 +271,7 @@ router.post('/getResentActivityOfWallet', async function(req, res) {
 
 router.post('/getWalletInfo', async function(req, res) {
 
-	const { wallet_address, member_uuid } = req.session.data;
+	const { wallet_address, member_did } = req.session.data;
 	
 	// 1.
 	// 
@@ -301,12 +327,12 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	const METHOD = '/getCurrentBalanceOfBuyer'
 
 	const { document_uuid } = req.body;
-	const { member_uuid, wallet_address } = req.session.data;
+	const { member_did, wallet_address } = req.session.data;
 
     // 1.
-    // getSellerUuid
+    // getSellerDid
     //
-    const [ seller_uuid, err1 ] = await sub.getSellerUuid(BUYER_STATUS, document_uuid, member_uuid);
+    const [ seller_did, err1 ] = await sub.getSellerDid(BUYER_STATUS, document_uuid, member_did);
     if(err1) {
         console.log("Error 1 status = 400 err="+err1);
 
@@ -316,7 +342,7 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
     // 2.
     // getSellerHost
     //
-    const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
+    const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
     if(err2) {
         console.log("Error 2 status = 400 err="+err2);
         return res.status(400).end(err2);
@@ -377,7 +403,7 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	// 7.
 	// Get seller account
 	//
-	const [status7, data7] = await to_seller.getAccountOfSellerWallet(seller_host, seller_uuid, member_uuid) ;
+	const [status7, data7] = await to_seller.getAccountOfSellerWallet(seller_host, seller_did, member_did) ;
 
 	if(status7 != 200) {
 		console.log("Error 7 status = 400 err="+data7);
@@ -448,7 +474,6 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 /*
 *	const blockCount = 4;
 *	const newestBlock = "latest";
-*	//const rewardPercentiles = [25, 50, 75];
 *	const rewardPercentiles = ["25", "50", "75"];
 *
 *	const [ estimateGas, err11 ] = await  eth.getFeeHistory(web3, blockCount, newestBlock, rewardPercentiles ) ;

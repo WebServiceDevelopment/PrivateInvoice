@@ -75,12 +75,12 @@ router.post('/setProfileImage', async function(req, res) {
 		SET
 			avatar_uuid = ?
 		WHERE
-			member_uuid = ?
+			member_did = ?
 	`;
 
 	args = [
 		avatar_uuid,
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 	];
 
 	// Update the current changes in session object
@@ -134,11 +134,11 @@ router.post('/setCompanyLogo', async function(req, res) {
         FROM
             members
         WHERE
-            member_uuid = ?
+            member_did = ?
 	`;
 
 	args = [
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 	];
 
     try {
@@ -147,21 +147,6 @@ router.post('/setCompanyLogo', async function(req, res) {
         throw err;
     }
 
-/*
-	sql = `
-		UPDATE
-			members
-		SET
-			logo_uuid = ?
-		WHERE
-			member_uuid = ?
-	`;
-
-	args = [
-		logo_uuid,
-		req.session.data.member_uuid,
-	];
-*/
 	sql = `
 		UPDATE
 			organizations

@@ -51,7 +51,7 @@ router.post('/create', async function(req, res) {
 // 2.
 	let args = [
 		invite_code,
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 		req.body.buyer,
 		req.body.seller
 	];
@@ -61,7 +61,7 @@ router.post('/create', async function(req, res) {
 	let sql = `
 		INSERT INTO ${INVITE_TABLE} (
 			invite_code,
-			local_member_uuid,
+			local_member_did,
 			rel_buyer,
 			rel_seller,
 			max_count
@@ -95,12 +95,12 @@ router.post('/create', async function(req, res) {
 		WHERE
 			invite_code = ?
 		AND
-			local_member_uuid = ?
+			local_member_did = ?
 	`;
 
 	args = [
 		invite_code,
-		req.session.data.member_uuid
+		req.session.data.member_did
 	];
 
 	let row;
@@ -140,7 +140,7 @@ router.post('/list', async function(req, res) {
 		FROM
 			${INVITE_TABLE}
 		WHERE
-			local_member_uuid = ?
+			local_member_did = ?
 		AND
 			removed_on IS NULL
 		ORDER BY
@@ -148,7 +148,7 @@ router.post('/list', async function(req, res) {
 	`;
 
 	let args = [
-		req.session.data.member_uuid
+		req.session.data.member_did
 	];
 
 	let rows;
@@ -187,7 +187,7 @@ router.post('/submit', async function(req, res) {
 	let sql = `
 		SELECT
 			invite_code,
-			local_member_uuid as local_member_uuid,
+			local_member_did as local_member_did,
 			rel_buyer,
 			rel_seller,
 			use_count,
@@ -245,7 +245,7 @@ router.post('/submit', async function(req, res) {
 		});
 	}
 
-	invite.local_member_uuid = invite.local_member_uuid.toString();
+	invite.local_member_did = invite.local_member_did.toString();
 
 // 4.
 	// Then we increment the use count of the invite entry
@@ -281,8 +281,8 @@ router.post('/submit', async function(req, res) {
 		INSERT INTO ${CONTACTS_TABLE} (
 			contact_uuid,
 			invite_code,
-			seller_uuid,
-			buyer_uuid
+			seller_did,
+			buyer_did
 		) VALUES (
 			?,
 			?,
@@ -302,8 +302,8 @@ router.post('/submit', async function(req, res) {
 		args = [
 			contact_uuid,
 			invite.invite_code,
-			req.session.data.member_uuid,
-			invite.local_member_uuid
+			req.session.data.member_did,
+			invite.local_member_did
 		];
 
 		try {
@@ -324,8 +324,8 @@ router.post('/submit', async function(req, res) {
 		args = [
 			contact_uuid,
 			invite.invite_code,
-			invite.local_member_uuid,
-			req.session.data.member_uuid
+			invite.local_member_did,
+			req.session.data.member_did
 		];
 
 		try {
@@ -363,14 +363,14 @@ router.post('/contacts', async function(req, res) {
 
 	switch(req.body.contactType) {
 	case "sellers":
-		contactType = "seller_uuid";
-		myPosition = "buyer_uuid";
+		contactType = "seller_did";
+		myPosition = "buyer_did";
 
 		//console.log("/contacts sellers ");
 		break;
 	case "buyers":
-		contactType = "remote_member_uuid";
-		myPosition = "local_member_uuid";
+		contactType = "remote_member_did";
+		myPosition = "local_member_did";
 
 		//console.log("/contacts buyers ");
 		break;
@@ -384,7 +384,7 @@ router.post('/contacts', async function(req, res) {
 	let sql = `
 		SELECT
 			${contactType} AS contact_uuid,
-			remote_member_uuid,
+			remote_member_did,
 			remote_membername,
 			remote_origin,
 			remote_organization
@@ -397,7 +397,7 @@ router.post('/contacts', async function(req, res) {
 	`;
 
 	let args = [
-		req.session.data.member_uuid
+		req.session.data.member_did
 	];
 
 	let rows;
@@ -427,7 +427,7 @@ router.post('/contacts', async function(req, res) {
 		
 		return {
 			remote_origin : row.remote_origin,
-			member_uuid : row.remote_member_uuid,
+			member_did : row.remote_member_did,
 			membername : row.remote_membername,
             organization_name : org.name,
             organization_address : org.address,
@@ -501,21 +501,6 @@ router.post('/status', async function(req, res) {
 // 3.
 	// Then we need to check for the details of the host
 
-/*
-	sql = `
-		SELECT
-			membername,
-			organization_name,
-			organization_postcode,
-			organization_address,
-			organization_building,
-			organization_department
-		FROM
-			members
-		WHERE
-			member_uuid = ?
-	`;
-*/
 	sql = `
 		SELECT
 			membername,
@@ -523,11 +508,11 @@ router.post('/status', async function(req, res) {
 		FROM
 			members
 		WHERE
-			member_uuid = ?
+			member_did = ?
 	`;
 
 	args = [
-		invite.local_member_uuid
+		invite.local_member_did
 	];
 
 	let host;
@@ -621,13 +606,13 @@ router.post('/remove', async function(req, res) {
 		SET
 			removed_on = NOW()
 		WHERE
-			local_member_uuid = ?
+			local_member_did = ?
 		AND
 			invite_code = ?
 	`;
 
 	let args = [
-		req.session.data.member_uuid,
+		req.session.data.member_did,
 		req.body.invite_code
 	];
 

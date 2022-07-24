@@ -68,7 +68,7 @@ const CONTACTS					= "contacts";
 
 // Helper function
 
-const getPrivateKey = async(member_uuid) => {
+const getPrivateKey = async(member_did) => {
 
 	const sql = `
 		SELECT
@@ -76,11 +76,11 @@ const getPrivateKey = async(member_uuid) => {
 		FROM
 			members
 		WHERE
-			member_uuid = ?
+			member_did = ?
 	`;
 
 	const args = [
-		member_uuid
+		member_did
 	];
 
 	let row;
@@ -101,7 +101,7 @@ const getPrivateKey = async(member_uuid) => {
 
 }
 
-const getSellerAddress = async(seller_uuid, member_uuid) => {
+const getSellerAddress = async(seller_did, member_did) => {
 
 	const sql = `
 		SELECT
@@ -109,15 +109,15 @@ const getSellerAddress = async(seller_uuid, member_uuid) => {
 		FROM
 			contacts
 		WHERE
-			local_member_uuid = ?
+			local_member_did = ?
 		AND
-			remote_member_uuid = ?
+			remote_member_did = ?
 	`;
 
 
 	const args = [
-		member_uuid,
-		seller_uuid
+		member_did,
+		seller_did
 	]
 	
 	console.log(args);
@@ -148,14 +148,14 @@ router.post('/returnToSender', async function(req, res) {
 	let start = Date.now();
 
 	const { document_uuid } = req.body;
-	const { member_uuid } = req.session.data;
+	const { member_did } = req.session.data;
 
 	const USE_PRESENTATION = true;
 	let errno, code;
 
 	// 1.
 	//
-	const [ seller_uuid, err1 ] = await sub.getSellerUuid(BUYER_STATUS, document_uuid, member_uuid);
+	const [ seller_did, err1 ] = await sub.getSellerDid(BUYER_STATUS, document_uuid, member_did);
 	if(err1) {
 		console.log("Error 1 status = 400 err="+err1);
 
@@ -164,17 +164,21 @@ router.post('/returnToSender', async function(req, res) {
 
 	// 2.
 	//
-	const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
+	const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
 	if(err2) {
 		console.log("Error 2 status = 400 err="+err2);
-		return res.status(400).json(err2);
+		return res
+			.status(400)
+			.json(err2);
 	}
 
 	// 3. buyer connect check
 	//
 	
-	if(!USE_PRESENTATION) {
-		const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
+/*
+*	if(!USE_PRESENTATION) {
+*/
+		const [ code3, err3 ] = await to_seller.connect(seller_host, member_did, seller_did);
 
 		if(code3 !== 200) {
 			console.log("Error 3 code="+code3+":err="+err3);
@@ -184,9 +188,13 @@ router.post('/returnToSender', async function(req, res) {
 			} else {
 				msg = {"err":err3};
 			}
-			return res.status(400).json(msg);
+			return res
+				.status(400)
+				.json(msg);
 		}
-	}
+/*
+*	}
+*/
 
 	// 4.
 	// begin Transaction
@@ -197,44 +205,36 @@ router.post('/returnToSender', async function(req, res) {
 	// 5.
 	// Set BUYER_STATUS to 'return' with document_uuid as the key.
 	//
-	const [_5 , err5 ] = await tran.setReturn (conn, BUYER_STATUS, document_uuid , member_uuid);
+	const [_5 , err5 ] = await tran.setReturn (conn, BUYER_STATUS, document_uuid , member_did);
 
 	if (err5 ) {
 		errno = 5;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err5, errno));
+		return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err5, errno));
 	}
 	
 	// 6.
 	// Send a 'return' request to seller.
 	//
-	if(!USE_PRESENTATION) {
-		const [ code6, err6 ] = await to_seller.return(seller_host, document_uuid, member_uuid);
+   	// Get private keys to sign credential
 
-		if(code6 !== 200) {
-
-			errno = 6;
-			return res.status(400).json(tran.rollbackAndReturn(conn, code6, err6, errno));
-		}
-
-	} else {
-		
-    	// Get private keys to sign credential
-
-		const [keyPair, err] = await getPrivateKeys(member_uuid);
-		if(err) {
-			throw err;
-		}
-
-		const url = `${seller_host}/api/presentations/available`
-		console.log(url);
-		const credential = await createReturnMessage(document_uuid,member_uuid, keyPair);
-		const [ sent, err6 ] = await makePresentation(url, keyPair, credential);
-		if(err6) {
-			return res.status(400).json(tran.rollbackAndReturn(conn, 'code6', err6, 6));
-		}
-
+	const [keyPair, err] = await getPrivateKeys(member_did);
+	if(err) {
+		throw err;
 	}
+
+	const url = `${seller_host}/api/presentations/available`
+	console.log(url);
+	const credential = await createReturnMessage(document_uuid,member_did, keyPair);
+	const [ sent, err6 ] = await makePresentation(url, keyPair, credential);
+	if(err6) {
+		return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, 'code6', err6, 6));
+	}
+
 	
 	// 7.
 	// commit
@@ -250,7 +250,7 @@ router.post('/returnToSender', async function(req, res) {
 
 	// 8.
 	//
-		const [ code8, err8 ] = await to_seller.rollbackReturnToSent(seller_host, member_uuid, seller_uuid);
+		const [ code8, err8 ] = await to_seller.rollbackReturnToSent(seller_host, member_did, seller_did);
 
 		if(code8 !== 200) {
 			console.log("Error 8 code="+code8+":err="+err8);
@@ -260,7 +260,9 @@ router.post('/returnToSender', async function(req, res) {
 				msg = {"err":err8};
 			}
 		}
-		return res.status(400).json(msg);
+		return res
+			.status(400)
+			.json(msg);
 
 	}
 
@@ -292,43 +294,54 @@ router.post('/confirm', async function(req, res) {
 	let start = Date.now();
 
 	const { document_uuid } = req.body;
-	const { member_uuid } = req.session.data;
+	const { member_did } = req.session.data;
 
 	const USE_PRESENTATION = true;
 	let errno, code;
 
 	// 1.
 	//
-	const [ seller_uuid, err1 ] = await sub.getSellerUuid(BUYER_STATUS, document_uuid, member_uuid);
+	const [ seller_did, err1 ] = await sub.getSellerDid(BUYER_STATUS, document_uuid, member_did);
 	if(err1) {
 		console.log("Error 1 status = 400 err="+err1);
 
-		return res.status(400).json(err1);
+		return res
+			.status(400)
+			.json(err1);
 	}
 
 	// 2.
 	//
-	const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
+	const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
 
 	if(err2) {
 		console.log("Error 2 status = 400 err="+err2);
-		return res.status(400).json(err2);
+		return res
+			.status(400)
+			.json(err2);
 	}
 
 	//3. buyer connect check
 	//
 	
-	if(!USE_PRESENTATION) {
-		const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
+/*
+*	if(!USE_PRESENTATION) {
+*/
+		const [ code3, err3 ] = await to_seller.connect(seller_host, member_did, seller_did);
 
 		if(code3 !== 200) {
    			console.log("Error 3 code="+code3+":err="+err3);
    			const msg = code3 === 500 ? 
 				{"err":"The destination node cannot be found"} :
 				{"err":err3};
-			return res.status(400).json(msg);
+
+			return res
+				.status(400)
+				.json(msg);
 		}
-	}
+/*
+*	}
+*/
 
 
 	// 4.
@@ -339,45 +352,36 @@ router.post('/confirm', async function(req, res) {
 
 	// 5.
 	//
-	const [ _5, err5 ] = await tran.setConfirm (conn, BUYER_STATUS, document_uuid , member_uuid);
+	const [ _5, err5 ] = await tran.setConfirm (conn, BUYER_STATUS, document_uuid , member_did);
 
 	if (err5 ) {
 		errno = 5;
 		code = 400;
 
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err5, errno));
+		return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err5, errno));
 	}
 
 	// 6.
 	//
-	
-	if(!USE_PRESENTATION) {
-		const [ code6, err6 ] = await to_seller.confirm(seller_host, document_uuid, member_uuid);
+   	// Get private keys to sign credential
 
-		if(code6 !== 200) {
-			console.log("seller_host="+seller_host+":"+document_uuid+":"+member_uuid);
-			errno = 6;
-			return res.status(400).json(tran.rollbackAndReturn(conn, code6, err6, errno));
-		}
-
-	} else {
-		
-    	// Get private keys to sign credential
-
-		const [keyPair, err] = await getPrivateKeys(member_uuid);
-		if(err) {
-			throw err;
-		}
-
-		const url = `${seller_host}/api/presentations/available`
-		console.log(url);
-		const credential = await createConfirmMessage(document_uuid,member_uuid, keyPair);
-		const [ sent, err6 ] = await makePresentation(url, keyPair, credential);
-		if(err6) {
-			return res.status(400).json(tran.rollbackAndReturn(conn, 'code6', err6, 6));
-		}
-
+	const [keyPair, err] = await getPrivateKeys(member_did);
+	if(err) {
+		throw err;
 	}
+
+	const url = `${seller_host}/api/presentations/available`
+	console.log(url);
+	const credential = await createConfirmMessage(document_uuid,member_did, keyPair);
+	const [ sent, err6 ] = await makePresentation(url, keyPair, credential);
+	if(err6) {
+		return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, 'code6', err6, 6));
+	}
+
 	
 	// 7.
 	// commit
@@ -392,7 +396,7 @@ router.post('/confirm', async function(req, res) {
 
 	// 8.
 	//
-		const [ code8, err8 ] = await to_seller.rollbackConfirmToSent(seller_host, member_uuid, seller_uuid);
+		const [ code8, err8 ] = await to_seller.rollbackConfirmToSent(seller_host, member_did, seller_did);
 
 		if(code8 !== 200) {
 			console.log("Error 8 code="+code8+":err="+err8);
@@ -403,7 +407,9 @@ router.post('/confirm', async function(req, res) {
 			}
 		}
 
-		return res.status(400).json(msg);
+		return res
+			.status(400)
+			.json(msg);
 	}
 
 	// 9.
@@ -434,33 +440,37 @@ router.post('/unconfirm', async function(req, res) {
 	let start = Date.now();
 
 	const { document_uuid } = req.body;
-	const { member_uuid } = req.session.data;
+	const { member_did } = req.session.data;
 
 	let errno, code;
 
 	// 1.
 	//
-	const [ seller_uuid, err1 ] = await sub.getSellerUuid( BUYER_STATUS, document_uuid, member_uuid);
+	const [ seller_did, err1 ] = await sub.getSellerDid( BUYER_STATUS, document_uuid, member_did);
 
 	if(err1) {
 		console.log("Error 1 status = 400 err="+err1);
 
-		return res.status(400).json(err1);
+		return res
+			.status(400)
+			.json(err1);
 	}
 
 	// 2.
 	//
-	const [ seller_host, err2 ] = await sub.getSellerHost( CONTACTS, seller_uuid, member_uuid);
+	const [ seller_host, err2 ] = await sub.getSellerHost( CONTACTS, seller_did, member_did);
 
 	if(err2) {
 		console.log("Error 2 status = 400 err="+err2);
 
-		return res.status(400).json(err2);
+		return res
+			.status(400)
+			.json(err2);
 	}
 
 	// 3. buyer connect check
 	//
-	const [ code3 , err3 ] = await to_seller.connect( seller_host, member_uuid, seller_uuid);
+	const [ code3 , err3 ] = await to_seller.connect( seller_host, member_did, seller_did);
 
 	if( code3 !== 200) {
 		console.log("Error 3 code="+code3+":err="+err3);
@@ -470,7 +480,9 @@ router.post('/unconfirm', async function(req, res) {
 		} else {
 			msg = {"err":err3};
 		}
-		return res.status(400).json(msg);
+		return res
+			.status(400)
+			.json(msg);
 	}
 
 	// 4
@@ -481,21 +493,25 @@ router.post('/unconfirm', async function(req, res) {
 
 	// 5.
 	//
-	const [ _5, err5] = await tran.setUnconfirm (conn, BUYER_STATUS, document_uuid , member_uuid);
+	const [ _5, err5] = await tran.setUnconfirm (conn, BUYER_STATUS, document_uuid , member_did);
 
 	if (err5 ) {
 		errno = 54
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err5, errno));
+		return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err5, errno));
 	}
 
 	// 6.
 	//
-	const [ code6, err6 ] = await to_seller.unconfirm(seller_host, document_uuid, member_uuid);
+	const [ code6, err6 ] = await to_seller.unconfirm(seller_host, document_uuid, member_did);
 
 	if(code6 !== 200) {
 		errno = 6;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code6, err6, errno));
+		return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code6, err6, errno));
 	}
 
 	// 7.
@@ -510,7 +526,7 @@ router.post('/unconfirm', async function(req, res) {
 
 	// 8.
 	//
-		const [ code8, err8 ] = await to_seller.rollbackSentToConfirm(seller_host, member_uuid, seller_uuid);
+		const [ code8, err8 ] = await to_seller.rollbackSentToConfirm(seller_host, member_did, seller_did);
 
 		if(code8 !== 200) {
 			console.log("Error 8 code="+code8+":err="+err8);
@@ -520,7 +536,9 @@ router.post('/unconfirm', async function(req, res) {
 				msg = {"err":err8};
 			}
 		}
-		return res.status(400).json(msg);
+		return res
+			.status(400)
+			.json(msg);
 
 	}
 
@@ -555,38 +573,44 @@ router.post('/makePayment', async function(req, res) {
 	const USE_PRESENTATION = true;
 
 	const { document_uuid , gasLimit} = req.body;
-	const { member_uuid } = req.session.data;
+	const { member_did } = req.session.data;
 
 	let errno, code ;
 
 	// 1.
-	// getSellerUuid
+	// getSellerDid
 	//
-	const [ seller_uuid, err1 ] = await sub.getSellerUuid(BUYER_STATUS, document_uuid, member_uuid);
+	const [ seller_did, err1 ] = await sub.getSellerDid(BUYER_STATUS, document_uuid, member_did);
 
 	if(err1) {
 		console.log("Error 1 status = 400 err="+err1);
 
-		return res.status(400).json(err1);
+		return res
+			.status(400)
+			.json(err1);
 	}
 
 	// 2.
 	// getSellerHost
 	//
-	const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_uuid, member_uuid);
+	const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
 
 	if(err2) {
 		console.log("Error 2 status = 400 err="+err2);
 
-		return res.status(400).json(err2);
+		return res
+			.status(400)
+			.json(err2);
 	}
 
 	// 3.
 	// connect
 	
-	if(!USE_PRESENTATION) {
+/*
+*	if(!USE_PRESENTATION) {
+*/
 
-		const [ code3, err3 ] = await to_seller.connect(seller_host, member_uuid, seller_uuid);
+		const [ code3, err3 ] = await to_seller.connect(seller_host, member_did, seller_did);
 
 		if(code3 !== 200) {
 			console.log("Error 3 code="+code3+":err="+err3);
@@ -596,10 +620,15 @@ router.post('/makePayment', async function(req, res) {
 			} else {
 				msg = {"err":err3};
 			}
-			return res.status(400).json(msg);
+
+			return res
+				.status(400)
+				.json(msg);
 		}
 
-	}
+/*
+*	}
+*/
 
 	// 4.
 	// Ask for remittance amount from document.
@@ -610,7 +639,7 @@ router.post('/makePayment', async function(req, res) {
 	
 	if(!USE_PRESENTATION) {
 
-		const [ code5, err5 ] = await to_seller.paymentReservation(seller_host, document_uuid, member_uuid);
+		const [ code5, err5 ] = await to_seller.paymentReservation(seller_host, document_uuid, member_did);
 
 		if(code5 !== 200) {
 			console.log("Error 5 code="+code5+":err="+err5);
@@ -620,7 +649,9 @@ router.post('/makePayment', async function(req, res) {
 			} else {
 				msg = {"err":err5};
 			}
-			return res.status(400).json(msg);
+			return res
+				.status(400)
+				.json(msg);
 		}
 
 	}
@@ -632,12 +663,13 @@ router.post('/makePayment', async function(req, res) {
 	const [ document , err6 ] = await sub.getDocument(BUYER_DOCUMENT, document_uuid);
 
 	if(err6) {
-		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
+		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
 
 		console.log("error 6: getDocumen");
 
-		return res.status(400).json(err6);
-		return;
+		return res
+			.status(400)
+			.json(err6);
 	}
 
 	// 7.
@@ -646,15 +678,16 @@ router.post('/makePayment', async function(req, res) {
 	try {
 		doc = JSON.parse( document.document_json);
 	} catch (err7) {
-		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
+		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
 
 		console.log("error JSON.parse ="+doc);
 		for (let key in doc){
 			console.log(key +":"+ doc[key]);
 		}
 
-		return res.status(400).json(err7);
-		return;
+		return res
+			.status(400)
+			.json(err7);
 	}
 
 	// 8.
@@ -672,27 +705,31 @@ router.post('/makePayment', async function(req, res) {
 	const [ balanceWei_1, err9 ] = await  eth.getBalance(web3, contract_address) ;
 
 	if( err9 ) {
-		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
+		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
 		console.log("error 9: getBalance");
-		return res.status(400).json(err9);
-		return;
+
+		return res
+			.status(400)
+			.json(err9);
 	}
 
 
 	// 10.
 	// Get seller account
 	
-	const to_address = await getSellerAddress(seller_uuid, member_uuid);
+	const to_address = await getSellerAddress(seller_did, member_did);
 	
 	/*
-	const [status10, data10] = await to_seller.getAccountOfSellerWallet(seller_host, seller_uuid, member_uuid) ;
+	const [status10, data10] = await to_seller.getAccountOfSellerWallet(seller_host, seller_did, member_did) ;
 
 	if(status10 != 200) {
-		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
+		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
 
 		console.log("Error 10 status = 400 err="+data10);
 
-		return res.status(400).json(data10);
+		return res
+			.status(400)
+			.json(data10);
 	}
 
 	const msg = (data10.msg);
@@ -737,7 +774,7 @@ router.post('/makePayment', async function(req, res) {
 	
 
 	// const PrivateKey = process.env.PRIVATE_KEY;
-	const PrivateKey = await getPrivateKey(member_uuid);
+	const PrivateKey = await getPrivateKey(member_did);
 
 	// 14. 
 	// sendTransaction
@@ -746,11 +783,13 @@ router.post('/makePayment', async function(req, res) {
 	const [ receipt14, err14 ] = await util.sendSignedTransaction (web3, contract_address, PrivateKey, to_address, gasLimit, makePaymantTo, ipfs_cid_hex)
 
 	if ( err14) {
-		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
+		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
 
 		let rt = {err:"Error : sendSignedTransaction failed."};
 
-		return res.status(400).json(rt);
+		return res
+			.status(400)
+			.json(rt);
 	}
 
 	const hash = receipt14.transactionHash;
@@ -767,14 +806,16 @@ router.post('/makePayment', async function(req, res) {
 	// 16.
 	// setMakePayment_status
 	//
-	const [ _16, err16 ] = await tran.setMakePayment_status (conn, BUYER_STATUS, document_uuid , member_uuid);
+	const [ _16, err16 ] = await tran.setMakePayment_status (conn, BUYER_STATUS, document_uuid , member_did);
 
 	if (err16 ) {
-		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
+		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
 
 		errno = 16;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err16, errno));
+		return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err16, errno));
 	}
 
 	// 17.
@@ -783,44 +824,34 @@ router.post('/makePayment', async function(req, res) {
 	const [ _17, err17 ] = await tran.setMakePayment_document (conn, BUYER_DOCUMENT, document_uuid , hash);
 
 	if (err17 ) {
-		await util.cancelPaymentReservation(seller_host, document_uuid, member_uuid);
+		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
 
 		errno = 17;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err17, errno));
+		return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err17, errno));
 	}
 
 
 	// 18.
 	// makePayment
 	//
-	
-	if(!USE_PRESENTATION) {
+   	// Get private keys to sign credential
 
-		const [ code18, err18 ] = await to_seller.makePayment(seller_host, document_uuid, member_uuid, hash);
+	const [keyPair, err] = await getPrivateKeys(member_did);
+	if(err) {
+		throw err;
+	}
 
-		if(code18 !== 200) {
-			errno = 18;
-			return res.status(400).json(tran.rollbackAndReturn(conn, code18, err18, errno));
-		}
-
-	} else {
-		
-    	// Get private keys to sign credential
-
-		const [keyPair, err] = await getPrivateKeys(member_uuid);
-		if(err) {
-			throw err;
-		}
-
-		const url = `${seller_host}/api/presentations/available`
-		console.log(url);
-		const credential = await createPaymentMessage(document_uuid,member_uuid, keyPair, hash);
-		const [ sent, err18 ] = await makePresentation(url, keyPair, credential);
-		if(err18) {
-			return res.status(400).json(tran.rollbackAndReturn(conn, 'code18', err18, 18));
-		}
-
+	const url = `${seller_host}/api/presentations/available`
+	console.log(url);
+	const credential = await createPaymentMessage(document_uuid,member_did, keyPair, hash);
+	const [ sent, err18 ] = await makePresentation(url, keyPair, credential);
+	if(err18) {
+		return res
+			.status(400)
+			.json(tran.rollbackAndReturn(conn, 'code18', err18, 18));
 	}
 
 
@@ -837,7 +868,7 @@ router.post('/makePayment', async function(req, res) {
 
 	// 20.
 	// rollback
-		const [ code20, err20 ] = await to_seller.rollbackPaidToConfirm(seller_host, member_uuid, seller_uuid);
+		const [ code20, err20 ] = await to_seller.rollbackPaidToConfirm(seller_host, member_did, seller_did);
 
 		if(code20 !== 200) {
 			console.log("Error 20 code="+code20+":err="+err20);
@@ -848,7 +879,9 @@ router.post('/makePayment', async function(req, res) {
 			}
 		}
 
-		return res.status(400).json(msg);
+		return res
+			.status(400)
+			.json(msg);
 	}
 
 
@@ -866,7 +899,6 @@ router.post('/makePayment', async function(req, res) {
    	let balanceETH_2 = web3.utils.fromWei(balanceWei_2 , 'ether');
    	let balanceETH_3 = web3.utils.fromWei((BigInt(balanceWei_1) - BigInt(balanceWei_2)).toString() , 'ether');
 
-	//console.log("Before:"+balanceETH_1+"ETH"+":"+"After:"+balanceETH_2+"ETH"+"paid="+balanceETH_3+" ETH");
 
 	// 23.
 	// ETH transaction result
