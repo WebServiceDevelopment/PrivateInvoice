@@ -41,6 +41,7 @@ const { eth } = web3;
 
 const db					= require('../database.js');
 const MEMBERS_TABLE			= "members";
+const { handleLogin } = require('../modules/sessions.js');
 
 // Module Functions
 
@@ -396,6 +397,14 @@ router.get("/logout", function(req, res) {
  */
 router.all('/check', async function(req, res) {
 
+	const isLoggedIn = (req.session && req.session.data) ? true : false;
+
+	if(!isLoggedIn) {
+		return res.status(400).json({
+			message: 'No active session found for request'
+		});
+	}
+
 	res.json(req.session.data);
 
 });
@@ -550,102 +559,14 @@ router.post('/updateProfile', async function(req, res) {
  */
 router.post('/login', async function(req, res) {
 
-	// 1.
-	
-	let sql;
-	sql = `
-		SELECT
-			member_did,
-			membername,
-			job_title,
-			work_email,
-			password_hash,
-			organization_uuid,
-			created_on,
-			wallet_address,
-			avatar_uuid
-		FROM
-			${MEMBERS_TABLE}
-		WHERE
-			work_email = ?
-	`;
+	const { membername, password } = req.body;
 
-	let member_data;
-
-	try {
-		member_data = await db.selectOne(sql, [req.body.membername]);
-	} catch(err) {
-		throw err;
+	const [ data, err ] = await handleLogin(membername, password);
+	if(err) {
+		return res.status(400).json(err);
 	}
 
-	if(!member_data) {
-		console.log("req.body.membername="+req.body.membername);
-		return res.json({
-			err : 100,
-			msg : "USERNAME NOT FOUND"
-		});
-	}
-
-// 2.
-	let match = false;
-
-	try {
-		match = await db.compare(req.body.password, member_data.password_hash);
-	} catch(err) {
-		throw err;
-	}
-
-	if(!match) {
-		return res.json({
-			err : 100,
-			msg : "INCORRECT PASSWORD"
-		});
-	}
-
-// 3.
-	sql = `
-		SELECT
-			organization_name,
-			organization_postcode,
-			organization_address,
-			organization_building,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			addressCity
-		FROM
-			organizations
-		WHERE
-			organization_uuid = ?
-	`;
-	let org;
-	try {
-		org = await db.selectOne(sql, [member_data.organization_uuid]);
-	} catch(err) {
-		return [null, err];
-	}
-
-// 4.
-	member_data.organization_name		= org.organization_name;
-	member_data.organization_postcode	= org.organization_postcode;
-	member_data.organization_address	= org.organization_address;
-	member_data.organization_building	= org.organization_building;
-	member_data.organization_department	= org.organization_department;
-	member_data.organization_tax_id		= org.organization_tax_id;
-	member_data.addressCountry			= org.addressCountry;
-	member_data.addressRegion			= org.addressRegion;
-	member_data.addressCity				= org.addressCity;
-
-
-// 5.
-	delete member_data.password_hash;
-	member_data.member_did = member_data.member_did.toString();
-
-	if( member_data.avatar_uuid != null) {
-		member_data.avatar_uuid = member_data.avatar_uuid.toString();
-	}
-	req.session.data = member_data;
+	req.session.data = data;
 
 	res.json({
 		err : 0,
