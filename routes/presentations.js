@@ -40,12 +40,16 @@ const challenges = {}
 
 // Define
 
+/*
+ * 1.
+ * available
+ */
 router.post('/available', async (req, res) => {
     console.log('--- /api/presentations/available ---')
     console.log(req.body)
 
     // Create a challenge
-    const domain = process.env.DOMAIN || `${process.env.SERVER_IP_ADDRESS}:${process.env.SERVER_PORT}`
+    const domain = process.env.SERVER_LOCATION.split("://")[1];
     const challenge = uuidv4()
 
 	console.log("domain ="+domain);
@@ -64,7 +68,12 @@ router.post('/available', async (req, res) => {
     })
 })
 
+/*
+ * 2.
+ * submissions
+ */
 router.post('/submissions', async (req, res) => {
+
     console.log('--- /api/presentations/submissions ---')
     const signedPresentation = req.body
     const { domain, challenge } = signedPresentation.proof
@@ -80,17 +89,8 @@ router.post('/submissions', async (req, res) => {
 
     // 2.
     // Then we need to verify the presentation
-    // TODO: Figure out why this does not verify
-    // https://github.com/WebServiceDevelopment/PrivateInvoice/issues/15
-
-    const result = await verifyPresentation(signedPresentation)
-
-	console.log('Are credentials verified?');
-    console.log(result.credentials)
-
-	console.log('Is presentation verified?');
-    console.log(result.presentation)
-
+    
+	const result = await verifyPresentation(signedPresentation)
     if (!result.verified) {
         // return 400;
     }
@@ -100,18 +100,8 @@ router.post('/submissions', async (req, res) => {
     // handle the contents of credentials that have been sent
     // to us
 
-    console.log('Signed Presentation')
-    console.log(signedPresentation)
-
     const { verifiableCredential } = signedPresentation
-
-    console.log('Verifiable Credential List')
-    console.log(verifiableCredential)
-
     const [credential] = verifiableCredential
-
-    console.log('Credential')
-    console.log(credential)
 
     // First option is a contact request, which does not require the
     // controller to be in the list of contacts

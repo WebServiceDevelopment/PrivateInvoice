@@ -30,17 +30,18 @@ module.exports				= router;
 
 const uuidv1				= require('uuid').v1
 const bip39					= require('bip39')
-const { ethers } = require('ethers')
+const { ethers }			= require('ethers')
 
-const Web3 = require('web3')
-const web3 = new Web3(process.env.GANACHE_ADDRESS)
-const { eth } = web3;
+const Web3					= require('web3')
+const web3					= new Web3(process.env.GANACHE_ADDRESS)
+const { eth }				= web3;
 
 
 // Database
 
 const db					= require('../database.js');
 const MEMBERS_TABLE			= "members";
+const { handleLogin }		= require('../modules/sessions.js');
 
 // Module Functions
 
@@ -396,256 +397,32 @@ router.get("/logout", function(req, res) {
  */
 router.all('/check', async function(req, res) {
 
+	const isLoggedIn = (req.session && req.session.data) ? true : false;
+
+	if(!isLoggedIn) {
+		return res.status(400).json({
+			message: 'No active session found for request'
+		});
+	}
+
 	res.json(req.session.data);
 
 });
 
 /*
  * 3.
- * Should be in settings (profile)
- */
-router.post('/updateCompany', async function(req, res) {
-
-	let sql, args, row;
-	// step 1 
-
-	sql = `
-        SELECT
-            organization_uuid,
-        FROM
-            members
-        WHERE
-            member_did = ?
-    `;
-
-    args = [
-        req.session.data.member_did,
-    ];
-
-    try {
-        row = await db.selectOne(sql, args);
-    } catch (err) {
-        throw err;
-    }
-
-	// Step 2 : Update members table
-
-	sql = `
-		UPDATE
-			organizations
-		SET
-			organization_name = ?,
-			organization_postcode = ?,
-			organization_address = ?,
-			organization_building = ?,
-			organization_department = ?,
-			organization_tax_id = ?,
-			addressCountry = ?,
-			addressRegion = ?,
-			addressCity = ?
-		WHERE
-			organization_uuid = ?
-	`;
-
-	args = [
-		req.body.organization_name,
-		req.body.organization_postcode,
-		req.body.organization_address,
-		req.body.organization_building,
-		req.body.organization_department,
-		req.body.organization_tax_id,
-		req.body.addressCountry,
-		req.body.addressRegion,
-		req.body.addressCity,
-		row.organization_uuid
-	];
-
-	// Step 3 : Write Changes to log database
-
-	try {
-		await db.update(sql, args);
-	} catch(err) {
-		throw err;
-	}
-
-	// Step 4 : Update Current Reddis Session
-
-	req.session.data.organization_name = req.body.organization_name;
-	req.session.data.organization_postcode = req.body.organization_postcode;
-	req.session.data.organization_address = req.body.organization_address;
-	req.session.data.organization_building = req.body.organization_building;
-	req.session.data.organization_department = req.body.organization_department;
-	req.session.data.organization_tax_id = req.body.organization_tax_id;
-	req.session.data.addressCountry = req.body.addressCountry;
-	req.session.data.addressRegion = req.body.addressRegion;
-	req.session.data.addressCity = req.body.addressCity;
-
-	res.json({
-		err : 0,
-		msg : 'okay'
-	});
-
-});
-
-/*
- * 4.
- * Should be in settings
- */
-router.post('/updateProfile', async function(req, res) {
-
-	// Step 1 : Update members table
-
-	let sql = `
-		UPDATE
-			${MEMBERS_TABLE}
-		SET
-			member_did = ?,
-			membername = ?,
-			job_title = ?,
-			work_email = ?
-		WHERE
-			member_did = ?
-	`;
-
-	let args = [
-		req.body.member_did,
-		req.body.membername,
-		req.body.job_title,
-		req.body.work_email,
-		req.session.data.member_did
-	];
-
-	// Step 2 : Write Changes to log database
-
-	let result, err;
-	try {
-		result = await db.update(sql, args);
-	} catch(err) {
-		//throw err;
-		return res.status(400).end(err);
-	}
-
-	if(result.affectedRows != 1) {
-		err = {err: 9, msg :"result.affectedRows != 1"}
-		return res.status(406).end(err);
-	}
-
-	// Step 3 : Update Current Reddis Session
-
-	req.session.data.member_did = req.body.member_did;
-	req.session.data.membername = req.body.membername;
-	req.session.data.job_title = req.body.job_title;
-	req.session.data.work_email = req.body.work_email;
-
-	res.json({
-		err : 0,
-		msg : 'okay'
-	});
-
-});
-
-/*
- * 5.
  * login
  */
 router.post('/login', async function(req, res) {
 
-	// 1.
-	
-	let sql;
-	sql = `
-		SELECT
-			member_did,
-			membername,
-			job_title,
-			work_email,
-			password_hash,
-			organization_uuid,
-			created_on,
-			wallet_address,
-			avatar_uuid
-		FROM
-			${MEMBERS_TABLE}
-		WHERE
-			work_email = ?
-	`;
+	const { membername, password } = req.body;
 
-	let member_data;
-
-	try {
-		member_data = await db.selectOne(sql, [req.body.membername]);
-	} catch(err) {
-		throw err;
+	const [ data, err ] = await handleLogin(membername, password);
+	if(err) {
+		return res.status(400).json(err);
 	}
 
-	if(!member_data) {
-		console.log("req.body.membername="+req.body.membername);
-		return res.json({
-			err : 100,
-			msg : "USERNAME NOT FOUND"
-		});
-	}
-
-// 2.
-	let match = false;
-
-	try {
-		match = await db.compare(req.body.password, member_data.password_hash);
-	} catch(err) {
-		throw err;
-	}
-
-	if(!match) {
-		return res.json({
-			err : 100,
-			msg : "INCORRECT PASSWORD"
-		});
-	}
-
-// 3.
-	sql = `
-		SELECT
-			organization_name,
-			organization_postcode,
-			organization_address,
-			organization_building,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			addressCity
-		FROM
-			organizations
-		WHERE
-			organization_uuid = ?
-	`;
-	let org;
-	try {
-		org = await db.selectOne(sql, [member_data.organization_uuid]);
-	} catch(err) {
-		return [null, err];
-	}
-
-// 4.
-	member_data.organization_name		= org.organization_name;
-	member_data.organization_postcode	= org.organization_postcode;
-	member_data.organization_address	= org.organization_address;
-	member_data.organization_building	= org.organization_building;
-	member_data.organization_department	= org.organization_department;
-	member_data.organization_tax_id		= org.organization_tax_id;
-	member_data.addressCountry			= org.addressCountry;
-	member_data.addressRegion			= org.addressRegion;
-	member_data.addressCity				= org.addressCity;
-
-
-// 5.
-	delete member_data.password_hash;
-	member_data.member_did = member_data.member_did.toString();
-
-	if( member_data.avatar_uuid != null) {
-		member_data.avatar_uuid = member_data.avatar_uuid.toString();
-	}
-	req.session.data = member_data;
+	req.session.data = data;
 
 	res.json({
 		err : 0,
@@ -686,7 +463,7 @@ const insertFunds = async ( newMemberAddress ) => {
 }
 
 /*
- * 6.
+ * 4.
  * signup
  */
 
@@ -783,4 +560,148 @@ router.post('/signup', async function(req, res) {
 
 });
 
+
+/*
+ * 5.
+ * Should be in settings (profile)
+ */
+router.post('/updateCompany', async function(req, res) {
+
+	let sql, args, row;
+	// step 1 
+
+	sql = `
+        SELECT
+            organization_uuid,
+        FROM
+            members
+        WHERE
+            member_did = ?
+    `;
+
+    args = [
+        req.session.data.member_did,
+    ];
+
+    try {
+        row = await db.selectOne(sql, args);
+    } catch (err) {
+        throw err;
+    }
+
+	// Step 2 : Update members table
+
+	sql = `
+		UPDATE
+			organizations
+		SET
+			organization_name = ?,
+			organization_postcode = ?,
+			organization_address = ?,
+			organization_building = ?,
+			organization_department = ?,
+			organization_tax_id = ?,
+			addressCountry = ?,
+			addressRegion = ?,
+			addressCity = ?
+		WHERE
+			organization_uuid = ?
+	`;
+
+	args = [
+		req.body.organization_name,
+		req.body.organization_postcode,
+		req.body.organization_address,
+		req.body.organization_building,
+		req.body.organization_department,
+		req.body.organization_tax_id,
+		req.body.addressCountry,
+		req.body.addressRegion,
+		req.body.addressCity,
+		row.organization_uuid
+	];
+
+	// Step 3 : Write Changes to log database
+
+	try {
+		await db.update(sql, args);
+	} catch(err) {
+		throw err;
+	}
+
+	// Step 4 : Update Current Reddis Session
+
+	req.session.data.organization_name = req.body.organization_name;
+	req.session.data.organization_postcode = req.body.organization_postcode;
+	req.session.data.organization_address = req.body.organization_address;
+	req.session.data.organization_building = req.body.organization_building;
+	req.session.data.organization_department = req.body.organization_department;
+	req.session.data.organization_tax_id = req.body.organization_tax_id;
+	req.session.data.addressCountry = req.body.addressCountry;
+	req.session.data.addressRegion = req.body.addressRegion;
+	req.session.data.addressCity = req.body.addressCity;
+
+	res.json({
+		err : 0,
+		msg : 'okay'
+	});
+
+});
+
+/*
+ * 6.
+ * Should be in settings
+ */
+router.post('/updateProfile', async function(req, res) {
+
+	// Step 1 : Update members table
+
+	let sql = `
+		UPDATE
+			${MEMBERS_TABLE}
+		SET
+			member_did = ?,
+			membername = ?,
+			job_title = ?,
+			work_email = ?
+		WHERE
+			member_did = ?
+	`;
+
+	let args = [
+		req.body.member_did,
+		req.body.membername,
+		req.body.job_title,
+		req.body.work_email,
+		req.session.data.member_did
+	];
+
+	// Step 2 : Write Changes to log database
+
+	let result, err;
+	try {
+		result = await db.update(sql, args);
+	} catch(err) {
+		//throw err;
+		return res.status(400).end(err);
+	}
+
+	if(result.affectedRows != 1) {
+		err = {err: 9, msg :"result.affectedRows != 1"}
+		return res.status(406).end(err);
+	}
+
+	// Step 3 : Update Current Reddis Session
+
+	req.session.data.member_did = req.body.member_did;
+	req.session.data.membername = req.body.membername;
+	req.session.data.job_title = req.body.job_title;
+	req.session.data.work_email = req.body.work_email;
+
+	res.json({
+		err : 0,
+		msg : 'okay'
+	});
+
+});
 

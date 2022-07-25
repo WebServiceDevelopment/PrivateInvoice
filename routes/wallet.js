@@ -57,16 +57,16 @@ const CONTACTS                  = "contacts";
  * 1.
  * getReceiptInResentActivity
  */
-router.post('/getReceiptInResentActivity', async function(req, res) {
+router.get('/getReceiptInResentActivity', async function(req, res) {
 
-	const hash = req.body.settlement_hash;
+	const hash = req.query.settlement_hash;
 
 	// 1.
 	//
 	const [ receipt, err1 ] = await  eth.getTransactionReceipt(web3, hash) ;
 
 	if(err1) {
-		console.log("error balanceWei");
+		console.log("error balanceWei 1.1");
 		res.json({
 			err : err1,
 			msg : null
@@ -89,10 +89,10 @@ router.post('/getReceiptInResentActivity', async function(req, res) {
  * 2.
  * getResentActivityOfWallet
  */
-router.post('/getResentActivityOfWallet', async function(req, res) {
+router.get('/getResentActivityOfWallet', async function(req, res) {
 
-	const OFFSET	= (req.body.start_position || 1) -1;
-	const LIST_MAX 	= (req.body.list_max|| 20)+OFFSET;
+	const OFFSET	= (req.query.start_position || 1) -1;
+	const LIST_MAX 	= (req.query.list_max|| 20)+OFFSET;
 
 	const SALE 		= "Sale";
 	const PURCHASE 	= "Purchase";
@@ -269,9 +269,10 @@ router.post('/getResentActivityOfWallet', async function(req, res) {
 
 
 
-router.post('/getWalletInfo', async function(req, res) {
+router.get('/getWalletInfo', async function(req, res) {
 
 	const { wallet_address, member_did } = req.session.data;
+	console.log("wallet_address="+wallet_address+":member_did="+member_did);
 	
 	// 1.
 	// 
@@ -322,13 +323,14 @@ router.post('/getWalletInfo', async function(req, res) {
  * [ Make Paymant]
  * getCurrentBalanceOfBuyer
  */
-router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
+router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 
 	const METHOD = '/getCurrentBalanceOfBuyer'
 
-	const { document_uuid } = req.body;
+	const { document_uuid } = req.query;
 	const { member_did, wallet_address } = req.session.data;
 
+	let rt;
     // 1.
     // getSellerDid
     //
@@ -336,7 +338,9 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
     if(err1) {
         console.log("Error 1 status = 400 err="+err1);
 
-        return res.status(400).end(err1);
+		rt = {err:1,msg  : err1.toString()};
+
+        return res.status(400).json(rt);
     }
 
     // 2.
@@ -345,7 +349,9 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
     const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
     if(err2) {
         console.log("Error 2 status = 400 err="+err2);
-        return res.status(400).end(err2);
+
+		rt = {err:2,msg  : err2.toString()};
+        return res.status(400).json(rt);
     }
 
 	// 3.
@@ -354,12 +360,10 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	const [ document , err3 ] = await sub.getDocument(BUYER_DOCUMENT, document_uuid);
 
 	if(err3) {
-		console.log("error getDocumen");
-		res.json({
-			err : err3,
-			msg : null
-		});
-		return;
+        console.log("Error 3 status = 400 err="+err3);
+
+		rt = {err:3,msg  : err3.toString()};
+        return res.status(400).json(rt);
 	}
 
 	// 4.
@@ -372,11 +376,10 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 		for (let key in doc){
 			console.log(key +":"+ doc[key]);
 		}
-		res.json({
-			err : err4,
-			msg : null
-		});
-		return;
+        console.log("Error 3 status = 400 err="+err3);
+
+		rt = {err:3,msg  : err3.toString()};
+        return res.status(400).json(rt);
 	}
 
 
@@ -395,7 +398,8 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	if(code == null) {
 		console.log("Error 6 status = 400 err="+err6);
 
-        return res.status(400).end(err6);
+		rt = {err:6,msg  : err6.toString()};
+        return res.status(400).json(rt);
 	}
 	//console.log("code="+code);
 
@@ -408,7 +412,8 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	if(status7 != 200) {
 		console.log("Error 7 status = 400 err="+data7);
 
-        return res.status(400).end(data7);
+		rt = {err:7,msg  : err7.toString()};
+        return res.status(400).json(rt);
 	}
 
 	const msg = (data7.msg);
@@ -434,12 +439,10 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	const [ balanceWei, err9 ] = await  eth.getBalance(web3, from_account) ;
 
 	if(err9) {
-		console.log("error 9: balanceWei "+err9);
-		res.json({
-			err : err9,
-			msg : null
-		});
-		return;
+		console.log("Error 9 status = 400 err="+data9);
+
+		rt = {err:9,msg  : err9.toString()};
+        return res.status(400).json(rt);
 	}
 
 
@@ -449,12 +452,10 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 	const [ gasPrice, err10 ] = await  eth.getGasPrice(web3) ;
 
 	if(err10) {
-		console.log("error 10: gasPrice,");
-		res.json({
-			err : err10,
-			msg : null
-		});
-		return;
+		console.log("Error 10 status = 400 err="+data10);
+
+		rt = {err:10,msg  : err10.toString()};
+        return res.status(400).json(rt);
 	}
 
 	// 11.
@@ -463,12 +464,10 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
 
 	const [ estimateGas, err11 ] = await  eth.estimateGas(web3,callObject ) ;
 	if(err11) {
-		console.log("error 11:estimateGas,");
-		res.json({
-			err : err11,
-			msg : null
-		});
-		return;
+		console.log("Error 11 status = 400 err="+data11);
+
+		rt = {err:11,msg  : err11.toString()};
+        return res.status(400).json(rt);
 	}
 
 /*
@@ -611,11 +610,11 @@ router.post('/getCurrentBalanceOfBuyer', async function(req, res) {
  * 5.
  * [ View Transaction Receipt ]
  */
-router.post('/getTransactionReceipt', async function(req, res) {
+router.get('/getTransactionReceipt', async function(req, res) {
 
 	const METHOD = '/getTransactionReceipt'
 
-	const { document_uuid , role, archive} = req.body;
+	const { document_uuid , role, archive} = req.query;
 
 	let table;
 
@@ -626,15 +625,17 @@ router.post('/getTransactionReceipt', async function(req, res) {
 	case 'buyer':
 		switch(archive){
 		case 0:
+		case "0":
 			table = BUYER_DOCUMENT;
 		break;
 		case 1:
+		case "1":
 			table = BUYER_DOCUMENT_ARCHIVE;
 		break;
 		default:
 			res.json({
-				err : "Invalid argument.",
-				msg : null
+				err : 1,
+				msg : "Invalid argument."
 			});
 			return ;
 		}
@@ -642,23 +643,25 @@ router.post('/getTransactionReceipt', async function(req, res) {
 	case 'seller':
 		switch(archive){
 		case 0:
+		case "0":
 			table = SELLER_DOCUMENT;
 		break;
 		case 1:
+		case "1":
 			table = SELLER_DOCUMENT_ARCHIVE;
 		break;
 		default:
 			res.json({
-				err : "Invalid argument.",
-				msg : null
+				err : 2,
+				msg : "Invalid argument."
 			});
 			return ;
 		}
 	break;
 	default:
 		res.json({
-			err : "Invalid argument.",
-			msg : null
+			err : 3,
+			msg : "Invalid argument."
 		});
 		return ;
 	}
@@ -668,38 +671,40 @@ router.post('/getTransactionReceipt', async function(req, res) {
 	const [ document , err2 ] = await sub.getDocument(table, document_uuid);
 
 	if(err2) {
-		console.log("error getDocumen");
+		console.log("Error getDocument "+err2);
 		res.json({
-			err : err2,
-			msg : null
+			err : 2,
+			msg : err2
 		});
 		return;
 	}
 
+	// 3.
 	if(document == null ) {
-		console.log("Documen is null");
+		console.log("This Document is null");
 		res.json({
-			err : "Not found.",
-			msg : null
+			err : 3,
+			msg : "This Document is null."
 		});
 		return;
 	}
 
 	const hash = document.settlement_hash;
 
-	// 3.
+	// 4.
 	//
-	const [ receipt, err3 ] = await  eth.getTransactionReceipt(web3, hash) ;
+	const [ receipt, err4 ] = await  eth.getTransactionReceipt(web3, hash) ;
 
-	if(err3) {
-		console.log("error balanceWei");
+	if(err4) {
+		console.log("Error transaction receipt "+err4);
 		res.json({
-			err : err3,
-			msg : null
+			err : 4,
+			msg : err4
 		});
 		return;
 	}
 
+	// 5.
 	res.json({
 		err : 0,
 		msg : {
@@ -716,11 +721,11 @@ router.post('/getTransactionReceipt', async function(req, res) {
  * [ JSON DATA ]
  * getIPFScidByTransactionHash
  */
-router.post('/getIPFScidByTransactionHash', async function(req, res) {
+router.get('/getIPFScidByTransactionHash', async function(req, res) {
 
 	const METHOD = '/getIPFScidByTransactionHash'
 
-	const { transactionHash } = req.body;
+	const { transactionHash } = req.query;
 
 
 	// 1.
@@ -729,7 +734,7 @@ router.post('/getIPFScidByTransactionHash', async function(req, res) {
 	const [ result, err1 ] = await  eth.getTransaction(web3, transactionHash) ;
 
 	if(err1) {
-		console.log("error balanceWei");
+		console.log("error balanceWei 6.1");
 		res.json({
 			err : err1,
 			msg : null

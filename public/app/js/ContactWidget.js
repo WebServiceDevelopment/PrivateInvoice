@@ -230,6 +230,7 @@ const ContactWidget = (function() {
 
 	function evt_handleInputFocus() {
 	
+
 		const elem =  FolderWidget.MEM.getActiveFolder();
 		if( elem != null) {
 			const folder = elem.getAttribute("data-folder");

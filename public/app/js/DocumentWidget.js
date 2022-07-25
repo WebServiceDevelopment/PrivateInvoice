@@ -1137,6 +1137,7 @@ const DocumentWidget = (function() {
 
 async	function api_openDocument(document_uuid, role, folder, archive) {
 
+
 		if(this.MEM.getSaveTimeout()) {
 			clearTimeout(this.MEM.getSaveTimeout());
 			this.MEM.initSaveTimeout();
@@ -1145,9 +1146,11 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			this.API.updateDocument();
 		}
 
+/*
 		const params = {
 			document_uuid : document_uuid
 		}
+*/
 
 
 		let PATH;
@@ -1182,11 +1185,13 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			PATH = '/api/invoice/getDocument'+ROLE;
 		break;
 		}
+console.log("openDocument PATH="+PATH);
 
 		let url = PATH;
 
         let response;
 
+/*
         let opts = {
             method: 'POST',
             cache: 'no-cache',
@@ -1196,9 +1201,16 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
             },
             body: JSON.stringify(params)
         };
+*/
+		console.log( url+'?'+new URLSearchParams({
+                 document_uuid: document_uuid
+            }).toString())
 
         try {
-            response = await fetch( url, opts);
+            response = await fetch( url+'?'+new URLSearchParams({
+                 document_uuid: document_uuid
+            }).toString());
+
         } catch(err) {
             //throw err;
             alert("Cannot connect server.");
