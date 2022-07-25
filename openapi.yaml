@@ -15,13 +15,27 @@ info:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0.html'
 
+components:
+  securitySchemes:
+    basicAuth: 
+      type: http
+      scheme: basic
+
+servers:
+- url: http://localhost:3000/
+  description: Seller Server
+- url: http://localhost:3001/
+  description: Buyer Server
+
+
+security:
+  - basicAuth: []
+
 tags:
   - name: "Contacts"
     description: "Paths related to handling contacts"
   - name: "Invoice"
     description: "Paths related to handling invoices"
-  - name: "Invite"
-    description: "Paths related to handling invites"
   - name: "Session"
     description: "Paths related to handling logins and sessions"
   - name: "Settings"
@@ -37,19 +51,24 @@ tags:
   - name: "Wallet"
     description: "Paths related to handling wallets"
 
-servers:
-  # - url: 'http://petstore.swagger.io/api'
-  - url: 'http://192.168.1.125:3000'
-  - url: 'http://192.168.1.125:3001'
-
 paths:
   #1.1 /api/contacts
   #require('./routes/contacts.js');
 
   #1.1.1
-  /api/contacts/generate:
+  /api/contacts/createBusunessCard:
     post:
-      description: \#1.1.1 contacts generate
+      description: >-
+        \#1.1.1 This end point will generate a Verifiable Business Card
+        that is signed with your contact details for the current date and
+        time. This Verifiable Business Card will be returned as a JSON
+        file that can be given to someone else to add to their Private Invoice
+        contacts.
+
+        The parameters to this end point provide the context of what relationship
+        will be included in the Verifiable Business Card for contact details.
+        These include where the contact will be a Buyer, Seller, or a Partner,
+        the number of uses, and then expiration date for the Verifiable Business Card.
       operationId: contacts_generate
       tags:
         - "Contacts"
@@ -70,7 +89,12 @@ paths:
   #1.1.2
   /api/contacts/add:
     post:
-      description: \#1.1.2 contacts add
+      description: >-
+        \#1.1.2 This end point will add a contact to your database
+        when provided with a Verifiable Business Card. For example
+        Alice exports a Verifiable Business Card and sends it to Bob.
+        This end point is intended for Bob to POST the contents of the
+        Verifiable Business Card to his node to add Alice as a contact.
       operationId: contacts_add
       tags:
         - "Contacts"
@@ -96,17 +120,17 @@ paths:
 
   #1.1.3
   /api/contacts/getContactList:
-    post:
+    get:
       description: \#1.1.3 contacts getContactList
       operationId: contacts_getContactList
       tags:
         - "Contacts"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: member_did
           required: true
           schema:
-            $ref: '#/contacts/schemas/Request_getContactList'
+            type: string
       responses:
         '200':
           description: getContactList response
@@ -230,17 +254,17 @@ paths:
   #require('./routes/buyer_invoice_document.js');
   #2.2.1
   /api/invoice/getDocumentBuyer:
-    post:
-      description: \#2.2.1 invoice getDocumentBuyer 
+    get:
+      description: \#2.2.1 invoice getDocumentBuyer : This request is  from Buyer.
       operationId: invoice_getDocumentBuyer
       tags:
         - "Invoice"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: document_uuid
           required: true
           schema:
-            $ref: '#/invoice/schemas/Request_getDocumentBuyer'
+            type: string
       responses:
         '200':
           description: buyer_invoice_document response
@@ -252,37 +276,38 @@ paths:
 
   #2.2.2
   /api/invoice/getDocumentSeller:
-    post:
+    get:
       description: \#2.2.2 invoice getDocumentSeller 
       operationId: invoice_getDocumentSeller
       tags:
         - "Invoice"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: document_uuid
           required: true
           schema:
-            $ref: '#/invoice/schemas/Request_getDocumentSeller'
+            type: string
       responses:
         '200':
           description: getDocumentSeller response
           content:
             application/json:
               schema:
+                $ref: '#/invoice/schemas/Responses_getDocumentBuyer'
 
   #2.2.3
   /api/invoice/getArchiveDocumentBuyer:
-    post:
-      description: \#2.2.3 invoice getArchiveDocumentBuyer 
+    get:
+      description: \#2.2.3 invoice getArchiveDocumentBuyer : This request is  from Buyer.
       operationId: invoice_getArchiveDocumentBuyer
       tags:
         - "Invoice"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: document_uuid
           required: true
           schema:
-            $ref: '#/invoice/schemas/Request_getArchiveDocumentBuyer'
+            type: string
       responses:
         '200':
           description: getArchiveDocumentBuyer response
@@ -294,23 +319,24 @@ paths:
 
   #2.2.4
   /api/invoice/getArchiveDocumentSeller:
-    post:
+    get:
       description: \#2.2.4 invoice getArchiveDocumentSeller 
       operationId: invoice_getArchiveDocumentSeller
       tags:
         - "Invoice"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: document_uuid
           required: true
           schema:
-            $ref: '#/invoice/schemas/Request_getArchiveDocumentSeller'
+            type: string
       responses:
         '200':
           description: getArchiveDocumentSeller response
           content:
             application/json:
               schema:
+                $ref: '#/invoice/schemas/Responses_getArchiveDocumentBuyer'
 
 
   #2.3
@@ -376,17 +402,17 @@ paths:
 
   #2.4.2
   /api/invoice/getDraftDocument:
-    post:
+    get:
       description: \#2.4.2 invoice getDraftDocument
       operationId: invoice_getDraftDocument
       tags:
         - "Invoice"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: document_uuid
           required: true
           schema:
-            $ref: '#/invoice/schemas/Request_getDraftDocument'
+            type: string
       responses:
         '200':
           description: getDraftDocument response
@@ -402,58 +428,58 @@ paths:
                 $ref: '#/invoice/schemas/Error_getDraftDocument'
 
   #2.4.3
-  /api/invoice/getDocument:
-    post:
-      description: \#2.4.3 invoice getDocument
-      operationId: invoice_getDocument
-      tags:
-        - "Invoice"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/invoice/schemas/Request_getDocument'
-      responses:
-        '200':
-          description: getDocument response
-          content:
-            application/json:
-              schema:
-                $ref: '#/invoice/schemas/Responses_getDocument'
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/invoice/schemas/Error_getDocument'
+#  /api/invoice/getDocument:
+#    post:
+#      description: \#2.4.3 invoice getDocument
+#      operationId: invoice_getDocument
+#      tags:
+#        - "Invoice"
+#      parameters:
+#        - in: "body"
+#          name: "body"
+#          required: true
+#          schema:
+#            $ref: '#/invoice/schemas/Request_getDocument'
+#      responses:
+#        '200':
+#          description: getDocument response
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/invoice/schemas/Responses_getDocument'
+#        default:
+#          description: unexpected error
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/invoice/schemas/Error_getDocument'
 
   #2.4.4
-  /api/invoice/getArchiveDocument:
-    post:
-      description: \#2.4.4 invoice getArchiveDocument
-      operationId: invoice_getArchiveDocument
-      tags:
-        - "Invoice"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/invoice/schemas/Request_getArchiveDocument'
-      responses:
-        '200':
-          description: getArchiveDocument response
-          content:
-            application/json:
-              schema:
-                $ref: '#/invoice/schemas/Responses_getArchiveDocument'
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/invoice/schemas/Error_getArchiveDocument'
+#  /api/invoice/getArchiveDocument:
+#    post:
+#      description: \#2.4.4 invoice getArchiveDocument
+#      operationId: invoice_getArchiveDocument
+#      tags:
+#        - "Invoice"
+#      parameters:
+#        - in: "body"
+#          name: "body"
+#          required: true
+#          schema:
+#            $ref: '#/invoice/schemas/Request_getArchiveDocument'
+#      responses:
+#        '200':
+#          description: getArchiveDocument response
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/invoice/schemas/Responses_getArchiveDocument'
+#        default:
+#          description: unexpected error
+#          content:
+#            application/json:
+#              schema:
+#                $ref: '#/invoice/schemas/Error_getArchiveDocument'
 
   #2.4.5
   /api/invoice/create:
@@ -671,169 +697,60 @@ paths:
                 $ref: '#/invoice/schemas/Responses_softDeleteBuyer'
 
 
-  #3.1
-  #require('./routes/invite.js');
-  
-  #3.1.1
-  /api/invite/create:
-    post:
-      description: \#3.1.1 invite create
-      operationId: invite_create
-      tags:
-        - "Invite"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/invite/schemas/Request_create'
-      responses:
-        '200':
-          description: create response
-          content:
-            application/json:
-              schema:
-                $ref: '#/invite/schemas/Responses_create'
-
-  #3.1.2
-  /api/invite/list:
-    post:
-      description: \#3.1.2 invite list
-      operationId: invite_list
-      tags:
-        - "Invite"
-      parameters:
-        - in: "body"
-          name: "body"
-
-      responses:
-        '200':
-          description: list response
-          content:
-            application/json:
-              schema:
-                $ref: '#/invite/schemas/Responses_list'
-
-  #3.1.3
-  /api/invite/submit:
-    post:
-      description: \#3.1.3 invite submit
-      operationId: invite_submit
-      tags:
-        - "Invite"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/invite/schemas/Request_submit'
-      responses:
-        '200':
-          description: submit response
-          content:
-            application/json:
-              schema:
-                $ref: '#/invite/schemas/Responses_submit'
-
-  #3.1.4
-  /api/invite/contacts:
-    post:
-      description: \#3.1.4 invite contacts
-      operationId: invite_contacts
-      tags:
-        - "Invite"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/invite/schemas/Request_contacts'
-      responses:
-        '200':
-          description: contacts response
-          content:
-            application/json:
-              schema:
-                $ref: '#/invite/schemas/Responses_contacts'
-
-  #3.1.5
-  /api/invite/status:
-    post:
-      description: \#3.1.5 invite status
-      operationId: invite_status
-      tags:
-        - "Invite"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/invite/schemas/Request_status'
-      responses:
-        '200':
-          description: status response
-          content:
-            application/json:
-              schema:
-                $ref: '#/invite/schemas/Responses_status'
-
-  #3.1.6
-  /api/invite/remove:
-    post:
-      description: \#3.1.6 invite remove
-      operationId: invite_remove
-      tags:
-        - "Invite"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/invite/schemas/Request_remove'
-      responses:
-        '200':
-          description: remove response
-          content:
-            application/json:
-              schema:
-                $ref: '#/invite/schemas/Responses_remove'
-
-  #4.1
-  #require('./routes/seller_message.js');
-  #/api/message:
-  #  post:
-
-
-  #4.2
-  #require('./routes/buyer_invoice_archive.js');
-  #/api/message:
-  #  post:
-
-
-  #4.3
-  #require('./routes/buyer_invoice_trash.js');
-  #/api/message:
-  #  post:
-
-
-  #4.4
-  #require('./routes/buyer_message.js');
-  #/api/message:
-  #  post:
-
-
-  #4.5
-  #require('./routes/contact_message.js');
-  #/api/message:
-  #  post:
-
 
   #5.1
   #require('./routes/presentations.js');
-  /api/presentations:
+  /api/presentations/available:
     post:
       tags:
         - "Trace"
+      description: >-
+        This is the end point is defined by the Traceability API which
+        Private Invoice uses to communicate with other nodes. When called,
+        this end point will return a domain and challenge for signing a
+        Verifiable Presentation.
+      requestBody:
+        description: Description of the flow
+        content:
+          application/json:
+            schema:
+                $ref: '#/presentations/schemas/NotifyPresentationAvailableRequest'
+      responses:
+        200:
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/presentations/schemas/NotifyPresentationAvailableResponse'
+      security: {}
+
+  /api/presentations/submissions:
+    post:
+      tags:
+        - "Trace"
+      description: >-
+        This end point is defined by the Traceability API which Private used to
+        communicate with other nodes. When called this end point takes a signed
+        Verifiable Presentation. This end point first checks which memeber did
+        the presentation is being sent to, and then confirms that the issuer is
+        in the list of contacts. It then proceeds to check that the Verifible
+        Presentation has a valid proof. The credentials of the Verifiable Presentation
+        will then be handled by type.
+      requestBody:
+        description: A Verifiable Presentation to submit
+        content:
+          application/json:
+            schema:
+                $ref: '#/presentations/schemas/VerifiablePresentation'
+      responses:
+        "200":
+          description: Expected response to a valid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/presentations/schemas/VerificationResult'
+
+      security: {}
 
 
   #6.1
@@ -841,17 +758,11 @@ paths:
 
   #6.1.1
   /api/session/logout:
-    post:
+    get:
       description: \#6.1.1 session logout
       operationId: session_logout
       tags:
         - "Session"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/session/schemas/Request_logout'
       responses:
         307:
           description: Redirect
@@ -885,63 +796,22 @@ paths:
 
   #6.1.2
   /api/session/check:
-    post:
+    get:
+      description: >-
+        The purpose of this end point is to provide a server-side call that will
+        allow the client to get information about what session information is availble.
       tags:
         - "Session"
-      parameters:
-        - in: "body"
-          name: "body"
       responses:
         '200':
-          description: check response
+          description: >-
+            If you have an active session, the response will show your session details
           content:
             application/json:
               schema:
                 $ref: '#/session/schemas/Responses_check'
 
   #6.1.3
-  /api/session/updateCompany:
-    post:
-      description: \#6.1.3 session updateCompany
-      operationId: session_logout
-      tags:
-        - "Session"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/session/schemas/Request_updateCompany'
-      responses:
-        '200':
-          description: logout response
-          content:
-            application/json:
-              schema:
-                $ref: '#/session/schemas/Responses_updateCompany'
-
-  #6.1.4
-  /api/session/updateProfile:
-    post:
-      description: \#6.1.4 session updateProfile
-      operationId: session_updateProfile
-      tags:
-        - "Session"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/session/schemas/Request_updateProfile'
-      responses:
-        '200':
-          description: updateProfile response
-          content:
-            application/json:
-              schema:
-                $ref: '#/session/schemas/Responses_updateProfile'
-
-  #6.1.5
   /api/session/login:
     post:
       description: \#6.1.5 session login
@@ -962,8 +832,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/session/schemas/Responses_login'
+      security: {}
 
-  #6.1.6
+  #6.1.4
   /api/session/signup:
     post:
       description: \#6.1.6 session signup
@@ -989,37 +860,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/session/schemas/Error_signup'
+      security: {}
 
 
+  #require('./routes/session.js');
   #7.1
-  #require('./routes/settings.js');
-
   #7.1.1
-  /api/settings/setProfileImage:
+  /api/session/updateCompany:
     post:
-      description: #7.1.1 settings setProfileImage
-      operationId: settings_setProfileImage
+      description: \#6.1.3 session updateCompany
+      operationId: session_logout
       tags:
         - "Settings"
       parameters:
         - in: "body"
-          required: true
           name: "body"
+          required: true
           schema:
-            $ref: '#/settings/schemas/Request_setProfileImage'
+            $ref: '#/session/schemas/Request_updateCompany'
       responses:
         '200':
-          description: setProfileImage response
+          description: logout response
           content:
             application/json:
               schema:
-                $ref: '#/settings/schemas/Responses_setProfileImage'
+                $ref: '#/settings/schemas/Responses_updateCompany'
 
   #7.1.2
-  /api/settings/setCompanyLogo:
+  /api/session/updateProfile:
     post:
-      description: #7.1.2 settings setCompanyLogo
-      operationId: settings_setCompanyLogo
+      description: \#6.1.4 session updateProfile
+      operationId: session_updateProfile
       tags:
         - "Settings"
       parameters:
@@ -1027,62 +898,20 @@ paths:
           name: "body"
           required: true
           schema:
-            $ref: '#/settings/schemas/Request_setCompanyLogo'
+            $ref: '#/session/schemas/Request_updateProfile'
       responses:
         '200':
-          description: setCompanyLogo response
+          description: updateProfile response
           content:
             application/json:
               schema:
-                $ref: '#/settings/schemas/Responses_setCompanyLogo'
-
-  #7.1.3
-  /api/settings/getProfileImage:
-    post:
-      description: #7.1.3 settingd getProfileImage
-      operationId: settings_getProfileImage
-      tags:
-        - "Settings"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/settings/schemas/Request_getProfileImage'
-      responses:
-        '200':
-          description: getProfileImage response
-          content:
-            application/json:
-              schema:
-                $ref: '#/settings/schemas/Responses_getProfileImage'
-
-  #7.1.4
-  /api/settings/getCompanyLogo:
-    post:
-      description: #7.1.4 settings getCompanyLogo
-      operationId: settings_getCompanyLogo
-      tags:
-        - "Settings"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/settings/schemas/Request_getCompanyLogo'
-      responses:
-        '200':
-          description: getCompanyLogo response
-          content:
-            application/json:
-              schema:
-                $ref: '#/settings/schemas/Responses_getCompanyLogo'
+                $ref: '#/settings/schemas/Responses_updateProfile'
 
 
   #8.1
   #require('./routes/test.js');
-  /api/test:
-    post:
+  #/api/test:
+  #  post:
 
 
   #9.1
@@ -1418,17 +1247,17 @@ paths:
 
   #12.1.1
   /api/wallet/getReceiptInResentActivity: 
-    post:
+    get:
       description: \#12.1.1 wallet getReceiptInResentActivity
       operationId: wallet_getReceiptInResentActivity
       tags:
         - "Wallet"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: settlement_hash
           required: true
           schema:
-            $ref: '#/wallet/schemas/Request_getReceiptInResentActivity'
+            type: string
       responses:
         '200':
           description: getReceiptInResentActivity response
@@ -1439,15 +1268,24 @@ paths:
 
   #12.1.2
   /api/wallet/getResentActivityOfWallet:
-    post:
+    get:
       description: \#12.1.2 wallet getResentActivityOfWallet
       operationId: wallet_getResentActivityOfWallet
       tags:
         - "Wallet"
       parameters:
-        - in: "body"
-          name: "body"
-          required: false
+        - in: query
+          name: list_max
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - in: query
+          name: start_position
+          required: true
+          schema:
+            type: integer
+            format: int64
 
       responses:
         '200':
@@ -1459,15 +1297,11 @@ paths:
 
   #12.1.3
   /api/wallet/getWalletInfo:
-    post:
+    get:
       description: \#12.1.3 wallet getWalletInfo
       operationId: wallet_getWalletInfo
       tags:
         - "Wallet"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: false
 
       responses:
         '200':
@@ -1479,17 +1313,17 @@ paths:
 
   #12.1.4
   /api/wallet/getCurrentBalanceOfBuyer:
-    post:
-      description: \#12.1.4 wallet getCurrentBalanceOfBuyer
+    get:
+      description: \#12.1.4 wallet getCurrentBalanceOfBuyer : This request is  from Buyer.
       operationId: wallet_getCurrentBalanceOfBuyer
       tags:
         - "Wallet"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: document_uuid
           required: true
           schema:
-            $ref: '#/wallet/schemas/Request_getCurrentBalanceOfBuyer'
+            type: string
       responses:
         '200':
           description: getCurrentBalanceOfBuyer response
@@ -1500,17 +1334,28 @@ paths:
 
   #12.1.5
   /api/wallet/getTransactionReceipt:
-    post:
+    get:
       description: \#12.1.5 wallet getTransactionReceipt
       operationId: wallet_getTransactionReceipt
       tags:
         - "Wallet"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: document_uuid
           required: true
           schema:
-            $ref: '#/wallet/schemas/Request_getTransactionReceipt'
+            type: string
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: archive
+          required: true
+          schema:
+            type: string
+            enum: ["0","1"]
       responses:
         '200':
           description: getTransactionReceipt response
@@ -1521,17 +1366,17 @@ paths:
 
   #12.1.6
   /api/wallet/getIPFScidByTransactionHash:
-    post:
-      description: \#12.1.7 wallet getIPFScidByTransactionHash
+    get:
+      description: \#12.1.7 wallet getIPFScidByTransactionHash [JSON DATA]
       operationId: wallet_getIPFScidByTransactionHash
       tags:
         - "Wallet"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: transactionHash
           required: true
           schema:
-            $ref: '#/wallet/schemas/Request_getIPFScidByTransactionHash'
+            type: string
       responses:
         '200':
           description: getIPFScidByTransactionHash response
@@ -1584,49 +1429,42 @@ contacts:
         type: string
 
     #1.1.3
-    Request_getContactList:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
 
     Responses_getContactList:
-      required:
-      properties:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: array
-          items:
+      type: array
+      items:
+        type: object
+        properties: 
+          remote_origin:
+            type: string
+          remote_member_uuid:
+            type: string
+          remote_membername:
+            type: string
+          remote_organization:
             type: object
             properties: 
-              remote_origin:
+              name:
                 type: string
-              remote_member_uuid:
+              postcode:
                 type: string
-              remote_membername:
+              address:
                 type: string
-              remote_organization:
-                type: object
-                properties: 
-                  name:
-                    type: string
-                  postcode:
-                    type: string
-                  address:
-                    type: string
-                  building:
-                    type: string
-                  department:
-                    type: string
-              local_to_remote:
+              building:
                 type: string
-              remote_to_local:
+              department:
                 type: string
-              created_on:
-                type: date-time
+          local_to_remote:
+            type: integer
+            format: int32
+          remote_to_local:
+            type: integer
+            format: int32
+          created_on:
+            type: string
+            description: RFC3339 UTC "Zulu" format, Datetime to set
+            format: date-time
+            pattern: pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})T([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2}).(?:[0-9]{3})Z/
 
 
 invoice:
@@ -1701,12 +1539,6 @@ invoice:
       $ref: '#/error/schemas/Responses_err_msg'
 
     #2.2.1
-    Request_getDocumentBuyer:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
     Responses_getDocumentBuyer:
       required:
         err:
@@ -1716,12 +1548,6 @@ invoice:
           type: string
 
     #2.2.2
-    Request_getDocumentSeller:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
     Responses_getDocumentSeller:
       required:
         err:
@@ -1731,12 +1557,6 @@ invoice:
           type: string
 
     #2.2.3
-    Request_getArchiveDocumentBuyer:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
     Responses_getArchiveDocumentBuyer:
       required:
         err:
@@ -1746,12 +1566,6 @@ invoice:
           type: string
 
     #2.2.4
-    Request_getArchiveDocumentSeller:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
     Responses_getArchiveDocumentSeller:
       required:
         err:
@@ -1779,12 +1593,6 @@ invoice:
       $ref: '#/error/schemas/Responses_err_msg'
 
     #2.4.2
-    Request_getDraftDocument:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
     Responses_getDraftDocument:
       required:
         err:
@@ -1796,40 +1604,40 @@ invoice:
       $ref: '#/error/schemas/Responses_err_msg'
 
     #2.4.3
-    Request_getDocument:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-    Responses_getDocument:
-      required:
-      properties:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: string
-    Error_getDocument:
-      $ref: '#/error/schemas/Responses_err_msg'
+#    Request_getDocument:
+#      type: object
+#      properties:
+#        id:
+#          type: integer
+#          format: int64
+#    Responses_getDocument:
+#      required:
+#      properties:
+#        err:
+#          type: integer
+#          format: int32
+#        msg:
+#          type: string
+#    Error_getDocument:
+#      $ref: '#/error/schemas/Responses_err_msg'
 
     #2.4.4
-    Request_getArchiveDocument:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-    Responses_getArchiveDocument:
-      required:
-      properties:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: string
-    Error_getArchiveDocument:
-      $ref: '#/error/schemas/Responses_err_msg'
+#    Request_getArchiveDocument:
+#      type: object
+#      properties:
+#        id:
+#          type: integer
+#          format: int64
+#    Responses_getArchiveDocument:
+#      required:
+#      properties:
+#        err:
+#          type: integer
+#          format: int32
+#        msg:
+#          type: string
+#    Error_getArchiveDocument:
+#      $ref: '#/error/schemas/Responses_err_msg'
 
     #2.4.5
     Request_create:
@@ -1980,162 +1788,353 @@ invoice:
           type: string
 
 
-invite:
-  #3.1
+
+presentations:
   schemas:
-    #3.1.1
-    Request_create:
+
+    Credential:
       type: object
-      properties:
-        buyer:
-          type: string
-        seller:
-          type: string
-
-    Responses_create:
       required:
+        - '@context'
+        - type
+        - issuer
+        - issuanceDate
+        - credentialSubject
       properties:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: object
-          properties:
-            invite_code:
-              type: string
-            local_member_uuid:
-              type: string
-            rel_buyer:
-              type: string
-            rel_seller:
-              type: string
-            max_count:
-              type: integer
-              format: int32
-
-    #3.1.2
-    Responses_list:
-      $ref: '#/invite/schemas/Responses_create'
-
-    #3.1.3
-    Request_submit:
-      type: object
-      properties:
-        code:
-          type: string
-
-    Responses_submit:
-      required:
-      properties:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: string
-
-    #3.1.4
-    Request_contacts:
-      type: object
-      properties:
-        contactType:
-          type: string
-
-    Responses_contacts:
-      required:
-      properties:
-        err:
-          type: integer
-          format: int32
-        msg:
+        '@context':
+          description: This JSON-LD Context defining all terms in the Credential.
           type: array
           items:
-            type: object
-            properties: 
-              remote_origin:
-                type: string
-              member_uuid:
-                type: string
-              membername:
-                type: string
-              organization_name:
-                type: string
-              organization_address:
-                type: string
-              organization_building:
-                type: string
-              organization_department:
-                type: string
-              organization_tax_id:
-                type: string
-              addressCountry:
-                type: string
-              addressRegion:
-                type: string
-              addressCity:
-                type: string
-              wallet_address:
-                type: string
-
-    #3.1.5
-    Request_status:
-      type: object
-      properties:
-        code:
+            type: string
+        id:
+          description: The IRI identifying the Credential
           type: string
-
-    Responses_status:
-      required:
-      properties:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: object
-          properties:
-            invite:
-              type: string
-            host:
-              type: string
-            session:
-              type: object
+        type:
+          description: The Type of the Credential
+          type: array
+          items:
+            type: string
+        issuer:
+          description: This value MUST match the assertionMethod used to create the Verifiable Credential.
+          oneOf:
+            - type: string
+            - type: object
+              required:
+                - id
               properties:
-                member_uuid:
+                id:
+                  description: The IRI identifying the Issuer
                   type: string
-                organization_name:
+        issuanceDate:
+          description: This value MUST be an XML Date Time String
+          type: string
+        credentialSubject:
+          oneOf:
+            - type: string
+            - type: object
+              properties:
+                id:
+                  description: The IRI identifying the Subject
                   type: string
-                organization_postcode:
-                  type: string
-                organization_address:
-                  type: string
-                organization_building:
-                  type: string
-                organization_department:
-                  type: string
-                organization_tax_id:
-                  type: string
-                addressCountry:
-                  type: string
-                addressRegion:
-                  type: string
-                addressCity:
-                  type: string
+      example:
+        {
+          '@context': ['https://www.w3.org/2018/credentials/v1'],
+          'id': 'urn:uuid:07aa969e-b40d-4c1b-ab46-ded252003ded',
+          'type': ['VerifiableCredential'],
+          'issuer': 'did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn',
+          'issuanceDate': '2010-01-01T19:23:24Z',
+          'credentialSubject': 'did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn',
+        }
 
-    #3.1.6
-    Request_remove:
+    CredentialLinkedDataProof:
+      title: Credential Linked Data Proof
+      allOf:
+        - $ref: '#/presentations/schemas/LinkedDataProof'
+        - type: object
+          properties:
+            proofPurpose:
+              type: string
+              description: Credentials rely on assertionMethod proof purpose.
+              enum: [assertionMethod]
+
+    VerifiableCredential:
+      title: Verifiable Credential
+      type: object
+      allOf:
+        - $ref: '#/presentations/schemas/Credential'
+        - type: object
+          properties:
+            proof:
+              $ref: '#/presentations/schemas/CredentialLinkedDataProof'
+      example:
+        {
+          "@context": ["https://www.w3.org/2018/credentials/v1"],
+          "id": "urn:uuid:07aa969e-b40d-4c1b-ab46-ded252003ded",
+          "type": ["VerifiableCredential"],
+          "issuer": "did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn",
+          "issuanceDate": "2010-01-01T19:23:24Z",
+          "credentialSubject": "did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn",
+          "proof":
+            {
+              "type": "Ed25519Signature2018",
+              "created": "2021-10-30T19:16:30Z",
+              "verificationMethod": "did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn#z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn",
+              "proofPurpose": "assertionMethod",
+              "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..puetBYS3pkYlYzAecBiT-WkigYAlVbslrz9wPFnk9JW4AwjrpJvcsSdZJPhZtNy_myMJUNzC_QaYyw3ni1V0BA",
+            },
+        }
+
+    Presentation:
+      title: Presentation
+      type: object
+      required:
+        - '@context'
+        - type
+      properties:
+        '@context':
+          type: array
+          items:
+            type: string
+        id:
+          type: string
+        type:
+          type: array
+          items:
+            type: string
+        holder:
+          type: string
+        verifiableCredential:
+          type: array
+          items:
+            $ref: '#/presentations/schemas/VerifiableCredential'
+      example:
+        {
+          '@context': ['https://www.w3.org/2018/credentials/v1'],
+          'type': ['VerifiablePresentation'],
+          'holder': 'did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn',
+          'verifiableCredential':
+            [
+              {
+                '@context': ['https://www.w3.org/2018/credentials/v1'],
+                'id': 'urn:uuid:07aa969e-b40d-4c1b-ab46-ded252003ded',
+                'type': ['VerifiableCredential'],
+                'issuer': 'did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn',
+                'issuanceDate': '2010-01-01T19:23:24Z',
+                'credentialSubject': 'did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn',
+                'proof':
+                  {
+                    'type': 'Ed25519Signature2018',
+                    'created': '2021-10-30T19:16:30Z',
+                    'verificationMethod': 'did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn#z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn',
+                    'proofPurpose': 'assertionMethod',
+                    'jws': 'eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..puetBYS3pkYlYzAecBiT-WkigYAlVbslrz9wPFnk9JW4AwjrpJvcsSdZJPhZtNy_myMJUNzC_QaYyw3ni1V0BA',
+                  },
+              },
+            ],
+        }
+
+    LinkedDataProof:
+      title: Linked Data Proof
+      type: object
+      description: A JSON-LD Linked Data proof.
+      properties:
+        type:
+          type: string
+          description: Linked Data Signature Suite used to produce proof.
+          enum: ["JsonWebSignature2020"]
+        created:
+          type: string
+          description: Date the proof was created.
+        verificationMethod:
+          type: string
+          description: Verification Method used to verify proof.
+        jws:
+          type: string
+          description: Detached JSON Web Signature
+
+    PresentationLinkedDataProof:
+      title: Presentation Linked Data Proof
+      allOf:
+        - $ref: '#/presentations/schemas/LinkedDataProof'
+        - type: object
+          properties:
+            proofPurpose:
+              type: string
+              description: Presentations rely on authentication proof purpose.
+              enum: [authentication]
+
+    VerifiablePresentation:
+      title: Verifiable Presentation
+      type: object
+      allOf:
+      - $ref: '#/presentations/schemas/Presentation'
+      - type: object
+        properties:
+        proof:
+          $ref: '#/presentations/schemas/PresentationLinkedDataProof'
+      example:
+        {
+          "@context": ["https://www.w3.org/2018/credentials/v1"],
+          "id": "urn:uuid:07aa969e-b40d-4c1b-ab46-ded252003ded",
+          "type": ["VerifiablePresentation"],
+          "holder": "did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn",
+          "verifiableCredential":
+          [
+            {
+            "@context":
+              [
+              "https://www.w3.org/2018/credentials/v1",
+              "https://w3id.org/vc-revocation-list-2020/v1",
+              ],
+            "id": "urn:uuid:07aa969e-b40d-4c1b-ab46-ded252003ded",
+            "type": ["VerifiableCredential"],
+            "issuer": "did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn",
+            "issuanceDate": "2010-01-01T19:23:24Z",
+            "credentialStatus":
+              {
+              "id": "https://api.did.actor/revocation-lists/1.json#0",
+              "type": "RevocationList2020Status",
+              "revocationListIndex": 0,
+              "revocationListCredential": "https://api.did.actor/revocation-lists/1.json",
+              },
+            "credentialSubject": { "id": "did:example:123" },
+            "proof":
+              {
+              "type": "Ed25519Signature2018",
+              "created": "2021-10-31T19:14:41Z",
+              "verificationMethod": "did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn#z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn",
+              "proofPurpose": "assertionMethod",
+              "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..zH7YvO8ihoDO4NWgzPu4kvvdQJjWAPOUlz7D1551U4uSMqOGjRmEGef6NSbIdxqCy5FxXwOD49KyPRU66LpwBA",
+              },
+            },
+          ],
+          "proof":
+          {
+            "type": "Ed25519Signature2018",
+            "created": "2021-10-31T19:15:10Z",
+            "verificationMethod": "did:key:z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn#z6MktiSzqF9kqwdU8VkdBKx56EYzXfpgnNPUAGznpicNiWfn",
+            "proofPurpose": "authentication",
+            "challenge": "e42ab41a-06c3-45f5-878a-b27928aab8bd",
+            "jws": "eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..QdPVT5CramMhVx09RJ57IZD2WA4i2Hw0oG9_-i8r4BEyMS36bWSsrnwNd9ERyLEqeo4-6mwUD-swu3Bxsj7lDg",
+          },
+        }
+
+
+    Verification:
+      title: Verification
       type: object
       properties:
-        invite_code:
+        title:
           type: string
+          enum: 
+            - Proof
+            - Activation
+            - Expired
+            - Revocation
+        status:
+          type: string
+          enum: 
+            - good
+            - bad
+        description:
+          type: string
+      required: 
+        - title
+        - status
 
-    Responses_remove:
-      required:
+    VerificationResult:
+      title: Verification Result
+      type: object
       properties:
-        err:
-          type: integer
-          format: int32
-        msg:
+      verified:
+        type: boolean
+      verifications:
+        type: array
+        items:
+        $ref: '#/presentations/schemas/Verification'
+      required: 
+        - verified
+      example:
+        {
+          "verified": true,
+          "verifications": [
+            {
+              "status": "good",
+              "title": "Activation",
+              "description": "This credential activated 2 weeks ago",
+            },
+            {
+              "status": "good",
+              "title": "Signature",
+              "description": "did:key:ni5kvh48ZRcVN2gfs6cteK8M1JzJdcwcYJak5R7VkhXeqsHn#z6Mkvh48ZRcVN2gfs6cteK8M1JzJdcwcYJak5R7VkhXeqsHn",
+            }
+          ]
+        }
+
+    NotifyPresentationAvailableRequest:
+      title: Notify Presentation Available
+      type: object
+      properties:
+        query:
+          type: object
+          description: See https://w3c-ccg.github.io/vp-request-spec/#format
+          properties:
+            type:
+              type: string
+              description: "The type of query the server should reply with."
+            credentialQuery:
+              type: object
+              description: "Details of the client's available presentation"
+      example:
+        {
+          "query":
+            [
+              {
+                "type": "QueryByExample",
+                "credentialQuery":
+                  [
+                    {
+                      "type": ["VerifiableCredential"],
+                      "reason": "We want to present credentials.",
+                    },
+                  ],
+              },
+            ],
+        }
+
+
+    NotifyPresentationAvailableResponse:
+      title: Notify Presentation Requirements
+      type: object
+      properties:
+        query:
+          type: object
+          description: See https://w3c-ccg.github.io/vp-request-spec/#format
+        domain:
           type: string
-          enum: ["okey"]
+          description: See https://w3id.org/security#domain
+        challenge:
+          type: string
+          description: See https://w3id.org/security#challenge
+      example:
+        {
+          "query":
+            [
+              {
+                "type": "QueryByExample",
+                "credentialQuery":
+                  {
+                    "example":
+                      {
+                        "@context": ["https://www.w3.org/2018/credentials/v1"],
+                        "type": ["VerifiableCredential"],
+                      },
+                  },
+              },
+            ],
+          "domain": "verifier.example.com",
+          "challenge": "3182bdea-63d9-11ea-b6de-3b7c1404d57f",
+        }
 
 session:
   #6.1
@@ -2205,34 +2204,6 @@ session:
         addressCity:
           type: string
 
-    #6.1.3
-    Request_updateCompany:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-
-    Responses_updateCompany:
-      required:
-      properties:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: string
-          enum: ["okey"]
-
-    #6.1.4
-    Request_updateProfile:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-
-    Responses_updateProfile:
-      $ref: '#/session/schemas/Responses_updateCompany'
 
     #6.1.5
     Request_login:
@@ -2295,13 +2266,14 @@ settings:
   #7.1
   schemas:
     #7.1.1
-    Request_setProfileImage: #ok
+    Request_updateCompany:
       type: object
       properties:
-        dataUrl:
-          type: string
+        id:
+          type: integer
+          format: int64
 
-    Responses_setProfileImage:
+    Responses_updateCompany:
       required:
       properties:
         err:
@@ -2312,53 +2284,15 @@ settings:
           enum: ["okey"]
 
     #7.1.2
-    Request_setCompanyLogo: #ok
+    Request_updateProfile:
       type: object
       properties:
-        dataUrl:
-          type: string
-
-    Responses_setCompanyLogo:
-      $ref: '#/settings/schemas/Responses_setProfileImage'
-
-    #7.1.3
-    Request_getProfileImage:
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            avatar_uuid:
-            type: string
-
-    Responses_getProfileImage: #ok
-      required:
-      properties:
-        err:
+        id:
           type: integer
-          format: int32
-        msg:
-          type: object
-          properties:
-            row:
-              type: object
-              properties:
-                dataUrl:
-                  type: string
-                  format: byte
+          format: int64
 
-    #7.1.4
-    Request_getCompanyLogo: #ok
-      type: object
-      properties:
-        data:
-          type: object
-          properties:
-            logo_uuid:
-              type: string
-
-    Responses_getCompanyLogo:
-      $ref: '#/settings/schemas/Request_getProfileImage'
+    Responses_updateProfile:
+      $ref: '#/settings/schemas/Responses_updateCompany'
 
 tray:
   #9.1
@@ -2712,11 +2646,6 @@ wallet:
   schemas:
 
     #12.1.1
-    Request_getReceiptInResentActivity: #ok
-      type: object
-      properties:
-        settlement_hash:
-          type: string
 
     Responses_getReceiptInResentActivity:
       $ref: '#/wallet/schemas/Responses_getTransactionReceipt'
@@ -2767,16 +2696,12 @@ wallet:
               type: string
             networkType:
               type: string
+              enum: ["private","public"]
             chainId:
-              type: string
+              type: integer
+              format: int32
 
     #12.1.4
-    Request_getCurrentBalanceOfBuyer: #ok
-      type: object
-      properties:
-        properties:
-          document_uuid:
-            type: string
 
     Responses_getCurrentBalanceOfBuyer:
       required:
@@ -2851,12 +2776,6 @@ wallet:
                   - {  }
 
     #12.1.6
-    Request_getIPFScidByTransactionHash: #ok
-      type: object
-      properties:
-        transactionHash:
-          type: string
-
     Responses_getIPFScidByTransactionHash:
       properties:
         err:

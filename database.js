@@ -26,8 +26,17 @@ const bcrypt = require('bcrypt');
 
 const configStr = fs.readFileSync('config.json').toString();
 const config = JSON.parse(configStr);
-config.DATABASE.database = process.env.DATABASE_NAME;
-const pool = mysql.createPool(config.DATABASE);
+
+const DATABASE = {
+		"connectionLimit" : 4,
+		"host" : "localhost",
+		"user" : process.env.DATABASE_USER,
+		"password" : process.env.DATABASE_PASS,
+		"database" : process.env.DATABASE_NAME
+	}
+const pool = mysql.createPool(DATABASE);
+
+
 const SALT_ROUNDS = 10;
 
 module.exports = {

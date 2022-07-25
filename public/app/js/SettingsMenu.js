@@ -121,9 +121,6 @@ const SettingsMenu = (function() {
 
 	function api_openPage(leaf) {
 
-		//console.log("Open : %s", leaf);
-
-		//if(this.MEM.leaf === leaf) {
 		if(this.MEM.getLeaf() === leaf) {
 			return;
 		}
@@ -133,14 +130,6 @@ const SettingsMenu = (function() {
 			this.DOM.activePage.classList.remove("active");
 		}
 
-		switch(leaf) {
-		case "invite":
-			SettingsInvite.API.open();
-			break;
-		}
-
-		//console.log(leaf)
-		//this.MEM.leaf = leaf;
 		this.MEM.setLeaf( leaf );
 		this.DOM.activeMenu = this.DOM.menu[leaf];
 		this.DOM.activePage = this.DOM.pages[leaf];

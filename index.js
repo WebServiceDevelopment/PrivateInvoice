@@ -40,22 +40,28 @@ const YAML = require('yamljs');
 require('dotenv').config()
 const config = require('./config.json');
 const db = require('./database.js');
-
 const netUtil = require('./modules/netUtil.js');
+
 // Create server
 
 const app = express();
 app.use(bodyParser.json());
 const session_opts = config.SESSION;
 session_opts.store = new RedisStore({ client: redisClient });
-
 app.use(session(session_opts));
 
-//const swaggerDocument = YAML.load('./swagger.yaml');
-const swaggerDocument = YAML.load('./openapi.yaml');
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', function(req, res, next){
+
+	const swaggerDocument = YAML.load('./openapi.yaml');
+	swaggerDocument.servers = [{ url : process.env.SERVER_LOCATION }];
+	req.swaggerDoc = swaggerDocument;
+	next();
+
+}, swaggerUi.serve, swaggerUi.setup());
 
 // Middleware
+
+const { handleLogin } = require('./modules/sessions.js');
 
 app.get("*", function (req, res, next) {
 
@@ -78,10 +84,53 @@ app.get("*", function (req, res, next) {
 
 });
 
+app.all("*", async (req, res, next) => {
+
+	// Force logout for swagger when basic not provided
+	if(req.headers.referer && req.headers.referer.indexOf('/api-docs') !== -1) {
+		if(!req.headers.authorization && req.headers.cookie) {
+			req.session.data = null;
+			req.session.destroy();
+			res.clearCookie("connect.sid")
+			return next();
+		}
+	}
+
+	// Check for authorization header
+	if(!req.headers.authorization) {
+		return next();
+	}
+	
+	// Already logged in, dont need to do it again
+	if(req.headers.cookie) {
+		return next();
+	}
+
+	// Only account for basic authentication
+	if(req.headers.authorization.indexOf('Basic') === -1) {
+		return next();
+	}
+	
+	// Get the base64 encoded username + password
+	const base64 = req.headers.authorization.split(' ').pop();
+	const text = Buffer.from(base64, 'base64').toString('utf-8');
+
+	const [ membername, password ] = text.split(':');
+	const [ data, err ] = await handleLogin(membername, password);
+	if(err) {
+		return next();
+	}
+
+	req.session.data = data;
+	return next();
+
+});
+
 app.all("*", function (req, res, next) {
 
+
     // First we check to see if user is logged in
-    const isLoggedIn = req.session.data ? true : false;
+    const isLoggedIn = (req.session && req.session.data) ? true : false;
 
     // If they are logged in, then we dont need to check anything
     if(isLoggedIn) {
@@ -153,7 +202,6 @@ app.use('/api/settings', require('./routes/settings.js'));
 app.use('/api/message', require('./routes/contact_message.js'));
 
 app.use('/api/wallet', require('./routes/wallet.js'));
-app.use('/api/test', require('./routes/test.js'));
 app.use('/api/presentations', require('./routes/presentations.js'));
 
 

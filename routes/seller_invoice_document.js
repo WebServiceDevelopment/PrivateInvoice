@@ -52,7 +52,7 @@ const SELLER_ARCHIVE_DOCUMENT   = "seller_document_archive";
 // Error Message
 const MESSAGE_AFFECTED_ROWS 	= "result.affectedRows != 1";
 
-const DEFAULT_SERVER_PORT 		= config.PORT || 3000;
+const DEFAULT_SERVER_PORT 		= 3000;
 
 // ------------------------------- End Points -------------------------------
 
@@ -214,11 +214,8 @@ router.post('/update', async function(req, res) {
 /*
  * getDraftDocument
  */
-router.post('/getDraftDocument', async function(req, res) {
+router.get('/getDraftDocument', async function(req, res) {
 
-/*
-	let start = Date.now();
-*/
 
 	let sql = `
 		SELECT
@@ -249,7 +246,7 @@ router.post('/getDraftDocument', async function(req, res) {
 	let args = [
 		req.session.data.member_did,
 		req.session.data.member_did,
-		req.body.document_uuid
+		req.query.document_uuid
 	];
 
 	let doc;
@@ -262,7 +259,7 @@ router.post('/getDraftDocument', async function(req, res) {
 	if(!doc) {
 		return res.json({
 			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR MEMBER"
+			msg : "Draft DOCUMENT NOT FOUND FOR MEMBER"
 		});
 	}
 
@@ -274,11 +271,6 @@ router.post('/getDraftDocument', async function(req, res) {
 	doc.currency_options = JSON.parse(doc.currency_options);
 	doc.document_json = JSON.parse(doc.document_json);
 
-/*
-	let end = Date.now();
-	console.log("DraftDocument Time: %d ms", end - start);
-*/
-
 	res.json({
 		err : 0,
 		msg : doc
@@ -289,98 +281,103 @@ router.post('/getDraftDocument', async function(req, res) {
 /*
  * getDocument
  */
-router.post('/getDocument', async function(req, res) {
 
-	let start = Date.now();
-
-    let sql = `
-        SELECT
-            document_uuid,
-            document_json
-        FROM
-            ${SELLER_DOCUMENT}
-        WHERE
-            document_uuid = ?
-    `;
-
-    let args = [
-        req.body.document_uuid
-    ];
-
-	let result;
-	let doc;
-	try {
-		result = await db.selectOne(sql, args);
-	} catch(err) {
-		throw err;
-	}
-
-	if(!result) {
-		return res.json({
-			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR MEMBER"
-		});
-	}
-
-	doc =  JSON.parse(result.document_json);
-
-	let end = Date.now();
-	console.log("Document Time: %d ms", end - start);
-
-	res.json({
-		err : 0,
-		msg : doc
-	});
-
-});
+/* del 20220725
+*router.post('/getDocument', async function(req, res) {
+*
+*	let start = Date.now();
+*
+*    let sql = `
+*        SELECT
+*            document_uuid,
+*            document_json
+*        FROM
+*            ${SELLER_DOCUMENT}
+*        WHERE
+*            document_uuid = ?
+*    `;
+*
+*    let args = [
+*        req.body.document_uuid
+*    ];
+*
+*	let result;
+*	let doc;
+*	try {
+*		result = await db.selectOne(sql, args);
+*	} catch(err) {
+*		throw err;
+*	}
+*
+*	if(!result) {
+*		return res.json({
+*			err : 5,
+*			msg : "DOCUMENT NOT FOUND FOR MEMBER"
+*		});
+*	}
+*
+*	doc =  JSON.parse(result.document_json);
+*
+*	let end = Date.now();
+*	console.log("Document Time: %d ms", end - start);
+*
+*	res.json({
+*		err : 0,
+*		msg : doc
+*	});
+*
+*});
+*/
 
 /*
  * getArchiveDocument
  */
-router.post('/getArchiveDocument', async function(req, res) {
-
-	let start = Date.now();
-
-    let sql = `
-        SELECT
-            document_uuid,
-            document_json
-        FROM
-            ${SELLER_ARCHIVE_DOCUMENT}
-        WHERE
-            document_uuid = ?
-    `;
-
-    let args = [
-        req.body.document_uuid
-    ];
-
-	let result;
-	let doc;
-	try {
-		result = await db.selectOne(sql, args);
-	} catch(err) {
-		throw err;
-	}
-
-	if(!result) {
-		return res.json({
-			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR MEMBER"
-		});
-	}
-
-	doc =  JSON.parse(result.document_json);
-
-	let end = Date.now();
-	console.log("ArchiveDocument Time: %d ms", end - start);
-
-	res.json({
-		err : 0,
-		msg : doc
-	});
-
-});
+/* del 20220725
+*router.post('/getArchiveDocument', async function(req, res) {
+*
+*	let start = Date.now();
+*
+*    let sql = `
+*        SELECT
+*            document_uuid,
+*            document_json
+*        FROM
+*            ${SELLER_ARCHIVE_DOCUMENT}
+*        WHERE
+*            document_uuid = ?
+*    `;
+*
+*    let args = [
+*        req.body.document_uuid
+*    ];
+*
+*	let result;
+*	let doc;
+*	try {
+*		result = await db.selectOne(sql, args);
+*	} catch(err) {
+*		throw err;
+*	}
+*
+*	if(!result) {
+*		return res.json({
+*			err : 5,
+*			msg : "DOCUMENT NOT FOUND FOR MEMBER"
+*		});
+*	}
+*
+*	doc =  JSON.parse(result.document_json);
+*
+*	let end = Date.now();
+*	console.log("ArchiveDocument Time: %d ms", end - start);
+*
+*	res.json({
+*		err : 0,
+*		msg : doc
+*	});
+*
+*});
+*/
 
 
 /*
@@ -659,8 +656,10 @@ router.post('/create', async function(req, res) {
 	seller.address.addressRegion	= org.addressRegion;
 	seller.address.addressCity		= org.addressCity;
 
-	let ip_address = process.env.SERVER_IP_ADDRESS;
-	let port = process.env.SERVER_PORT || DEFAULT_SERVER_PORT;
+	let ip_address = process.env.SERVER_LOCATION.split("://")[1];
+	ip_address = ip_address.split(":")[0];
+
+	let port = process.env.SERVER_PORT;
 	if( ip_address == null || ip_address == 'undefined') {
 		ip_address = netUtil.getLocalIp();
 

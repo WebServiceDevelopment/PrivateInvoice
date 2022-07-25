@@ -49,7 +49,7 @@ const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
  * 1.
  * getDocumentBuyer
  */
-router.post('/getDocumentBuyer', async function(req, res) {
+router.get('/getDocumentBuyer', async function(req, res) {
 
     let sql = `
         SELECT
@@ -62,7 +62,7 @@ router.post('/getDocumentBuyer', async function(req, res) {
     `;
 
     let args = [
-        req.body.document_uuid
+        req.query.document_uuid
     ];
 
 	let result;
@@ -74,9 +74,10 @@ router.post('/getDocumentBuyer', async function(req, res) {
 	}
 
 	if(!result) {
+		console.log("Buyer DOCUMENT NOT FOUND FOR MEMBER:"+req.query.document_uuid)
 		return res.json({
-			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR MEMBER"
+			err : 2,
+			msg : "Buyer DOCUMENT NOT FOUND FOR MEMBER"
 		});
 	}
 
@@ -94,7 +95,7 @@ router.post('/getDocumentBuyer', async function(req, res) {
  * 2.
  * getDocumentSeller
  */
-router.post('/getDocumentSeller', async function(req, res) {
+router.get('/getDocumentSeller', async function(req, res) {
 
     let sql = `
         SELECT
@@ -107,7 +108,7 @@ router.post('/getDocumentSeller', async function(req, res) {
     `;
 
     let args = [
-        req.body.document_uuid
+        req.query.document_uuid
     ];
 
 	let result;
@@ -119,9 +120,10 @@ router.post('/getDocumentSeller', async function(req, res) {
 	}
 
 	if(!result) {
+		console.log("seller DOCUMENT NOT FOUND FOR MEMBER:"+req.query.document_uuid)
 		return res.json({
-			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR MEMBER"
+			err : 2,
+			msg : "Seller DOCUMENT NOT FOUND FOR MEMBER"
 		});
 	}
 
@@ -139,7 +141,7 @@ router.post('/getDocumentSeller', async function(req, res) {
  * 3.
  * getArchiveDocumentBuyer
  */
-router.post('/getArchiveDocumentBuyer', async function(req, res) {
+router.get('/getArchiveDocumentBuyer', async function(req, res) {
 
     let sql = `
         SELECT
@@ -152,7 +154,7 @@ router.post('/getArchiveDocumentBuyer', async function(req, res) {
     `;
 
     let args = [
-        req.body.document_uuid
+        req.query.document_uuid
     ];
 
 	let result;
@@ -165,8 +167,8 @@ router.post('/getArchiveDocumentBuyer', async function(req, res) {
 
 	if(!result) {
 		return res.json({
-			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR MEMBER"
+			err : 2,
+			msg : "Buyer DOCUMENT NOT FOUND FOR MEMBER"
 		});
 	}
 
@@ -184,7 +186,7 @@ router.post('/getArchiveDocumentBuyer', async function(req, res) {
  * 4.
  * getArchiveDocumentSeller
  */
-router.post('/getArchiveDocumentSeller', async function(req, res) {
+router.get('/getArchiveDocumentSeller', async function(req, res) {
 
     let sql = `
         SELECT
@@ -197,7 +199,7 @@ router.post('/getArchiveDocumentSeller', async function(req, res) {
     `;
 
     let args = [
-        req.body.document_uuid
+        req.query.document_uuid
     ];
 
 	let result;
@@ -210,8 +212,8 @@ router.post('/getArchiveDocumentSeller', async function(req, res) {
 
 	if(!result) {
 		return res.json({
-			err : 5,
-			msg : "DOCUMENT NOT FOUND FOR MEMBER"
+			err : 2,
+			msg : "Seller DOCUMENT NOT FOUND FOR MEMBER"
 		});
 	}
 

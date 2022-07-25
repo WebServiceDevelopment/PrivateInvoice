@@ -1,5 +1,4 @@
 {
-	"PORT" : 30000,
 	"CURRENCY" : {
 		"formatWithSymbol" : true,
 		"symbol" : "Gwei",
@@ -7,13 +6,6 @@
 		"decimal" : ".",
 		"precision" : 0,
 		"pattern" : "# !"
-	},
-	"DATABASE" : {
-		"connectionLimit" : 4,
-		"host" : "localhost",
-		"user" : "pi_user",
-		"password" : "raspberry",
-		"database" : "PrivateInvoice"
 	},
 	"SESSION" : {
 		"secret" : "KeyboardCat",
