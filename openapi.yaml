@@ -2051,7 +2051,7 @@ presentations:
       verifications:
         type: array
         items:
-        $ref: #/presentations/schemas/Verification
+        $ref: '#/presentations/schemas/Verification'
       required: 
         - verified
       example:
