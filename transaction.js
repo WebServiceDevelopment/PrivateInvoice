@@ -25,7 +25,15 @@ const mysql			= require('mysql');
 
 const configStr		= fs.readFileSync('config.json').toString();
 const config		= JSON.parse(configStr);
-config.DATABASE.database = process.env.DATABASE_NAME;
+
+const DATABASE = {
+		"connectionLimit" : 4,
+		"host" : "localhost",
+		"user" : process.env.DATABASE_USER,
+		"password" : process.env.DATABASE_PASS,
+		"database" : process.env.DATABASE_NAME
+	}
+
 const SALT_ROUNDS 	= 10;
 
 
@@ -65,7 +73,7 @@ function _commit (connection) {
 }
 
 function _connection () {
-	return mysql.createConnection(config.DATABASE);
+	return mysql.createConnection(DATABASE);
 }
 
 function _delete (connection, sql, args) {

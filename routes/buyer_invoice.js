@@ -51,14 +51,20 @@ const {
 const web3						= eth.getWeb3();
 web3.eth.transactionConfirmationBlocks = 2;
 
-// Libraries
+// Ipfs client url
+let ip_wk = process.env.IPFS_ADDRESS.split(":");
+const IPFS_CLIENT_URL = ip_wk[0]+":"+ip_wk[1]+":5001"
 
-const ipfs_http_client		  = require('ipfs-http-client');
-const Ipfs_Http_Client		  = ipfs_http_client.create('http://192.168.1.127:5001');
+console.log("IPFS_CLIENT_URL ="+IPFS_CLIENT_URL );
+
+// Libraries
+const ipfs_http_client		  	= require('ipfs-http-client');
+//const Ipfs_Http_Client		= ipfs_http_client.create('http://192.168.1.127:5001');
+const Ipfs_Http_Client		  	= ipfs_http_client.create(IPFS_CLIENT_URL);
 
 // Database
 
-const db                    = require('../database.js');
+const db						= require('../database.js');
 const config					= require('../config.json');
 
 const BUYER_STATUS				= "buyer_status";

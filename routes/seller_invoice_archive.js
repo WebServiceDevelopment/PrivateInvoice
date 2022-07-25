@@ -103,7 +103,7 @@ router.post('/sellerArchive', async function(req, res) {
 	if(err1) {
 		console.log("Error 1 status = 400 err="+err1);
 
-		return res.status(400).end(err1);
+		return res.status(400).json(err1);
 	}
 
 	// 2.
@@ -113,7 +113,7 @@ router.post('/sellerArchive', async function(req, res) {
 	if(err2) {
 		console.log("Error 2.status = 400 err="+err2);
 
-		return res.status(400).end(err2);
+		return res.status(400).json(err2);
 	}
 
 	// 3.
@@ -153,8 +153,8 @@ router.post('/sellerArchive', async function(req, res) {
 	const [ old_status , _4 ] = await sub.getStatus( SELLER_STATUS, document_uuid) ;
 
 	if(old_status == undefined) {
-		res.json({
-			err : 0,
+		res.status(400).json({
+			err : 4,
 			msg : 'Record is not exist.'
 		});
 		return;
@@ -165,8 +165,8 @@ router.post('/sellerArchive', async function(req, res) {
 	const [ old_document , _5 ] = await sub.getDocument( SELLER_DOCUMENT, document_uuid) ;
 
 	if(old_document == undefined) {
-		res.json({
-			err : 0,
+		res.status(400).json({
+			err : 5,
 			msg : 'Record is not exist.'
 		});
 		return;
@@ -181,7 +181,7 @@ router.post('/sellerArchive', async function(req, res) {
 
 	if (err6 ) {
 		errno = 6;
-		console.log("Error: "+errno);
+		console.log("Error 6.status = 400 err="+err6);
 		return res.status(400).json({ err : errno, msg : err6 });
 	}
 
@@ -192,7 +192,7 @@ router.post('/sellerArchive', async function(req, res) {
 
 	if (err6 ) {
 		errno = 7;
-		console.log("Error: "+errno);
+		console.log("Error 7.status = 400 err="+err7);
 		return res.status(400).json({ err : errno, msg : err7 });
 	}
 

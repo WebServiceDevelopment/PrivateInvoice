@@ -522,9 +522,10 @@
 						<td class="email" id="SessionWidget.menu.membername">
 							membername@instance
 						</td>
+
 						<td class="menu">
-							<div class="btn" id="TabWidget.tab.bell">
-								<i class="fas fa-bell"></i>
+							<div class="btn" style="display: none">
+								<i class="fa-solid fa-book"></i>
 							</div>
 						</td>
 
@@ -1316,185 +1317,6 @@
 										<button>Upgrade</button>
 									</div>
 								</div>
-
-							</div>
-
-						</div>
-
-						<div class="page" id="SettingsMenu.pages.invite">
-
-							<div class="breadcrumbs">
-								<table>
-									<tr>
-										<td>
-											<label>Settings</label>
-										</td>
-										<td>
-											<i class="fas fa-angle-double-right"></i>
-										</td>
-										<td>
-											<label>Invite People</label>
-										</td>
-									</tr>
-								</table>
-							</div>
-
-							<h3 class="inv-header">Invite People</h3>
-
-							<div class="invite-gen">
-
-								<p>Generate and share links with others to grant access to this server</p>
-
-								<table>
-									<thead>
-										<tr>
-											<th>Max number of uses</th>
-											<th>Expire after</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<td>
-												<div class="rel">
-													<select id="SettingsInvite.form.count">
-														<option value="unlimited">Unlimited</option>
-														<option value="1">1 Use</option>
-														<option value="5">5 Uses</option>
-														<option value="10">10 Uses</option>
-														<option value="25">25 Uses</option>
-														<option value="50">50 Uses</option>
-														<option value="100">100 Uses</option>
-													</select>
-													<i class="fas fa-sort"></i>
-												</div>
-											</td>
-											<td>
-												<div class="rel">
-													<select id="SettingsInvite.form.minutes">
-														<option value="unlimited">Never</option>
-														<option value="30">30 minutes</option>
-														<option value="60">1 hour</option>
-														<option value="360">6 hours</option>
-														<option value="760">12 hours</option>
-														<option value="1520">1 day</option>
-														<option value="10640">1 week</option>
-													</select>
-													<i class="fas fa-sort"></i>
-												</div>
-											</td>
-										</tr>
-										<tr>
-											<td>
-												<div class="space"></div>
-												<label>
-													<input type="checkbox" name="invite-roll" id="SettingsInvite.form.buyer" checked> Invite as a buyer
-												</label>
-												<span>You will be able to send invoices to the member</span>
-											</td>
-											<td>
-												<div class="space"></div>
-												<label>
-													<input type="checkbox" name="invite-roll" id="SettingsInvite.form.seller"> Invite as a seller
-												</label>
-												<span>The member will be able to send invoices to you</span>
-											</td>
-										</tr>
-									</tbody>
-								</table>
-
-								<button class="submit" id="SettingsInvite.form.submit">Generate Invite Link</button>
-
-								<ul>
-
-									<li class="labels">
-										<table>
-											<tr>
-												<td class="link"></td>
-												<td class="uses">Uses</td>
-												<td class="expire">Expires</td>
-												<td class="cancel"></td>
-											</tr>
-										</table>
-									</li>
-
-									<div id="SettingsInvite.form.list">
-
-									<li class="even">
-										<table>
-											<tr>
-												<td class="link">
-													<div class="outline">
-														<i class="fab fa-telegram-plane ok"></i>
-														<i class="fas fa-inbox"></i>
-
-														<input type="text" value="https://privateinvoice.com/invite/5e4f23bb502d6" readonly="readonly">
-														<button>Copy</button>
-													</div>
-												</td>
-												<td class="uses">
-													<a><i class="fas fa-member"></i> 0/1</a>
-												</td>
-												<td class="expire">
-													<a>3 Days</a>
-												</td>
-												<td class="cancel"> 
-													<a><i class="fas fa-times"></i> Deactivate</a>
-												</td>
-											</tr>
-										</table>
-									</li>
-
-									<li class="odd">
-										<table>
-											<tr>
-												<td class="link">
-													<div class="outline">
-														<i class="fab fa-telegram-plane"></i>
-														<i class="fas fa-inbox ok"></i>
-														<input type="text" value="https://privateinvoice.com/invite/5e4f23bb502d6" readonly="readonly">
-														<button>Copy</button>
-													</div>
-												</td>
-												<td class="uses">
-													<a><i class="fas fa-member"></i> 1/2</a>
-												</td>
-												<td class="expire">
-													<a>1 Week</a>
-												</td>
-												<td class="cancel"> 
-													<a><i class="fas fa-times"></i> Deactivate</a>
-												</td>
-											</tr>
-										</table>
-									</li>
-
-									<li class="even">
-										<table>
-											<tr>
-												<td class="link">
-													<div class="outline">
-														<i class="fab fa-telegram-plane ok"></i>
-														<i class="fas fa-inbox ok"></i>
-														<input type="text" value="https://privateinvoice.com/invite/5e4f23bb502d6" readonly="readonly">
-														<button>Copy</button>
-													</div>
-												</td>
-												<td class="uses">
-													<a><i class="fas fa-member"></i> 3</a>
-												</td>
-												<td class="expire">
-													<a>∞</a>
-												</td>
-												<td class="cancel"> 
-													<a><i class="fas fa-times"></i> Deactivate</a>
-												</td>
-											</tr>
-										</table>
-									</li>
-
-									</div>
-
-								</ul>
 
 							</div>
 
@@ -3490,7 +3312,6 @@
 		
 		<script type="text/javascript" src="js/SessionWidget.js"></script>
 		<script type="text/javascript" src="js/ToolsetWidget.js"></script>
-		<script type="text/javascript" src="js/SettingsInvite.js"></script>
 		<script type="text/javascript" src="js/SettingsProfile.js"></script>
 		<script type="text/javascript" src="js/SettingsContacts.js"></script>
 		<script type="text/javascript" src="js/SettingsWallet.js"></script>

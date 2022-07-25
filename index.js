@@ -202,7 +202,6 @@ app.use('/api/settings', require('./routes/settings.js'));
 app.use('/api/message', require('./routes/contact_message.js'));
 
 app.use('/api/wallet', require('./routes/wallet.js'));
-// app.use('/api/test', require('./routes/test.js'));
 app.use('/api/presentations', require('./routes/presentations.js'));
 
 
