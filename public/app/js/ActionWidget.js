@@ -269,26 +269,14 @@ const ActionWidget = (function() {
 
 		const transactionHash = this.MEM.getTransactionHash();
 
-        const params = {
-            transactionHash : transactionHash
-        };
-
         const url = '/api/wallet/getIPFScidByTransactionHash';
-
-        const opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        };
-
 
         let response;
         try {
-            response = await fetch( url, opts);
+            response = await fetch( url+'?'+new URLSearchParams({
+            	transactionHash : transactionHash
+            }).toString());
+
         } catch(err) {
 
             throw err;
@@ -483,30 +471,20 @@ const ActionWidget = (function() {
  * [ View transaction Receipt ]
  */
 	async function api_transaction_receipt(role, archive) { 
+		console.log("transaction_receipt:"+role +":"+ archive)
 
 		const url = '/api/wallet/getTransactionReceipt';
 
         const doc = DocumentWidget.API.getDocument();
 
-        const params = {
-            "document_uuid" : doc.document_uuid,
-			"role" : role,
-			"archive" : archive
-        };
-
-        const opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        };
-
         let response;
         try {
-            response = await fetch( url, opts);
+            response = await fetch( url+'?'+new URLSearchParams({
+          			document_uuid : doc.document_uuid,
+					role : role,
+					archive : archive
+            }));
+
         } catch(err) {
 			console.log("err="+err);
 			alert("Cannot connect server.");
@@ -523,13 +501,11 @@ const ActionWidget = (function() {
 		//console.log(res.msg.receipt);
 		let i,id, elm;
 
-		if(res.err != 0) {
-			alert(res.err);
-			return;
-		}
-		if(res.msg == null) {
-			alert("Error View Transaction Rceipt.");
-			return;
+		if( response.status != 200) {
+			if(res.err != 0) {
+				alert(res.msg);
+				return;
+			}
 		}
 
 		let receipt = res.msg.receipt;
@@ -583,24 +559,12 @@ const ActionWidget = (function() {
 
         const doc = DocumentWidget.API.getDocument();
 
-        const params = {
-            document_uuid : doc.document_uuid
-        };
-
-        const opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        };
-
-
         let response;
         try {
-            response = await fetch( url, opts);
+            response = await fetch( url+'?'+new URLSearchParams({
+   				 document_uuid: doc.document_uuid
+			}).toString());
+
         } catch(err) {
 			return;
         }
@@ -611,6 +575,13 @@ const ActionWidget = (function() {
         } catch(err) {
 			return;
         }
+
+		if(response.status != 200) {
+			console.error('Server Error ');
+			alert("Server Error "+res.msg)
+			return;
+		}
+
 
 		let base = 'ActionWidget.modal.';	
 		let i, id, elm;

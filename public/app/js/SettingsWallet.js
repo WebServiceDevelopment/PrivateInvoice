@@ -95,24 +95,13 @@ const SettingsWallet = (function() {
 
 		const url = '/api/wallet/getResentActivityOfWallet';
 
-        const params = {
-			"list_max": LIST_MAX,
-			"start_position":1
-        }
-
-		const opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        }
-
 		let response;
         try {
-            response = await fetch( url, opts);
+            response = await fetch( url+'?'+new URLSearchParams({
+				list_max: LIST_MAX,
+				start_position:1
+            }).toString());
+
         } catch(err) {
 
             throw err;
@@ -226,19 +215,13 @@ const SettingsWallet = (function() {
 
        	const url = '/api/wallet/getReceiptInResentActivity';
 
-		const opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        }
 
 		let response;
         try {
-        	response = await fetch(url, opts);
+            response = await fetch( url+'?'+new URLSearchParams({
+				settlement_hash : settlement_hash
+            }).toString());
+
 		} catch(err) {
 
             throw err;
@@ -294,13 +277,12 @@ const SettingsWallet = (function() {
         }
 
 		const opts = {
-            method: 'POST',
+            method: 'GET',
             cache: 'no-cache',
             credentials: 'same-origin',
             headers: {
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
+            }
         }
 
 		let response;

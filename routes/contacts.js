@@ -398,7 +398,7 @@ const getPrivateKeys = async (member_did) => {
  * generate
  */
 
-router.post('/generate', async function(req, res) {
+router.post('/createBusunessCard', async function(req, res) {
 
 	const { body } = req;
 

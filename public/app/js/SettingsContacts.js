@@ -150,7 +150,11 @@ const SettingsContacts = (function() {
 
 		const url = '/api/contacts/getContactList';
 
-		const req = await fetch(url);
+		const opts = {
+			method: 'GET',
+		}
+
+		const req = await fetch(url, opts);
 		const contacts = await req.json();
 		
 		const { page } = this.DOM.table;
@@ -262,8 +266,8 @@ const SettingsContacts = (function() {
 
 	async function api_addContact() {
 
-		console.log('now we add the contact!!')
 		const { details } = this.MEM;
+		console.log('now we add the contact!! details='+details)
 
 		const opts = {
 			method: 'POST',
@@ -402,7 +406,7 @@ const SettingsContacts = (function() {
 			body: JSON.stringify(params)
 		};
 
-		const url = '/api/contacts/generate';
+		const url = '/api/contacts/createBusunessCard';
 
 		let response;
 		try {
