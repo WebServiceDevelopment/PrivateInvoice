@@ -38,61 +38,219 @@ const SELLER_STATUS			= "seller_status";
 
 /*
  * 1.
- * getCountBuyer
+ * getCount
  */
-router.post('/getCountBuyer', function(req, res) {
+router.get('/getCountOfInvoice', function(req, res) {
 
-	sub.getCount(req, res, BUYER_STATUS);
+	//console.log("/getCountOfInvoice")
+
+    const archive = req.query.archive;
+    const folder = req.query.folder;
+    const role = req.query.role;
+    const type = req.query.type;
+
+    if(type != 'invoice') {
+        res.status(400).json({
+            err : 11,
+            msg : "Invalid argument"
+        });
+    }
+
+    if(role != 'buyer' && role != 'seller') {
+        res.status(400).json({
+            err : 12,
+            msg : "Invalid argument"
+        });
+    }
+
+    if(archive != 0) {
+        res.status(400).json({
+            err : 13,
+            msg : "Invalid argument"
+        });
+    }
+
+    if(folder != '[sent,returned,confirmed,paid]') {
+        res.status(400).json({
+            err : 14,
+            msg : "Invalid argument"
+        });
+    }
+
+
+    switch(role) {
+    case "buyer":
+    	req.body = [
+            { type : "invoice", role : "buyer", folder : "sent", archive : 0 },
+            { type : "invoice", role : "buyer", folder : "returned", archive : 0 },
+            { type : "invoice", role : "buyer", folder : "confirmed", archive : 0 },
+            { type : "invoice", role : "buyer", folder : "paid", archive : 0 }
+        ]
+    break;
+    case "seller":
+    	req.body = [
+            { type : "invoice", role : "seller", folder : "sent", archive : 0 },
+            { type : "invoice", role : "seller", folder : "returned", archive : 0 },
+            { type : "invoice", role : "seller", folder : "confirmed", archive : 0 },
+            { type : "invoice", role : "seller", folder : "paid", archive : 0 }
+        ]
+    break;
+    }
+
+    sub.getCount(req, res, ((role) => {
+			switch(role) {
+			case "buyer":
+				return BUYER_STATUS;
+			case "seller":
+				return SELLER_STATUS;
+			}
+		})(role)
+	);
 
 });
+
 
 /*
  * 2.
- * getCountSeller
+ * getFolderOfInvoice
  */
-router.post('/getCountSeller', function(req, res) {
+router.get('/getFolderOfInvoice', function(req, res) {
 
-	sub.getCount(req, res, SELLER_STATUS);
+    const archive = req.query.archive;
+    const folder = req.query.folder;
+    const role = req.query.role;
+    const type = req.query.type;
+
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    if(type != 'invoice') {
+        res.status(400).json({
+            err : 11,
+            msg : "Invalid argument"
+        });
+    }
+
+    if(role != 'buyer' && role != 'seller') {
+        res.status(400).json({
+            err : 12,
+            msg : "Invalid argument"
+        });
+    }
+
+    if(archive != 0) {
+        res.status(400).json({
+            err : 13,
+            msg : "Invalid argument"
+        });
+    }
+
+    switch(folder) {
+	case 'sent':
+	case 'returned':
+	case 'confirmed':
+	case 'paid':
+	break;
+	default:
+        res.status(400).json({
+            err : 14,
+            msg : "Invalid argument"
+        });
+		
+	}
+
+    req.body = 
+			{
+				archive : archive,
+				folder : folder,
+				role : role,
+				type : type,
+				offset : offset,
+				limit : limit
+			}
+
+
+	sub.getFolder(req, res, ((role) => {
+			switch(role) {
+			case "buyer":
+				return BUYER_STATUS;
+			case "seller":
+				return SELLER_STATUS;
+			}
+		})(role)
+	);
 
 });
+
 
 /*
  * 3.
- * getFolderBuyer
+ * getTotalInvoice
  */
-router.post('/getFolderBuyer', function(req, res) {
+router.get('/getTotalOfInvoice', async function(req, res) {
 
-	sub.getFolder(req, res, BUYER_STATUS);
+    const archive = req.query.archive;
+    const folder = req.query.folder;
+    const role = req.query.role;
+    const type = req.query.type;
+
+    const offset = req.query.offset;
+    const limit = req.query.limit;
+
+    if(type != 'invoice') {
+        res.status(400).json({
+            err : 11,
+            msg : "Invalid argument"
+        });
+    }
+
+    if(role != 'buyer' && role != 'seller') {
+        res.status(400).json({
+            err : 12,
+            msg : "Invalid argument"
+        });
+    }
+
+    if(archive != 0) {
+        res.status(400).json({
+            err : 13,
+            msg : "Invalid argument"
+        });
+    }
+
+    switch(folder) {
+	case 'sent':
+	case 'returned':
+	case 'confirmed':
+	case 'paid':
+	break;
+	default:
+        res.status(400).json({
+            err : 14,
+            msg : "Invalid argument"
+        });
+		
+	}
+
+    req.body = 
+			{
+				archive : archive,
+				folder : folder,
+				role : role,
+				type : type,
+				offset : offset,
+				limit : limit
+			}
+
+
+	sub.getTotal(req, res, ((role) => {
+			switch(role) {
+			case "buyer":
+				return BUYER_STATUS;
+			case "seller":
+				return SELLER_STATUS;
+			}
+		})(role)
+	);
 
 });
-
-/*
- * 4.
- * getFolderSeller
- */
-router.post('/getFolderSeller', function(req, res) {
-
-	sub.getFolder(req, res, SELLER_STATUS);
-
-});
-
-/*
- * 5.
- * getTotalBuyer
- */
-router.post('/getTotalBuyer', async function(req, res) {
-
-	sub.getTotal(req, res, BUYER_STATUS);
-
-});
-
-/*
- * 6.
- * getTotalSeller
- */
-router.post('/getTotalSeller', async function(req, res) {
-
-	sub.getTotal(req, res, SELLER_STATUS);
-
-});
-

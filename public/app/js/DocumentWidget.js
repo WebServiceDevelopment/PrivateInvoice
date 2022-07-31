@@ -355,7 +355,7 @@ const DocumentWidget = (function() {
 
 		let doc = this.MEM.document;
 		for(let key in doc) {
-			console.log(key +"="+doc[key]);
+			//console.log(key +"="+doc[key]);
 		}
 
 		this.API.triggerSavePoint();
@@ -1146,13 +1146,6 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			this.API.updateDocument();
 		}
 
-/*
-		const params = {
-			document_uuid : document_uuid
-		}
-*/
-
-
 		let PATH;
 		let ROLE;
 
@@ -1185,26 +1178,10 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			PATH = '/api/invoice/getDocument'+ROLE;
 		break;
 		}
-console.log("openDocument PATH="+PATH);
 
 		let url = PATH;
 
         let response;
-
-/*
-        let opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        };
-*/
-		console.log( url+'?'+new URLSearchParams({
-                 document_uuid: document_uuid
-            }).toString())
 
         try {
             response = await fetch( url+'?'+new URLSearchParams({
@@ -1231,10 +1208,13 @@ console.log("openDocument PATH="+PATH);
             return;
         }
 
-		//console.log("openDocument");
 
 		Traceability.API.setCredential (res.msg.document_json);
 
+		if(res.msg.document_json== null) {
+			console.error("Caution : res.msg.document_json is null.")
+			return;
+		}
 		if(res.msg.document_json.credentialSubject != null) {
 			Traceability.API.setCredentialSubject(res.msg.document_json.credentialSubject);
 		} else {
@@ -1334,7 +1314,7 @@ console.log("openDocument PATH="+PATH);
 			this.DOM.meta.taxId.textContent = this.MEM.document.document_meta.taxId;
 			let document_meta = this.MEM.document.document_meta;
 			for(let key in document_meta) {
-				console.log(key +"="+document_meta[key]);
+				//console.log(key +"="+document_meta[key]);
 			}
 
 			this.DOM.meta.due_by.textContent = "";

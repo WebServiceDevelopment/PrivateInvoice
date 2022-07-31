@@ -254,6 +254,8 @@ async function api_getCount(req, res, table) {
 			req.body[i].archive
 		];
 
+		//console.log(args);
+
 		try {
 			let row = await db.selectOne(sql, args);
 			counts[i] = row.num;
@@ -375,10 +377,11 @@ async function api_getFolder(req, res, table) {
 		break;
 	default:
 
-		return res.json({
-			err : 1,
-			msg : "INVALID MEMBER ROLE"
-		});
+		return res.status(400)
+			.json({
+				err : 1,
+				msg : "INVALID MEMBER ROLE"
+			});
 
 	}
 

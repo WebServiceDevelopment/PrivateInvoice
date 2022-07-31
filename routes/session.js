@@ -435,9 +435,8 @@ const insertFunds = async ( newMemberAddress ) => {
 
 	// 0.1 ETH in Wei
 	const UNIT_VALUE = 100000000000000000;
-	const AMOUNT = Math.floor( Math.random() * 10 );
+	const AMOUNT = Math.floor( Math.random() * 3 ) + 1;
 	const WEI_TO_SEND = UNIT_VALUE * AMOUNT;
-
 
 	const accounts = await eth.getAccounts()
 	const [ sourceAddress ] = accounts;
@@ -687,7 +686,7 @@ router.post('/updateProfile', async function(req, res) {
 	}
 
 	if(result.affectedRows != 1) {
-		err = {err: 9, msg :"result.affectedRows != 1"}
+		err = {err: 9, msg :"/updateProfile:result.affectedRows != 1"}
 		return res.status(406).end(err);
 	}
 
