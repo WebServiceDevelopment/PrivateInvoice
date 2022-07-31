@@ -37,61 +37,142 @@ const SELLER_ARCHIVE_STATUS	= "seller_status_archive";
 //--------------------------------- End Points --------------------------------
 /*
  * 1.
- * getCountBuyer
+ * getCountOfArchive
  */
-router.post('/getCountBuyer', function(req, res) {
+router.get('/getCountOfArchive', function(req, res) {
+	const archive = req.query.archive;
+	const folder = req.query.folder;
+	const role = req.query.role;
+	const type = req.query.type;
 
-    sub.getCount(req, res, BUYER_ARCHIVE_STATUS);
+	if(type != 'invoice') {
+		res.status(400).json({
+			err : 11,
+			msg : "Invalid argument"
+		});
+	}
+
+	if(role != 'buyer' && role != 'seller') {
+		res.status(400).json({
+			err : 11,
+			msg : "Invalid argument"
+		});
+	}
+	
+	if(archive != 1 && archive != 0) {
+		res.status(400).json({
+			err : 11,
+			msg : "Invalid argument"
+		});
+	}
+
+	if(folder != 'paid' && folder != 'trash') {
+		res.status(400).json({
+			err : 11,
+			msg : "Invalid argument"
+		});
+	}
+	
+	req.body = [
+            {
+                archive : archive,
+                folder : folder,
+                role : role,
+                type : 'invoice'
+            }
+        ]
+
+	//console.log(JSON.stringify(req.body));
+
+	let table_name;
+
+	switch(role) {
+	case "buyer":
+		table_name = BUYER_ARCHIVE_STATUS;	
+	break;
+	case "seller":
+		table_name = SELLER_ARCHIVE_STATUS;	
+	break;
+	}
+
+    sub.getCount(req, res, table_name);
 
 });
 
 /*
  * 2.
- * getCountSeller
+ * getFolderOfArchive
  */
-router.post('/getCountSeller', function(req, res) {
+router.get('/getFolderOfArchive', function(req, res) {
 
-    sub.getCount(req, res, SELLER_ARCHIVE_STATUS);
+	const archive = req.query.archive;
+	const folder = req.query.folder;
+	const role = req.query.role;
+	const type = req.query.type;
+
+	const offset = req.query.offset;
+	const limit = req.query.limit;
+
+    req.body =
+            {
+                archive : archive,
+                folder : folder,
+                role : role,
+                type : type,
+                offset : offset,
+                limit : limit
+            }
+
+	//console.log(JSON.stringify(req.body));
+
+	let table_name;
+
+	switch(role) {
+	case "buyer":
+		table_name = BUYER_ARCHIVE_STATUS;	
+	break;
+	case "seller":
+		table_name = SELLER_ARCHIVE_STATUS;	
+	break;
+	}
+
+    sub.getFolder(req, res, table_name);
 
 });
 
-/*
- * 3.
- * getFolderBuyer
- */
-router.post('/getFolderBuyer', function(req, res) {
-
-    sub.getFolder(req, res, BUYER_ARCHIVE_STATUS);
-
-});
 
 /*
- * 4.
- * getFolderSeller
- */
-router.post('/getFolderSeller', function(req, res) {
-
-    sub.getFolder(req, res, SELLER_ARCHIVE_STATUS);
-
-});
-
-/*
- * 5.
+ * 7.
  * getTotalBuyer
  */
-router.post('/getTotalBuyer', async function(req, res) {
+router.get('/getTotalOfArchive', async function(req, res) {
 
-    sub.getTotal(req, res, BUYER_ARCHIVE_STATUS);
+	const archive = req.query.archive;
+	const folder = req.query.folder;
+	const role = req.query.role;
+	const type = req.query.type;
+
+    req.body =
+            {
+                archive : archive,
+                folder : folder,
+                role : role,
+                type : type
+            }
+
+	//console.log(JSON.stringify(req.body));
+
+	let table_name;
+
+	switch(role) {
+	case "buyer":
+		table_name = BUYER_ARCHIVE_STATUS;	
+	break;
+	case "seller":
+		table_name = SELLER_ARCHIVE_STATUS;	
+	break;
+	}
+
+    sub.getTotal(req, res, table_name);
 
 });
-
-/*
- * 6.
- * getTotalSeller
- */
-router.post('/getTotalSeller', async function(req, res) {
-
-    sub.getTotal(req, res, SELLER_ARCHIVE_STATUS);
-
-});
-

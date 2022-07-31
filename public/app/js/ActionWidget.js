@@ -611,6 +611,30 @@ const ActionWidget = (function() {
 
 		this.DOM.modal.body.classList.add('open');
 
+//
+// Check for insufficient balance
+//
+// If the balance is insufficient, 
+// the Send Transaction button cannot be pressed.
+//
+		let balance = parseInt(msg[ids[0]].replace(/,/g,"").replace("Gwei",""));
+		let amount = 0;
+
+		for ( i=1; i<ids.length; i++) {
+			id = ids[i];
+			amount += parseInt(msg[id].replace(/,/g,"").replace("Gwei",""));
+		}
+		amount += parseInt(GAS_LIMIT.replace(/,/g,""));
+		if(balance <= amount) {
+			this.DOM.modal.submit.setAttribute("disabled", true);
+			alert(`Insufficient balance : ${(balance - amount)} Gwei`);
+
+		} else {
+			if( this.DOM.modal.submit.hasAttribute("disabled")) {
+				this.DOM.modal.submit.removeAttribute("disabled");
+			}
+		}
+
 	}
 
 	async function evt_handleOrderRequestCancel() {
@@ -1545,7 +1569,7 @@ const ActionWidget = (function() {
 
 		if(response.status != 200) {
 			setTimeout(function() {
-				alert("[ makePayment ]\nerr="+res.err+"\ncode : "+res.code);
+				alert("[ makePayment ]\nerr="+res.err+"\nmsg : "+res.msg);
 			}, 100);
 		} else {
 

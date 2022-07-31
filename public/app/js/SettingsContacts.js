@@ -267,7 +267,7 @@ const SettingsContacts = (function() {
 	async function api_addContact() {
 
 		const { details } = this.MEM;
-		console.log('now we add the contact!! details='+details)
+		console.log("linkRelationship="+details.relatedLink[0].linkRelationship)
 
 		const opts = {
 			method: 'POST',
@@ -276,10 +276,10 @@ const SettingsContacts = (function() {
 			headers: {
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify(details)
+			body: JSON.stringify(details), 
 		};
 
-		const url = '/api/contacts/add';
+		const url = '/api/contacts/addContact';
 
 		let response;
 		try {
@@ -387,13 +387,37 @@ const SettingsContacts = (function() {
 
 	async function evt_handleExportClick() {
 
-		console.log('export click!!');
+        let linkRelationship;
+		let buyer, seller;
+
+		if( this.DOM.exportDetails.partner.checked ) {
+			buyer = 1;
+			seller = 1;
+            linkRelationship = this.DOM.exportDetails.partner.value;
+
+		} else if( this.DOM.exportDetails.seller.checked ) {
+			buyer = 0;
+			seller = 1;
+            linkRelationship = this.DOM.exportDetails.seller.value;
+
+		} else if( this.DOM.exportDetails.buyer.checked ) {
+			buyer = 1;
+			seller = 0;
+            linkRelationship = this.DOM.exportDetails.buyer.value;
+
+		} else {
+			console.error("Error : Invite Contact")
+			return
+		}
+
+		console.log('export click!! linkRelationship ='+ linkRelationship);
 		
 		const params = {
 			uses: parseInt(this.DOM.exportDetails.uses.value),
-			buyer: 1,
-			seller: 1,
-			expire: this.DOM.exportDetails.expire.value
+			buyer: buyer,
+			seller: seller,
+			expire: this.DOM.exportDetails.expire.value,
+			linkRelationship: linkRelationship
 		};
 
 		const opts = {

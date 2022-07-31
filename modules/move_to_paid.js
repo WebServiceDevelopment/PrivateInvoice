@@ -74,15 +74,24 @@ const moveToPaid = async (document_uuid, buyer_did, hash) => {
 	const document_json = JSON.parse(document.document_json);
 	const totalPaymentDue = document_json.credentialSubject.totalPaymentDue;
 
-	console.log("totalPaymentDue="+totalPaymentDue.price);
+	console.log("moveToPaid : totalPaymentDue="+totalPaymentDue.price);
 
+	// 4.
 	let wk = '0';
 	if( totalPaymentDue != null && totalPaymentDue.price != null) {
 		wk = totalPaymentDue.price;
+		wk = wk.replace(/,/g, "");
 	}
-	const total = web3.utils.toWei(wk , 'Gwei');
 
-	// 4.
+	let total;
+	try {
+		total = web3.utils.toWei(wk , 'Gwei');
+	} catch (err4) {
+		console.log(err4);
+		return 4;
+	}
+
+	// 5.
 	// Does transaction value and invoice total match?
 	//
 
@@ -93,33 +102,21 @@ const moveToPaid = async (document_uuid, buyer_did, hash) => {
 		let msg = "Transaction value and invoice total do not match."
 			console.log("error :"+msg);
 			let err = {err:msg}
-			return 4;
+			return 5;
 		}
 	} else {
-		console.log("4:"+result)
+		console.log("5:"+result)
 	}
-
-	// 5.
-	// begin Transaction
-	//
-	const [ conn , _5 ] = await tran.connection ();
-	await tran.beginTransaction(conn);
 
 	// 6.
+	// begin Transaction
 	//
-	const [ _6, err6] = await tran.setMakePayment_status(conn, SELLER_STATUS, document_uuid, buyer_did);
-
-	if(err6) {
-		console.log(err6);
-		let code = 400;
-		let errno = 6;
-		tran.rollbackAndReturn(conn, code, err6, errno);
-		return 6;
-	}
+	const [ conn , _6 ] = await tran.connection ();
+	await tran.beginTransaction(conn);
 
 	// 7.
 	//
-	const [_7, err7] = await tran.setMakePayment_document(conn, SELLER_DOCUMENT, document_uuid, hash);
+	const [ _7, err7] = await tran.setMakePayment_status(conn, SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err7) {
 		console.log(err7);
@@ -130,19 +127,31 @@ const moveToPaid = async (document_uuid, buyer_did, hash) => {
 	}
 
 	// 8.
-	// commit
 	//
-	const [ _8, err8 ] = await tran.commit(conn);
+	const [_8, err8] = await tran.setMakePayment_document(conn, SELLER_DOCUMENT, document_uuid, hash);
 
-	if (err8) {
+	if(err8) {
 		console.log(err8);
-		let errno = 8;
 		let code = 400;
+		let errno = 8;
 		tran.rollbackAndReturn(conn, code, err8, errno);
 		return 8;
 	}
 
 	// 9.
+	// commit
+	//
+	const [ _9, err9 ] = await tran.commit(conn);
+
+	if (err9) {
+		console.log(err9);
+		let errno = 9;
+		let code = 400;
+		tran.rollbackAndReturn(conn, code, err9, errno);
+		return 9;
+	}
+
+	// 10.
 	//
 	conn.end();
 	return null;

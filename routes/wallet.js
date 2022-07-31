@@ -51,6 +51,9 @@ const SELLER_DOCUMENT_ARCHIVE	= "seller_document_archive";
 
 const CONTACTS                  = "contacts";
 
+// CURRENCY
+const CURRENCY                  = config.CURRENCY
+
 // ------------------------------- End Points -------------------------------
 
 /*
@@ -301,7 +304,7 @@ router.get('/getWalletInfo', async function(req, res) {
 
 	//console.log("balanceWei ="+balanceWei)
 
-	let balanceGwei = web3.utils.fromWei(balanceWei,'Gwei');
+	let balanceGwei = web3.utils.fromWei(balanceWei,CURRENCY.symbol);
 	//console.log("balanceGwei ="+balanceGwei)
 
 	res.json({
@@ -407,12 +410,12 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 	// 7.
 	// Get seller account
 	//
-	const [status7, data7] = await to_seller.getAccountOfSellerWallet(seller_host, seller_did, member_did) ;
+	const [code7, data7] = await to_seller.getAccountOfSellerWallet(seller_host, seller_did, member_did) ;
 
-	if(status7 != 200) {
+	if(code7 != 200) {
 		console.log("Error 7 status = 400 err="+data7);
 
-		rt = {err:7,msg  : err7.toString()};
+		rt = {err:7,msg  : data7.toString()};
         return res.status(400).json(rt);
 	}
 
@@ -520,8 +523,8 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 	// 12.
 	// Add the integer part and the decimal point separatelya.
 	//
-	let balanceGwei = web3.utils.fromWei(balanceWei, 'Gwei');
-	let gasPriceGwei = web3.utils.fromWei(gasPrice , 'Gwei');
+	let balanceGwei = web3.utils.fromWei(balanceWei, CURRENCY.symbol);
+	let gasPriceGwei = web3.utils.fromWei(gasPrice , CURRENCY.symbol);
 	let gasGwei = estimateGas * gasPriceGwei;
 
 	let payment = doc.credentialSubject.totalPaymentDue.price.replace(/,/g,"");
@@ -550,7 +553,7 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 		msg : transaction_result,
 	});
 
-	//console.log("After:"+ balanceGwei+"Gwei");
+	//console.log("After:"+ balanceGwei+CURRENCY.symbol);
 
 	return;
 
@@ -568,11 +571,11 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 			return integerPart;
 		} else if( decimalPart < 0 ) {
 			decimalPart = -1 * decimalPart;
-			decimalPart = web3.utils.fromWei(decimalPart.toString() ,'Gwei');
+			decimalPart = web3.utils.fromWei(decimalPart.toString() ,CURRENCY.symbol);
 
 			return (integerPart-1) + (1-decimalPart).toString().substr(1);
 		} else {
-			decimalPart = web3.utils.fromWei(decimalPart.toString() ,'Gwei');
+			decimalPart = web3.utils.fromWei(decimalPart.toString() ,CURRENCY.symbol);
 
 			return integerPart + decimalPart.toString().substr(1);
 		}		
@@ -594,7 +597,7 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 
 		let res;
 		try {
-			res = web3.utils.toWei(result , 'Gwei');
+			res = web3.utils.toWei(result , CURRENCY.symbol);
 		} catch(e) {
 			res = 0;
 		}

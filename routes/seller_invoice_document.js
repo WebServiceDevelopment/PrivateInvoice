@@ -45,18 +45,17 @@ const tran                      = require("../modules/invoice_sub_transaction.js
 const SELLER_DRAFT_DOCUMENT	    = "seller_document_draft";
 const SELLER_DRAFT_STATUS		= "seller_status_draft";
 
-const SELLER_DOCUMENT 		    = "seller_document";
-
-const SELLER_ARCHIVE_DOCUMENT   = "seller_document_archive";
 
 // Error Message
-const MESSAGE_AFFECTED_ROWS 	= "result.affectedRows != 1";
+const MESSAGE_AFFECTED_ROWS 	= ":result.affectedRows != 1";
 
-const DEFAULT_SERVER_PORT 		= 3000;
+// CURRENCY
+const CURRENCY					= config.CURRENCY
 
 // ------------------------------- End Points -------------------------------
 
 /*
+ * 1.
  * update
  */
 router.post('/update', async function(req, res) {
@@ -128,7 +127,7 @@ router.post('/update', async function(req, res) {
 	if(result2.affectedRows != 1) {
 		errno = 3;
 		code = 400;
-		const err3 = MESSAGE_AFFECTED_ROWS;
+		const err3 = "Error update 3:"+MESSAGE_AFFECTED_ROWS;
 		let msg = tran.rollbackAndReturn(conn, code, err3, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
@@ -183,7 +182,7 @@ router.post('/update', async function(req, res) {
 	if(result4.affectedRows != 1) {
 		errno = 5;
 		code = 400;
-		const err5 = MESSAGE_AFFECTED_ROWS;
+		const err5 = "Error update 5:"+MESSAGE_AFFECTED_ROWS;
 		let msg = tran.rollbackAndReturn(conn, code, err5, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
@@ -211,176 +210,9 @@ router.post('/update', async function(req, res) {
 
 });
 
-/*
- * getDraftDocument
- */
-router.get('/getDraftDocument', async function(req, res) {
-
-
-	let sql = `
-		SELECT
-			document_uuid,
-			document_json,
-			document_type,
-			subject_line,
-			currency_options,
-			seller_did,
-			seller_membername,
-			seller_details,
-			buyer_did,
-			buyer_membername,
-			buyer_details,
-			created_on,
-			document_meta,
-			document_body,
-			document_totals,
-			document_logo
-		FROM
-			${SELLER_DRAFT_DOCUMENT}
-		WHERE
-			(seller_did = ? OR buyer_did = ?)
-		AND
-			document_uuid = ?
-	`;
-
-	let args = [
-		req.session.data.member_did,
-		req.session.data.member_did,
-		req.query.document_uuid
-	];
-
-	let doc;
-	try {
-		doc = await db.selectOne(sql, args);
-	} catch(err) {
-		throw err;
-	}
-
-	if(!doc) {
-		return res.json({
-			err : 5,
-			msg : "Draft DOCUMENT NOT FOUND FOR MEMBER"
-		});
-	}
-
-	doc.document_body = JSON.parse(doc.document_body);
-	doc.document_meta = JSON.parse(doc.document_meta);
-	doc.document_totals = JSON.parse(doc.document_totals);
-	doc.seller_details = JSON.parse(doc.seller_details);
-	doc.buyer_details = JSON.parse(doc.buyer_details);
-	doc.currency_options = JSON.parse(doc.currency_options);
-	doc.document_json = JSON.parse(doc.document_json);
-
-	res.json({
-		err : 0,
-		msg : doc
-	});
-
-});
 
 /*
- * getDocument
- */
-
-/* del 20220725
-*router.post('/getDocument', async function(req, res) {
-*
-*	let start = Date.now();
-*
-*    let sql = `
-*        SELECT
-*            document_uuid,
-*            document_json
-*        FROM
-*            ${SELLER_DOCUMENT}
-*        WHERE
-*            document_uuid = ?
-*    `;
-*
-*    let args = [
-*        req.body.document_uuid
-*    ];
-*
-*	let result;
-*	let doc;
-*	try {
-*		result = await db.selectOne(sql, args);
-*	} catch(err) {
-*		throw err;
-*	}
-*
-*	if(!result) {
-*		return res.json({
-*			err : 5,
-*			msg : "DOCUMENT NOT FOUND FOR MEMBER"
-*		});
-*	}
-*
-*	doc =  JSON.parse(result.document_json);
-*
-*	let end = Date.now();
-*	console.log("Document Time: %d ms", end - start);
-*
-*	res.json({
-*		err : 0,
-*		msg : doc
-*	});
-*
-*});
-*/
-
-/*
- * getArchiveDocument
- */
-/* del 20220725
-*router.post('/getArchiveDocument', async function(req, res) {
-*
-*	let start = Date.now();
-*
-*    let sql = `
-*        SELECT
-*            document_uuid,
-*            document_json
-*        FROM
-*            ${SELLER_ARCHIVE_DOCUMENT}
-*        WHERE
-*            document_uuid = ?
-*    `;
-*
-*    let args = [
-*        req.body.document_uuid
-*    ];
-*
-*	let result;
-*	let doc;
-*	try {
-*		result = await db.selectOne(sql, args);
-*	} catch(err) {
-*		throw err;
-*	}
-*
-*	if(!result) {
-*		return res.json({
-*			err : 5,
-*			msg : "DOCUMENT NOT FOUND FOR MEMBER"
-*		});
-*	}
-*
-*	doc =  JSON.parse(result.document_json);
-*
-*	let end = Date.now();
-*	console.log("ArchiveDocument Time: %d ms", end - start);
-*
-*	res.json({
-*		err : 0,
-*		msg : doc
-*	});
-*
-*});
-*/
-
-
-/*
+ * 2.
  * create
  */
 router.post('/create', async function(req, res) {
@@ -511,13 +343,13 @@ router.post('/create', async function(req, res) {
             "invoiceSubtotal" : {
                 "type"					: "PriceSpecification",
                 "price"					: 0,
-                "priceCurrency"			: "Gwei"
+                "priceCurrency"			: CURRENCY.symbol
             },
 
             "totalPaymentDue" : {
                 "type"					: "PriceSpecification",
                 "price"					: 0,
-                "priceCurrency"			: "Gwei"
+                "priceCurrency"			: CURRENCY.symbol
             },
 
             "comments" : [
@@ -544,14 +376,14 @@ router.post('/create', async function(req, res) {
                 "productPrice" : {
                     "type" 				: "PriceSpecification",
                     "price"				: "",
-                    "priceCurrency"		: "Gwei"
+                    "priceCurrency"		: CURRENCY.symbol
                 }
             },
 
             "lineItemTotalPrice" : {
                 "type"					: "PriceSpecification",
                 "price"					: "",
-                "priceCurrency"			: "Gwei"
+                "priceCurrency"			: CURRENCY.symbol
             }
         }
     }
@@ -754,7 +586,7 @@ router.post('/create', async function(req, res) {
 	if(result10.affectedRows != 1) {
 		errno = 11;
 		code = 400;
-		const err11 = MESSAGE_AFFECTED_ROWS;
+		const err11 = "create 11:"+MESSAGE_AFFECTED_ROWS;
 		let msg = tran.rollbackAndReturn(conn, code, err11, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}
@@ -850,7 +682,7 @@ router.post('/create', async function(req, res) {
 	if(result12.affectedRows != 1) {
 		errno = 13;
 		code = 400;
-		const err13 = MESSAGE_AFFECTED_ROWS;
+		const err13 = "create 13"+MESSAGE_AFFECTED_ROWS;
 		let msg = tran.rollbackAndReturn(conn, code, err13, errno);
 		return res.status(400).json({ err : errno, msg : msg });
 	}

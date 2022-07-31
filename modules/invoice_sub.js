@@ -493,8 +493,6 @@ async function _getSellerHost (table,  seller_did, buyer_did) {
             remote_member_did = ?
         AND
             local_member_did = ?
-		AND
-			remote_to_local = 1
     `;
 
     const args = [
@@ -536,8 +534,6 @@ async function _getBuyerHost (table,  seller_did, buyer_did) {
             local_member_did = ?
         AND
             remote_member_did = ?
-		AND
-			local_to_remote = 1
     `;
 
     const args = [
@@ -637,7 +633,7 @@ async function _insertDraftDocument(table, document) {
 	}
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"insertDraftDocument:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -672,7 +668,7 @@ async function _insertDocument(table, status, document_json) {
 		return [false, err];
 	}
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"insertDocument:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -716,7 +712,7 @@ async function _insertArchiveDocument(table, status, document) {
 		return [false, err];
 	}
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"insertArchiveDocument:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -799,7 +795,7 @@ async function _insertStatus(table, status) {
 	}
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"insertStatus:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -888,7 +884,7 @@ async function _insertArchiveStatus(table, status) {
 	}
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"insertArchiveStatus:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -921,7 +917,7 @@ async function _deleteStatus(table, status) {
 	}
 
 	if(result.affectedRows != 1) {
-		err  = "result.affectedRows != 1";
+		err  = "deleteStatus:result.affectedRows != 1";
 		return [false, err];
 	}
 
@@ -929,7 +925,7 @@ async function _deleteStatus(table, status) {
 }
 
 /*
- *
+ * deleteDocument
  */
 async function _deleteDocument(table, status) {
 
@@ -953,7 +949,7 @@ async function _deleteDocument(table, status) {
 	}
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"deleteDocument:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -997,7 +993,7 @@ async function _setConfirm (table, document_uuid , buyer_did) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"setConfirm:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -1041,7 +1037,7 @@ async function _setUnconfirm (table, document_uuid , buyer_did) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"setUnconfirm:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -1091,7 +1087,7 @@ async function _setPaymentReservation (table, document_uuid , buyer_did) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"setPaymentReservation:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -1141,7 +1137,7 @@ async function _resetPaymentReservation (table, document_uuid , buyer_did) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"resetPaymentReservation:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -1191,7 +1187,7 @@ async function _setMakePayment_status (table, document_uuid , buyer_did) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"setMakePayment_status:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -1229,7 +1225,7 @@ async function _setMakePayment_document (table, document_uuid , hash) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"setMakePayment_document:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -1270,7 +1266,7 @@ async function _setWithdrawSeller (table, document_uuid , seller_did) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"setWithdrawSeller:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -1312,7 +1308,7 @@ async function _setWithdrawBuyer (table, document_uuid , buyer_did) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"setWithdrawBuyer:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -1353,7 +1349,7 @@ async function _setReturn (table, document_uuid , buyer_did) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"setReturn:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -1394,7 +1390,7 @@ async function _rollbackReturnToSent (table, document_uuid , buyer_did) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"rollbackReturnToSent:result.affectedRows != 1"};
 		return [false, err];
 	}
 
@@ -1455,7 +1451,7 @@ async function _rollbackPaidToConfirm (table, document_uuid , buyer_did) {
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"result.affectedRows != 1"};
+		err  = {msg:"rollbackPaidToConfirm:result.affectedRows != 1"};
 		return [false, err];
 	}
 
