@@ -181,7 +181,6 @@ app.use('/api/invite', require('./routes/invite.js'));
 app.use('/api/contacts', require('./routes/contacts.js'));
 
 app.use('/api/invoice', require('./routes/buyer_invoice.js'));
-app.use('/api/invoice', require('./routes/buyer_invoice_document.js'));
 app.use('/api/message', require('./routes/buyer_invoice_archive.js'));
 app.use('/api/message', require('./routes/buyer_invoice_trash.js'));
 app.use('/api/message', require('./routes/buyer_message.js'));
@@ -192,9 +191,11 @@ app.use('/api/invoice', require('./routes/seller_invoice_archive.js'));
 app.use('/api/invoice', require('./routes/seller_invoice_trash.js'));
 app.use('/api/message', require('./routes/seller_message.js'));
 
+app.use('/api/invoice', require('./routes/invoice_document.js'));
+
 app.use('/api/tray', require('./routes/tray.js'));
-app.use('/api/trayDrafts', require('./routes/seller_tray_drafts.js'));
-app.use('/api/trayArchive', require('./routes/tray_archive.js'));
+app.use('/api/tray', require('./routes/tray_drafts.js'));
+app.use('/api/tray', require('./routes/tray_archive.js'));
 
 app.use('/api/invoice', require('./routes/softDelete.js'));
 

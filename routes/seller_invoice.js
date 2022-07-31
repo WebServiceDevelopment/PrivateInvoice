@@ -49,19 +49,23 @@ const {
 } = require("../modules/update_status.js");
 
 // Database
+const config                    = require('../config.json');
 
 // Table Name
-const SELLER_DRAFT_DOCUMENT = "seller_document_draft";
-const SELLER_DRAFT_STATUS = "seller_status_draft";
+const SELLER_DRAFT_DOCUMENT		= "seller_document_draft";
+const SELLER_DRAFT_STATUS		= "seller_status_draft";
 
-const SELLER_DOCUMENT = "seller_document";
-const SELLER_STATUS = "seller_status";
+const SELLER_DOCUMENT			= "seller_document";
+const SELLER_STATUS				= "seller_status";
 
-const SELLER_ARCHIVE_DOCUMENT = "seller_document_archive";
-const SELLER_ARCHIVE_STATUS = "seller_status_archive";
+const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
+const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
 
 const CONTACTS = "contacts";
-const { getPrivateKeys } = require('../modules/verify_utils.js');
+const { getPrivateKeys }		= require('../modules/verify_utils.js');
+
+// CURRENCY
+const CURRENCY                  = config.CURRENCY
 
 // ------------------------------- End Points -------------------------------
 
@@ -78,7 +82,6 @@ router.post("/sendInvoice", async function (req, res) {
 	const { member_did } = req.session.data;
 
 	let code, errno;
-	const USE_PRESENTATION = true;
 
 	// 1.
 	const [buyer_did, err1] = await sub.getBuyerDidForDraft(
@@ -120,32 +123,26 @@ router.post("/sendInvoice", async function (req, res) {
 			.json(err2);
 	}
 
-/*
-*	if(!USE_PRESENTATION) {
-*/
-		//3. buyer connect check
-		const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
+	//3. buyer connect check
+	const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
 
-		if(code3 !== 200) {
-			console.log("Error 3 code="+code3+":err="+err3);
-			let msg;
-			if(code == 500) {
-				msg = {"err":"buyer connect check:ECONNRESET"};
-			} else {
-				switch(err3) {
-				case "Not found.":
-					msg = {"err":"The destination node cannot be found."};
-				break;
-				default:
-					msg = {"err":err3};
-				break;
-				}
-			}
-			return res.status(400).json(msg);
+	if(code3 !== 200) {
+		console.log("/sendInvoice Error 3 code="+code3+":err="+err3);
+		let msg;
+		if(code == 500) {
+			msg = {"err":"buyer connect check:ECONNRESET"};
+		} else {
+			switch(err3) {
+			case "Not found.":
+				msg = {"err":"The destination node cannot be found."};
+			break;
+			default:
+				msg = {"err":err3};
+			break;
 		}
-/*
-*	}
-*/
+		}
+		return res.status(400).json(msg);
+	}
 
 	// 4.
 	// DRAFT_STATUS
@@ -497,15 +494,8 @@ router.post("/recreate", async function (req, res) {
 
 	// 7.5 currency_options
 	//
-	const currency_options = {
-		formatWithSymbol: true,
-		symbol: "Gwei",
-		separator: ",",
-		decimal: ".",
-		precision: 0,
-		pattern: "# !",
-	};
-	document.currency_options = JSON.stringify(currency_options);
+
+	document.currency_options = JSON.stringify(CURRENCY);
 
 	// 7.6 seller_did
 	//
@@ -654,7 +644,6 @@ router.post("/recreate", async function (req, res) {
 
 	if (err11) {
 		errno = 11;
-		insertDraftDocument;
 		code = 400;
 		return res
 			.status(400)
@@ -803,7 +792,6 @@ router.post("/withdraw", async function (req, res) {
 	const { document_uuid, document_folder } = req.body;
 	const { member_did } = req.session.data;
 
-	const USE_PRESENTATION = true;
 	let errno, code;
 
 	// 1.
@@ -838,39 +826,32 @@ router.post("/withdraw", async function (req, res) {
 
 	//3. buyer connect check
 	
-/*
-*	if(!USE_PRESENTATION) {
-*/
+	const [code3, err3] = await to_buyer.connect(
+		buyer_host,
+		member_did,
+		buyer_did
+	);
 
-		const [code3, err3] = await to_buyer.connect(
-			buyer_host,
-			member_did,
-			buyer_did
-		);
-
-		if (code3 !== 200) {
-			console.log("Error 3 status = 400 code=" + code3);
-			let msg;
-			if (code3 == 500) {
-				msg = { err: "buyer connect check:ECONNRESET" };
-			} else {
-				switch (err3) {
-					case "Not found.":
-						msg = { err: "The destination node cannot be found." };
-						break;
-					default:
-						msg = { err: err3 };
-						break;
-				}
+	if (code3 !== 200) {
+		console.log("Error 3 status = 400 code=" + code3);
+		let msg;
+		if (code3 == 500) {
+			msg = { err: "buyer connect check:ECONNRESET" };
+		} else {
+			switch (err3) {
+				case "Not found.":
+					msg = { err: "The destination node cannot be found." };
+				break;
+				default:
+					msg = { err: err3 };
+					break;
 			}
-			return res
-				.status(400)
-				.json(msg);
 		}
 
-/*
-*	}
-*/
+		return res
+			.status(400)
+			.json(msg);
+	}
 
 	// 4
 	// STATUS

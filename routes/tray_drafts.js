@@ -39,7 +39,16 @@ const SELLER_DRAFT_STATUS	= "seller_status_draft";
 /*
  * getCountSeller
  */
-router.post('/getCountSeller', function(req, res) {
+router.get('/getCountOfDraft', function(req, res) {
+
+	req.body =  [
+            {
+                archive : 0,
+                folder : 'draft',
+                role : 'seller',
+                type : 'invoice'
+            }
+        ]
 
     sub.getCount(req, res, SELLER_DRAFT_STATUS);
 
@@ -47,18 +56,39 @@ router.post('/getCountSeller', function(req, res) {
 
 
 /*
- * getFolderSeller
+ * getFolderOfDraft
  */
-router.post('/getFolderSeller', function(req, res) {
+router.get('/getFolderOfDraft', function(req, res) {
+
+	const offset = req.query.offset;
+	const limit = req.query.limit;
+
+	req.body = 
+            {
+                archive : 0,
+                folder : 'draft',
+                role : 'seller',
+                type : 'invoice',
+				offset : offset,
+				limit : limit
+            }
 
     sub.getFolder(req, res, SELLER_DRAFT_STATUS);
 
 });
 
 /*
- * getTotalSellergetTotalSeller
+ * getTotalOfDraft
  */
-router.post('/getTotalSeller', async function(req, res) {
+router.get('/getTotalOfDraft', async function(req, res) {
+
+	req.body =  
+            {
+                archive : 0,
+                folder : 'draft',
+                role : 'seller',
+                type : 'invoice'
+            }
 
     sub.getTotal(req, res, SELLER_DRAFT_STATUS);
 

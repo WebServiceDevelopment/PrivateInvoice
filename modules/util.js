@@ -44,7 +44,7 @@ const GAS_LIMIT = 210000;
  */
 function _toReturnError(err , code, method_no) {
 
-	let ERR_KEYWORD = "Error: Returned error:";
+	let ERR_KEYWORD = "Error: toReturnError error:";
 	let error = err.toString();
 
 	let rt ={}

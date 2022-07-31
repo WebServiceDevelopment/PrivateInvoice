@@ -240,7 +240,7 @@ aside div.modal div.body table.contact-preview {
 
 	width: 100%;
 	table-layout: fixed;
-	border: collapse: collapse;
+	border-collapse: collapse;
 
 }
 
@@ -5959,7 +5959,7 @@ main.app section article div.settings-content div.page div.contacts-header div.c
 	padding: 0;
 	padding-top: 4px;
 	font-size: 14px;
-	color: #4a4a4a;
+	color: #8a8a8a;
 	margin: 0;
 
 }
