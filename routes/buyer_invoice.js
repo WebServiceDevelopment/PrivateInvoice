@@ -187,7 +187,7 @@ router.post('/returnToSender', async function(req, res) {
 		const [ code3, err3 ] = await to_seller.connect(seller_host, member_did, seller_did);
 
 		if(code3 !== 200) {
-			console.log("Error 3 code="+code3+":err="+err3);
+			console.log("/returnToSender Error 3 code="+code3+":err="+err3);
 			let msg;
 			if(code3 == 500) {
 				msg = {"err":"The destination node cannot be found."};
@@ -302,7 +302,8 @@ router.post('/confirm', async function(req, res) {
 	const { document_uuid } = req.body;
 	const { member_did } = req.session.data;
 
-	const USE_PRESENTATION = true;
+	//const USE_PRESENTATION = true;
+	const USE_PRESENTATION = false;
 	let errno, code;
 
 	// 1.
@@ -336,7 +337,7 @@ router.post('/confirm', async function(req, res) {
 		const [ code3, err3 ] = await to_seller.connect(seller_host, member_did, seller_did);
 
 		if(code3 !== 200) {
-   			console.log("Error 3 code="+code3+":err="+err3);
+   			console.log("/confirm Error 3 code="+code3+":err="+err3);
    			const msg = code3 === 500 ? 
 				{"err":"The destination node cannot be found"} :
 				{"err":err3};
@@ -479,7 +480,7 @@ router.post('/unconfirm', async function(req, res) {
 	const [ code3 , err3 ] = await to_seller.connect( seller_host, member_did, seller_did);
 
 	if( code3 !== 200) {
-		console.log("Error 3 code="+code3+":err="+err3);
+		console.log("/unconfirm Error 3 code="+code3+":err="+err3);
 		let msg;
 		if(code3 == 500) {
 			msg = {"err":"The destination node cannot be found."};
@@ -583,6 +584,7 @@ router.post('/makePayment', async function(req, res) {
 
 	let errno, code ;
 
+	console.log("Make Payment 1");
 	// 1.
 	// getSellerDid
 	//
@@ -595,6 +597,7 @@ router.post('/makePayment', async function(req, res) {
 			.status(400)
 			.json(err1);
 	}
+	console.log("Make Payment 2");
 
 	// 2.
 	// getSellerHost
@@ -619,7 +622,8 @@ router.post('/makePayment', async function(req, res) {
 		const [ code3, err3 ] = await to_seller.connect(seller_host, member_did, seller_did);
 
 		if(code3 !== 200) {
-			console.log("Error 3 code="+code3+":err="+err3);
+			console.log("/makePayment Error 3 code="+code3+":err="+err3);
+
 			let msg;
 			if(code3 == 500) {
 				msg = {"err":"The destination node cannot be found."};
@@ -635,6 +639,7 @@ router.post('/makePayment', async function(req, res) {
 /*
 *	}
 */
+	console.log("Make Payment 4");
 
 	// 4.
 	// Ask for remittance amount from document.
@@ -648,7 +653,8 @@ router.post('/makePayment', async function(req, res) {
 		const [ code5, err5 ] = await to_seller.paymentReservation(seller_host, document_uuid, member_did);
 
 		if(code5 !== 200) {
-			console.log("Error 5 code="+code5+":err="+err5);
+			console.log("/makePayment Error 5 code="+code5+":err="+err5);
+
 			let msg;
 			if(code5 == 500) {
 				msg = {"err":"seller connect check:ECONNRESET"};
@@ -671,7 +677,7 @@ router.post('/makePayment', async function(req, res) {
 	if(err6) {
 		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
 
-		console.log("error 6: getDocumen");
+		console.log("/makePayment Error 6: getDocumen");
 
 		return res
 			.status(400)
@@ -686,7 +692,7 @@ router.post('/makePayment', async function(req, res) {
 	} catch (err7) {
 		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
 
-		console.log("error JSON.parse ="+doc);
+		console.log("/makePayment Error 7: JSON.parse ="+doc);
 		for (let key in doc){
 			console.log(key +":"+ doc[key]);
 		}
@@ -696,6 +702,7 @@ router.post('/makePayment', async function(req, res) {
 			.json(err7);
 	}
 
+	console.log("Make Payment 8");
 	// 8.
 	// contract_address 
 	//
@@ -712,7 +719,7 @@ router.post('/makePayment', async function(req, res) {
 
 	if( err9 ) {
 		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
-		console.log("error 9: getBalance");
+		console.log("/makePayment Error 9: getBalance");
 
 		return res
 			.status(400)
@@ -731,7 +738,7 @@ router.post('/makePayment', async function(req, res) {
 	if(status10 != 200) {
 		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
 
-		console.log("Error 10 status = 400 err="+data10);
+		console.log("/makePayment Error 10 err="+data10);
 
 		return res
 			.status(400)

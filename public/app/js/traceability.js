@@ -566,22 +566,37 @@ function  Traceability_class () {
 			
 			itemsShipped[i] = new this.itemsShipped();
 
-			itemsShipped[i].description = b[i].date;
-			itemsShipped[i].product.description = b[i].desc;
+			if(b[i] != null) {
+				itemsShipped[i].description = b[i].date;
+				itemsShipped[i].product.description = b[i].desc;
 
-			itemsShipped[i].product.sizeOrAmount.unitCode = b[i].unit;
-			itemsShipped[i].product.sizeOrAmount.value = b[i].quan;
+				itemsShipped[i].product.sizeOrAmount.unitCode = b[i].unit;
+				itemsShipped[i].product.sizeOrAmount.value = b[i].quan;
 
 			
-			[price , currency] = _price_priceCurrency (b[i].price);
+				[price , currency] = _price_priceCurrency (b[i].price);
 				
-			itemsShipped[i].product.productPrice.price = price;
-			itemsShipped[i].product.productPrice.priceCurrency = currency;
+				itemsShipped[i].product.productPrice.price = price;
+				itemsShipped[i].product.productPrice.priceCurrency = currency;
 			
-			[price , currency] = _price_priceCurrency (b[i].subtotal);
+				[price , currency] = _price_priceCurrency (b[i].subtotal);
 				
-			itemsShipped[i].lineItemTotalPrice.price = price;
-			itemsShipped[i].lineItemTotalPrice.priceCurrency = currency;
+				itemsShipped[i].lineItemTotalPrice.price = price;
+				itemsShipped[i].lineItemTotalPrice.priceCurrency = currency;
+			} else {
+				itemsShipped[i].description = "";
+				itemsShipped[i].product.description = "";
+
+				itemsShipped[i].product.sizeOrAmount.unitCode = "";
+				itemsShipped[i].product.sizeOrAmount.value = "";
+
+			
+				itemsShipped[i].product.productPrice.price = "";
+				itemsShipped[i].product.productPrice.priceCurrency = "";
+			
+				itemsShipped[i].lineItemTotalPrice.price = "";
+				itemsShipped[i].lineItemTotalPrice.priceCurrency = "";
+			}
 		}
 
 		CS.itemsShipped = [...itemsShipped];
@@ -639,10 +654,10 @@ function  Traceability_class () {
 	
 		if( p.indexOf(" ") !== -1) {
 			wk = p.split(" ");
-			price = wk[0].replace(/,/ , "");
+			price = wk[0].replace(/,/g , "");
 			currency = wk[1];
 		} else {
-			price = p.replace(/,/ , "");
+			price = p.replace(/,/g , "");
 			currency = 'Gwei';
 		}
 

@@ -48,7 +48,7 @@ const INVITE_TABLE			= 'invite';
  * Helper functions
  */
 
-const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
+const createBusinessCard = async (req, member_did, invite_code, keyPair, linkRelationship) => {
 
 
 	let sql, args, row, org;
@@ -119,7 +119,8 @@ const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 
 //4.
 
-	console.log('json')
+	//console.log('json')
+	console.log('linkRelationship='+linkRelationship)
 
 	const credential = {
 		'@context': [
@@ -136,7 +137,7 @@ const createBusinessCard = async (req, member_did, invite_code, keyPair) => {
 			{
 				type: "LinkRole",
 				target: `${req.headers.origin}/api/presentations/available`,
-				linkRelationship: 'Partner'
+				linkRelationship: linkRelationship
 			}
 		],
 		issuanceDate: issuanceDate,
@@ -244,10 +245,10 @@ const insertNewContact = async (invite_code, local_member_did, credential) => {
 		relation.remote_to_local = 1;
 		break;
 	case 'Buyer':
-		relation.local_to_remote = 1;
+		relation.remote_to_local = 1;
 		break;
 	case 'Seller':
-		relation.remote_to_local = 1;
+		relation.local_to_remote = 1;
 		break;
 	}
 
@@ -459,7 +460,8 @@ router.post('/createBusunessCard', async function(req, res) {
 
 // 1.5
 	console.log('--- bbb ---');
-	const [ credential, err5 ] = await createBusinessCard(req, req.session.data.member_did, invite_code, keyPair);
+
+	const [ credential, err5 ] = await createBusinessCard(req, req.session.data.member_did, invite_code, keyPair, body.linkRelationship);
 	if(err5) {
 		return res.json({
 			err: 5,
@@ -480,22 +482,31 @@ router.post('/createBusunessCard', async function(req, res) {
 
 /*
  * 2.
- * add
+ * addContact
  */
 
-router.post('/add', async function(req, res) {
+router.post('/addContact', async function(req, res) {
 
 	const { body } = req;
 
+	// 2.1 
+	// First we need to verifyCredential
+    // 
+
 	const verified = await verifyCredential(body);
 	if(!verified) {
-		return res.status(400).end('Contact did not verify')
+		return res.status(400)
+			.json({
+				err: 1,
+				msg: 'Contact did not verify'
+			});
 	}
 
-	// 2.1 
-	// First we need to check if the contact already exists
 
-	console.log('1.1');
+	// 2.2 
+	// we need to check if the contact already exists
+	//
+	//console.log('2.2');
 
 	const local_member_did = req.session.data.member_did;
 	const remote_member_did = body.issuer.id;
@@ -503,34 +514,67 @@ router.post('/add', async function(req, res) {
 
 	const exists = await checkForExistingContact(local_member_did, remote_member_did)
 	if(exists) {
-		return res.status(400).end('Contact already exists')
+		return res.status(400)
+			.json({
+				err: 2,
+				msg: 'Contact already exists'
+			});
 	}
 
+
+    // 2.3 
 	// Keypair
+	//
 
-	const [ keyPair, err2 ] = await getPrivateKeys(req.session.data.member_did);
-	if(err2) {
-		return res.json({
-			err: 2,
-			msg: 'could not get private keys'
-		});
+	const [ keyPair, err3 ] = await getPrivateKeys(req.session.data.member_did);
+	if(err3) {
+		return res.status(400)
+			.json({
+				err: 3,
+				msg: 'could not get private keys'
+			});
 	}
 
-	// 2.2 
+    // 2.4 
+    // Extract linkRelationship from details
+    //
+    
+	let relatedLink = req.body.relatedLink;
+	let linkRelationship = relatedLink[0].linkRelationship;
+
+	switch(linkRelationship) {
+	case "Partner":
+	case "Buyer":
+	case "Seller":
+		break;
+	default:
+		return res.status(400)
+			.json({
+				err: 4,
+				msg: 'Incorrect inkRelationship'
+			});
+	}
+
+
+	// 2.5 
 	// Then we need to try and contact the remote host
 	// We start by creating our own verifiable business card
 
-	console.log('1.2');
+	//console.log('2.5');
 	const invite_code = body.id.split(':').pop();
 
-	const [ credential, err1 ] = await createBusinessCard(req, req.session.data.member_did, invite_code, keyPair);
-	if(err1) {
-		return res.json({
-			err: 1,
-			msg: 'could not create business card'
-		});
+	const [ credential, err5 ] = await createBusinessCard(req, req.session.data.member_did, invite_code, keyPair, linkRelationship);
+	if(err5) {
+		return res.status(400)
+			.json({
+				err: 5,
+				msg: 'could not create business card'
+			});
 	}
 
+
+	// 2.6
+	//
 	credential.relatedLink.push({
 		type: 'LinkRole',
 		target: remote_member_did,
@@ -538,24 +582,27 @@ router.post('/add', async function(req, res) {
 	});
 
 	const vbc = await signBusinessCard(credential, keyPair);
+
 	
-	// 2.3
+	// 2.7
 	// Then we need to send our verifiable business card to the other
 	// party
 	
-	console.log('1.3');
+	//console.log('2.7');
 	const [ link ] = body.relatedLink;
 	const url = link.target;
 
-	const [ response, err3 ] = await makePresentation(url, keyPair, vbc);
-	if(err3) {
-		return res.json({
-			err: 3,
-			msg: 'Presentation failed: ' + err3
-		});
+	const [ response, err7 ] = await makePresentation(url, keyPair, vbc);
+	if(err7) {
+		return res
+			.json({
+				err: 7,
+				msg: 'Presentation failed: ' + err3
+			});
 	}
+
 	
-	// 2.4
+	// 2.8
 	// For debug purposes, if we add ourselves as a contact, then the
 	// entry has already been made as a result of the presentation
 	// on our server
@@ -567,15 +614,22 @@ router.post('/add', async function(req, res) {
 		});
 	}
 
-	// 2.5
+
+	// 2.9
 	// If we get a successful response from the presentation,
 	// then we need to add a contact on our own server
 
-	const [ created, creatErr ] = await insertNewContact(invite_code, local_member_did, body);
-	if(creatErr) {
-		return res.status(400).end(creatErr.toString());
+	const [ created, err9 ] = await insertNewContact(invite_code, local_member_did, body);
+	if(err9) {
+		return res.status(400)
+			.json({
+				err: 9,
+				msg: err9.toString()
+			});
 	}
+
 	
+	// 2.10
 	// End Route
 
 	res.json({

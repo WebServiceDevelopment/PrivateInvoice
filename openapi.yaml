@@ -44,10 +44,6 @@ tags:
     description: "Paths related to sending and receiving presentations"
   - name: "Tray"
     description: "Paths related to handling document tray"
-  - name: "TrayArchive"
-    description: "Paths related to handling document trayArchive"
-  - name: "TrayDraft"
-    description: "Paths related to handling document trayDraft"
   - name: "Wallet"
     description: "Paths related to handling wallets"
 
@@ -121,7 +117,8 @@ paths:
   #1.1.3
   /api/contacts/getContactList:
     get:
-      description: \#1.1.3 contacts getContactList
+      description: >-
+        \#1.1.3 contacts getContactList
       operationId: contacts_getContactList
       tags:
         - "Contacts"
@@ -144,7 +141,8 @@ paths:
   #2.1.1
   /api/invoice/returnToSender:
     post:
-      description: \#2.1.1 invoice returnToSender 
+      description: >-
+        \#2.1.1 invoice returnToSender 
       operationId: invoice_returnToSender
       tags:
         - "Invoice"
@@ -171,7 +169,8 @@ paths:
   #2.1.2
   /api/invoice/confirm:
     post:
-      description: \#2.1.2 invoice confirm 
+      description: >-
+        \#2.1.2 invoice confirm 
       operationId: invoice_confirm
       tags:
         - "Invoice"
@@ -198,7 +197,8 @@ paths:
   #2.1.3
   /api/invoice/unconfirm:
     post:
-      description: \#2.1.3 invoice unconfirm 
+      description: >-
+        \#2.1.3 invoice unconfirm 
       operationId: invoice_unconfirm
       tags:
         - "Invoice"
@@ -225,7 +225,8 @@ paths:
   #2.1.4
   /api/invoice/makePayment:
     post:
-      description: \#2.1.4 invoice makePayment 
+      description: >-
+        \#2.1.4 invoice makePayment 
       operationId: invoice_makePayment
       tags:
         - "Invoice"
@@ -251,7 +252,7 @@ paths:
 
 
   #2.2
-  #require('./routes/buyer_invoice_document.js');
+  #require('./routes/invoice_document.js');
   #2.2.1
   /api/invoice/getDocumentBuyer:
     get:
@@ -338,6 +339,33 @@ paths:
               schema:
                 $ref: '#/invoice/schemas/Responses_getArchiveDocumentBuyer'
 
+  #2.2.5
+  /api/invoice/getDraftDocument:
+    get:
+      description: \#2.2.5 invoice getDraftDocument
+      operationId: invoice_getDraftDocument
+      tags:
+        - "Invoice"
+      parameters:
+        - in: query
+          name: document_uuid
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: getDraftDocument response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_getDraftDocument'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Error_getDraftDocument'
+
 
   #2.3
   #require('./routes/seller_invoice_archive.js');
@@ -401,90 +429,9 @@ paths:
                 $ref: '#/invoice/schemas/Error_update'
 
   #2.4.2
-  /api/invoice/getDraftDocument:
-    get:
-      description: \#2.4.2 invoice getDraftDocument
-      operationId: invoice_getDraftDocument
-      tags:
-        - "Invoice"
-      parameters:
-        - in: query
-          name: document_uuid
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: getDraftDocument response
-          content:
-            application/json:
-              schema:
-                $ref: '#/invoice/schemas/Responses_getDraftDocument'
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/invoice/schemas/Error_getDraftDocument'
-
-  #2.4.3
-#  /api/invoice/getDocument:
-#    post:
-#      description: \#2.4.3 invoice getDocument
-#      operationId: invoice_getDocument
-#      tags:
-#        - "Invoice"
-#      parameters:
-#        - in: "body"
-#          name: "body"
-#          required: true
-#          schema:
-#            $ref: '#/invoice/schemas/Request_getDocument'
-#      responses:
-#        '200':
-#          description: getDocument response
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/invoice/schemas/Responses_getDocument'
-#        default:
-#          description: unexpected error
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/invoice/schemas/Error_getDocument'
-
-  #2.4.4
-#  /api/invoice/getArchiveDocument:
-#    post:
-#      description: \#2.4.4 invoice getArchiveDocument
-#      operationId: invoice_getArchiveDocument
-#      tags:
-#        - "Invoice"
-#      parameters:
-#        - in: "body"
-#          name: "body"
-#          required: true
-#          schema:
-#            $ref: '#/invoice/schemas/Request_getArchiveDocument'
-#      responses:
-#        '200':
-#          description: getArchiveDocument response
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/invoice/schemas/Responses_getArchiveDocument'
-#        default:
-#          description: unexpected error
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/invoice/schemas/Error_getArchiveDocument'
-
-  #2.4.5
   /api/invoice/create:
     post:
-      description: \#2.4.5 invoice create
+      description: \#2.4.2 invoice create
       operationId: invoice_create
       tags:
         - "Invoice"
@@ -918,327 +865,366 @@ paths:
   #require('./routes/tray.js');
 
   #9.1.1
-  /api/tray/getCountBuyer:
-    post:
-      description: \#9.1.1 tray getCountBuyer
-      operationId: tray_getCountBuyer
+  /api/tray/getCountOfInvoice:
+    get:
+      description: \#9.1.1 tray getCountOfInvoice
+      operationId: tray_getCountOfInvoice
       tags:
         - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: archive
           required: true
           schema:
-            $ref: '#/tray/schemas/Request_getCountBuyer'
+            type: string
+            enum: ["0"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ['[sent,returned,confirmed,paid]']
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+            
       responses:
         '200':
-          description: getCountBuyer response
+          description: getCountOfInvoice
           content:
             application/json:
               schema:
-                $ref: '#/tray/schemas/Responses_getCountBuyer'
+                $ref: '#/tray/schemas/Responses_getCountOfInvoice'
 
   #9.1.2
-  /api/tray/getCountSeller:
-    post:
-      description: \#9.1.2 tray getCountSeller
-      operationId: tray_getCountSeller
+  /api/tray/getFolderOfInvoice:
+    get:
+      description: \#9.1.2 tray getFolderOfInvoice
+      operationId: tray_getFolderOfInvoice
       tags:
         - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: archive
           required: true
           schema:
-            $ref: '#/tray/schemas/Request_getCountSeller'
+            type: string
+            enum: ["0","1"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ["sent","returned","confirmed","paid"]
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 0
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 25
+            
       responses:
         '200':
-          description: getCountSeller response
+          description: getFolderOfInvoice response
           content:
             application/json:
               schema:
-                $ref: '#/tray/schemas/Responses_getCountSeller'
+                $ref: '#/tray/schemas/Responses_getFolderOfInvoice'
+
 
   #9.1.3
-  /api/tray/getFolderBuyer:
-    post:
-      description: \#9.1.3 tray getFolderBuyer
-      operationId: tray_getFolderBuyer
+  /api/tray/getTotalOfInvoice:
+    get:
+      description: \#9.1.3 tray getTotalOfInvoice
+      operationId: tray_getTotalOfInvoice
       tags:
         - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: archive
           required: true
           schema:
-            $ref: '#/tray/schemas/Request_getFolderBuyer'
+            type: string
+            enum: ["0","1"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ["sent","returned","confirmed","paid"]
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+
       responses:
         '200':
-          description: getFolderBuyer response
+          description: getTotalOfInvoice response
           content:
             application/json:
               schema:
-                $ref: '#/tray/schemas/Responses_getFolderBuyer'
+                $ref: '#/tray/schemas/Responses_getTotalOfInvoice'
 
-  #9.1.4
-  /api/tray/getFolderSeller:
-    post:
-      description: \#9.1.4 tray getFolderSeller
-      operationId: tray_getFolderSeller
-      tags:
-        - "Tray"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/tray/schemas/Request_getFolderSeller'
-      responses:
-        '200':
-          description: getFolderSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getFolderSeller'
 
-  #9.1.5
-  /api/tray/getTotalBuyer:
-    post:
-      description: \#9.1.5 tray getTotalBuyer
-      operationId: tray_getTotalBuyer
-      tags:
-        - "Tray"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/tray/schemas/Request_getTotalBuyer'
-      responses:
-        '200':
-          description: getTotalBuyer response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getTotalBuyer'
-
-  #9.1.6
-  /api/tray/getTotalSeller:
-    post:
-      description: \#9.1.6 tray getTotalSeller
-      operationId: tray_getTotalSeller
-      tags:
-        - "Tray"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/tray/schemas/Request_getTotalSeller'
-      responses:
-        '200':
-          description: getTotalSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getTotalSeller'
-
-  #10.1
+  #9.2
   #require('./routes/tray_archive.js');
 
-  #10.1.1
-  /api/trayArchive/getCountBuyer:
-    post:
-      description: \#10.1.1 trayArchive getCountBuyer
-      operationId: trayArchive_getCountBuyer
+  #9.2.1
+  /api/tray/getCountOfArchive:
+    get:
+      description: \#9.2.1 tray getCountOfArchive
+      operationId: tray_getCountOfArchive
       tags:
-        - "TrayArchive"
+        - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: archive
           required: true
           schema:
-            $ref: '#/trayArchive/schemas/Request_getCountBuyer'
+            type: string
+            enum: ["0","1"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ["paid","trash"]
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+            
       responses:
         '200':
-          description: getCountBuyer response
+          description: getCountOfArchive response
           content:
             application/json:
               schema:
-                $ref: '#/trayArchive/schemas/Responses_getCountBuyer'
+                $ref: '#/tray/schemas/Responses_getCountOfArchive'
 
-  #10.1.2
-  /api/trayArchive/getCountSeller:
-    post:
-      description: \#10.1.2 trayArchive getCountSeller
-      operationId: trayArchive_getCountSeller
+
+  #9.2.2
+  /api/tray/getFolderOfArchive:
+    get:
+      description: \#9.2.2 tray getFolderOfArchive
+      operationId: tray_getFolderOfArchive
       tags:
-        - "TrayArchive"
+        - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: archive
           required: true
           schema:
-            $ref: '#/trayArchive/schemas/Request_getCountSeller'
+            type: string
+            enum: ["0","1"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ["paid","trash"]
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 0
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 25
+            
+      responses:
+        '200':
+          description: getFolderOfArchive response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getFolderOfArchive'
+
+
+  #9.2.3
+  /api/tray/getTotalOfArchive:
+    get:
+      description: \#9.2.3 tray getTotalOfArchive
+      operationId: tray_getTotalOfArchive
+      tags:
+        - "Tray"
+      parameters:
+        - in: query
+          name: archive
+          required: true
+          schema:
+            type: string
+            enum: ["0","1"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ["paid","trash"]
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+            
+      responses:
+        '200':
+          description: getTotalOfArchive response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getTotalOfArchive'
+
+
+  #9.3
+  #require('./routes/tray_drafts.js');
+  #/api/trayDrafts:
+
+  #9.3.1
+  /api/tray/getCountOfDraft:
+    get:
+      description: \#9.3.1 traygetCountOfDraft
+      operationId: tray_getCountOfDraft
+      tags:
+        - "Tray"
+
       responses:
         '200':
           description: getCountSeller response
           content:
             application/json:
               schema:
-                $ref: '#/trayArchive/schemas/Responses_getCountSeller'
+                $ref: '#/tray/schemas/Responses_getCountOfDraft'
 
-  #10.1.3
-  /api/trayArchive/getFolderBuyer:
-    post:
-      description: \#10.1.3 trayArchive getFolderBuyer
-      operationId: trayArchive_getFolderBuyer
+  #9.3.2
+  /api/tray/getFolderOfDraft:
+    get:
+      description: \#9.3.2 tray getFolderOfDraft
+      operationId: tray_getFolderOfDraft
       tags:
-        - "TrayArchive"
+        - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: type
           required: true
           schema:
-            $ref: '#/trayArchive/schemas/Request_getFolderBuyer'
-      responses:
-        '200':
-          description: getFolderBuyer response
-          content:
-            application/json:
-              schema:
-                $ref: '#/trayArchive/schemas/Responses_getFolderBuyer'
-
-  #10.1.4
-  /api/trayArchive/getFolderSeller:
-    post:
-      description: \#10.1.4 trayArchive getFolderSeller
-      operationId: trayArchive_getFolderSeller
-      tags:
-        - "TrayArchive"
-      parameters:
-        - in: "body"
-          name: "body"
+            type: string
+            enum: ["invoice"]
+        - in: query
+          name: offset
           required: true
           schema:
-            $ref: '#/trayArchive/schemas/Request_getFolderSeller'
+            type: integer
+            format: int64
+            example: 0
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 25
+
       responses:
         '200':
           description: getFolderSeller response
           content:
             application/json:
               schema:
-                $ref: '#/trayArchive/schemas/Responses_getFolderSeller'
+                $ref: '#/tray/schemas/Responses_getFolderOfDraft'
 
-  #10.1.5
-  /api/trayArchive/getTotalBuyer:
-    post:
-      description: \#10.1.5 trayArchive getTotalBuyer
-      operationId: trayArchive_getTotalBuyer
+  #9.3.3
+  /api/tray/getTotalOfDraft:
+    get:
+      description: \#9.3.3 tray getTotalOfDraft
+      operationId: tray_getTotalOfDraft
       tags:
-        - "TrayArchive"
+        - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: type
           required: true
           schema:
-            $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
+            type: string
+            enum: ["invoice"]
+
       responses:
         '200':
-          description: getTotalSeller response
+          description: getTotalOfDraft response
           content:
             application/json:
               schema:
-                $ref: '#/trayArchive/schemas/Responses_getTotalBuyer'
-
-  #10.1.6
-  /api/trayArchive/getTotalSeller:
-    post:
-      description: \#10.1.6 trayArchive getTotalSeller
-      operationId: trayArchive_getTotalSeller
-      tags:
-        - "TrayArchive"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/trayArchive/schemas/Request_getTotalSeller'
-      responses:
-        '200':
-          description: getTotalSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/trayArchive/schemas/Responses_getTotalSeller'
-
-
-  #11.1
-  #require('./routes/seller_tray_drafts.js');
-  /api/trayDrafts:
-
-  #11.1.1
-  /api/trayDraft/getCountSeller:
-    post:
-      description: \#11.1.1 trayDraft getCountSeller
-      operationId: trayDraft
-      tags:
-        - "TrayDraft"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/trayDraft/schemas/Request_getCountSeller'
-      responses:
-        '200':
-          description: getCountSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/trayDraft/schemas/Responses_getCountSeller'
-
-  #11.1.2
-  /api/trayDraft/getFolderSeller:
-    post:
-      description: \#11.1.2 trayDraft getFolderSeller
-      operationId: trayDraft
-      tags:
-        - "TrayDraft"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/trayDraft/schemas/Request_getFolderSeller'
-      responses:
-        '200':
-          description: getFolderSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/trayDraft/schemas/Responses_getFolderSeller'
-
-  #11.1.3
-  /api/trayDraft/getTotalSeller:
-    post:
-      description: \#11.1.3 trayDraft getTotalSeller
-      operationId: trayDraft
-      tags:
-        - "TrayDraft"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/trayDraft/schemas/Request_getTotalSeller'
-      responses:
-        '200':
-          description: getTotalSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/trayDraft/schemas/Responses_getTotalSeller'
+                $ref: '#/tray/schemas/Responses_getTotalOfDraft'
 
 
   #12.1
@@ -1574,6 +1560,17 @@ invoice:
         msg:
           type: string
 
+    #2.2.5
+    Responses_getDraftDocument:
+      required:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: string
+    Error_getDraftDocument:
+      $ref: '#/error/schemas/Responses_err_msg'
+
 
     #2.4.1
     Request_update:
@@ -1592,54 +1589,8 @@ invoice:
     Error_update:
       $ref: '#/error/schemas/Responses_err_msg'
 
+
     #2.4.2
-    Responses_getDraftDocument:
-      required:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: string
-    Error_getDraftDocument:
-      $ref: '#/error/schemas/Responses_err_msg'
-
-    #2.4.3
-#    Request_getDocument:
-#      type: object
-#      properties:
-#        id:
-#          type: integer
-#          format: int64
-#    Responses_getDocument:
-#      required:
-#      properties:
-#        err:
-#          type: integer
-#          format: int32
-#        msg:
-#          type: string
-#    Error_getDocument:
-#      $ref: '#/error/schemas/Responses_err_msg'
-
-    #2.4.4
-#    Request_getArchiveDocument:
-#      type: object
-#      properties:
-#        id:
-#          type: integer
-#          format: int64
-#    Responses_getArchiveDocument:
-#      required:
-#      properties:
-#        err:
-#          type: integer
-#          format: int32
-#        msg:
-#          type: string
-#    Error_getArchiveDocument:
-#      $ref: '#/error/schemas/Responses_err_msg'
-
-    #2.4.5
     Request_create:
       type: object
       properties:
@@ -2297,110 +2248,66 @@ settings:
 tray:
   #9.1
   schemas:
-    #9.1.1
-    Request_getCountBuyer:
-      $ref: '#/tray/schemas/Request_getTotalBuyer'
 
-    Responses_getCountBuyer:
+    #9.1.1
+    Responses_getCountOfInvoice:
       required:
       properties:
-        document_uuid:
-          type: string
-        document_type:
-          type: string
-        document_number:
-          type: string
-        document_folder:
-          type: string
-        seller_uuid:
-          type: string
-        seller_membername:
-          type: string
-        seller_organization:
-          type: string
-        seller_archived:
-          type: string
-        seller_last_action: date
-        buyer_uuid:
-          type: string
-        buyer_membername:
-          type: string
-        buyer_organization:
-          type: string
-        buyer_archived:
-          type: string
-        buyer_last_action:
-          type: string
-        created_from:
-          type: string
-        root_document:
-          type: string
-        created_on:
-          type: date-time
-        opened:
-          type: string
-        subject_line:
-          type: string
-        due_by:
-          type: date-time
-        amount_due:
+        err:
           type: integer
           format: int32
+        msg:
+          type: array
+          items:
+            type: integer
+            format: int32
+          example:
+            - 1
+            - 2
+            - 3
+            - 4
 
     #9.1.2
-    Request_getCountSeller:
-      $ref: '#/tray/schemas/Request_getTotalBuyer'
+    Responses_getFolderOfInvoice:
+      $ref: '#/tray/schemas/Responses_getFolderOfDraft'
 
-    Responses_getCountSeller:
-      $ref: '#/tray/schemas/Responses_getCountBuyer'
 
     #9.1.3
-    Request_getFolderBuyer:
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-        key: 
-          - type: string
-              
-
-    Responses_getFolderBuyer: #contacts/ng
+    Responses_getTotalOfInvoice:
       required:
       properties:
         err:
           type: integer
           format: int32
         msg:
-          - properties:
+          type: string
+
+
+
+  #9.2
+    #9.2.1
+
+    Responses_getCountOfArchive:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: array
+          items:
+            type: integer
+            format: int32
+
+    #9.2.2
+    #
+
+    Responses_getFolderOfArchive:
+      $ref: '#/tray/schemas/Responses_getFolderOfDraft'
             
 
-    #9.1.4
-    Request_getFolderSeller:
-      $ref: '#/tray/schemas/Request_getFolderBuyer'
-
-    Responses_getFolderSeller:
-      $ref: '#/tray/schemas/Responses_getFolderBuyer'
-
-    #9.1.5
-    Request_getTotalBuyer: #ok
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-
-    Responses_getTotalBuyer:
+    #9.2.3
+    Responses_getTotalOfArchive:
       required:
       properties:
         err:
@@ -2409,237 +2316,107 @@ tray:
         msg:
           type: string
 
-    #9.1.6
-    Request_getTotalSeller:
-      $ref: '#/tray/schemas/Request_getTotalBuyer'
+  #9.3
 
-    Responses_getTotalSeller:
-      $ref: '#/tray/schemas/Responses_getTotalBuyer'
-
-
-trayArchive:
-  #10.1
-  schemas:
-    #10.1.1
-    Request_getCountBuyer:
-      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
-
-    Responses_getCountBuyer:
-      required:
-      properties:
-        document_uuid:
-          type: string
-        document_type:
-          type: string
-        document_number:
-          type: string
-        document_folder:
-          type: string
-        seller_uuid:
-          type: string
-        seller_membername:
-          type: string
-        seller_organization:
-          type: string
-        seller_archived:
-          type: string
-        seller_last_action:
-          type: date-time
-        buyer_uuid:
-          type: string
-        buyer_membername:
-          type: string
-        buyer_organization:
-          type: string
-        buyer_archived:
-          type: string
-        buyer_last_action:
-          type: string
-        created_from:
-          type: string
-        root_document:
-          type: string
-        created_on:
-          type: date-time
-        opened:
-          type: string
-        subject_line:
-          type: string
-        due_by:
-          type: date-time
-        amount_due:
-          type: integer
-          format: int32
-
-    #10.1.2
-    Request_getCountSeller:
-      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
-
-    Responses_getCountSeller:
-      $ref: '#/trayArchive/schemas/Responses_getCountBuyer'
-
-    #10.1.3
-    Request_getFolderBuyer:
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-        key: 
-          - type: string
-              
-
-    Responses_getFolderBuyer: #ng
+    #9.3.1
+    Responses_getCountOfDraft:
       required:
       properties:
         err:
           type: integer
           format: int32
         msg:
-          - properties:
-            
+          type: array
+          items:
+            type: integer
+            format: int32
 
-    #10.1.4
-    Request_getFolderSeller:
-      $ref: '#/trayArchive/schemas/Request_getFolderBuyer'
-
-    Responses_getFolderSeller:
-      $ref: '#/trayArchive/schemas/Responses_getFolderBuyer'
-
-    #10.1.5
-    Request_getTotalBuyer: #ok
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-
-    Responses_getTotalBuyer:
+    #9.3.2
+    Responses_getFolderOfDraft:
       required:
       properties:
         err:
           type: integer
           format: int32
         msg:
-          type: string
-
-    #10.1.6
-    Request_getTotalSeller:
-      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
-
-    Responses_getTotalSeller:
-      $ref: '#/trayArchive/schemas/Responses_getTotalBuyer'
-
-trayDraft:
-  #11.1
-  schemas:
-    #11.1.1
-    Request_getCountSeller:
-      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
-
-    Responses_getCountSeller:
-      required:
-      properties:
-        document_uuid:
-          type: string
-        document_type:
-          type: string
-        document_number:
-          type: string
-        document_folder:
-          type: string
-        seller_uuid:
-          type: string
-        seller_membername:
-          type: string
-        seller_organization:
-          type: string
-        seller_archived:
-          type: string
-        seller_last_action:
-          type: date-time
-        buyer_uuid:
-          type: string
-        buyer_membername:
-          type: string
-        buyer_organization:
-          type: string
-        buyer_archived:
-          type: string
-        buyer_last_action:
-          type: string
-        created_from:
-          type: string
-        root_document:
-          type: string
-        created_on:
-          type: date-time
-        opened:
-          type: string
-        subject_line:
-          type: string
-        due_by:
-          type: date-time
-        amount_due:
-          type: integer
-          format: int32
-
-    #11.1.2
-    Request_getFolderSeller:
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-        key: 
-          - type: string
-              
-
-    Responses_getFolderBuyer: #ng
+          type: array
+          items:
+            type: object
+            properties: 
+              document_uuid:
+                type: string
+              document_type:
+                type: string
+              document_number:
+                type: string
+              document_folder:
+                type: string
+              seller_uuid:
+                type: string
+              seller_membername:
+                type: string
+              seller_organization:
+                type: string
+              seller_archived:
+                type: integer
+                format: int32
+              seller_last_action:
+                type: string
+                description:  Datetime to set
+                format: date-time
+                example: '2022-01-31 23:59:59'
+                pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2}) ([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2})/
+              buyer_uuid:
+                type: string
+              buyer_membername:
+                type: string
+              buyer_organization:
+                type: string
+              buyer_archived:
+                type: integer
+                format: int32
+              buyer_last_action:
+                type: string
+                example: '2022-01-31 23:59:59'
+                pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2}) ([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2})/
+              created_from:
+                type: string
+              root_document:
+                type: string
+              created_on:
+                type: string
+                description: Datetime to set
+                format: date-time
+                example: '2022-01-31 23:59:59'
+                pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2}) ([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2})/
+              opened:
+                type: integer
+                format: int32
+              subject_line:
+                type: string
+              due_by:
+                type: string
+                description: Datetime to set
+                format: date-time
+                pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2}) ([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2})/
+                example: '2022-01-31 23:59:59'
+              amount_due:
+                type: integer
+                format: int32
+ 
+    #9.3.3
+    Responses_getTotalOfDraft:
       required:
       properties:
         err:
           type: integer
           format: int32
         msg:
-          - properties:
-            
-    #11.1.3
-    Request_getTotalSeller: #ok
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-
-    Responses_getTotalBuyer:
-      required:
-      properties:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: string
+          type: object
+          properties:
+            total:
+              type: string
+              example: 0.000005000 ETH
 
 wallet:
   #12.1

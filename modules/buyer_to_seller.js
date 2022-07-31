@@ -96,7 +96,7 @@ async function _getAccountOfSellerWallet(seller_host, seller_did, buyer_did) {
 /*
  * seller_connect
  */
-async function seller_connect(seller_host, document_uuid, buyer_did) {
+async function seller_connect(seller_host, seller_uuid, buyer_did) {
 
     const  url = `${seller_host}/api/message/sellerToConnect`;
 
@@ -104,7 +104,7 @@ async function seller_connect(seller_host, document_uuid, buyer_did) {
         method : 'post',
         url : url,
         data : {
-            document_uuid,
+            seller_uuid,
             buyer_did
         }
     };
@@ -119,6 +119,7 @@ async function seller_connect(seller_host, document_uuid, buyer_did) {
                 data : err.message
             }
         } else {
+			console.log(err);
             response = {
                 status : 500,
                 data : null

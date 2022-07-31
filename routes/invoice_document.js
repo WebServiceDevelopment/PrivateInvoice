@@ -42,6 +42,7 @@ const BUYER_ARCHIVE_DOCUMENT	= "buyer_document_archive";
 const SELLER_DOCUMENT 			= "seller_document";
 const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
 
+const SELLER_DRAFT_DOCUMENT		= "seller_document_draft";
 
 // ------------------------------- End Points -------------------------------
 
@@ -219,6 +220,74 @@ router.get('/getArchiveDocumentSeller', async function(req, res) {
 
 	doc = {};
 	doc.document_json =  JSON.parse(result.document_json);
+
+	res.json({
+		err : 0,
+		msg : doc
+	});
+
+});
+
+/*
+ * 5.
+ * getDraftDocument
+ */
+router.get('/getDraftDocument', async function(req, res) {
+
+
+	let sql = `
+		SELECT
+			document_uuid,
+			document_json,
+			document_type,
+			subject_line,
+			currency_options,
+			seller_did,
+			seller_membername,
+			seller_details,
+			buyer_did,
+			buyer_membername,
+			buyer_details,
+			created_on,
+			document_meta,
+			document_body,
+			document_totals,
+			document_logo
+		FROM
+			${SELLER_DRAFT_DOCUMENT}
+		WHERE
+			(seller_did = ? OR buyer_did = ?)
+		AND
+			document_uuid = ?
+	`;
+
+	let args = [
+		req.session.data.member_did,
+		req.session.data.member_did,
+		req.query.document_uuid
+	];
+
+	let doc;
+	try {
+		doc = await db.selectOne(sql, args);
+	} catch(err) {
+		throw err;
+	}
+
+	if(!doc) {
+		return res.json({
+			err : 5,
+			msg : "Draft DOCUMENT NOT FOUND FOR MEMBER"
+		});
+	}
+
+	doc.document_body = JSON.parse(doc.document_body);
+	doc.document_meta = JSON.parse(doc.document_meta);
+	doc.document_totals = JSON.parse(doc.document_totals);
+	doc.seller_details = JSON.parse(doc.seller_details);
+	doc.buyer_details = JSON.parse(doc.buyer_details);
+	doc.currency_options = JSON.parse(doc.currency_options);
+	doc.document_json = JSON.parse(doc.document_json);
 
 	res.json({
 		err : 0,

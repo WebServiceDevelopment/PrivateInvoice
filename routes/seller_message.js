@@ -36,6 +36,7 @@ module.exports					= router;
 const web3                      = eth.getWeb3();
 
 // Database
+const config                    = require('../config.json');
 
 
 // Table Name
@@ -43,6 +44,8 @@ const SELLER_STATUS         	= "seller_status";
 const SELLER_DOCUMENT        	= "seller_document";
 const CONTACTS					= "contacts";
 
+// CURRENCY
+const CURRENCY                  = config.CURRENCY
 
 // common function
 
@@ -100,14 +103,14 @@ router.post('/tellMeYourWalletAccount', async function(req, res) {
  */
 router.post('/sellerToConnect', async (req, res) => {
 
-	const { document_uuid, buyer_did } = req.body;
+	const { seller_uuid, buyer_did } = req.body;
 
 	// 1.
 	//
-	const [ seller_host, err1 ] = await sub.getSellerHost(CONTACTS, document_uuid, buyer_did);
+	const [ seller_host, err1 ] = await sub.getSellerHost(CONTACTS, seller_uuid, buyer_did);
 
 	if(err1) {
-		console.log(err1);
+		console.log("1. /sellerToConnect Error: "+ err1.toString());
 		return res.status(400).json(err1);
 	}
 
@@ -116,7 +119,7 @@ router.post('/sellerToConnect', async (req, res) => {
     if(!check_ipadder(req.ip , seller_host)) {
 		
         let err = { err:"invalid request : req.ip=${req.ip}:seller_host=${seller_host}"};
-        console.log(err.err);
+        console.log("2. /sellerToConnect Error:"+ err.err);
 		
         return res.status(400).json(err);
     }
@@ -231,13 +234,13 @@ router.post('/sellerToMakePayment', async (req, res) => {
 	const document_json = JSON.parse(document.document_json);
 	const totalPaymentDue = document_json.credentialSubject.totalPaymentDue;
 
-	console.log("totalPaymentDue="+totalPaymentDue.price);
+	console.log("/sellerToMakePayment : totalPaymentDue="+totalPaymentDue.price);
 
 	let wk = '0';
 	if( totalPaymentDue != null && totalPaymentDue.price != null) {
 		wk = totalPaymentDue.price;
 	}
-	const total = web3.utils.toWei(wk , 'Gwei');
+	const total = web3.utils.toWei(wk , CURRENCY.symbol);
 
 	// 4.
 	// Does transaction value and invoice total match?
