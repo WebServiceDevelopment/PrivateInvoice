@@ -379,7 +379,8 @@ const FolderWidget = (function() {
 		const url = '/api/tray/getCountOfInvoice';
 		const archive = '0';
 		const role = 'seller';
-		const folder = '[sent,returned,confirmed,paid]';
+		//const folder = '[sent,returned,confirmed,paid]';
+		const folder = '[sent,returned,confirmed,paid,draft]';
 		const type = 'invoice';
 
 	    let response;
@@ -418,6 +419,7 @@ const FolderWidget = (function() {
 		c.returned.textContent = counts[1];
 		c.confirmed.textContent = counts[2];
 		c.paid.textContent = counts[3];
+		c.draft.textContent = counts[4];
 
 	}
 
@@ -914,7 +916,7 @@ async function api_getCount(from) {
 		await this.API.getCFolderCount();
 		await this.API.getDFolderCount();
 
-		await this.API.getDraftsFolderCount();
+		//await this.API.getDraftsFolderCount();
 
 		DocumentWidget.API.readOnly ();
 /*

@@ -20,18 +20,23 @@
 
 "use strict";
 
-// Inport
-const sub					= require("../modules/tray_sub.js");
-
 // Import Router
 
-const express				= require('express');
-const router				= express.Router();
-module.exports				= router;
+const express                   = require('express');
+const router                    = express.Router();
+module.exports                  = router;
+
+// Import Modules
+const {
+    getCount,
+    getFolder,
+    getTotal,
+    nullCheckArgsOfInvoiceTray,
+}                               = require("../modules/tray_sub.js");
 
 // Database
 
-const SELLER_DRAFT_STATUS	= "seller_status_draft";
+const SELLER_DRAFT_STATUS       = "seller_status_draft";
 
 
 // ------------------------------- End Points -------------------------------
@@ -39,7 +44,7 @@ const SELLER_DRAFT_STATUS	= "seller_status_draft";
 /*
  * getCountSeller
  */
-router.get('/getCountOfDraft', function(req, res) {
+router.get('/getCountOfDraft', async function(req, res) {
 
 	req.body =  [
             {
@@ -50,7 +55,23 @@ router.get('/getCountOfDraft', function(req, res) {
             }
         ]
 
-    sub.getCount(req, res, SELLER_DRAFT_STATUS);
+	const table = SELLER_DRAFT_STATUS;
+
+    const [err, counts] = await getCount(req, res, table);
+
+    if(err) {
+        res.json({
+			err: 0,
+			msg: counts
+		});
+		return;
+    }
+
+    res.json({
+        err: err,
+        msg: counts
+    });
+
 
 });
 
@@ -58,7 +79,9 @@ router.get('/getCountOfDraft', function(req, res) {
 /*
  * getFolderOfDraft
  */
-router.get('/getFolderOfDraft', function(req, res) {
+router.get('/getFolderOfDraft', async function(req, res) {
+
+	const METHOD = '/getFolderOfDraft';
 
 	const offset = req.query.offset;
 	const limit = req.query.limit;
@@ -73,7 +96,20 @@ router.get('/getFolderOfDraft', function(req, res) {
 				limit : limit
             }
 
-    sub.getFolder(req, res, SELLER_DRAFT_STATUS);
+    const [rows, err] = await getFolder(req, res, SELLER_DRAFT_STATUS);
+
+	if(err) {
+		let msg = `ERROR:${METHOD}: Could not get Folder`
+        res.status(400).json({
+            err : 5,
+            msg : msg
+        });
+	}
+
+	res.json({
+		err : 0,
+		msg : rows
+	});
 
 });
 
@@ -81,6 +117,10 @@ router.get('/getFolderOfDraft', function(req, res) {
  * getTotalOfDraft
  */
 router.get('/getTotalOfDraft', async function(req, res) {
+
+	const METHOD = '/getTotalOfDraft';
+
+	const type = req.query.type;
 
 	req.body =  
             {
@@ -90,6 +130,27 @@ router.get('/getTotalOfDraft', async function(req, res) {
                 type : 'invoice'
             }
 
-    sub.getTotal(req, res, SELLER_DRAFT_STATUS);
+	if(type != 'invoice') {
+		let msg = `ERROR:${METHOD}: Invalid argument`;
+		res.status(400).json({
+			err : 1,
+			msg : msg
+		});
+	}
+
+    const [total, err] = await getTotal(req, res, SELLER_DRAFT_STATUS);
+
+	if(err) {
+		let msg = `ERROR:${METHOD}: Could not get Total`
+        res.status(400).json({
+            err : 1,
+            msg : {total : 0}
+        });
+	}
+
+	res.json({
+		err : 0,
+		msg : total
+	});
 
 });

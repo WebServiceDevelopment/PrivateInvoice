@@ -18,9 +18,10 @@
     
 **/
 
-//
+// Import Modules
 const to_seller					= require("../modules/buyer_to_seller.js");
 
+//  Libraries
 const Tx                        = require('ethereumjs-tx').Transaction;
 
 // Database Libraries

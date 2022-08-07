@@ -20,26 +20,27 @@
 
 "use strict";
 
-// Import sub
-const sub						= require("../modules/invoice_sub.js");
-const tran                      = require("../modules/invoice_sub_transaction.js");
-
 // Import Router
-const express					= require('express');
-const router					= express.Router();
-module.exports					= router;
+const express                    = require('express');
+const router                     = express.Router();
+module.exports                   = router;
 
 // Libraries
+
+// Import Modules
+const sub                        = require("../modules/invoice_sub.js");
+const tran                       = require("../modules/invoice_sub_transaction.js");
+
 
 // Database 
 
 // Table Name
 
-const BUYER_DOCUMENT			= "buyer_document";
-const BUYER_STATUS				= "buyer_status";
+const BUYER_DOCUMENT             = "buyer_document";
+const BUYER_STATUS               = "buyer_status";
 
-const BUYER_ARCHIVE_DOCUMENT	= "buyer_document_archive";
-const BUYER_ARCHIVE_STATUS		= "buyer_status_archive";
+const BUYER_ARCHIVE_DOCUMENT     = "buyer_document_archive";
+const BUYER_ARCHIVE_STATUS       = "buyer_status_archive";
 
 // ------------------------------- End Points -------------------------------
 
@@ -54,7 +55,7 @@ const BUYER_ARCHIVE_STATUS		= "buyer_status_archive";
 
 router.post('/buyerToTrash', async function(req, res) {
 
-    //console.log("trash");
+	const METHOD = '/buyerToTrash';
 
 	let start = Date.now();
 
@@ -67,11 +68,14 @@ router.post('/buyerToTrash', async function(req, res) {
     const [ old_status , _1 ] = await sub.getStatus( BUYER_STATUS, req.body.document_uuid) ;
 
     if(old_status == undefined) {
-        res.json({
-            err : 0,
-            msg : 'Record is not exist.'
-        });
-        return;
+
+		let msg = `ERROR:${METHOD}: Record is not exist`;
+
+        return res.status(400)
+			.json({
+				err : 1,
+				msg : msg
+			});
     }
 
     // 2.
@@ -81,13 +85,13 @@ router.post('/buyerToTrash', async function(req, res) {
 
     if(old_document == undefined) {
 
-        // status　からrecordを削除する
+		let msg = `ERROR:${METHOD}: Record is not exist`;
 
-        res.json({
-            err : 0,
-            msg : "Record is not exist."
-        });
-        return;
+        return res.status(400)
+			.json({
+				err : 2,
+				msg : msg
+			});
     }
 
 	// 3.
@@ -96,9 +100,14 @@ router.post('/buyerToTrash', async function(req, res) {
 	const [ _3, err3 ] = await sub.notexist_check( BUYER_ARCHIVE_STATUS, req.body.document_uuid)
 
 	if (err3 ) {
-        errno = 3;
-        console.log("Error: "+errno);
-        return res.status(400).json({ err : errno, msg : err });
+
+		let msg = `ERROR:${METHOD}: document_uuid is not exist`;
+
+        return res.status(400)
+			.json({
+				err : 3,
+				msg : msg
+			});
 	}
 
 	// 4.
@@ -106,9 +115,13 @@ router.post('/buyerToTrash', async function(req, res) {
 	//
 	const [ _4, err4] = await sub.notexist_check( BUYER_ARCHIVE_DOCUMENT, req.body.document_uuid)
 	if (err4 ) {
-        errno = 4;
-        console.log("Error: "+errno);
-        return res.status(400).json({ err : errno, msg : err });
+		let msg = `ERROR:${METHOD}: document_uuid is not exist`;
+
+        return res.status(400)
+			.json({
+				err : 4,
+				msg : msg
+			});
 	}
 
     // 5.
@@ -131,7 +144,9 @@ router.post('/buyerToTrash', async function(req, res) {
 	if (err7 ) {
         errno = 7;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err7, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err7, errno, METHOD));
+        return 
     }
 
 	// 8.
@@ -141,7 +156,9 @@ router.post('/buyerToTrash', async function(req, res) {
 	if(err8) {
         errno = 8;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err7, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err7, errno));
+        return 
     }
 	
 	// 9.
@@ -151,7 +168,9 @@ router.post('/buyerToTrash', async function(req, res) {
 	if(err9) {
         errno = 9;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err9, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err9, errno, METHOD));
+        return 
     }
 
 	// 10
@@ -161,7 +180,9 @@ router.post('/buyerToTrash', async function(req, res) {
 	if(err10) {
         errno = 10;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err10, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err10, errno, METHOD));
+        return 
     }
 
     // 11.
@@ -172,7 +193,9 @@ router.post('/buyerToTrash', async function(req, res) {
 	if (err11) {
         errno = 11;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err11, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err11, errno, METHOD));
+        return 
 	}
 
 	// 12.

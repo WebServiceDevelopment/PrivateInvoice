@@ -233,7 +233,7 @@ const SignupForm = (function() {
 				line2 : this.DOM.address.line2.value
 			}
 		};
-		
+
 		const ajax = new XMLHttpRequest();
 		ajax.open('POST', '/api/session/signup');
 		ajax.setRequestHeader('Content-Type', 'application/json');

@@ -45,6 +45,9 @@ module.exports = {
 	insertArchiveDocument	: _insertArchiveDocument,
 	insertDraftDocument		: _insertDraftDocument,
 
+	updateDraftDocument		: _updateDraftDocument,
+	updateDraftStatus		: _updateDraftStatus,
+
 	deleteStatus			: _deleteStatus,
 	deleteDocument			: _deleteDocument,
 
@@ -183,7 +186,10 @@ async function _exist_check(conn, table, uuid) {
 	try {
 		result = await db.selectOne(conn, sql, args);
 	} catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Select error";
+		return [false, msg];
 	}
 
 	//console.log("result.num ="+result.num);
@@ -219,7 +225,10 @@ async function _notexist_check(conn, table, uuid) {
 	try {
 		result = await db.selectOne(conn, sql, args);
 	} catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Select error";
+		return [false, msg];
 	}
 
 	//console.log("result.num ="+result.num);
@@ -253,7 +262,10 @@ async function _checkForExistingDocument (conn, table, document_uuid ) {
 	try {
     	result = await db.selectOne(conn, sql, args);
 	} catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Select error";
+		return [false, msg];
 	}
 
     if(result.num) {
@@ -326,7 +338,10 @@ async function _getDraftDocument(conn, table, uuid) {
 	try {
 		document = await db.selectOne(conn, sql, args);
 	} catch(err) {
-		return [null, err];
+		console.error(err);
+
+		let mag = "Select error";
+		return [false, msg];
 	}
 	//console.log(document)
 
@@ -361,7 +376,10 @@ async function _getDocument(conn, table, uuid) {
 	try {
 		result = await db.selectOne(conn, sql, args);
 	} catch(err) {
-		return [null, err];
+		console.error(err);
+
+		let mag = "Select error";
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -411,7 +429,10 @@ async function _getStatus(conn, table, uuid) {
 	try {
 		status = await db.selectOne(conn, sql, args);
 	} catch(err) {
-		return [null , err];
+		console.error(err);
+
+		let mag = "Select error";
+		return [false, msg];
 	}
 
 	return [status , null];
@@ -449,7 +470,10 @@ async function _getBuyerDid (conn, table, document_uuid, seller_did) {
         return [ buyer_did, null ];
 
     } catch(err) {
-        return [ null, err ];
+		console.error(err);
+
+		let mag = "Select error";
+		return [false, msg];
     }
 
 }
@@ -486,7 +510,10 @@ async function _getBuyerDidForDraft (conn, table, document_uuid, seller_did) {
         return [ buyer_did, null ];
 
     } catch(err) {
-        return [ null, err ];
+		console.error(err);
+
+		let mag = "Select error";
+		return [false, msg];
     }
 
 }
@@ -555,7 +582,10 @@ async function _getSellerHost (conn, table,  seller_did, buyer_did) {
     	result = await db.selectOne(conn, sql, args);
     	//console.log(result);
     } catch(err) {
-        return [ null, err ];
+		console.error(err);
+
+		let mag = "Select error";
+		return [false, msg];
 	}
 
     if(!result) {
@@ -595,7 +625,10 @@ async function _getBuyerHost (conn, table,  seller_did, buyer_did) {
 	    result = await db.selectOne(conn, sql, args);
 		//console.log(result);
 	} catch(err) {
-		return [ null, err ];
+		console.error(err);
+
+		let mag = "Select error";
+		return [false, msg];
 	}
 	if(!result) {
      	err = {msg:'buyer_host not found for buyer_did'};
@@ -682,7 +715,10 @@ async function _insertDraftDocument(conn, table, document) {
 	try {
 		result = await db.insert(conn, sql, args);
 	} catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Insert error";
+		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
@@ -718,7 +754,10 @@ async function _insertDocument(conn, table, status, document_json) {
 	try {
 		result = await db.insert(conn, sql, args);
 	} catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Insert error";
+		return [false, msg];
 	}
 	if(result.affectedRows != 1) {
 		err  = {msg:"insertDocument:result.affectedRows != 1"};
@@ -762,7 +801,10 @@ async function _insertArchiveDocument(conn, table, document) {
 	try {
 		result = await db.insert(conn, sql, args);
 	} catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Insert error";
+		return [false, msg];
 	}
 	if(result.affectedRows != 1) {
 		err  = {msg:"insertArchiveDocument:result.affectedRows != 1"};
@@ -843,7 +885,10 @@ async function _insertStatus(conn, table, status) {
 	try {
 		result = await db.insert(conn, sql, args);
 	} catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Insert error";
+		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
@@ -932,7 +977,10 @@ async function _insertArchiveStatus(conn, table, status) {
 	try {
 		result = await db.insert(conn, sql, args);
 	} catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Insert error";
+		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
@@ -941,6 +989,124 @@ async function _insertArchiveStatus(conn, table, status) {
 	}
 
 	return [result, null];
+}
+
+/*
+ * updateDraftDocument
+ */
+async function _updateDraftDocument(conn, table, req) {
+
+	let result, err;
+
+	let sql = `
+		UPDATE
+			${table}
+		SET
+			document_body = ?,
+			document_totals = ?,
+			document_meta = ?,
+			subject_line = ?,
+			buyer_did = ?,
+			buyer_membername = ?,
+			buyer_details = ?,
+			document_json = ?
+		WHERE
+			document_uuid = ?
+	`;
+
+	let args = [
+		JSON.stringify(req.body.document_body),
+		JSON.stringify(req.body.document_totals),
+		JSON.stringify(req.body.document_meta),
+		req.body.subject_line
+	];
+
+
+	if(req.body.buyer_details) {
+		args.push(req.body.buyer_details.member_did);
+		args.push(req.body.buyer_details.membername);
+		args.push(JSON.stringify(req.body.buyer_details));
+	} else {
+		args.push(null);
+		args.push(null);
+		args.push(null);
+	}
+
+	args.push(JSON.stringify(req.body.document_json));
+
+	args.push(req.body.document_uuid);
+	
+	try {
+		result = await db.update(conn, sql, args);
+	} catch(err) {
+		console.error(err);
+
+		let mag = "Update error";
+		return [false, msg];
+	}
+
+	if(result.affectedRows != 1) {
+		err  = {msg:"insertArchiveStatus:result.affectedRows != 1"};
+		return [false, err];
+	}
+
+	return [result, null ];
+}
+
+/*
+ * updateDraftStatus
+ */
+async function _updateDraftStatus(conn, table, req) {
+
+	let sql, args;
+
+	sql = `
+		UPDATE
+			${table}
+		SET
+			subject_line = ?,
+			amount_due = ?,
+			due_by = ?,
+			buyer_did = ?,
+			buyer_membername = ?,
+			buyer_organization = ?
+		WHERE
+			document_uuid = ?
+	`;
+
+	args = [
+		req.body.subject_line,
+		req.body.document_totals.total,
+		req.body.document_meta.due_by
+	];
+
+	if(req.body.buyer_details) {
+		args.push(req.body.buyer_details.member_did);
+		args.push(req.body.buyer_details.membername);
+		args.push(req.body.buyer_details.organization_name);
+	} else {
+		args.push(null);
+		args.push(null);
+		args.push(null);
+	}
+
+	args.push(req.body.document_uuid);
+
+	try {
+		result = await db.update(conn, sql, args);
+	} catch(err) {
+		console.error(err);
+
+		let mag = "Update error";
+		return [false, msg];
+	}
+
+	if(result.affectedRows != 1) {
+		err  = {msg:"insertArchiveStatus:result.affectedRows != 1"};
+		return [false, err];
+	}
+
+	return [result, null ];
 }
 
 /*
@@ -964,7 +1130,10 @@ async function _deleteStatus(conn, table, status) {
 	try {
 		result = await db.delete(conn, sql, args);
 	} catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Delete error";
+		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
@@ -996,7 +1165,10 @@ async function _deleteDocument(conn, table, status) {
 	try {
 		result = await db.delete(conn, sql, args);
 	} catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Delete error";
+		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
@@ -1039,7 +1211,10 @@ async function _setConfirm (conn, table, document_uuid , buyer_did) {
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
-        return [false, err];
+		console.error(err);
+
+		let mag = "Update error";
+		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
@@ -1082,7 +1257,10 @@ async function _setUnconfirm (conn, table, document_uuid , buyer_did) {
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Update error";
+		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
@@ -1128,7 +1306,10 @@ async function _setMakePayment_status (conn, table, document_uuid , buyer_did) {
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
-        return [false, err];
+		console.error(err);
+
+		let mag = "Update error";
+		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
@@ -1166,7 +1347,10 @@ async function _setMakePayment_document (conn, table, document_uuid , hash) {
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
-        return [false, err];
+		console.error(err);
+
+		let mag = "Update error";
+		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
@@ -1210,7 +1394,10 @@ async function _setWithdrawSeller (conn, table, document_uuid , seller_did, docu
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Update error";
+		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
@@ -1255,7 +1442,10 @@ async function _setWithdrawBuyer (conn, table, document_uuid , buyer_did, docume
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Update error";
+		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
@@ -1296,7 +1486,10 @@ async function _setReturn (conn, table, document_uuid , buyer_did) {
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
-		return [false, err];
+		console.error(err);
+
+		let mag = "Update error";
+		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
@@ -1310,24 +1503,49 @@ async function _setReturn (conn, table, document_uuid , buyer_did) {
 /*
  * rollbackAndReturn
  */
-async function _rollbackAndReturn(conn, code, err, errno) {
+async function _rollbackAndReturn(conn, code, err, errno, method) {
 
 	try {
     	await db.rollback(conn, err);
 	} catch(err) {
     	conn.end();
-    	return {"err":err};
+    	return {"err":errno, msg:`${method}:Rollback error`};
 	}
     conn.end();
 
     console.log("Error errno="+errno+" :code="+code);
 
-    let msg;
+    let rt;
+
     if(code == 500) {
-        msg = {"err":"buyer connect check:ECONNRESET"};
+        rt = {"err":code, msg:"buyer connect check:ECONNRESET"};
     } else {
-        msg = {"err":err};
+   		let msg;
+
+		if(typeof err === 'string') {
+			msg =err;
+		} else if(typeof err == "object"){
+			try {
+				msg = err.toString()
+			} catch(e) {
+				try {
+					JSON.parse(err) ;
+					if(err.sqlMessage != null) {
+						msg = err.sqlMessage;
+					} else {
+						console.error(err);
+						msg = "unknown cause"
+					}
+				} catch(e) {
+					msg = "unknown cause"
+				}
+			}
+		} else {
+			msg = err;
+		}
+
+        rt = {"err":errno, msg:`${methos}:${msg}`};
     }
-    return msg;
+    return rt;
 }
 

@@ -141,10 +141,10 @@ const ContactWidget = (function() {
 
 		if(!memberData) {
 			this.DOM.input.value = "";
-			TrayWidget.API.updateCompany("");
+			TrayWidget.API.updateOrganization("");
 
 		} else {
-			TrayWidget.API.updateCompany(memberData.organization_name);
+			TrayWidget.API.updateOrganization(memberData.organization_name);
 
 			memberData.contactPoint = _contactPoint(membername, memberData.remote_origin);
 
@@ -228,7 +228,7 @@ const ContactWidget = (function() {
 		this.MEM.setSaveTimeout( timeout );
 	}
 
-	function evt_handleInputFocus() {
+async function evt_handleInputFocus() {
 	
 
 		const elem =  FolderWidget.MEM.getActiveFolder();
@@ -239,11 +239,12 @@ const ContactWidget = (function() {
 			}
 		}
 
+
+/*
+		const url = '/api/invite/getContacts';
 		const params = {
 			contactType : "buyers"
 		};
-
-		const url = '/api/invite/contacts';
 
 		const ajax = new XMLHttpRequest();
 		ajax.open('POST', url);
@@ -274,7 +275,45 @@ const ContactWidget = (function() {
 			});
 
 		}
+*/
+		const url = '/api/invite/getContacts';
 
+        let response;
+        try {
+            response = await fetch( url+'?'+new URLSearchParams({
+				contactType : "buyers"
+            }).toString());
+
+        } catch(err) {
+
+            throw err;
+        }
+
+        let res;
+        try {
+            res = await response.json();
+        } catch(err) {
+
+            throw err;
+        }
+
+        if(response.status != 200) {
+            alert("this.Message.sent\n"+res.err);
+        }
+
+		this.MEM.initSaveTimeout();
+			
+		const list = res.msg;
+
+		this.MEM.setList( list );
+
+		this.MEM.lookup = {};
+		list.forEach( contact => {
+			this.MEM.setLookup( contact.membername, contact );
+			if(contact == null) {
+				return;
+			}
+		});
 	}
 
 	function evt_handleInputChange() {

@@ -1,0 +1,668 @@
+{
+	"info": {
+		"_postman_id": "0c68e31f-b2cb-41e1-872c-994780d7c037",
+		"name": "Create Alice Account",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "20243281"
+	},
+	"item": [
+		{
+			"name": "Create Alice Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg).to.eql('okay');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response should have a session cookie\", () => {\r",
+							"    pm.expect(pm.cookies.get('connect.sid')).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function randomString(len) {\r",
+							"    const length = len;\r",
+							"    const dataSet = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';\r",
+							"    let str = ''\r",
+							"    for (let i = 0; i < length; i++)\r",
+							"        str += dataSet.charAt(Math.floor(Math.random() * dataSet.length));\r",
+							"    return str;\r",
+							"}\r",
+							"\r",
+							"const membername = 'alice_' + randomString(4)\r",
+							"const password = randomString(16)\r",
+							"\r",
+							"pm.collectionVariables.set('alice_membername', membername)\r",
+							"pm.collectionVariables.set('alice_password', password)\r",
+							"\r",
+							"const text = CryptoJS.enc.Utf8.parse(membername + ':' + password)\r",
+							"const base64 = CryptoJS.enc.Base64.stringify(text);\r",
+							"const auth = `Basic ${base64}`\r",
+							"pm.collectionVariables.set('alice_auth', auth)\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": "Defines the postbody as application JSON",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"member\":{\r\n      \"membername\":\"{{alice_membername}}\",\r\n      \"job_title\":\"Head of Alice Corp.\",\r\n      \"contact_email\":\"alice@example.com\",\r\n      \"password\":\"{{alice_password}}\"\r\n   },\r\n   \"company\":{\r\n      \"name\":\"Alice Corp. International\",\r\n      \"department\":\"Executive\",\r\n      \"tax_id\":\"35-2337563\"\r\n   },\r\n   \"address\":{\r\n      \"country\":\"USA\",\r\n      \"region\":\"Oregon\",\r\n      \"postcode\":\"420-7156\",\r\n      \"city\":\"{{$randomCity}}\",\r\n      \"line1\":\"{{$randomStreetAddress}}\",\r\n      \"line2\":\"Suite 302\"\r\n   }\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/session/signup",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"1",
+						"130"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"session",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Alice Session",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson).to.have.property('member_did');\r",
+							"  pm.expect(responseJson).to.have.property('membername');\r",
+							"  pm.expect(responseJson).to.have.property('job_title');\r",
+							"  pm.expect(responseJson).to.have.property('work_email');\r",
+							"  pm.expect(responseJson).to.have.property('organization_uuid');\r",
+							"  pm.expect(responseJson).to.have.property('wallet_address');\r",
+							"  pm.expect(responseJson).to.have.property('organization_name');\r",
+							"  pm.expect(responseJson).to.have.property('organization_postcode');\r",
+							"  pm.expect(responseJson).to.have.property('organization_address');\r",
+							"  pm.expect(responseJson).to.have.property('organization_building');\r",
+							"  pm.expect(responseJson).to.have.property('organization_department');\r",
+							"  pm.expect(responseJson).to.have.property('organization_tax_id');\r",
+							"  pm.expect(responseJson).to.have.property('addressCountry');\r",
+							"  pm.expect(responseJson).to.have.property('addressRegion');\r",
+							"  pm.expect(responseJson).to.have.property('addressCity');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The session belongs to Alice\", () => {\r",
+							"    const name = pm.collectionVariables.get('alice_membername')\r",
+							"    const { membername } = pm.response.json();\r",
+							"    pm.expect(membername).to.eql(name);\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"description": "Alice Basic Auth Header",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/session/check",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"1",
+						"130"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"session",
+						"check"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Alice Business Card",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson).to.have.property('@context');\r",
+							"  pm.expect(responseJson).to.have.property('type');\r",
+							"  pm.expect(responseJson).to.have.property('id');\r",
+							"  pm.expect(responseJson).to.have.property('name');\r",
+							"  pm.expect(responseJson).to.have.property('relatedLink');\r",
+							"  pm.expect(responseJson).to.have.property('issuanceDate');\r",
+							"  pm.expect(responseJson).to.have.property('issuer');\r",
+							"  pm.expect(responseJson).to.have.property('credentialSubject');\r",
+							"  pm.expect(responseJson).to.have.property('proof');\r",
+							"  pm.collectionVariables.set('alice_vbc', pm.response.text())\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"uses\": 1,\r\n    \"buyer\": 1,\r\n    \"seller\": 1,\r\n    \"expire\": \"2040-01-01\",\r\n    \"linkRelationship\": \"Partner\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/contacts/createBusunessCard",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"1",
+						"130"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"contacts",
+						"createBusunessCard"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Bob Account",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg).to.eql('okay');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response should have a session cookie\", () => {\r",
+							"    pm.expect(pm.cookies.get('connect.sid')).to.be.a('string');\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"function randomString(len) {\r",
+							"    const length = len;\r",
+							"    const dataSet = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';\r",
+							"    let str = ''\r",
+							"    for (let i = 0; i < length; i++)\r",
+							"        str += dataSet.charAt(Math.floor(Math.random() * dataSet.length));\r",
+							"    return str;\r",
+							"}\r",
+							"\r",
+							"const membername = 'bob_' + randomString(4)\r",
+							"const password = randomString(16)\r",
+							"\r",
+							"pm.collectionVariables.set('bob_membername', membername)\r",
+							"pm.collectionVariables.set('bob_password', password)\r",
+							"\r",
+							"const text = CryptoJS.enc.Utf8.parse(membername + ':' + password)\r",
+							"const base64 = CryptoJS.enc.Base64.stringify(text);\r",
+							"const auth = `Basic ${base64}`\r",
+							"pm.collectionVariables.set('bob_auth', auth)\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": "Defines the postbody as application JSON",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"member\":{\r\n      \"membername\":\"{{bob_membername}}\",\r\n      \"job_title\":\"Head of Bob Co.\",\r\n      \"contact_email\":\"bob@example.com\",\r\n      \"password\":\"{{bob_password}}\"\r\n   },\r\n   \"company\":{\r\n      \"name\":\"Bob Co.\",\r\n      \"department\":\"Procurement\",\r\n      \"tax_id\":\"75-8772541\"\r\n   },\r\n   \"address\":{\r\n      \"country\":\"USA\",\r\n      \"region\":\"New York\",\r\n      \"postcode\":\"120-7612\",\r\n      \"city\":\"{{$randomCity}}\",\r\n      \"line1\":\"{{$randomStreetAddress}}\",\r\n      \"line2\":\"\"\r\n   }\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/session/signup",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"1",
+						"130"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"session",
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Bob Session",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson).to.have.property('member_did');\r",
+							"  pm.expect(responseJson).to.have.property('membername');\r",
+							"  pm.expect(responseJson).to.have.property('job_title');\r",
+							"  pm.expect(responseJson).to.have.property('work_email');\r",
+							"  pm.expect(responseJson).to.have.property('organization_uuid');\r",
+							"  pm.expect(responseJson).to.have.property('wallet_address');\r",
+							"  pm.expect(responseJson).to.have.property('organization_name');\r",
+							"  pm.expect(responseJson).to.have.property('organization_postcode');\r",
+							"  pm.expect(responseJson).to.have.property('organization_address');\r",
+							"  pm.expect(responseJson).to.have.property('organization_building');\r",
+							"  pm.expect(responseJson).to.have.property('organization_department');\r",
+							"  pm.expect(responseJson).to.have.property('organization_tax_id');\r",
+							"  pm.expect(responseJson).to.have.property('addressCountry');\r",
+							"  pm.expect(responseJson).to.have.property('addressRegion');\r",
+							"  pm.expect(responseJson).to.have.property('addressCity');\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The session belongs to Bob\", () => {\r",
+							"    const name = pm.collectionVariables.get('bob_membername')\r",
+							"    const { membername } = pm.response.json();\r",
+							"    pm.expect(membername).to.eql(name);\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{bob_auth}}",
+						"description": "Alice Basic Auth Header",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/session/check",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"1",
+						"130"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"session",
+						"check"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bob adds Alice to Contacts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg).to.eql('okay');\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{bob_auth}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{{alice_vbc}}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/contacts/addContact",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"1",
+						"130"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"contacts",
+						"addContact"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Alice Creates an Invoice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg).to.be.a('string');\r",
+							"  pm.collectionVariables.set('invoice_uuid', responseJson.msg)\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://localhost:3000/api/invoice/create",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"1",
+						"130"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"invoice",
+						"create"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null,
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Alice gets list of Contacts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"contactType\": \"buyers\"\r\n}"
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/invite/contacts",
+					"protocol": "http",
+					"host": [
+						"192",
+						"168",
+						"1",
+						"130"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"invite",
+						"contacts"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "alice_cookie",
+			"value": ""
+		},
+		{
+			"key": "alice_membername",
+			"value": ""
+		},
+		{
+			"key": "alice_password",
+			"value": ""
+		},
+		{
+			"key": "alice_auth",
+			"value": ""
+		},
+		{
+			"key": "alice_vbc",
+			"value": ""
+		},
+		{
+			"key": "bob_membername",
+			"value": ""
+		},
+		{
+			"key": "bob_password",
+			"value": ""
+		},
+		{
+			"key": "bob_auth",
+			"value": ""
+		},
+		{
+			"key": "invoice_uuid",
+			"value": ""
+		}
+	]
+}

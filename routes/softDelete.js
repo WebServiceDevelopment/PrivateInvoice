@@ -19,23 +19,19 @@
 
 "use strict";
 
-// Import sub
-
 // Import Router
 
-const express					= require('express');
-const router					= express.Router();
-module.exports					= router;
+const express                   = require('express');
+const router                    = express.Router();
+module.exports                  = router;
 
 // Libraries
 
-// Database
-
-const db						= require('../database.js');
-
-const BUYER__ARCHIVE_STATUS		= "buyer_status_archive";
-const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
-
+// Import Modules
+const {
+    softDeleteSeller,
+    softDeleteBuyer,
+}                               = require('../modules/softDelete_sub.js');
 
 
 // ------------------------------- End Points -------------------------------
@@ -46,50 +42,26 @@ const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
  */
 router.post('/softDeleteSeller', async function(req, res) {
 
-	const METHOD = '/softDeleteSeller';
-
-	const member_did			= "seller_did";
-	const archive				= "seller_archived";
-	const table					= SELLER_ARCHIVE_STATUS;
-
-	let sql = `
-		UPDATE
-			${table}
-		SET
-			${archive} = 1
-		WHERE
-			${member_did} = ?
-		AND
-			document_uuid = ?
-		AND
-			document_folder = 'trash'
-		AND
-			document_type = 'invoice'
-	`;
-
-	let args = [
-		req.session.data.member_did,
-		req.body.document_uuid
-	];
-
-	let result;
-
-	try {
-		result = await db.update(sql, args);
-	} catch(err) {
-		return res.json({
-			err : 9,
-			msg : "Error : SQL execution failed"
-		});
-
+	const [result , err] = await softDeleteSeller (
+							req.session.data.member_did, 
+							req.body.document_uuid
+						);
+	if (err) {
+		res.status(400)
+			.json({
+				err : 1,
+				msg : "Error : SQL execution failed"
+			});
+		return;
 	}
 
 	if(result.affectedRows != 1) {
-		return res.json({
-			err : 1,
-			msg : "Incorrect request"
-		});
-
+		res.status(400)
+			.json({
+				err : 2,
+				msg : "Incorrect request"
+			});
+		return;
 	}
 
 	return res.json({
@@ -104,49 +76,26 @@ router.post('/softDeleteSeller', async function(req, res) {
  */
 router.post('/softDeleteBuyer', async function(req, res) {
 
-	const METHOD = '/softDeleteBuyer';
-
-	const member_did		= "buyer_did";
-	const archive			= "buyer_archived";
-	const table				= BUYER__ARCHIVE_STATUS;
-
-	let sql = `
-		UPDATE
-			${table}
-		SET
-			${archive} = 1
-		WHERE
-			${member_did} = ?
-		AND
-			document_uuid = ?
-		AND
-			document_folder = 'trash'
-		AND
-			document_type = 'invoice'
-	`;
-
-	let args = [
-		req.session.data.member_did,
-		req.body.document_uuid
-	];
-
-	let result;
-
-	try {
-		result = await db.update(sql, args);
-	} catch(err) {
-		return res.json({
-			err : 9,
-			msg : "Error : SQL execution failed"
-		});
+	const [result , err] = await softDeleteBuyer (
+							req.session.data.member_did, 
+							req.body.document_uuid
+						);
+	if (err) {
+		res.status(400)
+			.json({
+				err : 1,
+				msg : "Error : SQL execution failed"
+			});
+		return;
 	}
 
 	if(result.affectedRows != 1) {
-		return res.json({
-			err : 1,
-			msg : "Incorrect request"
-		});
-
+		res.status(400)
+			.json({
+				err : 2,
+				msg : "Incorrect request"
+			});
+		return;
 	}
 
 	return res.json({

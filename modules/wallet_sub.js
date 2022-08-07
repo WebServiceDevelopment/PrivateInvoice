@@ -21,23 +21,89 @@
 "use strict";
 
 // Libraries
-const currency                  = require('currency.js');
 
 // Database
 
-const db 						= require('../database.js');
+const db 							= require('../database.js');
 
 // Exports
 module.exports = {
-	getRecentActivity			: api_getRecentActivity,
+	getRecentActivityBySeller_did	: _getRecentActivityBySeller_did,
+	getRecentActivityByBuyer_did	: _getRecentActivityByBuyer_did,
+	getRecentActivity_seller		: _getRecentActivity_seller,
+	getRecentActivity_buyer			: _getRecentActivity_buyer,
 }
 
 //------------------------------- export modules ------------------------------
 
 /*
- * getRecentActivity
+ * getRecentActivityBySeller_did
  */
-async function api_getRecentActivity(table, times) {
+async function _getRecentActivityBySeller_did(table, times, member_did) {
+
+	let sql = `
+		SELECT
+			document_uuid
+		FROM
+			${table}
+		WHERE
+			seller_did = ?
+		LIMIT
+			${times}
+	`;
+
+	let args = [
+		`${member_did}`
+	];
+
+	let rows;
+	try {
+		rows = await db.selectAll(sql, args);
+	} catch(err) {
+		console.log(err);
+		return [];
+	}
+
+	return rows;
+}
+
+/*
+ * getRecentActivityByBuyer_did
+ */
+async function _getRecentActivityByBuyer_did(table, times, member_did) {
+
+	let sql = `
+		SELECT
+			document_uuid
+		FROM
+			${table}
+		WHERE
+			buyer_did = ?
+		LIMIT
+			${times}
+	`;
+
+	let args = [
+		`${member_did}`
+	];
+
+	let rows;
+	try {
+		rows = await db.selectAll(sql, args);
+	} catch(err) {
+		console.log(err);
+		return [];
+	}
+
+	return rows;
+}
+
+
+async function _getRecentActivity_seller(table, times, document_uuids) {
+
+	if( document_uuids== "" ) {
+		return [];
+	}
 
 	let sql = `
 		SELECT
@@ -49,6 +115,8 @@ async function api_getRecentActivity(table, times) {
 			${table}
 		WHERE
 			settlement_time is not null
+		AND
+			document_uuid in (${document_uuids})
 		ORDER BY
 			settlement_time DESC
 		LIMIT
@@ -68,3 +136,44 @@ async function api_getRecentActivity(table, times) {
 
 	return rows;
 }
+
+
+async function _getRecentActivity_buyer(table, times, document_uuids) {
+
+	if( document_uuids== "" ) {
+		return [];
+	}
+	
+	let sql = `
+		SELECT
+			document_uuid,
+			document_json,
+			settlement_hash,
+			settlement_time
+		FROM
+			${table}
+		WHERE
+			settlement_time is not null
+		AND
+			document_uuid in (${document_uuids})
+		ORDER BY
+			settlement_time DESC
+		LIMIT
+			${times}
+	`;
+
+	let args = [
+	];
+
+	let rows;
+	try {
+		rows = await db.selectAll(sql, args);
+	} catch(err) {
+		console.log(err);
+		return [];
+	}
+
+	return rows;
+}
+
+

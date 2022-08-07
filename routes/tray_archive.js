@@ -20,59 +20,75 @@
 
 "use strict";
 
-// Inport
-const sub					= require("../modules/tray_sub.js");
-
 // Import Router
 
-const express				= require('express');
-const router				= express.Router();
-module.exports				= router;
+const express                   = require('express');
+const router                    = express.Router();
+module.exports                  = router;
+
+// Import Modules
+const {
+    getCount,
+    getFolder,
+    getTotal,
+	nullCheckArgsOfInvoiceTray,
+}                               = require("../modules/tray_sub.js");
 
 // Database
 
-const BUYER_ARCHIVE_STATUS	= "buyer_status_archive";
-const SELLER_ARCHIVE_STATUS	= "seller_status_archive";
+const BUYER_ARCHIVE_STATUS      = "buyer_status_archive";
+const SELLER_ARCHIVE_STATUS     = "seller_status_archive";
 
 //--------------------------------- End Points --------------------------------
 /*
  * 1.
  * getCountOfArchive
  */
-router.get('/getCountOfArchive', function(req, res) {
+router.get('/getCountOfArchive', async function(req, res) {
+
+	const METHOD = '/getCountOfArchive';
+
 	const archive = req.query.archive;
 	const folder = req.query.folder;
 	const role = req.query.role;
 	const type = req.query.type;
 
+// 1.
 	if(type != 'invoice') {
+		let msg = `ERROR:${METHOD}: Invalid argument`;
 		res.status(400).json({
-			err : 11,
-			msg : "Invalid argument"
+			err : 1,
+			msg : msg
 		});
 	}
 
 	if(role != 'buyer' && role != 'seller') {
+		let msg = `ERROR:${METHOD}: Invalid argument`;
 		res.status(400).json({
-			err : 11,
-			msg : "Invalid argument"
+			err : 1,
+			msg : msg
 		});
 	}
 	
 	if(archive != 1 && archive != 0) {
+		let msg = `ERROR:${METHOD}: Invalid argument`;
 		res.status(400).json({
-			err : 11,
-			msg : "Invalid argument"
+			err : 1,
+			msg : msg
 		});
 	}
 
 	if(folder != 'paid' && folder != 'trash') {
+
+		let msg = `ERROR:${METHOD}: Invalid argument`;
+
 		res.status(400).json({
-			err : 11,
-			msg : "Invalid argument"
+			err : 1,
+			msg : msg
 		});
 	}
 	
+// 2.
 	req.body = [
             {
                 archive : archive,
@@ -82,20 +98,33 @@ router.get('/getCountOfArchive', function(req, res) {
             }
         ]
 
-	//console.log(JSON.stringify(req.body));
+	const table = ((role) => {
 
-	let table_name;
+			switch(role) {
+			case "buyer":
+				return BUYER_ARCHIVE_STATUS;	
+			case "seller":
+				return SELLER_ARCHIVE_STATUS;	
+			}
 
-	switch(role) {
-	case "buyer":
-		table_name = BUYER_ARCHIVE_STATUS;	
-	break;
-	case "seller":
-		table_name = SELLER_ARCHIVE_STATUS;	
-	break;
-	}
+		})(role)
 
-    sub.getCount(req, res, table_name);
+    const [err , counts] = await getCount(req, res, table);
+
+    if(err) {
+
+        res.json({
+			err: 0,
+			msg: counts
+		});
+		return;
+    }
+
+    res.json({
+        err: 0,
+        msg: counts
+    });
+
 
 });
 
@@ -103,7 +132,7 @@ router.get('/getCountOfArchive', function(req, res) {
  * 2.
  * getFolderOfArchive
  */
-router.get('/getFolderOfArchive', function(req, res) {
+router.get('/getFolderOfArchive', async function(req, res) {
 
 	const archive = req.query.archive;
 	const folder = req.query.folder;
@@ -136,21 +165,48 @@ router.get('/getFolderOfArchive', function(req, res) {
 	break;
 	}
 
-    sub.getFolder(req, res, table_name);
+    const [rows, err1] = await getFolder(req, res, table_name);
+
+	if(err1) {
+		let msg = `ERROR:${METHOD}: Could not get Folder`
+        res.status(400).json({
+            err : 1,
+            msg : msg
+        });
+	}
+
+	res.json({
+		err : 0,
+		msg : rows
+	});
 
 });
 
 
 /*
- * 7.
- * getTotalBuyer
+ * 3.
+ * getTotalOfArchive
  */
 router.get('/getTotalOfArchive', async function(req, res) {
+
+	const METHOD = '/getTotalOfArchive';
 
 	const archive = req.query.archive;
 	const folder = req.query.folder;
 	const role = req.query.role;
 	const type = req.query.type;
+
+	if(nullCheckArgsOfInvoiceTray(req)== false) {
+
+		let msg = `ERROR:${METHOD}: Invalid argument`
+
+		res.status(400)
+			.json({
+				err : 1,
+				msg : msg
+			});
+		return;
+	}
 
     req.body =
             {
@@ -173,6 +229,19 @@ router.get('/getTotalOfArchive', async function(req, res) {
 	break;
 	}
 
-    sub.getTotal(req, res, table_name);
+    const [total, err] = await getTotal(req, res, table_name);
+
+	if(err) {
+		let msg = `ERROR:${METHOD}: Could not get Total`
+        res.status(400).json({
+            err : 1,
+            msg : {total : 0}
+        });
+	}
+
+	res.json({
+		err : 0,
+		msg : total
+	});
 
 });
