@@ -27,13 +27,11 @@ const config                    = require('../config.json');
 
 // web3.js
 const Web3						= require('web3');
-
 const web3						= new Web3();
 
 const URL						= process.env.GANACHE_ADDRESS;
 
 web3.setProvider(new web3.providers.HttpProvider(URL));
-
 web3.eth.defaultAccount			= process.env.ACCOUNT;
 
 

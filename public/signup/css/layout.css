@@ -182,6 +182,7 @@ div.field label.placeholder {
 	top: 16px;
 	transition: all 200ms;
 	pointer-events: none;
+    color: #777;
 
 }
 

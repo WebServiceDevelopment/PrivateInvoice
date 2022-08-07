@@ -20,27 +20,28 @@
 
 "use strict";
 
-// Import sub
-const sub						= require("../modules/invoice_sub.js");
-const tran                      = require("../modules/invoice_sub_transaction.js");
-
 // Import Router
-const express					= require('express');
-const router					= express.Router();
-module.exports					= router;
-const to_seller                 = require("../modules/buyer_to_seller.js");
+const express                   = require('express');
+const router                    = express.Router();
+module.exports                  = router;
 
 // Libraries
+
+// Import Modules
+const sub                       = require("../modules/invoice_sub.js");
+const tran                      = require("../modules/invoice_sub_transaction.js");
+
+
 
 // Database 
 
 // Table Name
 
-const BUYER_DOCUMENT			= "buyer_document";
-const BUYER_STATUS				= "buyer_status";
+const BUYER_DOCUMENT            = "buyer_document";
+const BUYER_STATUS              = "buyer_status";
 
-const BUYER_ARCHIVE_DOCUMENT	= "buyer_document_archive";
-const BUYER_ARCHIVE_STATUS		= "buyer_status_archive";
+const BUYER_ARCHIVE_DOCUMENT    = "buyer_document_archive";
+const BUYER_ARCHIVE_STATUS	    = "buyer_status_archive";
 
 const CONTACTS                  = "contacts";
 
@@ -53,7 +54,8 @@ const CONTACTS                  = "contacts";
  * buyerToArchive
  */
 router.post('/buyerToArchive', async function(req, res) {
-	const _NO = "090";
+
+	const METHOD = '/buyerToArchive'
 
     const FOLDER  = 'paid';
 
@@ -66,12 +68,15 @@ router.post('/buyerToArchive', async function(req, res) {
     // First we go ahead and get the status.
     // Does record exist?
     //
-    const [ old_status , _1] = await sub.getStatus( BUYER_STATUS, req.body.document_uuid) ;
+    const [ old_status , _1] = await sub.getStatus( BUYER_STATUS, document_uuid) ;
 
 	if(old_status == undefined) {
+
+		let msg = `ERROR:${METHOD}: Record is not exist.`
+
 		res.json({
 			err : 1,
-			msg : 'Record is not exist.'
+			msg : msg
 		});
         return;
 	}
@@ -80,12 +85,12 @@ router.post('/buyerToArchive', async function(req, res) {
     // Second we go ahead and get the document
     // Does record exist?
     //
-	const [ old_document, _2 ] = await sub.getDocument( BUYER_DOCUMENT, req.body.document_uuid) ;
+	const [ old_document, _2 ] = await sub.getDocument( BUYER_DOCUMENT, document_uuid) ;
 
 	if(old_document == undefined) {
 		res.json({
 			err : 2,
-			msg : 'Record is not exist.'
+			msg : `ERROR:${METHOD}: Record is not exist.`
 		});
         return;
 	}
@@ -105,22 +110,29 @@ router.post('/buyerToArchive', async function(req, res) {
     //
     const [ seller_host, err4 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
     if(err4) {
-        console.log("Error 4 status = 400 err="+err4 +":NO="+_NO);
-        return res
-			.status(400)
-			.json(err4);
+
+		let msg = `ERROR:${METHOD}: Record is not exist.`
+
+        return res .status(400)
+				.json({
+				err : 4,
+				msg : msg
+			});
     }
 
     // 5.
     // Compare Host address and req.ip.
     // Are the two ips the same?
     //
-    if(!check_ipadder(req.ip , seller_host)) {
-        console.log("invalid request : req.ip="+req.ip+":seller_host="+seller_host);
-		let err5 = {err:"invalid host"};
-        return res
-			.status(400)
-			.json(err5);
+    if(!sub.check_ipadder(req.ip , seller_host)) {
+
+		let msg = `ERROR:${METHOD}: invalid host`;
+
+        return res.status(400)
+				.json({
+				err : 5,
+				msg : msg
+			});
     }
 
 	// 6.
@@ -129,9 +141,15 @@ router.post('/buyerToArchive', async function(req, res) {
 	const [ bool6, err6 ] = await sub.notexist_check( BUYER_ARCHIVE_STATUS, req.body.document_uuid)
 
 	if ( bool6 == false) {
+
+		let msg = `ERROR:${METHOD}: document_uuid already notexist `;
+
         return res
 			.status(400)
-			.json(err6);
+				.json({
+				err : 5,
+				msg : msg
+			});
 	}
 
 	// 7.
@@ -140,9 +158,14 @@ router.post('/buyerToArchive', async function(req, res) {
 	const [ bool7, err7 ] = await sub.notexist_check( BUYER_ARCHIVE_DOCUMENT, req.body.document_uuid)
 
 	if ( bool7 == false) {
+
+		let msg = `ERROR:${METHOD}: document_uuid already notexist `;
+
         return res
-			.status(400)
-			.json(err7);
+			.status(400).json({
+				err : 5,
+				msg : msg
+			});
 	}
 
 
@@ -168,9 +191,8 @@ router.post('/buyerToArchive', async function(req, res) {
 	if(err10) {
 		errno = 10;
         code = 400;
-        return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err10, errno));
+        return res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err10, errno, METHOD));
     }
 
 	// 11.
@@ -181,9 +203,8 @@ router.post('/buyerToArchive', async function(req, res) {
 	if(err11) {
 		errno = 11;
         code = 400;
-        return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err11, errno));
+        return res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err11, errno, METHOD));
     }
 
 	// 12.
@@ -194,9 +215,8 @@ router.post('/buyerToArchive', async function(req, res) {
 	if(err11) {
 		errno = 12;
         code = 400;
-        return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err12, errno));
+        return res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err12, errno, METHOD));
     }
 
 	// 13.
@@ -207,9 +227,8 @@ router.post('/buyerToArchive', async function(req, res) {
 	if(err13) {
 		errno = 13;
         code = 400;
-        return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err13, errno));
+        return res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err13, errno, METHOD));
     }
 
 
@@ -221,9 +240,8 @@ router.post('/buyerToArchive', async function(req, res) {
 	if (err14) {
 		errno = 14;
         code = 400;
-        return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err14, errno));
+        return res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err14, errno, METHOD));
 	}
 
 	// 15.
@@ -247,7 +265,8 @@ router.post('/buyerToArchive', async function(req, res) {
  * buyerToRecreate
  */
 router.post('/buyerToRecreate', async function(req, res) {
-	const _NO = "091";
+
+	const METHOD = '/buyerToRecreate';
 
 	const { document_uuid, seller_did } = req.body;
 
@@ -264,10 +283,14 @@ router.post('/buyerToRecreate', async function(req, res) {
     const [ old_status , _1 ] = await sub.getStatus( BUYER_STATUS, req.body.document_uuid) ;
 
 	if(old_status == undefined) {
-		res.json({
-			err : 0,
-			msg : 'Record is not exist.'
-		});
+
+		let	msg = `ERROR:${METHOD}: Record is not exist`
+
+		res.status(400)
+			.json({
+				err : 0,
+				msg : msg
+			});
         return;
 	}
 
@@ -279,12 +302,13 @@ router.post('/buyerToRecreate', async function(req, res) {
 
 	if(old_document == undefined) {
 
-		// status　からrecordを削除する
+		let	msg = `ERROR:${METHOD}: Record is not exist`
 
-		res.json({
-			err : 0,
-			msg : "Record is not exist."
-		});
+		res.status(400)
+			.json({
+					err : 0,
+				msg : msg
+			});
         return;
 	}
 
@@ -300,21 +324,30 @@ router.post('/buyerToRecreate', async function(req, res) {
     //
     const [ seller_host, err4 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
     if(err4) {
-        console.log("Error 4 status = 400 err="+err4+":NO"+_NO);
-        return res
-			.status(400)
-			.json(err4);
+
+        let msg = `ERROR:${METHOD}: Invalid host`
+
+		res.status(400)
+			.json({
+				err : 4,
+				msg : msg
+			});
+		return;
     }
 
     // 5.
     // Before host apaddress, check  
     //
-    if(!check_ipadder(req.ip , seller_host)) {
-        console.log("invalid request : req.ip="+req.ip+":seller_host="+seller_host);
-		let err5 = {err:"invalid host"};
-        return res
-			.status(400)
-			.json(err5);
+    if(!sub.check_ipadder(req.ip , seller_host)) {
+
+        let msg = `ERROR:${METHOD}: Invalid host`
+
+		res.status(400)
+			.json({
+				err : 5,
+				msg : msg
+			});
+		return;
     }
 
 	// 6.
@@ -323,11 +356,15 @@ router.post('/buyerToRecreate', async function(req, res) {
 	const [bool6, _6] = await sub.notexist_check( BUYER_ARCHIVE_STATUS, req.body.document_uuid)
 
 	if ( bool6 == false) {
-		res.json({
-			err : 0,
-			msg : "document_uuid already exist."
-		});
-		return;
+
+		let	msg = `ERROR:${METHOD}: document_uuid already exist.`
+
+		res.status(400)
+			.json({
+				err : 0,
+				msg : msg
+			});
+			return;
 	}
 
 	// 7.
@@ -336,10 +373,14 @@ router.post('/buyerToRecreate', async function(req, res) {
 	const [bool7, _7 ] = await sub.notexist_check( BUYER_ARCHIVE_DOCUMENT, document_uuid)
 
 	if ( bool7 == false) {
-		res.json({
-			err : 0,
-			msg : "document_uuid already exist."
-		});
+
+		let	msg = `ERROR:${METHOD}: document_uuid already exist.`
+
+		res.status(400)
+			.json({
+				err : 0,
+				msg : msg
+			});
 		return;
 	}
 
@@ -365,9 +406,9 @@ router.post('/buyerToRecreate', async function(req, res) {
 	if(err10) {
 		errno = 10;
         code = 400;
-        return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err10, errno));
+        res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err10, errno, METHOD));
+		return;
     }
 
 	// 11. 
@@ -377,9 +418,9 @@ router.post('/buyerToRecreate', async function(req, res) {
 	if(err11) {
 		errno = 11;
         code = 400;
-        return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err11, errno));
+        res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err11, errno, METHOD));
+		return;
     }
 
 	// 12.
@@ -389,9 +430,9 @@ router.post('/buyerToRecreate', async function(req, res) {
 	if(err12) {
 		errno = 12;
         code = 400;
-        return res
-			.status(400)
+        res .status(400)
 			.json(tran.rollbackAndReturn(conn, code, err12, errno));
+		return;
     }
 
 	// 13.
@@ -401,9 +442,9 @@ router.post('/buyerToRecreate', async function(req, res) {
 	if(err13) {
 		errno = 13;
         code = 400;
-        return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err13, errno));
+        res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err13, errno, METHOD));
+		return;
     }
 
     // 14.
@@ -414,9 +455,9 @@ router.post('/buyerToRecreate', async function(req, res) {
 	if (err14) {
         errno = 14;
         code = 400;
-        return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err14, errno));
+        res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err14, errno, METHOD));
+		return;
 	}
 
 	// 15.
@@ -434,16 +475,3 @@ router.post('/buyerToRecreate', async function(req, res) {
 	return;
 });
 
-/*
- *
- */
-function check_ipadder (req_ip , seller_host) {
-
-	let ip = req_ip.split(":")[3];
-
-	if(seller_host.indexOf(ip) != -1) {
-                return true;
-	}
-	return false;
-
- }

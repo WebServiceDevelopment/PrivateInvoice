@@ -95,7 +95,7 @@ const TrayWidget = (function() {
 		updateSelectSubject : api_updateSelectSubject.bind(this),
 		updateSelectTotal : api_updateSelectTotal.bind(this),
 		updateDueDate : api_updateDueDate.bind(this),
-		updateCompany : api_updateCompany.bind(this),
+		updateOrganization : api_updateOrganization.bind(this),
 		refresh : api_refresh.bind(this),
 		clearDocument : api_clearDocument.bind(this),
 
@@ -328,9 +328,9 @@ const TrayWidget = (function() {
 
 	}
 
-	function api_updateCompany(txt) {
+	function api_updateOrganization(txt) {
 
-		//console.log("api_updateCompany");
+		//console.log("api_updateOrganization");
 
 		let activeLi = this.STATUS.getActiveLi();
 

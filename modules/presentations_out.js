@@ -22,20 +22,35 @@
 
 // NPM Libraries
 
-const axios = require('axios')
-const transmute = require('@transmute/vc.js')
+const axios					= require('axios')
+const transmute				= require('@transmute/vc.js')
 
 const {
 	Ed25519Signature2018,
 	Ed25519VerificationKey2018,
 } = require('@transmute/ed25519-signature-2018')
 
-const { resolve } = require('@transmute/did-key.js')
+const { resolve }			= require('@transmute/did-key.js')
 
 // Local Libraries
 
-const db = require('../database.js')
-const { documentLoader } = require('./verify_utils.js');
+const {
+		documentLoader,
+		getPrivateKeys,
+}							= require('./verify_utils.js');
+
+// Database
+
+const db					= require('../database.js')
+
+// Exports
+
+module.exports = {
+	makePresentation		: _makePresentation,
+
+	getWalletPrivateKey		: _getWalletPrivateKey,
+	getSellerWalletAddress	: _getSellerWalletAddress,
+}
 
 /**
  * Helper Functions
@@ -49,7 +64,8 @@ const checkStatus = () => {
  * Module Functions
  **/
 
-const getPrivateKeys = async (member_did) => {
+/*
+async function _getPrivateKeys (member_did) {
 	const sql = `
 		SELECT
 			public_key
@@ -71,6 +87,110 @@ const getPrivateKeys = async (member_did) => {
 	const keyPair = JSON.parse(row.public_key)
 	return [keyPair, null]
 }
+*/
+
+async function _makePresentation (url, keyPair, vc) {
+	console.log('making the presentation!!!')
+
+	// 1 Init Presentation
+
+	console.log(url)
+
+	const [available, _err1] = await initPresentation(url)
+	if (_err1) {
+		return [null, 'could not init']
+	}
+
+	const { domain, challenge } = available
+	console.log(domain, challenge)
+
+	// 2 Send Presentation
+
+	const [send, _err2] = await sendPresentation(
+		url,
+		keyPair,
+		domain,
+		challenge,
+		vc
+	)
+	if (_err2) {
+		console.log(_err2)
+		return [null, 'could not submit']
+	}
+
+	// Return Success
+
+	return [send, null]
+}
+
+
+async function _getWalletPrivateKey (member_did) {
+
+	const sql = `
+		SELECT
+			wallet_private_key
+		FROM
+			members
+		WHERE
+			member_did = ?
+	`;
+
+	const args = [
+		member_did
+	];
+
+	let row;
+	try {
+		row = await db.selectOne(sql, args);
+	} catch(err) {
+		throw err;
+	}
+
+	console.log(row.wallet_private_key);
+	const buffer = Buffer.from(row.wallet_private_key.substring(2), 'hex');
+	console.log(buffer);
+	console.log(buffer.length);
+	const privatekey = new Uint8Array(buffer);
+	console.log(privatekey);
+
+	return privatekey;
+
+}
+
+async function _getSellerWalletAddress (seller_did, member_did) {
+
+	const sql = `
+		SELECT
+			remote_wallet_address
+		FROM
+			contacts
+		WHERE
+			local_member_did = ?
+		AND
+			remote_member_did = ?
+	`;
+
+
+	const args = [
+		member_did,
+		seller_did
+	]
+	
+	console.log(args);
+
+	let row
+	try {
+		row = await db.selectOne(sql, args);
+	} catch(err) {
+		throw err;
+	}
+
+	console.log(row);
+
+	return row.remote_wallet_address;
+
+}
+
 
 const initPresentation = async (url) => {
 	const method = 'post'
@@ -117,7 +237,7 @@ const initPresentation = async (url) => {
 	return [response.data, null]
 }
 
-const sendPresentation = async (url, keyPair, domain, challenge, vc) => {
+const sendPresentation = async(url, keyPair, domain, challenge, vc) => {
 
 	console.log('--- Making presentation ---');
 
@@ -202,44 +322,3 @@ const signPresentation = async (presentation, keyPair, domain, challenge) => {
 	return signedPresentation
 }
 
-const makePresentation = async (url, keyPair, vc) => {
-	console.log('making the presentation!!!')
-
-	// 1 Init Presentation
-
-	console.log(url)
-
-	const [available, _err1] = await initPresentation(url)
-	if (_err1) {
-		return [null, 'could not init']
-	}
-
-	const { domain, challenge } = available
-	console.log(domain, challenge)
-
-	// 2 Send Presentation
-
-	const [send, _err2] = await sendPresentation(
-		url,
-		keyPair,
-		domain,
-		challenge,
-		vc
-	)
-	if (_err2) {
-		console.log(_err2)
-		return [null, 'could not submit']
-	}
-
-	// Return Success
-
-	return [send, null]
-}
-
-module.exports = {
-	getPrivateKeys,
-	initPresentation,
-	sendPresentation,
-	signPresentation,
-	makePresentation,
-}
