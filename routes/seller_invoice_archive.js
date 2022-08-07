@@ -20,60 +20,36 @@
 
 "use strict";
 
-// Import sub
-const sub						= require("../modules/invoice_sub.js");
-const tran				  		= require("../modules/invoice_sub_transaction.js");
-const to_buyer					= require("../modules/seller_to_buyer.js");
-
 // Import Router
-const express					= require('express');
-const router					= express.Router();
-module.exports					= router;
+const express                   = require('express');
+const router                    = express.Router();
+module.exports                  = router;
+
+const { getPrivateKeys }        = require('../modules/verify_utils.js');
 
 // Libraries
+
+// Import Modules
+const sub                       = require("../modules/invoice_sub.js");
+const tran                      = require("../modules/invoice_sub_transaction.js");
+const to_buyer                  = require("../modules/seller_to_buyer.js");
+
+const sign_your_credentials    = require("../modules/sign_your_credentials.js");
+const { makePresentation }     = require("../modules/presentations_out.js");
+const { createArchiveMessage } = require("../modules/update_status.js");
+
 
 // Database 
 
 // Table Name
-const SELLER_DOCUMENT			= "seller_document";
-const SELLER_STATUS				= "seller_status";
+const SELLER_DOCUMENT           = "seller_document";
+const SELLER_STATUS             = "seller_status";
 
-const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
-const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
+const SELLER_ARCHIVE_DOCUMENT   = "seller_document_archive";
+const SELLER_ARCHIVE_STATUS     = "seller_status_archive";
 
-const CONTACTS					= "contacts"
+const CONTACTS                  = "contacts"
 
-// Import Sign
-
-const db = require("../database.js");
-const sign_your_credentials = require("../modules/sign_your_credentials.js");
-const { makePresentation }  = require("../modules/presentations_out.js");
-const {
-    createArchiveMessage,
-} = require("../modules/update_status.js");
-
-const getPrivateKeys = async (member_did) => {
-    const sql = `
-        SELECT
-            public_key
-        FROM
-            privatekeys
-        WHERE
-            member_did = ?
-    `;
-
-    const args = [member_did];
-
-    let row;
-    try {
-        row = await db.selectOne(sql, args);
-    } catch (err) {
-        return [null, err];
-    }
-
-    const keyPair = JSON.parse(row.public_key);
-    return [keyPair, null];
-};
 
 
 // ------------------------------- End Points -------------------------------
@@ -84,7 +60,8 @@ const getPrivateKeys = async (member_did) => {
  * [ Move to Archive ]
  */
 router.post('/sellerArchive', async function(req, res) {
-	const _NO = "190";
+
+	const METHOD = '/sellerArchive';
 
 	let start = Date.now();
 
@@ -93,7 +70,6 @@ router.post('/sellerArchive', async function(req, res) {
 	const { document_uuid } = req.body;
 	const { member_did } = req.session.data;
 
-	const USE_PRESENTATION = true;
 	let err, errno, code;
 
 	// 1.
@@ -101,9 +77,15 @@ router.post('/sellerArchive', async function(req, res) {
 	const [ buyer_did, err1 ] = await sub.getBuyerDid(SELLER_STATUS, document_uuid, member_did);
 
 	if(err1) {
-		console.log("Error 1 status = 400 err="+err1);
 
-		return res.status(400).json(err1);
+		let msg = `ERROR:${METHOD}: buyer_did is not found`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
 	}
 
 	// 2.
@@ -111,40 +93,44 @@ router.post('/sellerArchive', async function(req, res) {
 	const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_did, buyer_did);
 
 	if(err2) {
-		console.log("Error 2.status = 400 err="+err2);
 
-		return res.status(400).json(err2);
+		let msg = `ERROR:${METHOD}: buyer_did is not found`;
+
+		res.status(400)
+			.json({
+				err: 2,
+				msg: msg
+			});
+		return;
 	}
 
 	// 3.
 	// buyer connect check
 	
-/*
-*	if(!USE_PRESENTATION) {
-*/
+	const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
 
-	   	const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
-
-		if(code3 !== 200) {
-			//console.log("Error 3 status = 400 code="+code3);
-			let msg;
-			if(code == 500) {
-				msg = {"err":"buyer connect check:ECONNRESET"};
-			} else {
-				switch(err3) {
-				case "Not found.":
-					msg = {"err":"The destination node cannot be found."};
-				break;
-				default:
-					msg = {"err":err3};
-				break;
-				}
+	if(code3 !== 200) {
+		let msg;
+		if(code == 500) {
+			msg = `ERROR:${METHOD}:buyer connect check:ECONNRESET`;
+		} else {
+			switch(err3) {
+			case "Not found.":
+				msg = `ERROR:${METHOD}:The destination node cannot be found`;
+			break;
+			default:
+				msg = `ERROR:${METHOD}: Invalid request`;
+			break;
 			}
-			return res.status(400).json(msg);
 		}
-/*
-*	}
-*/
+
+		res.status(400)
+				.json({
+			err: 3,
+				msg: msg
+			});
+		return;
+	}
 
 	// 4.
 	// STATUS
@@ -153,10 +139,14 @@ router.post('/sellerArchive', async function(req, res) {
 	const [ old_status , _4 ] = await sub.getStatus( SELLER_STATUS, document_uuid) ;
 
 	if(old_status == undefined) {
-		res.status(400).json({
-			err : 4,
-			msg : 'Record is not exist.'
-		});
+
+		let msg = `ERROR:${METHOD}:Record is not exist`;
+
+		res.status(400)
+			.json({
+				err: 4,
+				msg: msg
+			});
 		return;
 	}
 
@@ -165,14 +155,16 @@ router.post('/sellerArchive', async function(req, res) {
 	const [ old_document , _5 ] = await sub.getDocument( SELLER_DOCUMENT, document_uuid) ;
 
 	if(old_document == undefined) {
-		res.status(400).json({
-			err : 5,
-			msg : 'Record is not exist.'
-		});
+
+		let msg = `ERROR:${METHOD}:Record is not exist`;
+
+		res.status(400)
+			.json({
+				err: 4,
+				msg: msg
+			});
 		return;
 	}
-	//console.log("here 1")
-	//console.log(old_document)
 
 	// 6.
 	// Does document_uuid already exist in the archive status table?
@@ -180,9 +172,15 @@ router.post('/sellerArchive', async function(req, res) {
 	const [ _6, err6 ] = await sub.notexist_check( SELLER_ARCHIVE_STATUS, document_uuid)
 
 	if (err6 ) {
-		errno = 6;
-		console.log("Error 6.status = 400 err="+err6);
-		return res.status(400).json({ err : errno, msg : err6 });
+
+		let msg = `ERROR:${METHOD}:document_uuid is not exist`;
+
+		res.status(400)
+			.json({
+				err: 6,
+				msg: msg
+			});
+		return;
 	}
 
 	// 7.
@@ -190,10 +188,15 @@ router.post('/sellerArchive', async function(req, res) {
 	//
 	const [ _7, err7 ] = await sub.notexist_check( SELLER_ARCHIVE_DOCUMENT, document_uuid)
 
-	if (err6 ) {
-		errno = 7;
-		console.log("Error 7.status = 400 err="+err7);
-		return res.status(400).json({ err : errno, msg : err7 });
+	if (err7 ) {
+		let msg = `ERROR:${METHOD}:document_uuid is not exist`;
+
+		res.status(400)
+			.json({
+				err: 6,
+				msg: msg
+			});
+		return;
 	}
 
 	// 8.
@@ -215,7 +218,9 @@ router.post('/sellerArchive', async function(req, res) {
 	if (err ) {
 		errno = 9;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err9, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err9, errno, METHOD));
+		return;
 	}
 
 	// 10.
@@ -227,7 +232,9 @@ router.post('/sellerArchive', async function(req, res) {
 		//console.log(old_document)
 		errno = 10;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err10, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err10, errno, METHOD));
+		return;
 	}
 
 	// 11.
@@ -237,7 +244,9 @@ router.post('/sellerArchive', async function(req, res) {
 	if (err11 ) {
 		errno = 11;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err11, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err11, errno, METHOD));
+		return;
 	}
 
 	// 12.
@@ -247,7 +256,9 @@ router.post('/sellerArchive', async function(req, res) {
 	if (err12 ) {
 		errno = 12;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err12, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err12, errno, METHOD));
+		return;
 	}
 
 
@@ -264,9 +275,11 @@ router.post('/sellerArchive', async function(req, res) {
     const credential = await createArchiveMessage(document_uuid,member_did, keyPair);
     const [ sent, err14 ] = await makePresentation(url, keyPair, credential);
     if(err14) {
-        return res
-			.status(400)
-			.json(tran.rollbackAndReturn(conn, 'code14', err14, 14));
+		errno = 14;
+		code = 400;
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err14, errno, METHOD));
+        return;
     }
 
 	// 15.
@@ -277,22 +290,24 @@ router.post('/sellerArchive', async function(req, res) {
 	if(err14) {
 		errno = 15;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err15, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err15, errno, METHOD));
+		return;
 	}
 
 	// 16.
 	//
 	conn.end();
 
-	//console.log("/sellerArchive accepted");
 
 	// 17.
 	//
-
 	res.json({
 		err : 0,
 		msg : old_status.document_uuid
 	});
+
+	//console.log("/sellerArchive accepted");
 
 	let end = Date.now();
 	console.log("/sellerArchive Time: %d ms", end - start);

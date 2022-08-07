@@ -36,13 +36,14 @@ const context = {
 	"https://w3id.org/traceability/v1" : require('../context/traceability_v1.json')
 }
 
-const { checkStatus } = require('@transmute/vc-status-rl-2020');
-const { resolve } = require('@transmute/did-key.js');
+const { checkStatus }				= require('@transmute/vc-status-rl-2020');
+const { resolve }					= require('@transmute/did-key.js');
 
 // Database
 
 const db 							= require('../database.js');
 
+// ---------------------------------------------------------------------------
 
 const documentLoader = async (iri) => {
 	

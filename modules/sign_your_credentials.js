@@ -23,7 +23,7 @@
 // Import sub
 
 // Import Router
-const express				   = require('express');
+const express				    = require('express');
 
 // Libraries
 
@@ -35,25 +35,25 @@ const transmute					= require('@transmute/vc.js');
 const {
 	Ed25519Signature2018,
 	Ed25519VerificationKey2018,
-} = require('@transmute/ed25519-signature-2018');
+}                               = require('@transmute/ed25519-signature-2018');
 
 const context = {
 	"https://www.w3.org/2018/credentials/v1" : require('../context/credentials_v1.json'),
 	"https://w3id.org/traceability/v1" : require('../context/traceability_v1.json')
 }
 
-const { checkStatus } = require('@transmute/vc-status-rl-2020');
-const { resolve } = require('@transmute/did-key.js');
-const { documentLoader } = require('../modules/verify_utils.js');
+const { checkStatus }           = require('@transmute/vc-status-rl-2020');
+const { resolve }               = require('@transmute/did-key.js');
+const { documentLoader }        = require('../modules/verify_utils.js');
 
 // module
 
 module.exports = {
-	signStatusMessage,
-	signInvoice,
-	signBusinessCard,
-	signPresentation,
-	verifyPresentation
+	signStatusMessage           : _signStatusMessage,
+	signInvoice                 : _signInvoice,
+	signBusinessCard            : _signBusinessCard,
+	signPresentation            : _signPresentation,
+	verifyPresentation          : _verifyPresentation,
 }
 
 // ------------------------------- modules -------------------------------
@@ -63,8 +63,34 @@ module.exports = {
  * Sign Status Message
  **/
 
-async function signStatusMessage (credential, keyPair) {
+async function _signStatusMessage (credential, keyPair) {
 
+	const { items } = await transmute.verifiable.credential.create({
+		credential,
+		format: ['vc'],
+		documentLoader,
+		suite: new Ed25519Signature2018({
+			key: await Ed25519VerificationKey2018.from(keyPair)
+		})
+	});
+
+	const [ signedCredential ] = items;
+	return signedCredential;
+
+
+}
+/*
+ * signInvoice (uuid, json_str)
+ */
+
+async function _signInvoice (uuid, json_str, keyPair) {
+ 
+	const credential = JSON.parse(json_str);
+	credential.id = uuid;
+	const timestamp = moment().toJSON()
+	credential.issuanceDate = timestamp.split('.').shift() + 'Z';
+	credential.issuer.id = keyPair.controller;
+	
 	const { items } = await transmute.verifiable.credential.create({
 		credential,
 		format: ['vc'],
@@ -83,7 +109,7 @@ async function signStatusMessage (credential, keyPair) {
  * Sign Business Card 
  **/
 
-async function signBusinessCard (credential, keyPair) {
+async function _signBusinessCard (credential, keyPair) {
 
 	const { items } = await transmute.verifiable.credential.create({
 		credential,
@@ -103,7 +129,7 @@ async function signBusinessCard (credential, keyPair) {
  * Sign Presentation
  **/
 
-async function signPresentation (presentation, keyPair, domain, challenge) {
+async function _signPresentation (presentation, keyPair, domain, challenge) {
 
 	console.log('okay?');
 
@@ -129,7 +155,7 @@ async function signPresentation (presentation, keyPair, domain, challenge) {
  * Verify Presentation
  **/
 
-async function verifyPresentation (signedPresentation) {
+async function _verifyPresentation (signedPresentation) {
 	
 	const suite = new Ed25519Signature2018();
 	const { domain, challenge } = signedPresentation.proof;
@@ -145,32 +171,6 @@ async function verifyPresentation (signedPresentation) {
 	});
 
 	return result;
-
-}
-
-/*
- * signInvoice (uuid, json_str)
- */
-
-async function signInvoice (uuid, json_str, keyPair) {
- 
-	const credential = JSON.parse(json_str);
-	credential.id = uuid;
-	const timestamp = moment().toJSON()
-	credential.issuanceDate = timestamp.split('.').shift() + 'Z';
-	credential.issuer.id = keyPair.controller;
-	
-	const { items } = await transmute.verifiable.credential.create({
-		credential,
-		format: ['vc'],
-		documentLoader,
-		suite: new Ed25519Signature2018({
-			key: await Ed25519VerificationKey2018.from(keyPair)
-		})
-	});
-
-	const [ signedCredential ] = items;
-	return signedCredential;
 
 }
 

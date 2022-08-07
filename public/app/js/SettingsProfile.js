@@ -78,7 +78,7 @@ const SettingsProfile = (function() {
 /*
 		clearFileInput : api_clearFileInput.bind(this),
 */
-		updateCompanyProfile : api_updateCompanyProfile.bind(this),
+		updateOrganizationProfile : api_updateOrganizationProfile.bind(this),
 		updateProfile : api_updateProfile.bind(this)
 	}
 
@@ -108,7 +108,7 @@ const SettingsProfile = (function() {
 
 	}
 
-	function api_updateCompanyProfile() {
+	function api_updateOrganizationProfile() {
 		
 		console.log("updating organization profile!!!");
 
@@ -126,7 +126,7 @@ const SettingsProfile = (function() {
 			addressCity : memberData.addressCity,
 		}
 
-		const url = '/api/session/updateCompany';
+		const url = '/api/settings/updateOrganization';
 
 		let ajax = new XMLHttpRequest();
 		ajax.open('POST', url);
@@ -136,7 +136,7 @@ const SettingsProfile = (function() {
 
 		ajax.onload = () => {
 
-			console.log(ajax.response);
+			//console.log(ajax.response);
 
 		}
 
@@ -204,7 +204,7 @@ const SettingsProfile = (function() {
 		organization.addressRegion.setAttribute("readonly", "readonly");
 		organization.addressCity.setAttribute("readonly", "readonly");
 
-		this.API.updateCompanyProfile()
+		this.API.updateOrganizationProfile()
 
 	}
 
@@ -374,7 +374,7 @@ const SettingsProfile = (function() {
 			work_email : memberData.work_email,
 		}
 
-		const url = '/api/session/updateProfile';
+		const url = '/api/settings/updateProfile';
 
 		let ajax = new XMLHttpRequest();
         ajax.open('POST', url );
@@ -383,7 +383,7 @@ const SettingsProfile = (function() {
 		ajax.send(JSON.stringify(args));
 
 		ajax.onload = () => {
-			console.log(ajax.response);
+			//console.log(ajax.response);
 		}
 
 	}

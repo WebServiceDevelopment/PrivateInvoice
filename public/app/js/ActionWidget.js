@@ -1682,6 +1682,7 @@ const ActionWidget = (function() {
 	
 /*
  * [ Move to Trash ] 
+ * Reterned Tray
  */
 	async function evt_handleInvoiceTrashClick() {
 
@@ -2047,7 +2048,9 @@ const ActionWidget = (function() {
 			this.API.submit.reset();
 
 			if(ajax.status != 200) {
-				alert("[ Send Invoice ]\n"+res.err);
+				alert("[ Send Invoice ]\n"
+						+`ErrorNo:${res.err}\n`
+						+`${res.msg}`);
 			}
 
 			this.SENDING_WRAP.hidden();
@@ -2057,6 +2060,7 @@ const ActionWidget = (function() {
 	
 /*
  * [ Move to Trash ]
+ * Draft Tray
  */
 	function evt_handleInvoiceDraftDelete() {
 		

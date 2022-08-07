@@ -21,62 +21,37 @@
 "use strict";
 
 // Import sub
-const sub						= require("../modules/invoice_sub.js");
-const tran					 	= require("../modules/invoice_sub_transaction.js");
-const to_buyer					= require("../modules/seller_to_buyer.js");
+const sub                       = require("../modules/invoice_sub.js");
+const tran                      = require("../modules/invoice_sub_transaction.js");
+const to_buyer                  = require("../modules/seller_to_buyer.js");
 
 
 // Import Router
-const express					= require('express');
-const router					= express.Router();
-module.exports					= router;
+const express                   = require('express');
+const router                    = express.Router();
+module.exports                  = router;
 
 // Libraries
 
-const db = require("../database.js");
-const sign_your_credentials  = require("../modules/sign_your_credentials.js");
-const { makePresentation }   = require("../modules/presentations_out.js");
-const { createTrashMessage } = require("../modules/update_status.js");
+const sign_your_credentials     = require("../modules/sign_your_credentials.js");
+const { makePresentation }      = require("../modules/presentations_out.js");
+const { createTrashMessage }    = require("../modules/update_status.js");
+
+const { getPrivateKeys }        = require('../modules//verify_utils.js');
 
 // Database 
 
 // Table Name
-const SELLER_DRAFT_DOCUMENT		= "seller_document_draft";
-const SELLER_DRAFT_STATUS		= "seller_status_draft";
+const SELLER_DRAFT_DOCUMENT     = "seller_document_draft";
+const SELLER_DRAFT_STATUS       = "seller_status_draft";
 
-const SELLER_DOCUMENT			= "seller_document";
-const SELLER_STATUS				= "seller_status";
+const SELLER_DOCUMENT           = "seller_document";
+const SELLER_STATUS             = "seller_status";
 
-const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
-const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
+const SELLER_ARCHIVE_DOCUMENT   = "seller_document_archive";
+const SELLER_ARCHIVE_STATUS     = "seller_status_archive";
 
-const CONTACTS					= "contacts"
-
-
-const getPrivateKeys = async (member_did) => {
-
-    const sql = `
-        SELECT
-            public_key
-        FROM
-            privatekeys
-        WHERE
-            member_did = ?
-    `;
-
-    const args = [member_did];
-
-    let row;
-    try {
-        row = await db.selectOne(sql, args);
-    } catch (err) {
-        return [null, err];
-    }
-
-    const keyPair = JSON.parse(row.public_key);
-    return [keyPair, null];
-
-}
+const CONTACTS                  = "contacts"
 
 
 // ------------------------------- End Points -------------------------------
@@ -88,7 +63,7 @@ const getPrivateKeys = async (member_did) => {
 
 router.post('/trashDraft', async function(req, res) {
 
-	//console.log("/trashDraft");
+	const METHOD = '/trashDraft';
 
 	let err, errno, code;
 
@@ -101,10 +76,14 @@ router.post('/trashDraft', async function(req, res) {
    const [ old_status , _1 ] = await sub.getStatus( SELLER_DRAFT_STATUS, req.body.document_uuid) ;
 
 	if(old_status == undefined) {
-		res.json({
-			err : 0,
-			msg : 'Record is not exist.'
-		});
+
+		let msg = `Err:r:${METHOD}: Status record is not exist.`
+
+		res.status(400)
+			.json({
+				err : 1,
+				msg : msg
+			});
 		return;
 	}
 
@@ -114,10 +93,14 @@ router.post('/trashDraft', async function(req, res) {
 	const [ old_document , _2 ] = await sub.getDraftDocument( SELLER_DRAFT_DOCUMENT, req.body.document_uuid) ;
 
 	if(old_document == undefined) {
-		res.json({
-			err : 0,
-			msg : 'Record is not exist.'
-		});
+
+		let msg = `Error:${METHOD}: Document record is not exist.`
+
+		res.status(400)
+			.json({
+				err : 2,
+				msg : msg
+			});
 		return;
 	}
 
@@ -139,9 +122,15 @@ router.post('/trashDraft', async function(req, res) {
 	//
 	const [ _4, err4 ] = await sub.notexist_check( SELLER_ARCHIVE_STATUS, req.body.document_uuid)
 	if (err4 ) {
-		errno = 4;
-		console.log("Error: "+errno);
-		return res.status(400).json({ err : errno, msg : err4 });
+
+		let msg = `Err:r:${METHOD}: document_uuid record is not exist.`
+
+		res.status(400)
+			.json({
+				err : 4,
+				msg : msg
+			});
+		return;
 	}
 
 	// 5.
@@ -150,8 +139,15 @@ router.post('/trashDraft', async function(req, res) {
 	const [ _5, err5 ] = await sub.notexist_check( SELLER_ARCHIVE_DOCUMENT, req.body.document_uuid)
 	if (err ) {
 		errno = 5;
-		console.log("Error: "+errno);
-		return res.status(400).json({ err : errno, msg : err5 });
+		
+		let msg = `Err:r:${METHOD}: document_uuid record is not exist.`
+
+		res.status(400)
+			.json({
+				err : 5,
+				msg : msg
+			});
+		return;
 	}
 
 	// 6.
@@ -179,7 +175,9 @@ router.post('/trashDraft', async function(req, res) {
 	if(err8) {
 		errno = 8;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err8, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err8, errno, METHOD));
+		return;
 	}
 
 	// 9.
@@ -190,7 +188,9 @@ router.post('/trashDraft', async function(req, res) {
 	if(err9) {
 		errno = 9;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err9, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err9, errno, METHOD));
+		return;
 	}
 
 	// 10.
@@ -200,7 +200,9 @@ router.post('/trashDraft', async function(req, res) {
 	if(err10) {
 		errno = 10;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err10, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err10, errno, METHOD));
+		return;
 	}
 
 	// 11.
@@ -210,7 +212,9 @@ router.post('/trashDraft', async function(req, res) {
 	if(err11) {
 		errno = 11;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err11, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err11, errno, METHOD));
+		return;
 	}
 
 	// 12.
@@ -221,7 +225,9 @@ router.post('/trashDraft', async function(req, res) {
 	if (err12) {
 		errno = 12;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err12, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err12, errno, METHOD));
+		return;
 	}
 
 	// 13.
@@ -234,6 +240,7 @@ router.post('/trashDraft', async function(req, res) {
 	});
 
 	let end = Date.now();
+
 	console.log("/TrashDraft Time: %d ms", end - start);
 
 });
@@ -244,6 +251,8 @@ router.post('/trashDraft', async function(req, res) {
 */
 
 router.post('/trash', async function(req, res) {
+
+	const METHOD = '/trash';
 
 	//console.log("trash");
 	let start = Date.now();
@@ -258,16 +267,28 @@ router.post('/trash', async function(req, res) {
 	// 1.
 	const [ buyer_did, err1 ] = await sub.getBuyerDid(SELLER_STATUS, document_uuid, member_did);
 	if(err1) {
-		console.log("Error 1 status = 400 err="+err1);
 
-		return res.status(400).end(err1);
+		let msg = `Error:${METHOD}: Could not get buyer did.`
+
+		res.status(400)
+			.json({
+				err : 1,
+				msg : msg
+			});
+		return;
 	}
 
 	// 2
 	const [ buyer_host, err2 ] = await sub.getBuyerHost(CONTACTS, member_did, buyer_did);
 	if(err2) {
-		console.log("Error 2 status = 400 err="+err2);
-		return res.status(400).end(err2);
+
+		let msg = `Error:${METHOD}: Could not get buyer Host.`
+
+		return res.status(400)
+			.json({
+				err : 2,
+				msg : msg
+			});
 	}
 
 	//3. buyer connect check
@@ -279,18 +300,23 @@ router.post('/trash', async function(req, res) {
 		if(code3 !== 200) {
 			let msg;
 			if(code == 500) {
-				msg = {"err":"buyer connect check:ECONNRESET"};
+				msg = { err: "buyer connect check:ECONNRESET" };
 			} else {
 				switch(err3) {
 				case "Not found.":
-					msg = {"err":"The destination node cannot be found."};
+					msg = { err: "The destination node cannot be found." };
 				break;
 				default:
-					msg = {"err":err3};
+					msg = `Error:${METHOD}: Invalid request`;
 				break;
 				}
 			}
-			return res.status(400).json(msg);
+			res.status(400)
+				.json({
+					err : 3,
+					msg : msg
+				});
+			return;
 		}
 /*
 *	}
@@ -303,10 +329,14 @@ router.post('/trash', async function(req, res) {
 	const [ old_status , _4 ] = await sub.getStatus( SELLER_STATUS, req.body.document_uuid) ;
 
 	if(old_status == undefined) {
-		res.json({
-			err : 0,
-			msg : 'Record is not exist.'
-		});
+
+		let msg = 'Error:${METHOD}: Record is not exist.';
+
+		res.status(400)
+			.json({
+				err : 4,
+				msg : msg
+			});
 		return;
 	}
 
@@ -316,10 +346,14 @@ router.post('/trash', async function(req, res) {
 	const [ old_document , _5 ]  = await sub.getDocument( SELLER_DOCUMENT, req.body.document_uuid) ;
 
 	if(old_document == undefined) {
-		res.json({
-			err : 0,
-			msg : 'Record is not exist.'
-		});
+
+		let msg = 'Error:${METHOD}: Record is not exist.';
+
+		res.satus(400)
+			.json({
+				err : 5,
+				msg : msg
+			});
 		return;
 	}
 
@@ -328,9 +362,15 @@ router.post('/trash', async function(req, res) {
 	//
 	const [ _6, err6] = await sub.notexist_check( SELLER_ARCHIVE_STATUS, req.body.document_uuid)
 	if (err6 ) {
-		errno = 6;
-		console.log("Error: "+errno);
-		return res.status(400).json({ err : errno, msg : err6 });
+
+		let msg = 'Error:${METHOD}: Record is not exist.';
+
+		res.status(400)
+			.json({
+				err : 6,
+				msg : err6
+			});
+		return;
 	}
 
 	// 7.
@@ -338,9 +378,15 @@ router.post('/trash', async function(req, res) {
 	//
 	const [ _7, err7] = await sub.notexist_check( SELLER_ARCHIVE_DOCUMENT, req.body.document_uuid)
 	if (err7 ) {
-		errno = 7;
-		console.log("Error: "+errno);
-		return res.status(400).json({ err : errno, msg : err7 });
+
+		let msg = 'Error:${METHOD}: Record is not exist.';
+
+		res.status(400)
+			.json({
+				err : 7,
+				msg : msg
+			});
+		return;
 	}
 
 	// 8.
@@ -364,7 +410,9 @@ router.post('/trash', async function(req, res) {
 	if (err10 ) {
 		errno = 10;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err10, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err10, errno, METHOD));
+		return;
 	}
 
 	// 11.
@@ -375,7 +423,9 @@ router.post('/trash', async function(req, res) {
 	if(err11) {
 		errno = 11;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err11, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err11, errno, METHOD));
+		return;
 	}
 
 	// 12.
@@ -385,7 +435,9 @@ router.post('/trash', async function(req, res) {
 	if(err) {
 		errno = 12;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err12, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err12, errno, METHOD));
+		return;
 	}
 
 	// 13.
@@ -395,7 +447,9 @@ router.post('/trash', async function(req, res) {
 	if(err13) {
 		errno = 13;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err13, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err13, errno, METHOD));
+		return;
 	}
 
 	// 14.
@@ -406,7 +460,9 @@ router.post('/trash', async function(req, res) {
 
 		if(code14 !== 200) {
 			errno = 14;
-			return res.status(400).json(tran.rollbackAndReturn(conn, code14, err14, errno));
+			res.status(400)
+				.json(tran.rollbackAndReturn(conn, code14, err14, errno, METHOD));
+			return;
 		}
 
 	} else {
@@ -415,12 +471,15 @@ router.post('/trash', async function(req, res) {
 		if(err) {
 			throw err;
 		}
+		errno = 14;
 
 		const url = `${buyer_host}/api/presentations/available`
 		const credential = await createTrashMessage(document_uuid,member_did, keyPair);
 		const [ sent, err14 ] = await makePresentation(url, keyPair, credential);
 		if(err14) {
-			return res.status(400).json(tran.rollbackAndReturn(conn, 'code14', err14, 14));
+			res.status(400)
+				.json(tran.rollbackAndReturn(conn, 'code14', err14, errno, METHOD));
+			return;
 		}
 
 	}
@@ -433,7 +492,9 @@ router.post('/trash', async function(req, res) {
 	if (err15) {
 		errno = 15;
 		code = 400;
-		return res.status(400).json(tran.rollbackAndReturn(conn, code, err15, errno));
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err15, errno, METHOD));
+		return;
 	}
 
 	// 16.
