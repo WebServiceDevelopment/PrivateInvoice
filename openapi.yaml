@@ -36,6 +36,8 @@ tags:
     description: "Paths related to handling contacts"
   - name: "Invoice"
     description: "Paths related to handling invoices"
+  - name: "Invite"
+    description: "Paths related to handling invite"
   - name: "Session"
     description: "Paths related to handling logins and sessions"
   - name: "Settings"
@@ -44,10 +46,6 @@ tags:
     description: "Paths related to sending and receiving presentations"
   - name: "Tray"
     description: "Paths related to handling document tray"
-  - name: "TrayArchive"
-    description: "Paths related to handling document trayArchive"
-  - name: "TrayDraft"
-    description: "Paths related to handling document trayDraft"
   - name: "Wallet"
     description: "Paths related to handling wallets"
 
@@ -85,9 +83,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/contacts/schemas/Responses_generate'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #1.1.2
-  /api/contacts/add:
+  /api/contacts/addContact:
     post:
       description: >-
         \#1.1.2 This end point will add a contact to your database
@@ -103,25 +107,32 @@ paths:
           name: "body"
           required: true
           schema:
-            $ref: '#/contacts/schemas/Request_add'
+            $ref: '#/contacts/schemas/Request_addContact'
       responses:
         '200':
           description: add response
           content:
             application/json:
               schema:
-                $ref: '#/contacts/schemas/Responses_add'
-        default:
-          description: unexpected error
+                $ref: '#/contacts/schemas/Responses_addContact'
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/contacts/schemas/Error_add'
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #1.1.3
   /api/contacts/getContactList:
     get:
-      description: \#1.1.3 contacts getContactList
+      description: >-
+        \#1.1.3 This endpoint searches the database and displays 
+        the contact list. The items in the contact list are contact person,
+        company name, sending authority, and receiving authority.
+        You can create an invoice for anyone you have permission to send.
+        Sending authority indicates that organizations with sending authority
+        can be billed. Receiving authority indicates that you can receive
+        invoices from organizations that indicate receiving authority.
       operationId: contacts_getContactList
       tags:
         - "Contacts"
@@ -138,13 +149,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/contacts/schemas/Responses_getContactList'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
+
+  #3.1.1
+  #require('./routes/invite.js');
+  /api/invite/getContacts:
+    get:
+      description: >-
+        \#3.1.1 This endpoint searches the database to retrieve the contact
+        list.
+        <br>It is used to set the To organizationname, address, and address
+        when creating a Draft invoice.
+        <br> To operate in the application, specify the member name in the
+        area for entering the member name of the recipient indicated by To
+        at the top.
+        <br>The information for the corresponding member in the
+        contact list is then displayed to the recipient indicated by To
+        in the invoice.
+      operationId: invite_getContacts
+      tags:
+        - "Invite"
+      parameters:
+        - in: query
+          name: contactType
+          required: true
+          schema:
+            type: string
+            enum: ["buyers"]
+      responses:
+        '200':
+          description: getContacts response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invite/schemas/Responses_getContacts'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #2.1
   #require('./routes/buyer_invoice.js');
   #2.1.1
   /api/invoice/returnToSender:
     post:
-      description: \#2.1.1 invoice returnToSender 
+      description: >-
+        \#2.1.1 This endpoint returns the invoice to the sender. 
+        This is an operation on the buyer side. <br>Operations that Folder
+        can perform on Recived invoices.  The name of the Button
+        that performs the operation is [Return to Sender].
+        <br>The returned invoices then go into the returned folder. 
       operationId: invoice_returnToSender
       tags:
         - "Invoice"
@@ -161,17 +222,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_returnToSender'
-        default:
-          description: unexpected error
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Error_returnToSender'
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #2.1.2
   /api/invoice/confirm:
     post:
-      description: \#2.1.2 invoice confirm 
+      description: >-
+        \#2.1.2 This endpoint verifies an invoice. This is an operation on 
+        the buyer side. <br>Operations that Folder can perform on Recived
+        invoices. 
+        The name of the Button that executes the operation is [Confirm Invoice].
+        <br>The confirmed invoice will then go into the Confirmed folder.
       operationId: invoice_confirm
       tags:
         - "Invoice"
@@ -188,17 +254,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_confirm'
-        default:
-          description: unexpected error
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Error_confirm'
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #2.1.3
   /api/invoice/unconfirm:
     post:
-      description: \#2.1.3 invoice unconfirm 
+      description: >-
+        \#2.1.3 This endpoint will Unconfrm the invoice.
+        This is an operation on the buyer side. <br>Folder is an action 
+        that can be performed on invoices that are Confirmed. 
+        The name of the Button that executes the operation is [Unconfirm].
+        <br>Next,the uncomfirmed invoice will be in the Received folder.
       operationId: invoice_unconfirm
       tags:
         - "Invoice"
@@ -215,17 +286,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_unconfirm'
-        default:
-          description: unexpected error
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Error_unconfirm'
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #2.1.4
   /api/invoice/makePayment:
     post:
-      description: \#2.1.4 invoice makePayment 
+      description: >- 
+        \#2.1.4 This endpoint will pay the other seller for the received
+        invoice. This is the buyer's operation. <br>The button name for 
+        that operation is [Payment]. When you press the button, 
+        a paid invoice will display a confirmation screen that will
+        display payment information and ask if you would like to pay.
+        <br>This payment information information includes Current Balance,
+        Make Payment To, Transfer Cost, Includes Expect Gas Cost.
       operationId: invoice_makePayment
       tags:
         - "Invoice"
@@ -242,20 +320,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_makePayment'
-        default:
-          description: unexpected error
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Error_makePayment'
+                $ref: '#/error/schemas/Responses_err_msg'
 
 
   #2.2
-  #require('./routes/buyer_invoice_document.js');
+  #require('./routes/invoice_document.js');
   #2.2.1
   /api/invoice/getDocumentBuyer:
     get:
-      description: \#2.2.1 invoice getDocumentBuyer : This request is  from Buyer.
+      description: >-
+        \#2.2.1 This endpoint retrieves the invoice document
+        for that invoice. This is executed when you select from the list of
+        payees displayed in the tray. <br>This operation is for buyer side only.
+        And the retrievable trays are Recived, Returned, Confirmed and Paid.
       operationId: invoice_getDocumentBuyer
       tags:
         - "Invoice"
@@ -272,12 +354,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_getDocumentBuyer'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
 
   #2.2.2
   /api/invoice/getDocumentSeller:
     get:
-      description: \#2.2.2 invoice getDocumentSeller 
+      description: >-
+        \#2.2.2 This endpoint retrieves the invoice document
+        for that invoice. This is executed when you select from the list of
+        payees displayed in the tray. <br>This operation is for saller side
+        only.  And available tray is Send, Returned, Await Payment, Paid.
       operationId: invoice_getDocumentSeller
       tags:
         - "Invoice"
@@ -294,11 +386,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_getDocumentBuyer'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #2.2.3
   /api/invoice/getArchiveDocumentBuyer:
     get:
-      description: \#2.2.3 invoice getArchiveDocumentBuyer : This request is  from Buyer.
+      description: >-
+        \#2.2.3 This endpoint retrieves the invoice document
+        for that invoice. This is executed when you select from the list of
+        payees displayed in the tray. <br>This operation is for buyer side only.
+        And the retrievable trays are Complete and Trashed.
       operationId: invoice_getArchiveDocumentBuyer
       tags:
         - "Invoice"
@@ -315,12 +417,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_getArchiveDocumentBuyer'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
 
   #2.2.4
   /api/invoice/getArchiveDocumentSeller:
     get:
-      description: \#2.2.4 invoice getArchiveDocumentSeller 
+      description: \#2.2.4 >-
+        \#2.2.4 This endpoint retrieves the invoice document
+        for that invoice. This is executed when you select from the list of
+        payees displayed in the tray. <br>This operation is for seller side
+        only.  And the retrievable trays are Complete and Trash.
       operationId: invoice_getArchiveDocumentSeller
       tags:
         - "Invoice"
@@ -337,73 +449,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_getArchiveDocumentBuyer'
-
-
-  #2.3
-  #require('./routes/seller_invoice_archive.js');
-
-  #2.3.1
-  /api/invoice/sellerArchive:
-    post:
-      description: \#2.3.1 invoice sellerArchive 
-      operationId: invoice_sellerArchive
-      tags:
-        - "Invoice"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/invoice/schemas/Request_sellerArchive'
-      responses:
-        '200':
-          description: sellerArchive response
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Responses_sellerArchive'
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/invoice/schemas/Error_sellerArchive'
+                $ref: '#/error/schemas/Responses_err_msg'
 
-
-  #2.4
-  #require('./routes/seller_invoice_document.js');
-
-  #2.4.1
-  /api/invoice/update:
-    post:
-      description: \#2.4.1 invoice update 
-      operationId: invoice_update
-      tags:
-        - "Invoice"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/invoice/schemas/Request_update'
-      responses:
-        '200':
-          description: Update response
-          content:
-            application/json:
-              schema:
-                $ref: '#/invoice/schemas/Responses_update'
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/invoice/schemas/Error_update'
-
-  #2.4.2
+  #2.2.5
   /api/invoice/getDraftDocument:
     get:
-      description: \#2.4.2 invoice getDraftDocument
+      description: >-
+        \#2.2.5 This endpoint retrieves the invoice document
+        for that invoice. This is executed when you select from the list of
+        payees displayed in the tray. <br>This operation is for seller side
+        only.  And the retrievable trays is Draft .
       operationId: invoice_getDraftDocument
       tags:
         - "Invoice"
@@ -420,71 +480,93 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_getDraftDocument'
-        default:
-          description: unexpected error
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Error_getDraftDocument'
+                $ref: '#/error/schemas/Responses_err_msg'
 
-  #2.4.3
-#  /api/invoice/getDocument:
-#    post:
-#      description: \#2.4.3 invoice getDocument
-#      operationId: invoice_getDocument
-#      tags:
-#        - "Invoice"
-#      parameters:
-#        - in: "body"
-#          name: "body"
-#          required: true
-#          schema:
-#            $ref: '#/invoice/schemas/Request_getDocument'
-#      responses:
-#        '200':
-#          description: getDocument response
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/invoice/schemas/Responses_getDocument'
-#        default:
-#          description: unexpected error
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/invoice/schemas/Error_getDocument'
 
-  #2.4.4
-#  /api/invoice/getArchiveDocument:
-#    post:
-#      description: \#2.4.4 invoice getArchiveDocument
-#      operationId: invoice_getArchiveDocument
-#      tags:
-#        - "Invoice"
-#      parameters:
-#        - in: "body"
-#          name: "body"
-#          required: true
-#          schema:
-#            $ref: '#/invoice/schemas/Request_getArchiveDocument'
-#      responses:
-#        '200':
-#          description: getArchiveDocument response
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/invoice/schemas/Responses_getArchiveDocument'
-#        default:
-#          description: unexpected error
-#          content:
-#            application/json:
-#              schema:
-#                $ref: '#/invoice/schemas/Error_getArchiveDocument'
+  #2.3
+  #require('./routes/seller_invoice_archive.js');
 
-  #2.4.5
+  #2.3.1
+  /api/invoice/sellerArchive:
+    post:
+      description: >-
+        \#2.3.1 This endpoint archives invoices returned to the Seller after 
+        payment by the Buyer.  This is an operation on the Paid tray on the 
+        Seller side. <br>The button name for that operation is 
+        [Move to Archive].  At the push of a button, the invoice will be 
+        placed in the Complete tray.
+      operationId: invoice_sellerArchive
+      tags:
+        - "Invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_sellerArchive'
+      responses:
+        '200':
+          description: sellerArchive response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_sellerArchive'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
+
+
+  #2.4
+  #require('./routes/seller_invoice_document.js');
+
+  #2.4.1
+  /api/invoice/update:
+    post:
+      description: >-
+        \#2.4.1 This endpoint updates invoice data. This is a Draft tray
+        operation on the Seller side. <br>There is no button for that operation.
+        Instead, when you enter, change, or delete a value in an invoice entry
+        field, it will automatically update the invoice data after a few 
+        seconds. 
+      operationId: invoice_update
+      tags:
+        - "Invoice"
+      parameters:
+        - in: "body"
+          name: "body"
+          required: true
+          schema:
+            $ref: '#/invoice/schemas/Request_update'
+      responses:
+        '200':
+          description: Update response
+          content:
+            application/json:
+              schema:
+                $ref: '#/invoice/schemas/Responses_update'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
+
+  #2.4.2
   /api/invoice/create:
     post:
-      description: \#2.4.5 invoice create
+      description: >-
+        \#2.4.2 This endpoint creates invoice data. This is an operation
+        on the Seller side. <br>The button for that operation is the [+] sign
+        to the right of INBOISE OUT on the upper left of the screen.
+        <br> Pressing [+]bnutton will create a new invoice in the Draft tray.
       operationId: invoice_create
       tags:
         - "Invoice"
@@ -501,12 +583,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_create'
-        default:
-          description: unexpected error
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Error_create'
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #2.5
   #require('./routes/seller_invoice.js');
@@ -514,7 +596,13 @@ paths:
   #2.5.1
   /api/invoice/send:
     post:
-      description: \#2.5.1 invoice send
+      description: >-
+        \#2.5.1 This endpoint will send invoice data. This is an operation
+        in the Draft tray on the Seller side. The name of the button
+        for that action is [Send Invoice]. <br>When you press this bnutton,
+        the invoice will be sent from the Seller side to the Buyer side.
+        <br>The sent invoice is put into the Sent tray on the Send side. 
+        Also, the Buyer will enter the Received Tray.
       operationId: invoice_send
       tags:
         - "Invoice"
@@ -531,17 +619,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_send'
-        default:
-          description: unexpected error
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Error_send'
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #2.5.2
   /api/invoice/recreate:
     post:
-      description: \#2.5.2 invoice recreate
+      description: >-
+        \#2.5.2 This endpoint will recreate the invoice data. 
+        This is an operation in the Returned tray on the Seller side. 
+        <br>The name of the button for that action is [Move to Draft].
+        Pressing this bnutton moves invoices from the Seller's Returned
+        tray to the Seller's Draft tray.
+        <br>Invoices moved to the Draft tray can no longer be viewed by
+         the Buyer.
       operationId: invoice_recreate
       tags:
         - "Invoice"
@@ -558,17 +653,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_recreate'
-        default:
-          description: unexpected error
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Error_recreate'
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #2.5.3
   /api/invoice/withdraw:
     post:
-      description: \#2.5.3 invoice withdraw
+      description: >-
+        \#2.5.3 This endpoint withdraws invoice data. This is an operation
+        on the Sent tray on the Seller side. <br>The name of the button for
+        that operation is [Withdraw]. Pressing this bnutton will move the
+        invoice from the Sent tray on the Seller side to the Seller side
+        Returned tray. <br>Invoices moved to the Returned tray will be Returned 
+        from the Buyer's point of view. You can refer to it with Retarned tray.
       operationId: invoice_withdraw
       tags:
         - "Invoice"
@@ -585,12 +686,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_withdraw'
-        default:
-          description: unexpected error
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Error_withdraw'
+                $ref: '#/error/schemas/Responses_err_msg'
 
 
   #2.6
@@ -599,7 +700,14 @@ paths:
   #2.6.1
   /api/invoice/trashDraft:
     post:
-      description: \#2.6.1 invoice trashDraft
+      description: >-
+        \#2.6.1 This endpoint moves invoice data to Trash. This is an
+        operation on the Returned tray on the Seller side.
+        <br> The name of the button for that action is [Move to Trash].
+        Pressing this bnutton moves invoices from the Seller's Returned tray
+        to the Seller's Trash tray.
+        <br> Invoices moved to the trash tray can be viewed by the buyer
+        in the trashed tray.
       operationId: invoice_trashDraft
       tags:
         - "Invoice"
@@ -616,17 +724,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_trashDraft'
-        default:
-          description: unexpected error
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/invoice/schemas/Error_trashDraft'
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #2.6.2
   /api/invoice/trash:
     post:
-      description: \#2.6.2 invoice trash
+      description: >-
+        \#2.6.2 This endpoint moves invoice data to Trash. This is an
+        operation on the Draft tray on the Seller side.
+        <br> The name of the button for that action is [Move to Trash].
+        Pressing this bnutton moves invoices from the Seller's Draft tray
+        to the Seller's Trash tray.
+        <br> Invoices moved to the trash tray are not visible to the buyer
+        in the trashed tray.
       operationId: invoice_trash
       tags:
         - "Invoice"
@@ -649,6 +764,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Error_trash'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
 
   #2.7
@@ -657,7 +778,13 @@ paths:
   #2.7.1
   /api/invoice/softDeleteSeller:
     post:
-      description: \#2.7.1 invoice softDeleteSeller
+      description: >-
+        \#2.7.1 This endpoint makes invoice data invisible to Trash.
+        This is a Trash tray operation on the Seller side. 
+        <br>The name of the button for that action is [Soft Delete].
+        Pressing this bnutton will prevent the corresponding invoice from
+        being viewed from the Seller's trash tray.
+        <br> However, you can refer to it from the Seller's Trashed tray.
       operationId: invoice_softDeleteSeller
       tags:
         - "Invoice"
@@ -674,11 +801,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_softDeleteSeller'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #2.7.2
   /api/invoice/softDeleteBuyer:
     post:
-      description: \#2.7.1 invoice softDeleteBuyer
+      description: >-
+        \#2.7.2 This endpoint makes invoice data invisible to Trashed.
+        This is an operation in the trashed tray on the buyer side.
+        <br> The name of the button for that action is [Soft Delete].
+        Pressing this bnutton will prevent the corresponding invoice from
+        being viewed from the buyer's trash tray.
+        <br>However, you can refer to it from the Seller's Trashed tray.
       operationId: invoice_softDeleteBuyer
       tags:
         - "Invoice"
@@ -695,6 +834,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/invoice/schemas/Responses_softDeleteBuyer'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
 
 
@@ -860,16 +1005,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/session/schemas/Error_signup'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
       security: {}
 
 
-  #require('./routes/session.js');
+  #require('./routes/settings.js');
   #7.1
   #7.1.1
-  /api/session/updateCompany:
+  /api/settings/updateOrganization:
     post:
-      description: \#6.1.3 session updateCompany
-      operationId: session_logout
+      description: >-
+        \#7.1.1 This endpoint updates Organization details.
+        <br> Details are Organization Name , Postcode, Address, Building Name,
+        Department, Organization Tax ID, Country , Region , City.
+      operationId: settings_updateOrganization
       tags:
         - "Settings"
       parameters:
@@ -877,20 +1031,32 @@ paths:
           name: "body"
           required: true
           schema:
-            $ref: '#/session/schemas/Request_updateCompany'
+            $ref: '#/settings/schemas/Request_updateOrganization'
       responses:
         '200':
           description: logout response
           content:
             application/json:
               schema:
-                $ref: '#/settings/schemas/Responses_updateCompany'
+                $ref: '#/settings/schemas/Responses_updateOrganization'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #7.1.2
-  /api/session/updateProfile:
+  /api/settings/updateProfile:
     post:
-      description: \#6.1.4 session updateProfile
-      operationId: session_updateProfile
+      description: >-
+        \#7.1.2 This endpoint updates Profile details.
+        <br> Details are Member name, User UUID , Job Title, Email Address.
+        <br>Member name is used when logging in. After logging in, it will be
+        displayed on the upper right of the screen as your own account.
+        Also, the other party's Member name will be used as the To or From
+        name on the invoice.
+      operationId: settings_updateProfile
       tags:
         - "Settings"
       parameters:
@@ -898,7 +1064,7 @@ paths:
           name: "body"
           required: true
           schema:
-            $ref: '#/session/schemas/Request_updateProfile'
+            $ref: '#/settings/schemas/Request_updateProfile'
       responses:
         '200':
           description: updateProfile response
@@ -906,6 +1072,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/settings/schemas/Responses_updateProfile'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
 
   #8.1
@@ -918,327 +1090,457 @@ paths:
   #require('./routes/tray.js');
 
   #9.1.1
-  /api/tray/getCountBuyer:
-    post:
-      description: \#9.1.1 tray getCountBuyer
-      operationId: tray_getCountBuyer
+  /api/tray/getCountOfInvoice:
+    get:
+      description: >-
+        \#9.1.1 This endpoint gets the number of invoices in the tray.
+        <br>The target trays are sent, returned, confirmed, paid, draft on the 
+        Seller side. 
+        For Buyer side, it is Received, Returned, Confirmed, Paid.
+        <br>Param as request is common on seller side and buyer side.
+      operationId: tray_getCountOfInvoice
       tags:
         - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: archive
           required: true
           schema:
-            $ref: '#/tray/schemas/Request_getCountBuyer'
+            type: string
+            enum: ["0"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ['[sent,returned,confirmed,paid]','[sent,returned,confirmed,paid,draft]']
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+            
       responses:
         '200':
-          description: getCountBuyer response
+          description: getCountOfInvoice
           content:
             application/json:
               schema:
-                $ref: '#/tray/schemas/Responses_getCountBuyer'
+                $ref: '#/tray/schemas/Responses_getCountOfInvoice'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #9.1.2
-  /api/tray/getCountSeller:
-    post:
-      description: \#9.1.2 tray getCountSeller
-      operationId: tray_getCountSeller
+  /api/tray/getFolderOfInvoice:
+    get:
+      description: >-
+        \#9.1.2 This endpoint retrieves the list of invoices in the given
+        Folder. <br>The target trays are sent, returned, confirmed, paid, draft
+        on the Seller side. For Buyer side, it is Received, Returned,
+        Confirmed, Paid. Param as request is common on seller side and buyer
+        side.
+      operationId: tray_getFolderOfInvoice
       tags:
         - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: archive
           required: true
           schema:
-            $ref: '#/tray/schemas/Request_getCountSeller'
+            type: string
+            enum: ["0","1"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ["sent","returned","confirmed","paid"]
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 0
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 25
+            
       responses:
         '200':
-          description: getCountSeller response
+          description: getFolderOfInvoice response
           content:
             application/json:
               schema:
-                $ref: '#/tray/schemas/Responses_getCountSeller'
+                $ref: '#/tray/schemas/Responses_getFolderOfInvoice'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
+
 
   #9.1.3
-  /api/tray/getFolderBuyer:
-    post:
-      description: \#9.1.3 tray getFolderBuyer
-      operationId: tray_getFolderBuyer
+  /api/tray/getTotalOfInvoice:
+    get:
+      description: >-
+        \#9.1.3 This endpoint retrieves the total amount of invoices in the
+        given Folder. <br>The target trays are sent, returned, confirmed, paid,
+        draft on the Seller side. For Buyer side, it is Received, Returned,
+        Confirmed, Paid. Param as request is common on seller side and buyer
+        side.
+      operationId: tray_getTotalOfInvoice
       tags:
         - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: archive
           required: true
           schema:
-            $ref: '#/tray/schemas/Request_getFolderBuyer'
+            type: string
+            enum: ["0","1"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ["sent","returned","confirmed","paid"]
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+
       responses:
         '200':
-          description: getFolderBuyer response
+          description: getTotalOfInvoice response
           content:
             application/json:
               schema:
-                $ref: '#/tray/schemas/Responses_getFolderBuyer'
-
-  #9.1.4
-  /api/tray/getFolderSeller:
-    post:
-      description: \#9.1.4 tray getFolderSeller
-      operationId: tray_getFolderSeller
-      tags:
-        - "Tray"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/tray/schemas/Request_getFolderSeller'
-      responses:
-        '200':
-          description: getFolderSeller response
+                $ref: '#/tray/schemas/Responses_getTotalOfInvoice'
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/tray/schemas/Responses_getFolderSeller'
+                $ref: '#/error/schemas/Responses_err_msg'
 
-  #9.1.5
-  /api/tray/getTotalBuyer:
-    post:
-      description: \#9.1.5 tray getTotalBuyer
-      operationId: tray_getTotalBuyer
-      tags:
-        - "Tray"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/tray/schemas/Request_getTotalBuyer'
-      responses:
-        '200':
-          description: getTotalBuyer response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getTotalBuyer'
 
-  #9.1.6
-  /api/tray/getTotalSeller:
-    post:
-      description: \#9.1.6 tray getTotalSeller
-      operationId: tray_getTotalSeller
-      tags:
-        - "Tray"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/tray/schemas/Request_getTotalSeller'
-      responses:
-        '200':
-          description: getTotalSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getTotalSeller'
-
-  #10.1
+  #9.2
   #require('./routes/tray_archive.js');
 
-  #10.1.1
-  /api/trayArchive/getCountBuyer:
-    post:
-      description: \#10.1.1 trayArchive getCountBuyer
-      operationId: trayArchive_getCountBuyer
+  #9.2.1
+  /api/tray/getCountOfArchive:
+    get:
+      description: >-
+        \#9.2.1 This endpoint gets the number of invoices in the tray.
+        <br>The target trays are Complete and Trash on the Seller side. 
+        For Buyer side, it is Complete and Trashed.
+        <br>Param as request is common on seller side and buyer side.
+      operationId: tray_getCountOfArchive
       tags:
-        - "TrayArchive"
+        - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: archive
           required: true
           schema:
-            $ref: '#/trayArchive/schemas/Request_getCountBuyer'
+            type: string
+            enum: ["0","1"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ["paid","trash"]
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+            
       responses:
         '200':
-          description: getCountBuyer response
+          description: getCountOfArchive response
           content:
             application/json:
               schema:
-                $ref: '#/trayArchive/schemas/Responses_getCountBuyer'
+                $ref: '#/tray/schemas/Responses_getCountOfArchive'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
-  #10.1.2
-  /api/trayArchive/getCountSeller:
-    post:
-      description: \#10.1.2 trayArchive getCountSeller
-      operationId: trayArchive_getCountSeller
+
+  #9.2.2
+  /api/tray/getFolderOfArchive:
+    get:
+      description: >-
+        \#9.2.2 This endpoint retrieves the list of invoices in the given
+        Folder. The target trays are Complete and Trash. 
+        on the Seller side. For Buyer side, it is  Complete and Trashed.
+        Confirmed, Paid. Param as request is common on seller side and buyer
+        side.
+      operationId: tray_getFolderOfArchive
       tags:
-        - "TrayArchive"
+        - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: archive
           required: true
           schema:
-            $ref: '#/trayArchive/schemas/Request_getCountSeller'
+            type: string
+            enum: ["0","1"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ["paid","trash"]
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+        - in: query
+          name: offset
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 0
+        - in: query
+          name: limit
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 25
+            
+      responses:
+        '200':
+          description: getFolderOfArchive response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getFolderOfArchive'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
+
+
+  #9.2.3
+  /api/tray/getTotalOfArchive:
+    get:
+      description: >-
+        \#9.2.3 This endpoint retrieves the total amount of invoices in
+        the given Folder.
+        <br>The target trays are Complete and Trash on the Seller side. 
+        For the Buyer side, it is Complete and trashed.
+        <br> Param as request is common on seller side and buyer side.
+      operationId: tray_getTotalOfArchive
+      tags:
+        - "Tray"
+      parameters:
+        - in: query
+          name: archive
+          required: true
+          schema:
+            type: string
+            enum: ["0","1"]
+        - in: query
+          name: folder
+          required: true
+          schema:
+            type: string
+            enum: ["paid","trash"]
+        - in: query
+          name: role
+          required: true
+          schema:
+            type: string
+            enum: ["buyer","seller"]
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+            
+      responses:
+        '200':
+          description: getTotalOfArchive response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getTotalOfArchive'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
+
+
+  #9.3
+  #require('./routes/tray_drafts.js');
+  #/api/trayDrafts:
+
+  #9.3.1
+  /api/tray/getCountOfDraft:
+    get:
+      description: >
+        \#9.3.1 This endpoint gets the number of invoices in the tray.
+        <br>The target tray is Draft on the Seller side. 
+      operationId: tray_getCountOfDraft
+      tags:
+        - "Tray"
+
       responses:
         '200':
           description: getCountSeller response
           content:
             application/json:
               schema:
-                $ref: '#/trayArchive/schemas/Responses_getCountSeller'
-
-  #10.1.3
-  /api/trayArchive/getFolderBuyer:
-    post:
-      description: \#10.1.3 trayArchive getFolderBuyer
-      operationId: trayArchive_getFolderBuyer
-      tags:
-        - "TrayArchive"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/trayArchive/schemas/Request_getFolderBuyer'
-      responses:
-        '200':
-          description: getFolderBuyer response
+                $ref: '#/tray/schemas/Responses_getCountOfDraft'
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/trayArchive/schemas/Responses_getFolderBuyer'
+                $ref: '#/error/schemas/Responses_err_msg'
 
-  #10.1.4
-  /api/trayArchive/getFolderSeller:
-    post:
-      description: \#10.1.4 trayArchive getFolderSeller
-      operationId: trayArchive_getFolderSeller
+  #9.3.2
+  /api/tray/getFolderOfDraft:
+    get:
+      description: >-
+        \#9.3.2 This endpoint retrieves the list of invoices in the given
+        Folder. The target tray is Draft. 
+        side.
+      operationId: tray_getFolderOfDraft
       tags:
-        - "TrayArchive"
+        - "Tray"
       parameters:
-        - in: "body"
-          name: "body"
+        - in: query
+          name: type
           required: true
           schema:
-            $ref: '#/trayArchive/schemas/Request_getFolderSeller'
-      responses:
-        '200':
-          description: getFolderSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/trayArchive/schemas/Responses_getFolderSeller'
-
-  #10.1.5
-  /api/trayArchive/getTotalBuyer:
-    post:
-      description: \#10.1.5 trayArchive getTotalBuyer
-      operationId: trayArchive_getTotalBuyer
-      tags:
-        - "TrayArchive"
-      parameters:
-        - in: "body"
-          name: "body"
+            type: string
+            enum: ["invoice"]
+        - in: query
+          name: offset
           required: true
           schema:
-            $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
-      responses:
-        '200':
-          description: getTotalSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/trayArchive/schemas/Responses_getTotalBuyer'
-
-  #10.1.6
-  /api/trayArchive/getTotalSeller:
-    post:
-      description: \#10.1.6 trayArchive getTotalSeller
-      operationId: trayArchive_getTotalSeller
-      tags:
-        - "TrayArchive"
-      parameters:
-        - in: "body"
-          name: "body"
+            type: integer
+            format: int64
+            example: 0
+        - in: query
+          name: limit
           required: true
           schema:
-            $ref: '#/trayArchive/schemas/Request_getTotalSeller'
-      responses:
-        '200':
-          description: getTotalSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/trayArchive/schemas/Responses_getTotalSeller'
+            type: integer
+            format: int64
+            example: 25
 
-
-  #11.1
-  #require('./routes/seller_tray_drafts.js');
-  /api/trayDrafts:
-
-  #11.1.1
-  /api/trayDraft/getCountSeller:
-    post:
-      description: \#11.1.1 trayDraft getCountSeller
-      operationId: trayDraft
-      tags:
-        - "TrayDraft"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/trayDraft/schemas/Request_getCountSeller'
-      responses:
-        '200':
-          description: getCountSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/trayDraft/schemas/Responses_getCountSeller'
-
-  #11.1.2
-  /api/trayDraft/getFolderSeller:
-    post:
-      description: \#11.1.2 trayDraft getFolderSeller
-      operationId: trayDraft
-      tags:
-        - "TrayDraft"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/trayDraft/schemas/Request_getFolderSeller'
       responses:
         '200':
           description: getFolderSeller response
           content:
             application/json:
               schema:
-                $ref: '#/trayDraft/schemas/Responses_getFolderSeller'
-
-  #11.1.3
-  /api/trayDraft/getTotalSeller:
-    post:
-      description: \#11.1.3 trayDraft getTotalSeller
-      operationId: trayDraft
-      tags:
-        - "TrayDraft"
-      parameters:
-        - in: "body"
-          name: "body"
-          required: true
-          schema:
-            $ref: '#/trayDraft/schemas/Request_getTotalSeller'
-      responses:
-        '200':
-          description: getTotalSeller response
+                $ref: '#/tray/schemas/Responses_getFolderOfDraft'
+        '400':
+          description: Bad request.
           content:
             application/json:
               schema:
-                $ref: '#/trayDraft/schemas/Responses_getTotalSeller'
+                $ref: '#/error/schemas/Responses_err_msg'
+
+  #9.3.3
+  /api/tray/getTotalOfDraft:
+    get:
+      description: >-
+        \#9.3.3 This endpoint retrieves the total amount of invoices in
+        the given Folder.
+        <br>The target trays is only Draft on the Seller side. 
+      operationId: tray_getTotalOfDraft
+      tags:
+        - "Tray"
+      parameters:
+        - in: query
+          name: type
+          required: true
+          schema:
+            type: string
+            enum: ["invoice"]
+
+      responses:
+        '200':
+          description: getTotalOfDraft response
+          content:
+            application/json:
+              schema:
+                $ref: '#/tray/schemas/Responses_getTotalOfDraft'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
 
   #12.1
@@ -1248,7 +1550,11 @@ paths:
   #12.1.1
   /api/wallet/getReceiptInResentActivity: 
     get:
-      description: \#12.1.1 wallet getReceiptInResentActivity
+      description: >-
+        \#12.1.1 This endpoint gets the latest wallet activity.
+        This endpoint is called when downloading a receipt from the Activity
+        list.
+        <br>This endpoint downloads the corresponding Receipt in JSON format.
       operationId: wallet_getReceiptInResentActivity
       tags:
         - "Wallet"
@@ -1265,11 +1571,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/wallet/schemas/Responses_getReceiptInResentActivity'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #12.1.2
   /api/wallet/getResentActivityOfWallet:
     get:
-      description: \#12.1.2 wallet getResentActivityOfWallet
+      description: >-
+        \#12.1.2 This endpoint retrieves the latest wallet Activity.
+        The Wallet tab displays this result as a list of transactions.
+        <br>The items are Date,Type,Transaction Hash, Transaction Receipt,
+        Invoice, Amount.
+        <br>Transaction Hash and Transaction Receipt are JSON-formatted faile,
+        which are methods of downloading and referencing.
       operationId: wallet_getResentActivityOfWallet
       tags:
         - "Wallet"
@@ -1298,7 +1616,9 @@ paths:
   #12.1.3
   /api/wallet/getWalletInfo:
     get:
-      description: \#12.1.3 wallet getWalletInfo
+      description: >-
+        \#12.1.3 This endpoint retrieves the latest wallet information.
+        Information includes Balance, Account Address, network Type, chain Id.
       operationId: wallet_getWalletInfo
       tags:
         - "Wallet"
@@ -1310,11 +1630,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/wallet/schemas/Responses_getWalletInfo'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #12.1.4
   /api/wallet/getCurrentBalanceOfBuyer:
     get:
-      description: \#12.1.4 wallet getCurrentBalanceOfBuyer : This request is  from Buyer.
+      description: >-
+        \#12.1.4 wallet getCurrentBalanceOfBuyer : This request is  from Buyer.
+        This endpoint gets the Balance indicated by the document uuid.
       operationId: wallet_getCurrentBalanceOfBuyer
       tags:
         - "Wallet"
@@ -1331,11 +1659,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/wallet/schemas/Responses_getCurrentBalanceOfBuyer'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #12.1.5
   /api/wallet/getTransactionReceipt:
     get:
-      description: \#12.1.5 wallet getTransactionReceipt
+      description: >-
+        \#12.1.5 This endpoint acquires the Transaction Receipt indicated
+        by the document uuid.
       operationId: wallet_getTransactionReceipt
       tags:
         - "Wallet"
@@ -1363,11 +1699,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/wallet/schemas/Responses_getTransactionReceipt'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
   #12.1.6
   /api/wallet/getIPFScidByTransactionHash:
     get:
-      description: \#12.1.7 wallet getIPFScidByTransactionHash [JSON DATA]
+      description: >-
+        \#12.1.6 This endpoint gets the ipfs cid and ipfs address from the
+        Transaction Hash.
       operationId: wallet_getIPFScidByTransactionHash
       tags:
         - "Wallet"
@@ -1384,6 +1728,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/wallet/schemas/Responses_getIPFScidByTransactionHash'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/error/schemas/Responses_err_msg'
 
 #------------------------------------- schemas ---------------------------------
 
@@ -1408,7 +1758,7 @@ contacts:
         type: !anything
 
     #1.1.2
-    Request_add:
+    Request_addContact:
       type: object
       properties:
         issuer:
@@ -1417,16 +1767,19 @@ contacts:
             id:
               type: string
 
-    Responses_add:
+    Responses_addContact:
+      type: object
       required:
+        - err
+        - msg
       properties:
+        err:
+          type: integer
+          format: int32
+          enum: ["0"]
         msg:
           type: string
           enum: ["okay"]
-
-    Error_add:
-      required:
-        type: string
 
     #1.1.3
 
@@ -1466,6 +1819,38 @@ contacts:
             format: date-time
             pattern: pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})T([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2}).(?:[0-9]{3})Z/
 
+invite:
+  #3.1
+  schemas:
+    #3.1.1
+    Responses_getContacts:
+      type: array
+      items:
+        type: object
+        properties:
+          remote_origin:
+            type: string
+          member_did:
+            type: string
+          membername:
+            type: string
+          organization_name:
+            type: string
+          organization_address:
+            type: string
+          organization_building:
+            type: string
+          organization_department:
+            type: string
+          organization_tax_id:
+            type: string
+          organization_department:
+          addressCountry:
+            type: string
+          addressRegion:
+            type: string
+          addressCity:
+            type: string
 
 invoice:
   #2.1
@@ -1474,16 +1859,21 @@ invoice:
     Request_returnToSender:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
     Responses_returnToSender:
+      type: object
       required:
+        - err
+        - msg
+      properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
+          enum: ["okay"]
     Error_returnToSender:
       $ref: '#/error/schemas/Responses_err_msg'
       
@@ -1491,16 +1881,21 @@ invoice:
     Request_confirm:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
     Responses_confirm:
+      type: object
       required:
+        - err
+        - msg
+      properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
+          enum: ["okay"]
     Error_confirm:
       $ref: '#/error/schemas/Responses_err_msg'
 
@@ -1508,16 +1903,21 @@ invoice:
     Request_unconfirm:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
     Responses_unconfirm:
+      type: object
       required:
+        - err
+        - msg
+      properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
+          enum: ["okay"]
     Error_unconfirm:
       $ref: '#/error/schemas/Responses_err_msg'
 
@@ -1525,136 +1925,163 @@ invoice:
     Request_makePayment:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
     Responses_makePayment:
+      type: object
       required:
+        - err
+        - msg
+      properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
+          enum: ["okay"]
     Error_makePayment:
       $ref: '#/error/schemas/Responses_err_msg'
 
     #2.2.1
     Responses_getDocumentBuyer:
+      type: object
       required:
+        - err
+        - msg
+      properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
 
     #2.2.2
     Responses_getDocumentSeller:
       required:
+      type: object
+      required:
+        - err
+        - msg
+      properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
 
     #2.2.3
     Responses_getArchiveDocumentBuyer:
       required:
+      type: object
+      required:
+        - err
+        - msg
+      properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
 
     #2.2.4
     Responses_getArchiveDocumentSeller:
       required:
+      type: object
+      required:
+        - err
+        - msg
+      properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
 
+    #2.2.5
+    Responses_getDraftDocument:
+      required:
+      type: object
+      required:
+        - err
+        - msg
+      properties:
+        err:
+          type: integer
+          format: int32
+          enum: [0]
+        msg:
+          type: string
+    #2.3.1
+    Request_sellerArchive:
+      type: object
+      properties:
+        document_uuid:
+          type: string
+    Responses_sellerArchive:
+      required:
+      type: object
+      required:
+        - err
+        - msg
+      properties:
+        err:
+          type: integer
+          format: int32
+          enum: [0]
+        msg:
+          type: string
+    Error_sellerArchive:
+      $ref: '#/error/schemas/Responses_err_msg'
 
     #2.4.1
     Request_update:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
     Responses_update:
       required:
+      type: object
+      required:
+        - err
+        - msg
+      properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
+          enum: ["okay"]
     Error_update:
       $ref: '#/error/schemas/Responses_err_msg'
 
+
     #2.4.2
-    Responses_getDraftDocument:
-      required:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: string
-    Error_getDraftDocument:
-      $ref: '#/error/schemas/Responses_err_msg'
-
-    #2.4.3
-#    Request_getDocument:
-#      type: object
-#      properties:
-#        id:
-#          type: integer
-#          format: int64
-#    Responses_getDocument:
-#      required:
-#      properties:
-#        err:
-#          type: integer
-#          format: int32
-#        msg:
-#          type: string
-#    Error_getDocument:
-#      $ref: '#/error/schemas/Responses_err_msg'
-
-    #2.4.4
-#    Request_getArchiveDocument:
-#      type: object
-#      properties:
-#        id:
-#          type: integer
-#          format: int64
-#    Responses_getArchiveDocument:
-#      required:
-#      properties:
-#        err:
-#          type: integer
-#          format: int32
-#        msg:
-#          type: string
-#    Error_getArchiveDocument:
-#      $ref: '#/error/schemas/Responses_err_msg'
-
-    #2.4.5
     Request_create:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
 
     Responses_create:
       required:
+      type: object
+      required:
+        - err
+        - msg
       properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
-          type: string
+          enum: ["okay"]
     Error_create:
       $ref: '#/error/schemas/Responses_err_msg'
 
@@ -1662,16 +2089,20 @@ invoice:
     Request_send:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
 
     Responses_send:
       required:
+      type: object
+      required:
+        - err
+        - msg
       properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
     Error_send:
@@ -1681,16 +2112,20 @@ invoice:
     Request_recreate:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
 
     Responses_recreate:
       required:
+      type: object
+      required:
+        - err
+        - msg
       properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
     Error_recreate:
@@ -1700,16 +2135,20 @@ invoice:
     Request_withdraw:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
 
     Responses_withdraw:
       required:
+      type: object
+      required:
+        - err
+        - msg
       properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
     Error_withdraw:
@@ -1719,16 +2158,20 @@ invoice:
     Request_trashDraft:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
 
     Responses_trashDraft:
       required:
+      type: object
+      required:
+        - err
+        - msg
       properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
     Error_trashDraft:
@@ -1738,16 +2181,20 @@ invoice:
     Request_trash:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
 
     Responses_trash:
       required:
+      type: object
+      required:
+        - err
+        - msg
       properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
     Error_trash:
@@ -1757,36 +2204,45 @@ invoice:
     Request_softDeleteSeller:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
 
     Responses_softDeleteSeller:
       required:
+      type: object
+      required:
+        - err
+        - msg
       properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
+          enum: ["okay"]
 
     #2.7.2
     Request_softDeleteBuyer:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        document_uuid:
+          type: string
 
     Responses_softDeleteBuyer:
       required:
+      type: object
+      required:
+        - err
+        - msg
       properties:
         err:
           type: integer
           format: int32
+          enum: [0]
         msg:
           type: string
-
+          enum: ["okay"]
 
 
 presentations:
@@ -2215,7 +2671,7 @@ session:
           type: string
 
     Responses_login:
-      $ref: '#/session/schemas/Responses_updateCompany'
+      $ref: '#/settings/schemas/Responses_updateOrganization'
 
     #6.1.6
     Request_signup:
@@ -2266,14 +2722,29 @@ settings:
   #7.1
   schemas:
     #7.1.1
-    Request_updateCompany:
+    Request_updateOrganization:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        organization_name:
+          type: string
+        organization_postcode:
+          type: string
+        organization_address:
+          type: string
+        organization_building:
+          type: string
+        organization_department:
+          type: string
+        organization_tax_id:
+          type: string
+        addressCountry:
+          type: string
+        addressRegion:
+          type: string
+        addressCity:
+          type: string
 
-    Responses_updateCompany:
+    Responses_updateOrganization:
       required:
       properties:
         err:
@@ -2287,120 +2758,81 @@ settings:
     Request_updateProfile:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
+        membername:
+          type: string
+        member_did:
+          type: string
+        job_title:
+          type: string
+        work_email:
+          type: string
 
     Responses_updateProfile:
-      $ref: '#/settings/schemas/Responses_updateCompany'
+      $ref: '#/settings/schemas/Responses_updateOrganization'
 
 tray:
   #9.1
   schemas:
-    #9.1.1
-    Request_getCountBuyer:
-      $ref: '#/tray/schemas/Request_getTotalBuyer'
 
-    Responses_getCountBuyer:
+    #9.1.1
+    Responses_getCountOfInvoice:
       required:
       properties:
-        document_uuid:
-          type: string
-        document_type:
-          type: string
-        document_number:
-          type: string
-        document_folder:
-          type: string
-        seller_uuid:
-          type: string
-        seller_membername:
-          type: string
-        seller_organization:
-          type: string
-        seller_archived:
-          type: string
-        seller_last_action: date
-        buyer_uuid:
-          type: string
-        buyer_membername:
-          type: string
-        buyer_organization:
-          type: string
-        buyer_archived:
-          type: string
-        buyer_last_action:
-          type: string
-        created_from:
-          type: string
-        root_document:
-          type: string
-        created_on:
-          type: date-time
-        opened:
-          type: string
-        subject_line:
-          type: string
-        due_by:
-          type: date-time
-        amount_due:
+        err:
           type: integer
           format: int32
+        msg:
+          type: array
+          items:
+            type: integer
+            format: int32
+          example:
+            - 1
+            - 2
+            - 3
+            - 4
 
     #9.1.2
-    Request_getCountSeller:
-      $ref: '#/tray/schemas/Request_getTotalBuyer'
+    Responses_getFolderOfInvoice:
+      $ref: '#/tray/schemas/Responses_getFolderOfDraft'
 
-    Responses_getCountSeller:
-      $ref: '#/tray/schemas/Responses_getCountBuyer'
 
     #9.1.3
-    Request_getFolderBuyer:
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-        key: 
-          - type: string
-              
-
-    Responses_getFolderBuyer: #contacts/ng
+    Responses_getTotalOfInvoice:
       required:
       properties:
         err:
           type: integer
           format: int32
         msg:
-          - properties:
+          type: string
+
+
+
+  #9.2
+    #9.2.1
+
+    Responses_getCountOfArchive:
+      required:
+      properties:
+        err:
+          type: integer
+          format: int32
+        msg:
+          type: array
+          items:
+            type: integer
+            format: int32
+
+    #9.2.2
+    #
+
+    Responses_getFolderOfArchive:
+      $ref: '#/tray/schemas/Responses_getFolderOfDraft'
             
 
-    #9.1.4
-    Request_getFolderSeller:
-      $ref: '#/tray/schemas/Request_getFolderBuyer'
-
-    Responses_getFolderSeller:
-      $ref: '#/tray/schemas/Responses_getFolderBuyer'
-
-    #9.1.5
-    Request_getTotalBuyer: #ok
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-
-    Responses_getTotalBuyer:
+    #9.2.3
+    Responses_getTotalOfArchive:
       required:
       properties:
         err:
@@ -2409,237 +2841,107 @@ tray:
         msg:
           type: string
 
-    #9.1.6
-    Request_getTotalSeller:
-      $ref: '#/tray/schemas/Request_getTotalBuyer'
+  #9.3
 
-    Responses_getTotalSeller:
-      $ref: '#/tray/schemas/Responses_getTotalBuyer'
-
-
-trayArchive:
-  #10.1
-  schemas:
-    #10.1.1
-    Request_getCountBuyer:
-      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
-
-    Responses_getCountBuyer:
-      required:
-      properties:
-        document_uuid:
-          type: string
-        document_type:
-          type: string
-        document_number:
-          type: string
-        document_folder:
-          type: string
-        seller_uuid:
-          type: string
-        seller_membername:
-          type: string
-        seller_organization:
-          type: string
-        seller_archived:
-          type: string
-        seller_last_action:
-          type: date-time
-        buyer_uuid:
-          type: string
-        buyer_membername:
-          type: string
-        buyer_organization:
-          type: string
-        buyer_archived:
-          type: string
-        buyer_last_action:
-          type: string
-        created_from:
-          type: string
-        root_document:
-          type: string
-        created_on:
-          type: date-time
-        opened:
-          type: string
-        subject_line:
-          type: string
-        due_by:
-          type: date-time
-        amount_due:
-          type: integer
-          format: int32
-
-    #10.1.2
-    Request_getCountSeller:
-      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
-
-    Responses_getCountSeller:
-      $ref: '#/trayArchive/schemas/Responses_getCountBuyer'
-
-    #10.1.3
-    Request_getFolderBuyer:
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-        key: 
-          - type: string
-              
-
-    Responses_getFolderBuyer: #ng
+    #9.3.1
+    Responses_getCountOfDraft:
       required:
       properties:
         err:
           type: integer
           format: int32
         msg:
-          - properties:
-            
+          type: array
+          items:
+            type: integer
+            format: int32
 
-    #10.1.4
-    Request_getFolderSeller:
-      $ref: '#/trayArchive/schemas/Request_getFolderBuyer'
-
-    Responses_getFolderSeller:
-      $ref: '#/trayArchive/schemas/Responses_getFolderBuyer'
-
-    #10.1.5
-    Request_getTotalBuyer: #ok
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-
-    Responses_getTotalBuyer:
+    #9.3.2
+    Responses_getFolderOfDraft:
       required:
       properties:
         err:
           type: integer
           format: int32
         msg:
-          type: string
-
-    #10.1.6
-    Request_getTotalSeller:
-      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
-
-    Responses_getTotalSeller:
-      $ref: '#/trayArchive/schemas/Responses_getTotalBuyer'
-
-trayDraft:
-  #11.1
-  schemas:
-    #11.1.1
-    Request_getCountSeller:
-      $ref: '#/trayArchive/schemas/Request_getTotalBuyer'
-
-    Responses_getCountSeller:
-      required:
-      properties:
-        document_uuid:
-          type: string
-        document_type:
-          type: string
-        document_number:
-          type: string
-        document_folder:
-          type: string
-        seller_uuid:
-          type: string
-        seller_membername:
-          type: string
-        seller_organization:
-          type: string
-        seller_archived:
-          type: string
-        seller_last_action:
-          type: date-time
-        buyer_uuid:
-          type: string
-        buyer_membername:
-          type: string
-        buyer_organization:
-          type: string
-        buyer_archived:
-          type: string
-        buyer_last_action:
-          type: string
-        created_from:
-          type: string
-        root_document:
-          type: string
-        created_on:
-          type: date-time
-        opened:
-          type: string
-        subject_line:
-          type: string
-        due_by:
-          type: date-time
-        amount_due:
-          type: integer
-          format: int32
-
-    #11.1.2
-    Request_getFolderSeller:
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-        key: 
-          - type: string
-              
-
-    Responses_getFolderBuyer: #ng
+          type: array
+          items:
+            type: object
+            properties: 
+              document_uuid:
+                type: string
+              document_type:
+                type: string
+              document_number:
+                type: string
+              document_folder:
+                type: string
+              seller_uuid:
+                type: string
+              seller_membername:
+                type: string
+              seller_organization:
+                type: string
+              seller_archived:
+                type: integer
+                format: int32
+              seller_last_action:
+                type: string
+                description:  Datetime to set
+                format: date-time
+                example: '2022-01-31 23:59:59'
+                pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2}) ([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2})/
+              buyer_uuid:
+                type: string
+              buyer_membername:
+                type: string
+              buyer_organization:
+                type: string
+              buyer_archived:
+                type: integer
+                format: int32
+              buyer_last_action:
+                type: string
+                example: '2022-01-31 23:59:59'
+                pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2}) ([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2})/
+              created_from:
+                type: string
+              root_document:
+                type: string
+              created_on:
+                type: string
+                description: Datetime to set
+                format: date-time
+                example: '2022-01-31 23:59:59'
+                pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2}) ([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2})/
+              opened:
+                type: integer
+                format: int32
+              subject_line:
+                type: string
+              due_by:
+                type: string
+                description: Datetime to set
+                format: date-time
+                pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2}) ([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2})/
+                example: '2022-01-31 23:59:59'
+              amount_due:
+                type: integer
+                format: int32
+ 
+    #9.3.3
+    Responses_getTotalOfDraft:
       required:
       properties:
         err:
           type: integer
           format: int32
         msg:
-          - properties:
-            
-    #11.1.3
-    Request_getTotalSeller: #ok
-      type: object
-      properties:
-        archive:
-          type: string
-        role:
-          type: string
-        folder:
-          type: string
-        type:
-          type: string
-
-    Responses_getTotalBuyer:
-      required:
-      properties:
-        err:
-          type: integer
-          format: int32
-        msg:
-          type: string
+          type: object
+          properties:
+            total:
+              type: string
+              example: 0.000005000 ETH
 
 wallet:
   #12.1
@@ -2800,6 +3102,7 @@ error:
         err:
           type: integer
           format: int32
+          enum: ["1","2","3","4","5","6","7","8","9"]
         msg:
           type: string
 

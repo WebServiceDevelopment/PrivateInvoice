@@ -20,44 +20,31 @@
 
 "use strict";
 
-// Import sub
-
-const sub                   	= require("../modules/invoice_sub.js");
-const tran                      = require("../modules/invoice_sub_transaction.js");
-const eth                       = require("../modules/web3_eth.js");
-
 // Import Router
 
-const express					= require('express');
-const router					= express.Router();
-module.exports					= router;
+const express                   = require('express');
+const router                    = express.Router();
+module.exports                  = router;
 
-//  web3.js
+// Import Modules
+
+const sub                       = require("../modules/invoice_sub.js");
+const tran                      = require("../modules/invoice_sub_transaction.js");
+const eth                       = require("../modules/web3_eth.js");
 const web3                      = eth.getWeb3();
 
 // Database
+const config                    = require('../config.json');
 
 
 // Table Name
-const SELLER_STATUS         	= "seller_status";
-const SELLER_DOCUMENT        	= "seller_document";
-const CONTACTS					= "contacts";
+const SELLER_STATUS             = "seller_status";
+const SELLER_DOCUMENT           = "seller_document";
+const CONTACTS                  = "contacts";
 
+// CURRENCY
+const CURRENCY                  = config.CURRENCY
 
-// common function
-
-/*
- * check_ipadder
- */
-function check_ipadder (req_ip , seller_host) {
-
-	let ip = req_ip.split(":")[3];
-
-	if(seller_host.indexOf(ip) != -1) {
-                return true;
-	}
-	return false;
-}
 
 // ------------------------------- End Points -------------------------------
 /*
@@ -65,26 +52,36 @@ function check_ipadder (req_ip , seller_host) {
  */
 router.post('/tellMeYourWalletAccount', async function(req, res) {
 
+	const METHOD = '/tellMeYourWalletAccount';
+
     const { seller_did, buyer_did } = req.body;
 
     // 1.
     //
     const [ seller_host, err1 ] = await sub.getBuyerHost(CONTACTS, seller_did, buyer_did);
     if(err1) {
-        console.log("Error 1 status = 400 err="+err1);
-        return res.status(400).end(err1);
+
+		let msg = `Error:${METHOD}: Invalid request.`;
+
+        return res.status(400)
+			.json({
+				err: 1,
+				msg : msg
+			});
     }
 
 	// 2.
 	//
-    if(!check_ipadder(req.ip , seller_host)) {
-        let err = { err:"invalid request : req.ip=${req.ip}:seller_host=${seller_host}"};
-        console.log(err.err);
-        return res.status(400).json(err);
+    if(!sub.check_ipadder(req.ip , seller_host)) {
+
+        let msg = `Error:${METHOD}: Invalid request.`;
+
+        return res.status(400)
+			.json({
+				err: 2,
+				msg : msg
+			});
     }
-
-
-    //console.log("ACCOUNT="+process.env.ACCOUNT)
 
     res.json({
         err : 0,
@@ -100,28 +97,47 @@ router.post('/tellMeYourWalletAccount', async function(req, res) {
  */
 router.post('/sellerToConnect', async (req, res) => {
 
-	const { document_uuid, buyer_did } = req.body;
+	const METHOD = '/sellerToConnect';
+
+	const { seller_uuid, buyer_did } = req.body;
 
 	// 1.
 	//
-	const [ seller_host, err1 ] = await sub.getSellerHost(CONTACTS, document_uuid, buyer_did);
+	const [ seller_host, err1 ] = await sub.getSellerHost(CONTACTS, seller_uuid, buyer_did);
 
 	if(err1) {
-		console.log(err1);
-		return res.status(400).json(err1);
+
+		let msg = `Error:${METHOD}: Invalid request.`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
 	}
 
 	// 2.
 	//
-    if(!check_ipadder(req.ip , seller_host)) {
+    if(!sub.check_ipadder(req.ip , seller_host)) {
 		
-        let err = { err:"invalid request : req.ip=${req.ip}:seller_host=${seller_host}"};
-        console.log(err.err);
+        let msg = `Error:${METHOD}: Invalid request.`;
 		
-        return res.status(400).json(err);
+        return res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
     }
 
-	return res.status(200).end('accepted');
+	console.log("/sellerToConnect accepted");
+
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
+	return;
 
 
 });
@@ -131,19 +147,32 @@ router.post('/sellerToConnect', async (req, res) => {
  */
 router.post('/sellerToConfirm', async (req, res) => {
 
+	const METHOD = '/sellerToConfirm';
+
 	const { document_uuid, buyer_did } = req.body;
 
 
 	const [ _, err] = await sub.setConfirm(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
-		console.log(err);
-		return res.status(400).json(err);
+
+        let msg = `Error:${METHOD}: Invalid request.`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
 	}
 
 	console.log("/sellerToConfirm accepted");
 
-	res.status(200).end('accepted');
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
 });
 
@@ -152,19 +181,33 @@ router.post('/sellerToConfirm', async (req, res) => {
  */
 router.post('/sellerToUnconfirm', async (req, res) => {
 
+	const METHOD = '/sellerToConfirm';
+
 	const { document_uuid, buyer_did } = req.body;
 
 
 	const [ _, err] = await sub.setUnconfirm(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
-		console.log(err);
-		return res.status(400).json(err);
+
+        let msg = `Error:${METHOD}: Invalid request.`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
 	}
 
-	res.status(200).end('accepted');
-
 	console.log("/sellerToUnconfirm accepted");
+
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
+
 });
 
 /*
@@ -172,19 +215,31 @@ router.post('/sellerToUnconfirm', async (req, res) => {
  */
 router.post('/sellerToReturn', async (req, res) => {
 
+	const METHOD = '/sellerToReturn';
+
 	const { document_uuid, buyer_did } = req.body;
 
 
 	const [_, err] = await sub.setReturn(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
-		console.log(err);
-		return res.status(400).json(err);
+        let msg = `Error:${METHOD}: Invalid request.`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
 	}
 
 	console.log("/sellerToReturn accepted");
 
-	res.status(200).end('accepted');
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
 });
 
@@ -192,6 +247,8 @@ router.post('/sellerToReturn', async (req, res) => {
  * sellerToMakePayment
  */
 router.post('/sellerToMakePayment', async (req, res) => {
+
+	const METHOD = '/sellerToMakePayment';
 
 	const { document_uuid, buyer_did , hash} = req.body;
 
@@ -203,10 +260,15 @@ router.post('/sellerToMakePayment', async (req, res) => {
     const [ receipt, err1 ] = await eth.getTransactionReceipt(web3, hash) ;
 
     if(err1) {
-        let msg = "No transaction reciept was found."
-        console.log("error :"+msg);
-		let err = {err:msg}
-		return res.status(400).json(err);
+
+        let msg = `Error:${METHOD}: No transaction reciept was found.`
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
     }
 
 	console.log(receipt);
@@ -216,10 +278,14 @@ router.post('/sellerToMakePayment', async (req, res) => {
     const [ result, err2 ] = await eth.getTransaction(web3, hash) ;
 
     if(err2) {
-        let msg = "No transaction was found."
-        console.log("error :"+msg);
-		let err = {err:msg}
-		return res.status(400).json(err);
+        let msg = `Error:${METHOD}:No transaction was found.`
+
+		res.status(400)
+			.json({
+				err: 2,
+				msg: msg
+			});
+		return;
     }
 
 	// 3.
@@ -231,29 +297,30 @@ router.post('/sellerToMakePayment', async (req, res) => {
 	const document_json = JSON.parse(document.document_json);
 	const totalPaymentDue = document_json.credentialSubject.totalPaymentDue;
 
-	console.log("totalPaymentDue="+totalPaymentDue.price);
+	console.log("/sellerToMakePayment : totalPaymentDue="+totalPaymentDue.price);
 
 	let wk = '0';
 	if( totalPaymentDue != null && totalPaymentDue.price != null) {
 		wk = totalPaymentDue.price;
 	}
-	const total = web3.utils.toWei(wk , 'Gwei');
+	const total = web3.utils.toWei(wk , CURRENCY.symbol);
 
 	// 4.
 	// Does transaction value and invoice total match?
 	//
 
 	if( result != null) {
-		console.log(result.value +":"+total);
 
 		if( result.value !=  total) {
-		let msg = "Transaction value and invoice total do not match."
-			console.log("error :"+msg);
-			let err = {err:msg}
-			return res.status(400).json(err);
+			let msg = "Transaction value and invoice total do not match."
+
+			res.status(400)
+				.json({
+					err: 1,
+					msg: msg
+				});
+			return;
 		}
-	} else {
-		console.log("4:"+result)
 	}
 
     // 5.
@@ -270,7 +337,9 @@ router.post('/sellerToMakePayment', async (req, res) => {
 		console.log(err6);
 		let code = 400;
 		let errno = 6;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err6, errno));
+        res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err6, errno, METHOD));
+		return;
 	}
 
 	// 7.
@@ -281,7 +350,9 @@ router.post('/sellerToMakePayment', async (req, res) => {
 		console.log(err7);
 		let code = 400;
 		let errno = 7;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err7, errno));
+        res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err7, errno, METHOD));
+		return;
 	}
 
 	// 8.
@@ -293,14 +364,20 @@ router.post('/sellerToMakePayment', async (req, res) => {
 		console.log(err8);
         let errno = 8;
         let code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err8, errno));
+        res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err8, errno, METHOD));
+		return;
     }
 
     // 9.
     //
     conn.end();
 
-	res.status(200).end('accepted');
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
 	console.log("/sellerToMakePayment accepted");
 });
@@ -310,19 +387,33 @@ router.post('/sellerToMakePayment', async (req, res) => {
  */
 router.post('/sellerToPaymentReservation', async (req, res) => {
 
+	const METHOD = '/sellerToPaymentReservation';
+
 	const { document_uuid, buyer_did } = req.body;
 
 
 	const [ _, err] = await sub.setPaymentReservation(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
-		console.log(err);
-		return res.status(400).json(err);
+
+		let msg = `Error:${METHOD}: Invalid request.`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+
+		return;
 	}
 
-	res.status(200).end('accepted');
-
 	console.log("/sellerToPaymentReservation accepted");
+
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 });
 
 /*
@@ -330,17 +421,30 @@ router.post('/sellerToPaymentReservation', async (req, res) => {
  */
 router.post('/sellerToCancelPaymentReservation', async (req, res) => {
 
+	const METHOD = '/sellerToCancelPaymentReservation';
+
 	const { document_uuid, buyer_did } = req.body;
 
 
 	const [ _, err] = await sub.resetPaymentReservation(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
-		console.log(err);
-		return res.status(400).json(err);
+
+		let msg = `Error:${METHOD}: Invalid request.`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
 	}
 
-	res.status(200).end('accepted');
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
 	console.log("/sellerToPaymentReservation accepted");
 });
@@ -350,17 +454,30 @@ router.post('/sellerToCancelPaymentReservation', async (req, res) => {
  */
 router.post('/sellerRollbackReturnToSent', async (req, res) => {
 
+	const METHOD = '/sellerRollbackReturnToSent';
+
 	const { document_uuid, buyer_did } = req.body;
 
 
 	const [ _, err] = await sub.rollbackReturnToSent(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
-		console.log(err);
-		return res.status(400).json(err);
+
+		let msg = `Error:${METHOD}: Invalid request.`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
 	}
 
-	res.status(200).end('accepted');
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
 	console.log("/sellerRollbackReturnToSent accepted");
 });
@@ -370,20 +487,32 @@ router.post('/sellerRollbackReturnToSent', async (req, res) => {
  */
 router.post('/sellerRollbackConfirmToSent', async (req, res) => {
 
+	const METHOD = '/sellerRollbackConfirmToSent';
+
 	const { document_uuid, buyer_did } = req.body;
 
 
 	const [ _, err] = await sub.rollbackConfirmToSent(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
-		console.log(err);
-		return res.status(400).json(err);
+
+		let msg = `Error:${METHOD}: Invalid request.`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
 	}
 
-	res.status(200).end('accepted');
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
 	console.log("/sellerRollbackConfirmToSent accepted");
-
 });
 
 /*
@@ -391,17 +520,31 @@ router.post('/sellerRollbackConfirmToSent', async (req, res) => {
  */
 router.post('/sellerRollbackSentToConfirm', async (req, res) => {
 
+	const METHOD = '/sellerRollbackSentToConfirm';
+
 	const { document_uuid, buyer_did } = req.body;
 
 
 	const [ _, err] = await sub.rollbackSentToConfirm(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
-		console.log(err);
-		return res.status(400).json(err);
+
+		let msg = `Error:${METHOD}: Invalid request.`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+
+		return;
 	}
 
-	res.status(200).end('accepted');
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
 	console.log("/sellerRollbackSentToConfirm accepted");
 });
@@ -411,17 +554,30 @@ router.post('/sellerRollbackSentToConfirm', async (req, res) => {
  */
 router.post('/sellerRollbackPaidToConfirm', async (req, res) => {
 
+	const METHOD = '/sellerRollbackPaidToConfirm';
+
 	const { document_uuid, buyer_did } = req.body;
 
 
 	const [ _, err] = await sub.rollbackPaidToConfirm(SELLER_STATUS, document_uuid, buyer_did);
 
 	if(err) {
-		console.log(err);
-		return res.status(400).json(err);
+
+		let msg = `Error:${METHOD}: Invalid request.`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
 	}
 
-	res.status(200).end('accepted');
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
 	console.log("/sellerRollbackPaidToConfirm accepted");
 });

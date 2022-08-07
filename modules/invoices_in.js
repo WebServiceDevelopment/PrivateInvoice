@@ -20,15 +20,190 @@
 
 'use strict'
 
+// Database Libraries
+const db						= require('../database.js');
+
 // Table Name
-const BUYER__DOCUMENT	= 'buyer_document'
-const BUYER__STATUS		= 'buyer_status'
-const CONTACTS			= 'contacts'
+const BUYER__DOCUMENT			= 'buyer_document'
+const BUYER__STATUS				= 'buyer_status'
 
-const sub  				= require('./invoice_sub.js')
-const tran 				= require('./invoice_sub_transaction.js')
+const SELLER_DRAFT_DOCUMENT     = "seller_document_draft";
+const SELLER_DRAFT_STATUS   	= "seller_status_draft";
 
-const handleIncomingInvoice = async (invoiceCert, res) => {
+const CONTACTS					= 'contacts'
+
+const sub  						= require('./invoice_sub.js')
+const tran 						= require('./invoice_sub_transaction.js')
+
+// Exports
+module.exports = {
+    getMemberInfo           	: _getMemberInfo,
+    getOrganizationInfo     	: _getOrganizationInfo,
+	insertSellerDraftStatus 	: _insertSellerDraftStatus,
+	insertSellerDraftDocument	: _insertSellerDraftDocument,
+
+    handleIncomingInvoice		: _handleIncomingInvoice,
+}
+
+// Error Message
+const MESSAGE_AFFECTED_ROWS     = ":result.affectedRows != 1";
+
+// --------------------------------- Modules ---------------------------------
+/*
+ *	getMemberInfo
+ */
+async function _getMemberInfo ( member_did ) {
+
+	const sql = `
+        SELECT
+            member_did as member_did,
+            membername,
+			organization_uuid,
+            wallet_address
+        FROM
+            members
+        WHERE
+            member_did = ?
+    `;
+
+    const args = [member_did];
+
+    let row;
+    try {
+        row = await db.selectOne(sql, args);
+    } catch(err) {
+		const msg = "This member_did is not found."
+		return [null, msg];
+
+    }
+
+	return [row, null];
+}
+
+/*
+ *	getOrganizationInfo
+ */
+async function _getOrganizationInfo ( organization_uuid ) {
+
+	const sql = `
+        SELECT
+            organization_name,
+            organization_address,
+            organization_building,
+            organization_department,
+            organization_tax_id,
+			organization_postcode,
+            addressCountry,
+            addressRegion,
+            addressCity
+        FROM
+            organizations
+        WHERE
+			organization_uuid = ?
+    `;
+
+    const args = [organization_uuid];
+
+    let  org;
+    try {
+        org = await db.selectOne(sql, args);
+    } catch(err) {
+		const msg = "This organization_uuid is not found."
+		return [null, msg];
+    }
+
+	return [org, null];
+}
+
+
+async function _insertSellerDraftStatus (conn, args) {
+
+	const sql = `
+		INSERT INTO ${SELLER_DRAFT_STATUS} (
+			document_uuid,
+			document_type,
+			document_number,
+			document_folder,
+			seller_did,
+			seller_membername,
+			seller_organization,
+			seller_last_action,
+			subject_line,
+			due_by,
+			amount_due
+		) VALUES (
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			NOW(),
+			'',
+			?,
+			?
+		)
+	`;
+
+	const [result , err ] = await tran.insert(conn, sql, args);
+
+	if(err) {
+		return [result , err ]
+	}
+
+	if(result.affectedRows != 1) {
+		let msg = {Message:MESSAGE_AFFECTED_ROWS};
+		return [result , msg ]
+	}
+
+	return [result , err ];
+
+}
+
+async function _insertSellerDraftDocument (conn, args) {
+
+	const sql = `
+		INSERT INTO ${SELLER_DRAFT_DOCUMENT} (
+			document_uuid,
+			document_json,
+			document_type,
+
+			currency_options,
+
+			seller_did,
+			seller_membername,
+			seller_details,
+			document_meta,
+			document_body,
+			document_totals
+		) VALUES (
+			?,
+			?,
+			?,
+
+			?,
+
+			?,
+			?,
+			?,
+			?,
+			?,
+			?
+		)
+	`;
+
+	const [result , err ] = await tran.insert(conn, sql, args);
+
+	return [result , err ];
+
+}
+
+
+/*
+ * handleIncomingInvoice
+ */
+async function _handleIncomingInvoice (invoiceCert, res) {
     //console.log("/buyerToSend");
 
     const { credentialSubject } = invoiceCert
@@ -165,6 +340,3 @@ const handleIncomingInvoice = async (invoiceCert, res) => {
     console.log('/buyerToSend accepted')
 }
 
-module.exports = {
-    handleIncomingInvoice,
-}

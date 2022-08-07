@@ -52,8 +52,8 @@ const FolderWidget = (function() {
 		groups : {
 			invoice_out : Elem('FolderWidget.groups.invoice_out'),
 			invoice_in : Elem('FolderWidget.groups.invoice_in'),
-			draft : Elem('FolderWidget.groups.draft'),
 		},
+		draft : Elem('FolderWidget.groups.draft'),
 		c : {
 			draft : Elem('FolderWidget.c.draft'),
 			sent : Elem('FolderWidget.c.sent'),
@@ -369,33 +369,32 @@ const FolderWidget = (function() {
 	}
 
 /*
+ * api_getCFolderCount
+ *
+ * '/api/tray/getCountOfInvoice'
 */
 	async function api_getCFolderCount() {
+		//console.log("CFolderCount")
 
-		const params = [
-			{ type : "invoice", role : "seller", folder : "sent", archive : 0 },
-			{ type : "invoice", role : "seller", folder : "returned", archive : 0 },
-			{ type : "invoice", role : "seller", folder : "confirmed", archive : 0 },
-			{ type : "invoice", role : "seller", folder : "paid", archive : 0 }
-		];
-
-		const url = '/api/tray/getCountSeller';
+		const url = '/api/tray/getCountOfInvoice';
+		const archive = '0';
+		const role = 'seller';
+		//const folder = '[sent,returned,confirmed,paid]';
+		const folder = '[sent,returned,confirmed,paid,draft]';
+		const type = 'invoice';
 
 	    let response;
-        let opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        };
 
 		try {
-            response = await fetch( url, opts);
+            response = await fetch( url+'?'+new URLSearchParams({
+				archive : archive,
+				folder : folder,
+				role : role,
+				type : type
+            }).toString() );
+
         } catch(err) {
-			console.log("err="+err);
+			console.error("Cannot connect server.");
 			alert("Cannot connect server.");
 			return;
         }
@@ -420,85 +419,36 @@ const FolderWidget = (function() {
 		c.returned.textContent = counts[1];
 		c.confirmed.textContent = counts[2];
 		c.paid.textContent = counts[3];
+		c.draft.textContent = counts[4];
 
-		//console.log("CFolderCount")
-	}
-
-/*
-*/
-	async function api_getDraftsFolderCount() {
-
-		const params = [
-			{ type : "invoice", role : "seller", folder : "draft", archive : 0 },
-		];
-
-		const url = '/api/trayDrafts/getCountSeller';
-
-        let opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        };
-
-	    let response;
-		try {
-            response = await fetch( url, opts);
-        } catch(err) {
-			alert("Cannot connect server.");
-			return;
-        }
-
-        let res;
-        try {
-            res = await response.json();
-        } catch(err) {
-			alert("Json Error.");
-			return;
-        }
-	
-		let counts = res.msg;
-		let c = this.DOM.c;
-
-		c.draft.textContent = counts[0];
-
-		DocumentWidget.API.readOnly ();
-
-		//console.log("DraftFolderCount role")
 	}
 
 
 /*
+ * api_getDFolderCount
+ *
+ * '/api/tray/getCountOfInvoice'
 */
-async function api_getDFolderCount() {
+	async function api_getDFolderCount() {
+		//console.log("DFolderCount ")
 
-		const params = [
-			{ type : "invoice", role : "buyer", folder : "sent", archive : 0 },
-			{ type : "invoice", role : "buyer", folder : "returned", archive : 0 },
-			{ type : "invoice", role : "buyer", folder : "confirmed", archive : 0 },
-			{ type : "invoice", role : "buyer", folder : "paid", archive : 0 }
-		];
-
-		const url = '/api/tray/getCountBuyer';
-
-        let opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        };
+		const url = '/api/tray/getCountOfInvoice';
+		const archive = '0';
+		const role = 'buyer';
+		const folder = '[sent,returned,confirmed,paid]';
+		const type = 'invoice';
 
 	    let response;
 		try {
-            response = await fetch( url, opts);
+            response = await fetch( url+'?'+new URLSearchParams({
+				archive : archive,
+				folder : folder,
+				role : role,
+				type : type
+            }).toString() );
+
         } catch(err) {
-            //throw err;
+			console.error("Cannot connect server.");
 			alert("Cannot connect server.");
 			return;
         }
@@ -522,50 +472,65 @@ async function api_getDFolderCount() {
 		d.confirmed.textContent = counts[2];
 		d.paid.textContent = counts[3];
 
-		//console.log("DFolderCount ")
 	}
 
+/*
+ * api_getDraftsFolderCount
+ *
+ * '/api/tray/getCountOfDraft';
+*/
+	async function api_getDraftsFolderCount() {
 
-	function api_updateInvoiceDraftCount() {
 
-		//console.log("updateInvoiceDraftCount");
-		
-		const args = [
-			{
-				archive : 0,
-				folder : 'draft',
-				role : 'seller',
-				type : 'invoice'
-			}
-		]
+		const url = '/api/tray/getCountOfDraft';
 
-		const url = '/api/trayDrafts/getCountSeller';
-
-		const ajax = new XMLHttpRequest();
-		ajax.open('POST', url );
-		ajax.setRequestHeader('Content-Type', 'application/json');
-		ajax.responseType = "json";
-		ajax.send(JSON.stringify(args));
-
-		//console.log("Update draft count");
-
-		ajax.onload = () => {
-			
-			let res = ajax.response;
-			//console.log(res);
-
-			let count = res.msg[0];
-			this.DOM.c.draft.textContent = count;
-
-			//console.log("updateInvoiceDraftCount count="+count);
-
-			this.SIMULATE.clickDraftsOfTray();
+        let opts = {
+            method: 'GET',
+            cache: 'no-cache',
+            credentials: 'same-origin',
 		}
 
+	    let response;
+		try {
+            response = await fetch( url, opts);
+        } catch(err) {
+			console.error("Cannot connect server.");
+			alert("Cannot connect server.");
+			return;
+        }
+
+        let res;
+        try {
+            res = await response.json();
+        } catch(err) {
+			alert("Json Error.");
+			return;
+        }
+	
+		let count = res.msg[0];
+		this.DOM.c.draft.textContent = count;
+
+		if(TrayWidget.STATUS.getActiveLi()) {
+			console.log("DraftFolderCount all ="+count)
+
+			TrayWidget.SHOWING.setAll( count );
+			TrayWidget.DOM.showing.setAll( count );
+		}
+
+		//console.log("DraftFolderCount role")
 	}
 
 
-async function api_getInvoiceCount(count, role, folder , archive, exec) {
+	async function api_updateInvoiceDraftCount() {
+
+		await this.API.getDraftsFolderCount();
+
+		this.SIMULATE.clickDraftsOfTray();
+
+	}
+
+
+	async function api_getInvoiceCount(count, role, folder , archive, exec) {
 
 		console.log("getInvoiceCount");
 
@@ -613,6 +578,7 @@ async function api_getInvoiceCount(count, role, folder , archive, exec) {
         }
 
 		if(response == 'ERR_CONNECTION_REFUSED') {
+			console.error("Cannot connect server.");
             alert("Cannot connect server.");
             return;
         }
@@ -635,50 +601,30 @@ async function api_getInvoiceCount(count, role, folder , archive, exec) {
 async function api_getInvoiceArchiveCount(count, role, folder , archive, exec) {
 
 		//console.log("getInvoiceArchiveCount");
+		//
+		if( _argsCheck(role, folder, archive) == false) {
+			return;
+		}
 
-		const PATH = '/api/trayArchive/getCount';
-        let ROLE;
+		const url = '/api/tray/getCountOfArchive';
 
-        switch(role) {
-        case 'seller':
-            ROLE = 'Seller';
-        break;
-        case 'buyer':
-            ROLE = 'Buyer';
-        break;
-        default:
-            return;
-        }
 
-		const params = [
-			{
-				archive : archive,
-				folder : folder,
-				role : role,
-				type : 'invoice'
-			}
-		]
-
-        const opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        };
-
-		const url = PATH +ROLE;
+		//console.log(archive+":"+folder+":"+role);
 
         let response;
         try {
-            response = await fetch(url, opts);
+            response = await fetch( url+'?'+new URLSearchParams({
+				archive : archive,
+				folder : folder,
+				role : role,
+				type: 'invoice'
+            }).toString() );
         } catch(err) {
             throw err;
         }
 
 		if(response == 'ERR_CONNECTION_REFUSED') {
+			console.error("Cannot connect server.");
             alert("Cannot connect server.");
             return;
         }
@@ -705,12 +651,46 @@ async function api_getInvoiceArchiveCount(count, role, folder , archive, exec) {
 			console.log("count err");
 		}
 
+		return;
+
+		function _argsCheck(role, folderi, archive) {
+
+	        switch(role) {
+			case 'seller':
+			case 'buyer':
+			break;
+			default:
+				console.error("Error: role:"+role);
+				return false;
+			}
+
+			switch(folder) {
+			case 'paid':
+			case 'trash':
+			break;
+			default:
+				console.error("Error: folder:"+folder);
+				return false;
+			}
+
+			switch(archive) {
+			case 0:
+			case '0':
+			case 1:
+			case '1':
+			break;
+			default:
+				console.error("Error: archive:"+archive);
+				return false;
+        	}
+		}
+
+		return true;
+
 	}
 
-/*
-* add 20220407 k.ogawa
-*/
 	async function api_getFolderTotal() {
+
 		let type =  this.API.getActiveFolderType();
 		let folder =  this.API.getActiveFolderFolder();
 		let role =  this.API.getActiveFolderRole();
@@ -718,7 +698,7 @@ async function api_getInvoiceArchiveCount(count, role, folder , archive, exec) {
 
 		//console.log("getFolderTotal:"+role +":"+folder+":"+archive);
 
-		if(archive == 1) {
+		if(archive== 1 && folder == 'paid') {
 			TrayWidget.API.displayShowingTotal( null );
 			return;
 		}
@@ -741,55 +721,36 @@ async function api_getInvoiceArchiveCount(count, role, folder , archive, exec) {
 
 
 		let PATH;
-		let ROLE;
-
-		switch(role) {
-        case 'seller':
-            ROLE = 'Seller';
-        break;
-        case 'buyer':
-            ROLE = 'Buyer';
-        break;
-        default:
-            return;
-        }
-	
 
 		switch(folder) {
 		case 'draft':
-			PATH =  '/api/trayDrafts/getTotal'+ROLE
+			PATH =  '/api/tray/getTotalOfDraft';
 		break;
 		case 'paid':
-			if(archive == 1) {
-				PATH =  '/api/trayArchive/getTotal'+ROLE
+			if(archive == 0) {
+				PATH =  '/api/tray/getTotalOfInvoice';
 			} else {
-				PATH =  '/api/tray/getTotal'+ROLE
+				PATH =  '/api/tray/getTotalOfArchive';
 			}
 		break;
 		case 'trash':
-				PATH =  '/api/trayArchive/getTotal'+ROLE
+				PATH =  '/api/tray/getTotalOfArchive';
 		break;
 		default:
-			PATH =  '/api/tray/getTotal'+ROLE
+			PATH =  '/api/tray/getTotalOfInvoice';
 		break;
 		}
 		
-
-        const opts = {
-            method: 'POST',
-            cache: 'no-cache',
-            credentials: 'same-origin',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(params)
-        };
-
 		const url = PATH;
 
 		let response;
         try {
-            response = await fetch( url, opts);
+            response = await fetch( url+'?'+new URLSearchParams({
+				archive : archive,
+				folder : folder,
+				role : role,
+				type: 'invoice'
+            }).toString() );
         } catch(err) {
             throw err;
         }
@@ -818,9 +779,6 @@ async function api_getInvoiceArchiveCount(count, role, folder , archive, exec) {
 		this.API.renderFolderTotal(res.msg);
 	}
 
-/*
-* add 20220407 k.ogawa
-*/
 	function api_renderFolderTotal(msg) {
 
 			let total = msg.total;
@@ -831,8 +789,8 @@ async function api_getInvoiceArchiveCount(count, role, folder , archive, exec) {
 			TrayWidget.API.displayShowingTotal( total );
 			
 	}
+
 /*
- * add 20220405 k.ogawa
  * When you create a new Document, Simulate clicking on Draft Try.
 */
 	function simulate_clickDraftsOfTray() {
@@ -842,7 +800,7 @@ async function api_getInvoiceArchiveCount(count, role, folder , archive, exec) {
 			old_folder.classList.remove("active");
 		}
 
-		let new_folder = this.DOM.groups.draft;
+		let new_folder = this.DOM.draft;
 		this.MEM.setActiveFolder(new_folder);
 		new_folder.classList.add("active");
 
@@ -856,7 +814,6 @@ async function api_getInvoiceArchiveCount(count, role, folder , archive, exec) {
 	}
 
 /*
- * add 20220406 k.ogawa
  * Get folder type.
 */
 	function api_getActiveFolderType() {
@@ -959,7 +916,9 @@ async function api_getCount(from) {
 		await this.API.getCFolderCount();
 		await this.API.getDFolderCount();
 
-		await this.API.getDraftsFolderCount();
+		//await this.API.getDraftsFolderCount();
+
+		DocumentWidget.API.readOnly ();
 /*
 * add 20220407 k.ogawa
 * Totalの表示

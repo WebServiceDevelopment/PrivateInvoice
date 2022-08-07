@@ -22,23 +22,28 @@
 
 // Import Router
 
-const express = require('express')
-const router = express.Router()
-module.exports = router
+const express                   = require('express')
+const router                    = express.Router()
+module.exports                  = router
 
 // Import Libraries
 
-const uuidv4 = require('uuid').v4
-const { verifyPresentation }	= require('../modules/sign_your_credentials.js')
-const { handleContactRequest }	= require('../modules/contacts_in.js')
-const { handleIncomingInvoice }	= require('../modules/invoices_in.js')
-const { handleStatusUpdate }	= require('../modules/update_status.js')
+const uuidv4                    = require('uuid').v4
+
+// Import Modules
+
+const { verifyPresentation }    = require('../modules/sign_your_credentials.js')
+const { handleContactRequest }  = require('../modules/contacts_in.js')
+const { handleIncomingInvoice } = require('../modules/invoices_in.js')
+const { handleStatusUpdate }    = require('../modules/update_status.js')
 
 // Global Variable for Storing Challenges
 
-const challenges = {}
+const challenges                = {}
 
 // Define
+
+// ------------------------------- End Points -------------------------------
 
 /*
  * 1.
@@ -119,7 +124,6 @@ router.post('/submissions', async (req, res) => {
         // Handle Commercial Invoice
         console.log('handle status update!!!!')
         return await handleStatusUpdate(credential, res)
-        // return res.status(400).end("Stahhp it");
     }
 
     res.status(400).end('no valid credential detected')

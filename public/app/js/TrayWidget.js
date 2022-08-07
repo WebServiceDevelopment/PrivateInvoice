@@ -95,7 +95,7 @@ const TrayWidget = (function() {
 		updateSelectSubject : api_updateSelectSubject.bind(this),
 		updateSelectTotal : api_updateSelectTotal.bind(this),
 		updateDueDate : api_updateDueDate.bind(this),
-		updateCompany : api_updateCompany.bind(this),
+		updateOrganization : api_updateOrganization.bind(this),
 		refresh : api_refresh.bind(this),
 		clearDocument : api_clearDocument.bind(this),
 
@@ -154,7 +154,7 @@ const TrayWidget = (function() {
 	}
 
 	this.AJAX = {
-		post : ajax_post.bind(this),
+		get : ajax_get.bind(this),
 	}
 
 
@@ -299,7 +299,7 @@ const TrayWidget = (function() {
 
 	}
 
-	function api_refresh() {
+	async function api_refresh() {
 
 		let role, type, folder, archive;
 
@@ -310,20 +310,16 @@ const TrayWidget = (function() {
 
 		const params = this.MEM.getParams();
 
-		const ajax = this.AJAX.post( params , role, folder, archive);
+		const res = await this.AJAX.get( params , role, folder, archive);
 
-		ajax.onload = () => {
-
-			let res = ajax.response;
-
-			if(res.err) {
-				throw res.msg;
-			}
-
-			this.MEM.setResults( res.msg );
-
-			this.API.renderFolder(role, folder, archive);
+		if(res.err) {
+			throw res.msg;
 		}
+
+		this.MEM.setResults( res.msg );
+
+		this.API.renderFolder(role, folder, archive);
+
 	}
 
 	function api_getParams() {
@@ -332,9 +328,9 @@ const TrayWidget = (function() {
 
 	}
 
-	function api_updateCompany(txt) {
+	function api_updateOrganization(txt) {
 
-		//console.log("api_updateCompany");
+		//console.log("api_updateOrganization");
 
 		let activeLi = this.STATUS.getActiveLi();
 
@@ -647,53 +643,78 @@ const TrayWidget = (function() {
 
 	}
 
-	function ajax_post ( params , role, folder, archive) {
+	async function ajax_get ( params , role, folder, archive) {
+
+		//console.log("params="+JSON.stringify(params));
+		//console.log("ajax_get:"+"folder="+folder+":arcgive="+archive+":role="+role);
 
 		let PATH;
-		let ROLE;
-		//console.log("ajax_post:"+"folder="+folder+":arcgive="+archive);
-
-	
-        switch(role) {
-        case 'seller':
-            ROLE = 'Seller';
-        break;
-        case 'buyer':
-            ROLE = 'Buyer';
-        break;
-        default:
-            return;
-        }
+		let args = {
+				offset : params.offset,
+				limit : params.limit
+		}
 
 		switch(folder) {
 		case 'draft':
-			PATH = '/api/trayDrafts/getFolder'+ROLE;
+			PATH = '/api/tray/getFolderOfDraft';
 		break;
 		case 'paid':
-			if(archive == 0) {
-					PATH = '/api/tray/getFolder'+ROLE;
+			if( archive == 0) {
+				args.archive = archive;
+				args.folder = folder;
+				args.role = role;
+				args.type = params.type;
+				PATH = '/api/tray/getFolderOfInvoice';
 			} else {
-					PATH = '/api/trayArchive/getFolder'+ROLE;
+				args.archive = archive;
+				args.folder = folder;
+				args.role = role;
+				args.type = params.type;
+				PATH = '/api/tray/getFolderOfArchive';
 			}
 		break;
+
 		case 'trash':
-				PATH = '/api/trayArchive/getFolder'+ROLE;
+				args.archive = archive;
+				args.folder = folder;
+				args.role = role;
+				args.type = params.type;
+				PATH = '/api/tray/getFolderOfArchive';
 		break;
 		default:
-			PATH = '/api/tray/getFolder'+ROLE;
+			args.archive = archive;
+			args.folder = folder;
+			args.role = role;
+			args.type = params.type;
+			PATH = '/api/tray/getFolderOfInvoice';
 		break;
 		}
 
-		const ajax = new XMLHttpRequest();
-		ajax.open('POST', PATH);
-		ajax.setRequestHeader('Content-Type', 'application/json');
-		ajax.responseType = "json";
-		ajax.send(JSON.stringify(params));
+		const url = PATH;
 
-		return ajax;
+		if(params.order_by == null) {
+			delete params.order_by;
+		}
+		if(params.order == null) {
+			delete params.order;
+		}
+
+		let response;
+        try {
+            response = await fetch( url+'?'+new URLSearchParams(
+				args
+            ).toString());
+
+        } catch(err) {
+
+            throw err;
+        }
+		
+		return await response.json();
+
 	}
 
-	function api_movePage(role, type, folder, archive, offset) {
+	async function api_movePage(role, type, folder, archive, offset) {
 
 		const params = {
 			role : role,
@@ -708,24 +729,18 @@ const TrayWidget = (function() {
 
 		this.MEM.setParams( params );
 
-		const ajax = this.AJAX.post( params , role, folder, archive);
-
-		ajax.onload = () => {
-
-			let res = ajax.response;
-
-			if(res.err) {
-				throw res.msg;
-			}
-
-			this.MEM.setResults( res.msg );
-
-			this.API.renderFolder(role, folder, archive);
+		const res = await this.AJAX.get( params , role, folder, archive);
+		if(res.err) {
+			throw res.msg;
 		}
+
+		this.MEM.setResults( res.msg );
+
+		this.API.renderFolder(role, folder, archive);
 
 	}
 
-	function api_openFolder(role, type, folder, archive) {
+	async function api_openFolder(role, type, folder, archive) {
 
 		const params = {
 			role : role,
@@ -740,20 +755,15 @@ const TrayWidget = (function() {
 
 		this.MEM.setParams( params );
 
-		const ajax = this.AJAX.post( params , role, folder, archive );
+		const res = await this.AJAX.get( params , role, folder, archive );
 
-		ajax.onload = () => {
-
-			let res = ajax.response;
-
-			if(res.err) {
-				throw res.msg;
-			}
-
-			this.MEM.setResults( res.msg );
-
-			this.API.renderFolder(role, folder, archive);
+		if(res.err) {
+			throw res.msg;
 		}
+
+		this.MEM.setResults( res.msg );
+
+		this.API.renderFolder(role, folder, archive);
 
 	}
 
@@ -761,7 +771,7 @@ const TrayWidget = (function() {
 * When you create a new Document, first display it on Draft Tray.
 * Next, select the created Document.
 */
-	function api_openFolderForNewDocument(role, type, folder, archive) {
+	async function api_openFolderForNewDocument(role, type, folder, archive) {
 
 		const params = {
 			role : role,
@@ -776,22 +786,18 @@ const TrayWidget = (function() {
 
 		this.MEM.setParams( params );
 
-		const ajax = this.AJAX.post( params , role, folder, archive);
+		const res = await this.AJAX.get( params , role, folder, archive);
 
-		ajax.onload = () => {
-
-			let res = ajax.response;
-
-			if(res.err) {
-				throw res.msg;
-			}
-
-			this.MEM.setResults( res.msg );
-
-			this.SIMULATE.clickNewDocument(role, folder, archive);
-
-			this.API.renderFolder(role, folder, archive);
+		if(res.err) {
+			throw res.msg;
 		}
+
+		this.MEM.setResults( res.msg );
+
+		this.SIMULATE.clickNewDocument(role, folder, archive);
+
+		this.API.renderFolder(role, folder, archive);
+
 	}
 
 /*

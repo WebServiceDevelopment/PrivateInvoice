@@ -20,20 +20,20 @@
 
 "use strict";
 
-// Import sub
-const sub						= require("../modules/invoice_sub.js");
-const eth						= require("../modules/web3_eth.js");
+// Import Router
+
+const express                   = require('express');
+const router                    = express.Router();
+module.exports                  = router;
+
+// Import Modules
+const sub                       = require("../modules/invoice_sub.js");
 const to_seller                 = require("../modules/buyer_to_seller.js");
 const wallet_sub                = require("../modules/wallet_sub.js");
 
-// Import Router
+const eth                       = require("../modules/web3_eth.js");
+const web3                      = eth.getWeb3();
 
-const express					= require('express');
-const router					= express.Router();
-module.exports					= router;
-
-//  web3,js
-const web3						= eth.getWeb3();
 
 // Libraries
 const currency                  = require('currency.js');
@@ -43,13 +43,21 @@ const currency                  = require('currency.js');
 const config                    = require('../config.json');
 
 const BUYER_STATUS              = "buyer_status";
-const BUYER_DOCUMENT			= "buyer_document";
-const BUYER_DOCUMENT_ARCHIVE	= "buyer_document_archive";
+const BUYER_STATUS_ARCHIVE      = "buyer_status_archive";
+const BUYER_DOCUMENT            = "buyer_document";
+const BUYER_DOCUMENT_ARCHIVE    = "buyer_document_archive";
 
-const SELLER_DOCUMENT			= "seller_document";
-const SELLER_DOCUMENT_ARCHIVE	= "seller_document_archive";
+const SELLER_STATUS             = "seller_status";
+const SELLER_STATUS_ARCHIVE     = "seller_status_archive";
+const SELLER_DOCUMENT           = "seller_document";
+const SELLER_DOCUMENT_ARCHIVE   = "seller_document_archive";
 
 const CONTACTS                  = "contacts";
+
+// CURRENCY
+const CURRENCY                  = config.CURRENCY
+
+const LIST_MAX_DEFAULT             = 20;
 
 // ------------------------------- End Points -------------------------------
 
@@ -59,6 +67,8 @@ const CONTACTS                  = "contacts";
  */
 router.get('/getReceiptInResentActivity', async function(req, res) {
 
+	const METHOD = '/getReceiptInResentActivity';
+
 	const hash = req.query.settlement_hash;
 
 	// 1.
@@ -66,11 +76,12 @@ router.get('/getReceiptInResentActivity', async function(req, res) {
 	const [ receipt, err1 ] = await  eth.getTransactionReceipt(web3, hash) ;
 
 	if(err1) {
-		console.log("error balanceWei 1.1");
-		res.json({
-			err : err1,
-			msg : null
-		});
+		let msg = `ERROR:${METHOD}: Could not get TransactionReceipt`; 
+		res.status(400)
+			.json({
+				err : err1,
+				msg : msg
+			});
 		return;
 	}
 
@@ -92,7 +103,7 @@ router.get('/getReceiptInResentActivity', async function(req, res) {
 router.get('/getResentActivityOfWallet', async function(req, res) {
 
 	const OFFSET	= (req.query.start_position || 1) -1;
-	const LIST_MAX 	= (req.query.list_max|| 20)+OFFSET;
+	const LIST_MAX 	= (req.query.list_max|| LIST_MAX_DEFAULT)+OFFSET;
 
 	const SALE 		= "Sale";
 	const PURCHASE 	= "Purchase";
@@ -101,6 +112,7 @@ router.get('/getResentActivityOfWallet', async function(req, res) {
 	let Activity1 = [];
 	let Activity2 = [];
 
+	const { member_did } = req.session.data;
 
 	// 1.
 	// Extract RecentActivity from each table and set Type (Sales, Purchase).
@@ -110,13 +122,41 @@ router.get('/getResentActivityOfWallet', async function(req, res) {
 	// - Buyer_id
 	// - CredentialSubject
     // 
-	const act = wallet_sub.getRecentActivity;
+	const act_S = wallet_sub.getRecentActivityBySeller_did;
+	const act_B = wallet_sub.getRecentActivityByBuyer_did;
+
+	const act_s = wallet_sub.getRecentActivity_seller;
+	const act_b = wallet_sub.getRecentActivity_buyer;
+
+	let str;
+
+	// 1.1
+
+	str = _uuidsToString( await act_S(SELLER_STATUS, LIST_MAX, member_did));
 
 	const 
-	[a1, len1] = _extract( await act(SELLER_DOCUMENT, LIST_MAX), SALE),
-	[a2, len2] = _extract( await act(SELLER_DOCUMENT_ARCHIVE, LIST_MAX), SALE),
-	[a3, len3] = _extract( await act(BUYER_DOCUMENT, LIST_MAX), PURCHASE),
-	[a4, len4] = _extract( await act(BUYER_DOCUMENT_ARCHIVE, LIST_MAX), PURCHASE);
+	[a1, len1] = _extract( await act_s(SELLER_DOCUMENT, LIST_MAX, str), SALE);
+
+	// 1.2
+
+	str = _uuidsToString( await act_S(SELLER_STATUS_ARCHIVE, LIST_MAX, member_did));
+
+	const 
+	[a2, len2] = _extract( await act_s(SELLER_DOCUMENT_ARCHIVE, LIST_MAX, str), SALE);
+
+	// 1.3
+
+	str = _uuidsToString( await act_B(BUYER_STATUS, LIST_MAX, member_did));
+
+	const 
+	[a3, len3] = _extract( await act_b(BUYER_DOCUMENT, LIST_MAX, str), PURCHASE);
+
+	// 1.4
+
+	str = _uuidsToString( await act_B(BUYER_STATUS_ARCHIVE, LIST_MAX, member_did));
+
+	const 
+	[a4, len4] = _extract( await act_b(BUYER_DOCUMENT_ARCHIVE, LIST_MAX, str), PURCHASE);
 
 
 	// 2.
@@ -223,9 +263,24 @@ router.get('/getResentActivityOfWallet', async function(req, res) {
 
 	return;
 
+	function _uuidsToString(document_uuids) {
+
+		if( document_uuids.length == 0) {
+			return "";
+		}
+
+		let d = [];
+		for(let i in document_uuids) {
+			d.push(document_uuids[i].document_uuid);
+		}
+		return "'"+d.join("','")+"'";
+
+	}
+
 	function _extract (row, type) {
 		let len = row.length;
 		let json;
+
 		const PLAS_MINUS = ((type) => {
 					switch(type) {
 					case SALE:
@@ -271,15 +326,13 @@ router.get('/getResentActivityOfWallet', async function(req, res) {
 
 router.get('/getWalletInfo', async function(req, res) {
 
+	const METHOD = '/getWalletInfo';
+
 	const { wallet_address, member_did } = req.session.data;
-	console.log("wallet_address="+wallet_address+":member_did="+member_did);
 	
 	// 1.
 	// 
 	
-	//console.log("NetworkType="+await web3.eth.net.getNetworkType())
-	//console.log("Chain id="+await web3.eth.getChainId())
-
 	const type = await web3.eth.net.getNetworkType();
 	const id = await web3.eth.getChainId();
 	const account = wallet_address;
@@ -291,18 +344,16 @@ router.get('/getWalletInfo', async function(req, res) {
     const [ balanceWei, err2 ] = await  eth.getBalance(web3, from_account) ;
 
     if(err2) {
-        console.log("error 2: balanceWei");
-        res.json({
-            err : err2,
-            msg : null
+		let msg = `ERROR:${METHOD}: Could not get getBalance`
+        res.status(400)
+		json({
+            err : 2,
+            msg : msg
         });
         return;
     }
 
-	//console.log("balanceWei ="+balanceWei)
-
-	let balanceGwei = web3.utils.fromWei(balanceWei,'Gwei');
-	//console.log("balanceGwei ="+balanceGwei)
+	let balanceGwei = web3.utils.fromWei(balanceWei,CURRENCY.symbol);
 
 	res.json({
 		err : 0,
@@ -325,22 +376,25 @@ router.get('/getWalletInfo', async function(req, res) {
  */
 router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 
-	const METHOD = '/getCurrentBalanceOfBuyer'
+	const METHOD = '/getCurrentBalanceOfBuyer';
 
 	const { document_uuid } = req.query;
 	const { member_did, wallet_address } = req.session.data;
 
-	let rt;
     // 1.
     // getSellerDid
     //
     const [ seller_did, err1 ] = await sub.getSellerDid(BUYER_STATUS, document_uuid, member_did);
     if(err1) {
-        console.log("Error 1 status = 400 err="+err1);
 
-		rt = {err:1,msg  : err1.toString()};
+		let msg = `ERROR:${METHOD}: Could not get did`;
 
-        return res.status(400).json(rt);
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+        return; 
     }
 
     // 2.
@@ -348,10 +402,15 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
     //
     const [ seller_host, err2 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
     if(err2) {
-        console.log("Error 2 status = 400 err="+err2);
 
-		rt = {err:2,msg  : err2.toString()};
-        return res.status(400).json(rt);
+		let msg = `ERROR:${METHOD}: Could not get host`;
+
+		res.status(400)
+			.json({
+				err: 2,
+				msg: msg
+			});
+        return; 
     }
 
 	// 3.
@@ -360,10 +419,15 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 	const [ document , err3 ] = await sub.getDocument(BUYER_DOCUMENT, document_uuid);
 
 	if(err3) {
-        console.log("Error 3 status = 400 err="+err3);
 
-		rt = {err:3,msg  : err3.toString()};
-        return res.status(400).json(rt);
+		let msg = `ERROR:${METHOD}: Could not get document`;
+
+		res.status(400)
+			.json({
+				err: 3,
+				msg: msg
+			});
+        return; 
 	}
 
 	// 4.
@@ -372,14 +436,15 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 	try {
 		doc = JSON.parse( document.document_json);
 	} catch (err4) {
-		console.log("error JSON.parse ="+doc);
-		for (let key in doc){
-			console.log(key +":"+ doc[key]);
-		}
-        console.log("Error 3 status = 400 err="+err3);
 
-		rt = {err:3,msg  : err3.toString()};
-        return res.status(400).json(rt);
+		let msg = `ERROR:${METHOD}: Could not get document_json`;
+
+		res.status(400)
+			.json({
+				err: 4,
+				msg: msg
+			});
+        return; 
 	}
 
 
@@ -388,39 +453,45 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 	//
 
 	const from_account = wallet_address;
-	//console.log("from_account ="+from_account)
 
 	// 6.
 	// code
 	//
-	const [code , err6 ] = await eth.getCode(web3, from_account );
+	const [code , _6 ] = await eth.getCode(web3, from_account );
 
 	if(code == null) {
-		console.log("Error 6 status = 400 err="+err6);
 
-		rt = {err:6,msg  : err6.toString()};
-        return res.status(400).json(rt);
+		let msg = `ERROR:${METHOD}: Could not get code`;
+
+		res.status(400)
+			.json({
+				err: 6,
+				msg: msg
+			});
+        return; 
 	}
-	//console.log("code="+code);
 
 
 	// 7.
 	// Get seller account
 	//
-	const [status7, data7] = await to_seller.getAccountOfSellerWallet(seller_host, seller_did, member_did) ;
+	const [code7, data7] = await to_seller.getAccountOfSellerWallet(seller_host, seller_did, member_did) ;
 
-	if(status7 != 200) {
-		console.log("Error 7 status = 400 err="+data7);
+	if(code7 != 200) {
 
-		rt = {err:7,msg  : err7.toString()};
-        return res.status(400).json(rt);
+		let msg = `ERROR:${METHOD}: Could not get account`;
+
+		res.status(400)
+			.json({
+				err: 7,
+				msg: msg
+			});
+        return; 
 	}
 
 	const msg = (data7.msg);
 
 	const to_account = msg.account;
-
-	//console.log("to_account="+to_account)
 
 	// 8.
 	// callObject
@@ -431,7 +502,6 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 		code: code
 	}
 
-	//console.log("from_account="+from_account);
 
 	// 9.
 	// getBalance
@@ -439,10 +509,15 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 	const [ balanceWei, err9 ] = await  eth.getBalance(web3, from_account) ;
 
 	if(err9) {
-		console.log("Error 9 status = 400 err="+data9);
 
-		rt = {err:9,msg  : err9.toString()};
-        return res.status(400).json(rt);
+		let msg = `ERROR:${METHOD}: Could not get balance`;
+
+		res.status(400)
+			.json({
+				err: 9,
+				msg: msg
+			});
+        return; 
 	}
 
 
@@ -452,10 +527,15 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 	const [ gasPrice, err10 ] = await  eth.getGasPrice(web3) ;
 
 	if(err10) {
-		console.log("Error 10 status = 400 err="+data10);
 
-		rt = {err:10,msg  : err10.toString()};
-        return res.status(400).json(rt);
+		let msg = `ERROR:${METHOD}: Could not get gasPrice`;
+
+		res.status(400)
+			.json({
+				err: 10,
+				msg: msg
+			});
+        return; 
 	}
 
 	// 11.
@@ -464,10 +544,15 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 
 	const [ estimateGas, err11 ] = await  eth.estimateGas(web3,callObject ) ;
 	if(err11) {
-		console.log("Error 11 status = 400 err="+data11);
 
-		rt = {err:11,msg  : err11.toString()};
-        return res.status(400).json(rt);
+		let msg = `ERROR:${METHOD}: Could not get estimateGas`;
+
+		res.status(400)
+			.json({
+				err: 10,
+				msg: msg
+			});
+        return; 
 	}
 
 /*
@@ -515,13 +600,11 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 */
 
 
-	//console.log("estimateGas= "+estimateGas);
-
 	// 12.
 	// Add the integer part and the decimal point separatelya.
 	//
-	let balanceGwei = web3.utils.fromWei(balanceWei, 'Gwei');
-	let gasPriceGwei = web3.utils.fromWei(gasPrice , 'Gwei');
+	let balanceGwei = web3.utils.fromWei(balanceWei, CURRENCY.symbol);
+	let gasPriceGwei = web3.utils.fromWei(gasPrice , CURRENCY.symbol);
 	let gasGwei = estimateGas * gasPriceGwei;
 
 	let payment = doc.credentialSubject.totalPaymentDue.price.replace(/,/g,"");
@@ -529,7 +612,6 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 	let makePaymantTo = parseFloat(payment);
 	let transferCost  = 0;
 
-	//console.log (balanceGwei+":"+ makePaymantTo +":"+ transferCost +":"+ gasGwei);
 	let endBalance = await _calc_decimalPart (balanceGwei, makePaymantTo , transferCost , gasGwei);
 
 
@@ -550,29 +632,25 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 		msg : transaction_result,
 	});
 
-	//console.log("After:"+ balanceGwei+"Gwei");
-
 	return;
 
 	function _calc_decimalPart (balanceGwei, makePaymantTo , transferCost , gasGwei) {
 
 
 		let integerPart = parseInt(balanceGwei) - parseInt(gasGwei) - parseInt(makePaymantTo) - parseInt(transferCost);
-		//console.log("1 integerPart="+integerPart);
 
 		let decimalPart = _decimalPart(balanceGwei) - _decimalPart(gasGwei) - _decimalPart(makePaymantTo) - _decimalPart(transferCost);
 
-		//console.log("2 decimalPart="+decimalPart);
 
 		if( decimalPart == 0) {
 			return integerPart;
 		} else if( decimalPart < 0 ) {
 			decimalPart = -1 * decimalPart;
-			decimalPart = web3.utils.fromWei(decimalPart.toString() ,'Gwei');
+			decimalPart = web3.utils.fromWei(decimalPart.toString() ,CURRENCY.symbol);
 
 			return (integerPart-1) + (1-decimalPart).toString().substr(1);
 		} else {
-			decimalPart = web3.utils.fromWei(decimalPart.toString() ,'Gwei');
+			decimalPart = web3.utils.fromWei(decimalPart.toString() ,CURRENCY.symbol);
 
 			return integerPart + decimalPart.toString().substr(1);
 		}		
@@ -587,19 +665,17 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
 		let dotIdx  = numStr.indexOf(".");
 		let result  = "0." + (dotIdx > -1 ? numStr.substring(dotIdx + 1) : "0");
 
-		if( num = '0.0') {
+		if( num == '0.0') {
 			return 0;
 		}
-		//console.log("result = "+result);
 
 		let res;
 		try {
-			res = web3.utils.toWei(result , 'Gwei');
+			res = web3.utils.toWei(result , CURRENCY.symbol);
 		} catch(e) {
 			res = 0;
 		}
 
-		//console.log("res = "+res+":num = "+num);
 
 		return  (res);
 	}
@@ -612,7 +688,7 @@ router.get('/getCurrentBalanceOfBuyer', async function(req, res) {
  */
 router.get('/getTransactionReceipt', async function(req, res) {
 
-	const METHOD = '/getTransactionReceipt'
+	const METHOD = '/getTransactionReceipt';
 
 	const { document_uuid , role, archive} = req.query;
 
@@ -633,10 +709,11 @@ router.get('/getTransactionReceipt', async function(req, res) {
 			table = BUYER_DOCUMENT_ARCHIVE;
 		break;
 		default:
-			res.json({
-				err : 1,
-				msg : "Invalid argument."
-			});
+			res.staus(400)
+				.json({
+					err : 1,
+					msg : "Invalid argument."
+				});
 			return ;
 		}
 	break;
@@ -651,18 +728,20 @@ router.get('/getTransactionReceipt', async function(req, res) {
 			table = SELLER_DOCUMENT_ARCHIVE;
 		break;
 		default:
-			res.json({
-				err : 2,
-				msg : "Invalid argument."
-			});
+			res.staus(400)
+				.json({
+					err : 2,
+					msg : "Invalid argument."
+				});
 			return ;
 		}
 	break;
 	default:
-		res.json({
-			err : 3,
-			msg : "Invalid argument."
-		});
+		res.staus(400)
+			.json({
+				err : 3,
+				msg : "Invalid argument."
+			});
 		return ;
 	}
 
@@ -671,21 +750,27 @@ router.get('/getTransactionReceipt', async function(req, res) {
 	const [ document , err2 ] = await sub.getDocument(table, document_uuid);
 
 	if(err2) {
-		console.log("Error getDocument "+err2);
-		res.json({
-			err : 2,
-			msg : err2
-		});
+
+		let msg = `Error:${METHOD}: Could not get document`;
+
+		res.status(400)
+			.json({
+				err : 2,
+				msg : msg
+			});
 		return;
 	}
 
 	// 3.
 	if(document == null ) {
-		console.log("This Document is null");
-		res.json({
-			err : 3,
-			msg : "This Document is null."
-		});
+
+		let msg = `Error:${METHOD}: This Document is null`;
+
+		res.status(400)
+			.json({
+				err : 3,
+				msg : msg
+			});
 		return;
 	}
 
@@ -696,11 +781,13 @@ router.get('/getTransactionReceipt', async function(req, res) {
 	const [ receipt, err4 ] = await  eth.getTransactionReceipt(web3, hash) ;
 
 	if(err4) {
-		console.log("Error transaction receipt "+err4);
-		res.json({
-			err : 4,
-			msg : err4
-		});
+		let msg = `Error:${METHOD}: Could not get transaction receipt`;
+
+		res.sttaus
+			.json({
+				err : 4,
+				msg : msg
+			});
 		return;
 	}
 
@@ -723,7 +810,7 @@ router.get('/getTransactionReceipt', async function(req, res) {
  */
 router.get('/getIPFScidByTransactionHash', async function(req, res) {
 
-	const METHOD = '/getIPFScidByTransactionHash'
+	const METHOD = '/getIPFScidByTransactionHash';
 
 	const { transactionHash } = req.query;
 
@@ -734,11 +821,14 @@ router.get('/getIPFScidByTransactionHash', async function(req, res) {
 	const [ result, err1 ] = await  eth.getTransaction(web3, transactionHash) ;
 
 	if(err1) {
-		console.log("error balanceWei 6.1");
-		res.json({
-			err : err1,
-			msg : null
-		});
+
+		let msg = `ERROR:${METHOD}: Could not get Transaction`;
+
+		res.status(400)
+			.json({
+				err : 1,
+				msg : msg
+			});
 		return;
 	}
 

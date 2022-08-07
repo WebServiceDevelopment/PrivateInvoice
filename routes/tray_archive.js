@@ -20,78 +20,228 @@
 
 "use strict";
 
-// Inport
-const sub					= require("../modules/tray_sub.js");
-
 // Import Router
 
-const express				= require('express');
-const router				= express.Router();
-module.exports				= router;
+const express                   = require('express');
+const router                    = express.Router();
+module.exports                  = router;
+
+// Import Modules
+const {
+    getCount,
+    getFolder,
+    getTotal,
+	nullCheckArgsOfInvoiceTray,
+}                               = require("../modules/tray_sub.js");
 
 // Database
 
-const BUYER_ARCHIVE_STATUS	= "buyer_status_archive";
-const SELLER_ARCHIVE_STATUS	= "seller_status_archive";
+const BUYER_ARCHIVE_STATUS      = "buyer_status_archive";
+const SELLER_ARCHIVE_STATUS     = "seller_status_archive";
 
 //--------------------------------- End Points --------------------------------
 /*
  * 1.
- * getCountBuyer
+ * getCountOfArchive
  */
-router.post('/getCountBuyer', function(req, res) {
+router.get('/getCountOfArchive', async function(req, res) {
 
-    sub.getCount(req, res, BUYER_ARCHIVE_STATUS);
+	const METHOD = '/getCountOfArchive';
+
+	const archive = req.query.archive;
+	const folder = req.query.folder;
+	const role = req.query.role;
+	const type = req.query.type;
+
+// 1.
+	if(type != 'invoice') {
+		let msg = `ERROR:${METHOD}: Invalid argument`;
+		res.status(400).json({
+			err : 1,
+			msg : msg
+		});
+	}
+
+	if(role != 'buyer' && role != 'seller') {
+		let msg = `ERROR:${METHOD}: Invalid argument`;
+		res.status(400).json({
+			err : 1,
+			msg : msg
+		});
+	}
+	
+	if(archive != 1 && archive != 0) {
+		let msg = `ERROR:${METHOD}: Invalid argument`;
+		res.status(400).json({
+			err : 1,
+			msg : msg
+		});
+	}
+
+	if(folder != 'paid' && folder != 'trash') {
+
+		let msg = `ERROR:${METHOD}: Invalid argument`;
+
+		res.status(400).json({
+			err : 1,
+			msg : msg
+		});
+	}
+	
+// 2.
+	req.body = [
+            {
+                archive : archive,
+                folder : folder,
+                role : role,
+                type : 'invoice'
+            }
+        ]
+
+	const table = ((role) => {
+
+			switch(role) {
+			case "buyer":
+				return BUYER_ARCHIVE_STATUS;	
+			case "seller":
+				return SELLER_ARCHIVE_STATUS;	
+			}
+
+		})(role)
+
+    const [err , counts] = await getCount(req, res, table);
+
+    if(err) {
+
+        res.json({
+			err: 0,
+			msg: counts
+		});
+		return;
+    }
+
+    res.json({
+        err: 0,
+        msg: counts
+    });
+
 
 });
 
 /*
  * 2.
- * getCountSeller
+ * getFolderOfArchive
  */
-router.post('/getCountSeller', function(req, res) {
+router.get('/getFolderOfArchive', async function(req, res) {
 
-    sub.getCount(req, res, SELLER_ARCHIVE_STATUS);
+	const archive = req.query.archive;
+	const folder = req.query.folder;
+	const role = req.query.role;
+	const type = req.query.type;
+
+	const offset = req.query.offset;
+	const limit = req.query.limit;
+
+    req.body =
+            {
+                archive : archive,
+                folder : folder,
+                role : role,
+                type : type,
+                offset : offset,
+                limit : limit
+            }
+
+	//console.log(JSON.stringify(req.body));
+
+	let table_name;
+
+	switch(role) {
+	case "buyer":
+		table_name = BUYER_ARCHIVE_STATUS;	
+	break;
+	case "seller":
+		table_name = SELLER_ARCHIVE_STATUS;	
+	break;
+	}
+
+    const [rows, err1] = await getFolder(req, res, table_name);
+
+	if(err1) {
+		let msg = `ERROR:${METHOD}: Could not get Folder`
+        res.status(400).json({
+            err : 1,
+            msg : msg
+        });
+	}
+
+	res.json({
+		err : 0,
+		msg : rows
+	});
 
 });
+
 
 /*
  * 3.
- * getFolderBuyer
+ * getTotalOfArchive
  */
-router.post('/getFolderBuyer', function(req, res) {
+router.get('/getTotalOfArchive', async function(req, res) {
 
-    sub.getFolder(req, res, BUYER_ARCHIVE_STATUS);
+	const METHOD = '/getTotalOfArchive';
+
+	const archive = req.query.archive;
+	const folder = req.query.folder;
+	const role = req.query.role;
+	const type = req.query.type;
+
+	if(nullCheckArgsOfInvoiceTray(req)== false) {
+
+		let msg = `ERROR:${METHOD}: Invalid argument`
+
+		res.status(400)
+			.json({
+				err : 1,
+				msg : msg
+			});
+		return;
+	}
+
+    req.body =
+            {
+                archive : archive,
+                folder : folder,
+                role : role,
+                type : type
+            }
+
+	//console.log(JSON.stringify(req.body));
+
+	let table_name;
+
+	switch(role) {
+	case "buyer":
+		table_name = BUYER_ARCHIVE_STATUS;	
+	break;
+	case "seller":
+		table_name = SELLER_ARCHIVE_STATUS;	
+	break;
+	}
+
+    const [total, err] = await getTotal(req, res, table_name);
+
+	if(err) {
+		let msg = `ERROR:${METHOD}: Could not get Total`
+        res.status(400).json({
+            err : 1,
+            msg : {total : 0}
+        });
+	}
+
+	res.json({
+		err : 0,
+		msg : total
+	});
 
 });
-
-/*
- * 4.
- * getFolderSeller
- */
-router.post('/getFolderSeller', function(req, res) {
-
-    sub.getFolder(req, res, SELLER_ARCHIVE_STATUS);
-
-});
-
-/*
- * 5.
- * getTotalBuyer
- */
-router.post('/getTotalBuyer', async function(req, res) {
-
-    sub.getTotal(req, res, BUYER_ARCHIVE_STATUS);
-
-});
-
-/*
- * 6.
- * getTotalSeller
- */
-router.post('/getTotalSeller', async function(req, res) {
-
-    sub.getTotal(req, res, SELLER_ARCHIVE_STATUS);
-
-});
-

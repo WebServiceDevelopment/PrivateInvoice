@@ -9,7 +9,8 @@
     "debug": "npx dotenv -e debug.env node index.js",
     "dev:seller": "NODE_OPTIONS=--openssl-legacy-provider npx dotenv -e seller.env node index.js",
     "dev:buyer": "NODE_OPTIONS=--openssl-legacy-provider npx dotenv -e buyer.env node index.js",
-    "ganache": "ganache --wallet.seed myCustomSeed"
+    "ganache": "ganache --wallet.seed myCustomSeed",
+    "postman": "npx newman run ./postman_collection.json --reporters cli --verbose --bail"
   },
   "repository": {
     "type": "git",
@@ -49,6 +50,7 @@
     "moment": "^2.29.3",
     "mysql": "^2.18.1",
     "node-gyp-build": "^4.4.0",
+    "qs": "^6.11.0",
     "redis": "^3.1.2",
     "serve-static": "^1.15.0",
     "session-file-store": "^1.5.0",
@@ -63,7 +65,7 @@
   },
   "devDependencies": {
     "dotenv-cli": "^5.1.0",
-    "eslint": "^8.15.0",
-    "eslint-plugin-react": "^7.29.4"
+    "eslint-plugin-react": "^7.29.4",
+    "newman": "^5.3.2"
   }
 }

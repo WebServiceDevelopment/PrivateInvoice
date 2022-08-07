@@ -20,22 +20,44 @@
 
 "use strict";
 
-const db = require('../database.js')
-const moment = require('moment');
-const { signStatusMessage } = require('./sign_your_credentials.js');
-const sub					= require("./invoice_sub.js");
-const { moveToTrash }		= require('./move_to_trash.js');
-const { moveToPaid }		= require('./move_to_paid.js');
-const { moveToArchive }		= require('./move_to_archive.js');
+// Libraries
+const moment                = require('moment');
 
-const handleStatusUpdate = async(credential, res) => {
+// Import Modules
+const sub					= require("./invoice_sub.js");
+const { signStatusMessage } = require('./sign_your_credentials.js');
+
+const {
+    moveToTrash,
+    moveToPaid,
+    moveToArchive,
+}							= require('./move_to.js');
+
+// Database
+const db                    = require('../database.js')
+
+// Exports
+module.exports = {
+	handleStatusUpdate      : _handleStatusUpdate,
+	createConfirmMessage    : _createConfirmMessage,
+	createReturnMessage     : _createReturnMessage,
+	createWithdrawMessage   : _createWithdrawMessage,
+	createTrashMessage      : _createTrashMessage,
+	createRecreateMessage   : _createRecreateMessage,
+	createPaymentMessage    : _createPaymentMessage,
+	createArchiveMessage    : _createArchiveMessage,
+}
+
+// -------------------------- Export Modules ---------------------------------
+
+async function _handleStatusUpdate (credential, res) {
 
 
 	const [ message ] = credential.credentialSubject.items;
 	
-	let status, document_uuid, buyer_did, seller_did, hash, moveErr;
+	let status, document_uuid, buyer_did, seller_did, hash; 
 
-	let  _, err;
+	let  msg, err;
 
 	switch(message.statusCode) {
 	case 'toConfirm':
@@ -43,7 +65,11 @@ const handleStatusUpdate = async(credential, res) => {
 		status = 'seller_status';
         document_uuid = message.recordNo;
         buyer_did = message.entryNo;
-		await sub.setConfirm(status, document_uuid, buyer_did);
+		[ msg, err] = await sub.setConfirm(status, document_uuid, buyer_did);
+		if(err) {
+			_error (message.statusCode, msg, err);
+			return res.status(400).end(msg);
+		}
 		return res.status(200).end('okay');
 
 	case 'toPaid':
@@ -52,9 +78,11 @@ const handleStatusUpdate = async(credential, res) => {
         document_uuid = message.recordNo;
         buyer_did = message.entryNo;
         hash = message.validCodeReason;
-		moveErr = await moveToPaid(document_uuid, buyer_did, hash);
-		if(moveErr) {
-			return res.status(400).end(moveErr);
+
+		[ msg, err] = await moveToPaid(document_uuid, buyer_did, hash);
+		if(err) {
+			_error (message.statusCode, msg, err);
+			return res.status(400).end(msg);
 		}
 		return res.status(200).end('okay');
 
@@ -63,7 +91,15 @@ const handleStatusUpdate = async(credential, res) => {
 		status = 'seller_status';
         document_uuid = message.recordNo;
         buyer_did = message.entryNo;
-		await sub.setReturn(status, document_uuid, buyer_did);
+
+		[ msg, err] = await sub.setReturn(status, document_uuid, buyer_did);
+		if(err) {
+			_error (message.statusCode, msg, err);
+			return res.status(400).end(msg);
+		}
+
+		console.log("toReturn accepted");
+
 		return res.status(200).end('okay');
 
 	case "toWithdraw":
@@ -72,8 +108,11 @@ const handleStatusUpdate = async(credential, res) => {
         document_uuid = message.recordNo;
         seller_did = message.entryNo;
 
-		[ _, err] = await sub.setWithdrawSeller(status, document_uuid, seller_did);
-		if(err) _error (message.statusCode, err);
+		[ msg, err] = await sub.setWithdrawSeller(status, document_uuid, seller_did);
+		if(err) {
+			_error (message.statusCode, msg, err);
+			return res.status(400).end(msg);
+		}
 
 		return res.status(200).end('okay');
 
@@ -83,7 +122,15 @@ const handleStatusUpdate = async(credential, res) => {
 		status = 'buyer_status';
         document_uuid = message.recordNo;
         seller_did = message.entryNo;
-		await moveToTrash(status, document_uuid, seller_did);
+
+		[ msg, err] = await moveToTrash(status, document_uuid, seller_did);
+		if(err) {
+			_error (message.statusCode, msg, err);
+			return res.status(400).end(msg);
+		}
+
+		console.log("moveToTrash accepted");
+
 		return res.status(200).end('okay');
 
 	case "toArchive":
@@ -91,24 +138,151 @@ const handleStatusUpdate = async(credential, res) => {
 		status = 'buyer_status';
         document_uuid = message.recordNo;
         seller_did = message.entryNo;
-		moveErr = await moveToArchive(document_uuid);
-		if(moveErr) {
-			return res.status(400).end(moveErr);
+
+		[ msg, err] = await moveToArchive(document_uuid);
+		if(err) {
+			_error (message.statusCode, msg, err);
+			return res.status(400).end(msg);
 		}
+
+		console.log("moveToArchive accepted");
+
 		return res.status(200).end('okay');
 
 	default:
 		return res.status(400).end('Invalid message')
 	}
 
-	return;
 
-	function _error (statusCode, err) {
+	function _error (statusCode, msg, err) {
 
-		console.log(`${statusCode} err=`+JSON.stringify(err));
+		console.log(`${statusCode}, mag=${msg}, err=+${err}`);
 	}
 
 }
+
+
+async function _createConfirmMessage (document_uuid, member_did, keyPair) {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_did,
+		entryLineSequence: "Message sent from buyer",
+		statusCode: "toConfirm",
+		statusCodeDescription: "Buyer has confirmed this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_did, message, keyPair);
+
+}
+
+
+async function _createReturnMessage (document_uuid, member_did, keyPair) {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_did,
+		entryLineSequence: "Message sent from buyer",
+		statusCode: "toReturn",
+		statusCodeDescription: "Buyer has disputed this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_did, message, keyPair);
+
+}
+
+async function _createWithdrawMessage (document_uuid, member_did, keyPair) {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_did,
+		entryLineSequence: "Message sent from seller",
+		statusCode: "toWithdraw",
+		statusCodeDescription: "Seller has retracted this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_did, message, keyPair);
+
+}
+
+async function _createTrashMessage (document_uuid, member_did, keyPair) {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_did,
+		entryLineSequence: "Message sent from seller",
+		statusCode: "toTrash",
+		statusCodeDescription: "Seller has trashed this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_did, message, keyPair);
+
+}
+
+async function _createRecreateMessage (document_uuid, member_did, keyPair) {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_did,
+		entryLineSequence: "Message sent from seller",
+		statusCode: "toRecreate",
+		statusCodeDescription: "Seller has recreated this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_did, message, keyPair);
+
+}
+
+async function _createPaymentMessage (document_uuid, member_did, keyPair, hash) {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_did,
+		entryLineSequence: "Message sent from buyer",
+		statusCode: "toPaid",
+		statusCodeDescription: "Buyer has paid this invoice",
+		validCodeReason: hash,
+		validCodeReasonDescription: "The hash to validate the transaction",
+	}
+
+	return await createMessage(document_uuid, member_did, message, keyPair);
+
+}
+
+async function _createArchiveMessage (document_uuid, member_did, keyPair) {
+
+	const message = {
+		type: "PGAStatusMessage",
+		recordNo: document_uuid,
+		entryNo: member_did,
+		entryLineSequence: "Message sent from seller",
+		statusCode: "toArchive",
+		statusCodeDescription: "Seller has archived this invoice",
+		validCodeReason: "",
+		validCodeReasonDescription: "",
+	}
+
+	return await createMessage(document_uuid, member_did, message, keyPair);
+
+}
+
+// -------------------------- Private Modules ---------------------------------
 
 const createMessage = async (document_uuid, member_did, message, keyPair) => {
 
@@ -175,135 +349,4 @@ const createMessage = async (document_uuid, member_did, message, keyPair) => {
 
 	const signedCredential = await signStatusMessage(credential, keyPair);
 	return signedCredential;
-}
-
-const createConfirmMessage = async(document_uuid, member_did, keyPair) => {
-
-	const message = {
-		type: "PGAStatusMessage",
-		recordNo: document_uuid,
-		entryNo: member_did,
-		entryLineSequence: "Message sent from buyer",
-		statusCode: "toConfirm",
-		statusCodeDescription: "Buyer has confirmed this invoice",
-		validCodeReason: "",
-		validCodeReasonDescription: "",
-	}
-
-	return await createMessage(document_uuid, member_did, message, keyPair);
-
-}
-
-
-const createReturnMessage = async(document_uuid, member_did, keyPair) => {
-
-	const message = {
-		type: "PGAStatusMessage",
-		recordNo: document_uuid,
-		entryNo: member_did,
-		entryLineSequence: "Message sent from buyer",
-		statusCode: "toReturn",
-		statusCodeDescription: "Buyer has disputed this invoice",
-		validCodeReason: "",
-		validCodeReasonDescription: "",
-	}
-
-	return await createMessage(document_uuid, member_did, message, keyPair);
-
-}
-
-const createWithdrawMessage = async(document_uuid, member_did, keyPair) => {
-
-	const message = {
-		type: "PGAStatusMessage",
-		recordNo: document_uuid,
-		entryNo: member_did,
-		entryLineSequence: "Message sent from seller",
-		statusCode: "toWithdraw",
-		statusCodeDescription: "Seller has retracted this invoice",
-		validCodeReason: "",
-		validCodeReasonDescription: "",
-	}
-
-	return await createMessage(document_uuid, member_did, message, keyPair);
-
-}
-
-const createTrashMessage = async(document_uuid, member_did, keyPair) => {
-
-	const message = {
-		type: "PGAStatusMessage",
-		recordNo: document_uuid,
-		entryNo: member_did,
-		entryLineSequence: "Message sent from seller",
-		statusCode: "toTrash",
-		statusCodeDescription: "Seller has trashed this invoice",
-		validCodeReason: "",
-		validCodeReasonDescription: "",
-	}
-
-	return await createMessage(document_uuid, member_did, message, keyPair);
-
-}
-
-const createRecreateMessage = async(document_uuid, member_did, keyPair) => {
-
-	const message = {
-		type: "PGAStatusMessage",
-		recordNo: document_uuid,
-		entryNo: member_did,
-		entryLineSequence: "Message sent from seller",
-		statusCode: "toRecreate",
-		statusCodeDescription: "Seller has recreated this invoice",
-		validCodeReason: "",
-		validCodeReasonDescription: "",
-	}
-
-	return await createMessage(document_uuid, member_did, message, keyPair);
-
-}
-
-const createPaymentMessage = async(document_uuid, member_did, keyPair, hash) => {
-
-	const message = {
-		type: "PGAStatusMessage",
-		recordNo: document_uuid,
-		entryNo: member_did,
-		entryLineSequence: "Message sent from buyer",
-		statusCode: "toPaid",
-		statusCodeDescription: "Buyer has paid this invoice",
-		validCodeReason: hash,
-		validCodeReasonDescription: "The hash to validate the transaction",
-	}
-
-	return await createMessage(document_uuid, member_did, message, keyPair);
-
-}
-
-const createArchiveMessage = async(document_uuid, member_did, keyPair) => {
-
-	const message = {
-		type: "PGAStatusMessage",
-		recordNo: document_uuid,
-		entryNo: member_did,
-		entryLineSequence: "Message sent from seller",
-		statusCode: "toArchive",
-		statusCodeDescription: "Seller has archived this invoice",
-		validCodeReason: "",
-		validCodeReasonDescription: "",
-	}
-
-	return await createMessage(document_uuid, member_did, message, keyPair);
-
-}
-
-module.exports = {
-	handleStatusUpdate,
-	createConfirmMessage,
-	createReturnMessage,
-	createWithdrawMessage,
-	createTrashMessage,
-	createRecreateMessage,
-	createPaymentMessage,
-	createArchiveMessage
 }

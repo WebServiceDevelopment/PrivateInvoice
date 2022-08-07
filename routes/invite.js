@@ -22,85 +22,79 @@
 
 // Import Router
 
-const express				= require('express');
-const router				= express.Router();
-module.exports				= router;
-const uniqid				= require("uniqid");
+const express                   = require('express');
+const router                    = express.Router();
+module.exports                  = router;
+	
+// Import Modules
+const {getContactListByMember_did} = require("../modules/contacts_in.js");
 
 // Libraries
 
-const uuidv1				= require('uuid').v1;
-
 // Database
 
-const db					= require('../database.js');
 
 //------------------------------- export modules -------------------------------
 
 /*
- * 4.
+ * 1.
  * contacts
  */
 
-router.post('/contacts', async function(req, res) {
+router.get('/getContacts', async function(req, res) {
 
-	const CONTACTS_TABLE = "contacts";
+	const METHOD = '/getContacts';
+
 	let contactType, myPosition;
 
 	// First we get a list of all of the contact uuid's
 	// in the direction that we request
 
-	switch(req.body.contactType) {
+	console.log("req.query.contactType="+req.query.contactType)
+
+	// 1.
+	//
+	switch(req.query.contactType) {
 	case "sellers":
 		contactType = "seller_did";
 		myPosition = "buyer_did";
 
-		//console.log("/contacts sellers ");
 		break;
 	case "buyers":
 		contactType = "remote_member_did";
 		myPosition = "local_member_did";
 
-		//console.log("/contacts buyers ");
 		break;
 	default:
-		return res.json({
-			err : 1,
-			msg : "Invalid contact type provided"
-		});
+
+		let msg = `ERROR:${METHOD}: Invalid contact type provided`;
+
+		res.status(400)
+			.json({
+				err : 1,
+				msg : msg
+			});
+		return;
 	}
 
-	let sql = `
-		SELECT
-			${contactType} AS contact_uuid,
-			remote_member_did,
-			remote_membername,
-			remote_origin,
-			remote_organization
-		FROM
-			${CONTACTS_TABLE}
-		WHERE
-			${myPosition} = ?
-		AND
-			local_to_remote = 1
-	`;
 
-	let args = [
-		req.session.data.member_did
-	];
+	//2.
+	//
+	const [rows, err2] = await getContactListByMember_did( 
+								contactType, 
+								myPosition, 
+								req.session.data.member_did);
 
-	let rows;
+	if( err2) {
 
-	try {
-		rows = await db.selectAll(sql, args);
-	} catch(err) {
-		//throw err;
-		console.log("invite contacts error 1")
+		let msg = `ERROR:${METHOD}: Invalid request`;
 
-		return res.status(400).json({
-			err : 1,
-			msg : "Could not select CONTACTS_TABLE"
-		});
+		res.status(400)
+			.json({
+				err : 2,
+				msg : msg
+			});
+		return;
 	}
 
 	if(!rows.length) {
@@ -108,8 +102,11 @@ router.post('/contacts', async function(req, res) {
 			err : 0,
 			msg : []
 		});
+		return;
 	}
 
+	// 3.
+	//
 	const contactList = rows.map( (row) => {
 
 		const org = JSON.parse(row.remote_organization);
@@ -123,15 +120,17 @@ router.post('/contacts', async function(req, res) {
             organization_building : org.building,
             organization_department : org.department,
             organization_tax_id : '',
-            addressCountry : '',
-            addressRegion : '',
-            addressCity : '',
+            addressCountry : org.country,
+            addressRegion : org.state,
+            addressCity : org.city,
             wallet_address : ''
 		}
 	});
 
 
-	return res.json({
+	// 4.
+	//
+	res.json({
 		err : 0,
 		msg : contactList
 	});

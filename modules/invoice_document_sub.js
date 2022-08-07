@@ -18,40 +18,36 @@
     
 **/
 
-"use strict";
-
-// Import Router
-
-const express					= require('express');
-const router					= express.Router();
-module.exports					= router;
-
-// Libraries
-
-
-// Database 
-
+// Database Libraries
 const config					= require('../config.json');
+
 const db						= require('../database.js');
 
-
 const BUYER_DOCUMENT			= "buyer_document";
-
 const BUYER_ARCHIVE_DOCUMENT	= "buyer_document_archive";
 
 const SELLER_DOCUMENT 			= "seller_document";
 const SELLER_ARCHIVE_DOCUMENT	= "seller_document_archive";
+const SELLER_DRAFT_DOCUMENT		= "seller_document_draft";
 
+// Exports 
+module.exports = {
+	getDocumentBuyer			: _getDocumentBuyer,
+	getDocumentSeller			: _getDocumentSeller,
+	getArchiveDocumentBuyer		: _getArchiveDocumentBuyer,
+	getArchiveDocumentSeller	: _getArchiveDocumentSeller,
+	getDraftDocument			: _getDraftDocument,
+}
 
-// ------------------------------- End Points -------------------------------
+//------------------------------- export modules ------------------------------
 
 /*
  * 1.
  * getDocumentBuyer
  */
-router.get('/getDocumentBuyer', async function(req, res) {
+async function _getDocumentBuyer (document_uuid) {
 
-    let sql = `
+    const sql = `
         SELECT
             document_uuid,
             document_json
@@ -61,43 +57,28 @@ router.get('/getDocumentBuyer', async function(req, res) {
             document_uuid = ?
     `;
 
-    let args = [
-        req.query.document_uuid
+    const args = [
+        document_uuid
     ];
 
 	let result;
-	let doc;
 	try {
 		result = await db.selectOne(sql, args);
 	} catch(err) {
-		throw err;
+		[ null, err];
 	}
 
-	if(!result) {
-		console.log("Buyer DOCUMENT NOT FOUND FOR MEMBER:"+req.query.document_uuid)
-		return res.json({
-			err : 2,
-			msg : "Buyer DOCUMENT NOT FOUND FOR MEMBER"
-		});
-	}
+	return [ result, null];
 
-	doc = {};
-	doc.document_json =  JSON.parse(result.document_json);
-
-	res.json({
-		err : 0,
-		msg : doc
-	});
-
-});
+};
 
 /*
  * 2.
  * getDocumentSeller
  */
-router.get('/getDocumentSeller', async function(req, res) {
+async function _getDocumentSeller (document_uuid) {
 
-    let sql = `
+    const sql = `
         SELECT
             document_uuid,
             document_json
@@ -107,43 +88,28 @@ router.get('/getDocumentSeller', async function(req, res) {
             document_uuid = ?
     `;
 
-    let args = [
-        req.query.document_uuid
+    const args = [
+        document_uuid
     ];
 
 	let result;
-	let doc;
 	try {
 		result = await db.selectOne(sql, args);
 	} catch(err) {
-		throw err;
+		[ null, err];
 	}
 
-	if(!result) {
-		console.log("seller DOCUMENT NOT FOUND FOR MEMBER:"+req.query.document_uuid)
-		return res.json({
-			err : 2,
-			msg : "Seller DOCUMENT NOT FOUND FOR MEMBER"
-		});
-	}
+	return [ result, null];
 
-	doc = {};
-	doc.document_json = JSON.parse(result.document_json);
-
-	res.json({
-		err : 0,
-		msg : doc
-	});
-
-});
+};
 
 /*
  * 3.
  * getArchiveDocumentBuyer
  */
-router.get('/getArchiveDocumentBuyer', async function(req, res) {
+async function _getArchiveDocumentBuyer (document_uuid) {
 
-    let sql = `
+    const sql = `
         SELECT
             document_uuid,
             document_json
@@ -153,42 +119,28 @@ router.get('/getArchiveDocumentBuyer', async function(req, res) {
             document_uuid = ?
     `;
 
-    let args = [
-        req.query.document_uuid
+    const args = [
+        document_uuid
     ];
 
 	let result;
-	let doc;
 	try {
 		result = await db.selectOne(sql, args);
 	} catch(err) {
-		throw err;
+		[ null, err];
 	}
 
-	if(!result) {
-		return res.json({
-			err : 2,
-			msg : "Buyer DOCUMENT NOT FOUND FOR MEMBER"
-		});
-	}
+	return [ result, null];
 
-	doc = {};
-	doc.document_json =  JSON.parse(result.document_json);
-
-	res.json({
-		err : 0,
-		msg : doc
-	});
-
-});
+};
 
 /*
  * 4.
  * getArchiveDocumentSeller
  */
-router.get('/getArchiveDocumentSeller', async function(req, res) {
+async function _getArchiveDocumentSeller (document_uuid) {
 
-    let sql = `
+    const sql = `
         SELECT
             document_uuid,
             document_json
@@ -198,31 +150,67 @@ router.get('/getArchiveDocumentSeller', async function(req, res) {
             document_uuid = ?
     `;
 
-    let args = [
-        req.query.document_uuid
+    const args = [
+        document_uuid
     ];
 
 	let result;
-	let doc;
 	try {
 		result = await db.selectOne(sql, args);
 	} catch(err) {
-		throw err;
+		[ null, err];
 	}
 
-	if(!result) {
-		return res.json({
-			err : 2,
-			msg : "Seller DOCUMENT NOT FOUND FOR MEMBER"
-		});
+	return [ result, null];
+
+};
+
+/*
+ * 5.
+ * getDraftDocument
+ */
+async function _getDraftDocument (member_did, document_uuid) {
+
+
+	const sql = `
+		SELECT
+			document_uuid,
+			document_json,
+			document_type,
+			subject_line,
+			currency_options,
+			seller_did,
+			seller_membername,
+			seller_details,
+			buyer_did,
+			buyer_membername,
+			buyer_details,
+			created_on,
+			document_meta,
+			document_body,
+			document_totals,
+			document_logo
+		FROM
+			${SELLER_DRAFT_DOCUMENT}
+		WHERE
+			(seller_did = ? OR buyer_did = ?)
+		AND
+			document_uuid = ?
+	`;
+
+	const args = [
+		member_did,
+		member_did,
+		document_uuid
+	];
+
+	let doc;
+	try {
+		doc = await db.selectOne(sql, args);
+	} catch(err) {
+		return [ null,  err];
 	}
 
-	doc = {};
-	doc.document_json =  JSON.parse(result.document_json);
+	return [doc , null];
 
-	res.json({
-		err : 0,
-		msg : doc
-	});
-
-});
+};

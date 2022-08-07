@@ -18,9 +18,10 @@
     
 **/
 
-//
+// Import Modules
 const to_seller					= require("../modules/buyer_to_seller.js");
 
+//  Libraries
 const Tx                        = require('ethereumjs-tx').Transaction;
 
 // Database Libraries
@@ -44,7 +45,7 @@ const GAS_LIMIT = 210000;
  */
 function _toReturnError(err , code, method_no) {
 
-	let ERR_KEYWORD = "Error: Returned error:";
+	let ERR_KEYWORD = "Error: toReturnError error:";
 	let error = err.toString();
 
 	let rt ={}
