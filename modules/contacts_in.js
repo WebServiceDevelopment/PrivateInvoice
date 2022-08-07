@@ -22,17 +22,129 @@
 
 // Import Libraries
 
-const uuidv1 = require('uuid').v1
+const uuidv1					= require('uuid').v1
 
 // Database
 
-const db = require('../database.js')
+const db						= require('../database.js')
+
+const CONTACTS_TABLE 			= "contacts";
+
+// Exports
+module.exports = {
+    handleContactRequest		: _handleContactRequest,
+	checkInviteCodeValid		: _checkInviteCodeValid,
+	checkForExistingContact 	: _checkForExistingContact,
+	insertNewContact			: _insertNewContact,
+
+	getContactListByMember_did	: _getContactListByMember_did,
+}
+
+//------------------------------ define modules ------------------------------
+
+/*
+ * handleContactRequest
+ */
+async function _handleContactRequest (body) {
+    console.log('--- Handle Contact Request ---')
+
+    // 1.
+    // First we see if the invite code is still valid
+
+    const invite_code = body.id.split(':').pop()
+    const [linkRelationship] = body.relatedLink.filter((link) => {
+        return link.linkRelationship === 'Invite'
+    })
+
+	console.log(linkRelationship);
+    const local_member_did = linkRelationship.target
+
+    const [invite, inviteEr] = await _checkInviteCodeValid(
+        local_member_did,
+        invite_code
+    )
+
+    if (inviteEr) {
+        return [400, 'invite code invalid']
+    }
+
+    // 2.
+    // Then we see if the contact already exists
+
+    // const remote_member_did = body.issuer.id
+	
+    const remote_member_did = body.credentialSubject.id
+    const exists = await _checkForExistingContact(
+        local_member_did,
+        remote_member_did
+    )
+    if (exists) {
+        return [400, 'contact already exists']
+    }
+
+    // 3.
+    // Then we try to insert the contact
+
+    const [created, createErr] = await _insertNewContact(
+        invite_code,
+        local_member_did,
+        body
+    )
+    if (createErr) {
+        return [400, 'could not create contact']
+    }
+
+    // Then we return a confirmation status
+
+    return [200, 'contact created']
+}
+
+
+async function _getContactListByMember_did (contactType, myPosition, member_did) {
+
+	const sql = `
+		SELECT
+			${contactType} AS contact_uuid,
+			remote_member_did,
+			remote_membername,
+			remote_origin,
+			remote_organization
+		FROM
+			${CONTACTS_TABLE}
+		WHERE
+			${myPosition} = ?
+		AND
+			local_to_remote = 1
+	`;
+
+	const args = [
+		member_did
+	];
+
+	let rows;
+
+	try {
+		rows = await db.selectAll(sql, args);
+	} catch(err) {
+		const msg = err.toString();
+
+		console.log(msg)
+
+		return [null , msg];
+	}
+
+	return [rows, null];
+}
+
+
+//-----------------------------------------------------------------------------
 
 /*
  * Helper functions
  */
 
-const checkInviteCodeValid = async (local_uuid, invite_code) => {
+async function _checkInviteCodeValid (local_uuid, invite_code) {
+
     const sql = `
 		SELECT
 			invite_code,
@@ -68,7 +180,8 @@ const checkInviteCodeValid = async (local_uuid, invite_code) => {
 /*
  * checkForExistingContact
  */
-const checkForExistingContact = async (local_uuid, remote_uuid) => {
+async function _checkForExistingContact (local_uuid, remote_uuid) {
+
     const sql = `
 		SELECT
 			COUNT(*) AS num
@@ -91,7 +204,7 @@ const checkForExistingContact = async (local_uuid, remote_uuid) => {
 /*
  * insertNewContact
  */
-const insertNewContact = async (invite_code, local_member_did, credential) => {
+async function _insertNewContact (invite_code, local_member_did, credential) {
     // Get local username
 
     const mySql = `
@@ -227,66 +340,3 @@ const insertNewContact = async (invite_code, local_member_did, credential) => {
 
 }
 
-//------------------------------ define endpoints ------------------------------
-
-/*
- * contactRequest
- */
-
-const handleContactRequest = async (body) => {
-    console.log('--- Handle Contact Request ---')
-
-    // 1.
-    // First we see if the invite code is still valid
-
-    const invite_code = body.id.split(':').pop()
-    const [linkRelationship] = body.relatedLink.filter((link) => {
-        return link.linkRelationship === 'Invite'
-    })
-
-	console.log(linkRelationship);
-    const local_member_did = linkRelationship.target
-
-    const [invite, inviteEr] = await checkInviteCodeValid(
-        local_member_did,
-        invite_code
-    )
-
-    if (inviteEr) {
-        return [400, 'invite code invalid']
-    }
-
-    // 2.
-    // Then we see if the contact already exists
-
-    // const remote_member_did = body.issuer.id
-	
-    const remote_member_did = body.credentialSubject.id
-    const exists = await checkForExistingContact(
-        local_member_did,
-        remote_member_did
-    )
-    if (exists) {
-        return [400, 'contact already exists']
-    }
-
-    // 3.
-    // Then we try to insert the contact
-
-    const [created, createErr] = await insertNewContact(
-        invite_code,
-        local_member_did,
-        body
-    )
-    if (createErr) {
-        return [400, 'could not create contact']
-    }
-
-    // Then we return a confirmation status
-
-    return [200, 'contact created']
-}
-
-module.exports = {
-    handleContactRequest,
-}

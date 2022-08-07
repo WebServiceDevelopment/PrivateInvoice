@@ -22,35 +22,43 @@
 
 // Import Router
 
-const express 					= require('express');
-const router 					= express.Router();
+const express                   = require('express');
+const router                    = express.Router();
 
-module.exports 					= router;
+module.exports                  = router;
 
 // Libraries
 
-const uuidv1 					= require('uuid').v1;
-const uniqid 					= require('uniqid');
-const moment 					= require('moment');
-const currency 					= require('currency.js');
+const uuidv1                    = require('uuid').v1;
+const uniqid                    = require('uniqid');
+const moment                    = require('moment');
+const currency                  = require('currency.js');
 
-const netUtil 					= require('../modules/netUtil.js');
+
+// Import Modules
+
+const config                    = require('../config.json');
+const tran                      = require('../modules/invoice_sub_transaction.js');
+const netUtil                   = require('../modules/netUtil.js');
+
+const {
+    getMemberInfo,
+    getOrganizationInfo,
+    insertSellerDraftStatus,
+    insertSellerDraftDocument,
+}                               = require('../modules/invoices_in.js');
 
 // Database 
 
-const config 					= require('../config.json');
-const db 						= require('../database.js');
-const tran                      = require("../modules/invoice_sub_transaction.js");
-
-const SELLER_DRAFT_DOCUMENT	    = "seller_document_draft";
-const SELLER_DRAFT_STATUS		= "seller_status_draft";
+const SELLER_DRAFT_DOCUMENT     = "seller_document_draft";
+const SELLER_DRAFT_STATUS       = "seller_status_draft";
 
 
 // Error Message
-const MESSAGE_AFFECTED_ROWS 	= ":result.affectedRows != 1";
+const MESSAGE_AFFECTED_ROWS     = ":result.affectedRows != 1";
 
 // CURRENCY
-const CURRENCY					= config.CURRENCY
+const CURRENCY                  = config.CURRENCY
 
 // ------------------------------- End Points -------------------------------
 
@@ -59,6 +67,8 @@ const CURRENCY					= config.CURRENCY
  * update
  */
 router.post('/update', async function(req, res) {
+
+	const METHOD = '/update'
 
 	let start = Date.now();
 	
@@ -70,133 +80,60 @@ router.post('/update', async function(req, res) {
     const [ conn , _1 ] = await tran.connection ();
     await tran.beginTransaction(conn);
 
-
-
 	// 2.
 	// Second we update the document
-	let sql = `
-		UPDATE
-			${SELLER_DRAFT_DOCUMENT}
-		SET
-			document_body = ?,
-			document_totals = ?,
-			document_meta = ?,
-			subject_line = ?,
-			buyer_did = ?,
-			buyer_membername = ?,
-			buyer_details = ?,
-			document_json = ?
-		WHERE
-			document_uuid = ?
-	`;
 
-	let args = [
-		JSON.stringify(req.body.document_body),
-		JSON.stringify(req.body.document_totals),
-		JSON.stringify(req.body.document_meta),
-		req.body.subject_line
-	];
+	const [result2, err2 ] = await tran.updateDraftDocument (conn , SELLER_DRAFT_DOCUMENT, req );
 
-
-	if(req.body.buyer_details) {
-		args.push(req.body.buyer_details.member_did);
-		args.push(req.body.buyer_details.membername);
-		args.push(JSON.stringify(req.body.buyer_details));
-	} else {
-		args.push(null);
-		args.push(null);
-		args.push(null);
-	}
-
-	args.push(JSON.stringify(req.body.document_json));
-
-	args.push(req.body.document_uuid);
-
-
-	const [result2, err2 ] = await tran.update(conn, sql, args);
 	if (err2) {
 		console.log(err2);
 		errno = 2;
 		code = 400;
-		let msg = tran.rollbackAndReturn(conn, code, err2, errno);
-		return res.status(400).json({ err : errno, msg : msg });
+		let msg = await tran.rollbackAndReturn(conn, code, err2, errno, METHOD);
+
+		res.status(400)
+			.json({
+				err: 2,
+				msg: msg
+			});
+		return;
 	}
 
 	// 3.
-	//
-	if(result2.affectedRows != 1) {
-		errno = 3;
-		code = 400;
-		const err3 = "Error update 3:"+MESSAGE_AFFECTED_ROWS;
-		let msg = tran.rollbackAndReturn(conn, code, err3, errno);
-		return res.status(400).json({ err : errno, msg : msg });
-	}
-
-	// 4.
 	// And then we update the status
 
-	sql = `
-		UPDATE
-			${SELLER_DRAFT_STATUS}
-		SET
-			subject_line = ?,
-			amount_due = ?,
-			due_by = ?,
-			buyer_did = ?,
-			buyer_membername = ?,
-			buyer_organization = ?
-		WHERE
-			document_uuid = ?
-	`;
+	const [result3, err3 ] = await tran.updateDraftStatus (conn , SELLER_DRAFT_STATUS, req );
 
-	args = [
-		req.body.subject_line,
-		req.body.document_totals.total,
-		req.body.document_meta.due_by
-	];
-
-	if(req.body.buyer_details) {
-		args.push(req.body.buyer_details.member_did);
-		args.push(req.body.buyer_details.membername);
-		args.push(req.body.buyer_details.organization_name);
-	} else {
-		args.push(null);
-		args.push(null);
-		args.push(null);
-	}
-
-	args.push(req.body.document_uuid);
-
-	const [	result4 , err4 ] = await tran.update(conn, sql, args);
-
-	if (err4) {
-		console.log(err4);
-		errno = 4;
+	if (err3) {
+		console.log(err3);
+		errno = 3;
 		code = 400;
-		let msg = tran.rollbackAndReturn(conn, code, err4, errno);
-		return res.status(400).json({ err : errno, msg : msg });
+		let msg = await tran.rollbackAndReturn(conn, code, err3, errno, METHOD);
+
+		res.status(400)
+			.json({
+				err: 3,
+				msg: msg
+			});
+		return;
 	}
 
-	// 5.
-	//
-	if(result4.affectedRows != 1) {
-		errno = 5;
-		code = 400;
-		const err5 = "Error update 5:"+MESSAGE_AFFECTED_ROWS;
-		let msg = tran.rollbackAndReturn(conn, code, err5, errno);
-		return res.status(400).json({ err : errno, msg : msg });
-	}
-
-    // 6.
+    // 4.
     // commit
     //
-    const [ _6, err6 ] = await tran.commit(conn);
+    const [ _4, err4 ] = await tran.commit(conn);
 
-    if (err6 ) {
-        errno = 6;
+    if (err4 ) {
+        errno = 4;
         code = 400;
-		let msg = tran.rollbackAndReturn(conn, code, err6, errno);
-		return res.status(400).json({ err : errno, msg : msg });
+		let msg = await tran.rollbackAndReturn(conn, code, err4, errno, METHOD);
+
+		res.status(400)
+			.json({
+				err: 3,
+				msg: msg
+			});
+		return;
     }
 
     // 5.
@@ -216,6 +153,8 @@ router.post('/update', async function(req, res) {
  * create
  */
 router.post('/create', async function(req, res) {
+
+	const METHOD = '/create'
 
 	const MAX_ROWS = 10;
 
@@ -391,7 +330,7 @@ router.post('/create', async function(req, res) {
 
 	// 4.
 	//
-	let credentialSubject = new credentialSubject_object (); 
+	const credentialSubject = new credentialSubject_object (); 
 
 	credentialSubject.customerReferenceNumber = "";
 	credentialSubject.identifier = document_uuid;
@@ -406,67 +345,41 @@ router.post('/create', async function(req, res) {
 
 	// 5.1
 	//
-    let  sql, args, row, org;
+	const [row, err5_1] = await getMemberInfo(
+								req.session.data.member_did
+							);
 
-	sql = `
-        SELECT
-            member_did as member_did,
-            membername,
-			organization_uuid,
-            wallet_address
-        FROM
-            members
-        WHERE
-            member_did = ?
-    `;
+    if (err5_1) {
 
-     args = [req.session.data.member_did];
+		let msg = `Error:${METHOD}: Create Error `;
 
-     try {
-         row = await db.selectOne(sql, args);
-     } catch(err) {
-		console.log("Create Error 5.1");
-		res.json({
-			err : 5,
-			msg : "This member_did is not found."
-		});
+		res.status(400)
+			.json({
+				err : 5,
+				msg : msg
+			});
 		return;
 
-     }
+    }
 
 	// 5.2
 	//
-	sql = `
-        SELECT
-            organization_name,
-            organization_address,
-            organization_building,
-            organization_department,
-            organization_tax_id,
-			organization_postcode,
-            addressCountry,
-            addressRegion,
-            addressCity
-        FROM
-            organizations
-        WHERE
-			organization_uuid = ?
-    `;
+	const [org, err5_2] = await getOrganizationInfo(
+								row.organization_uuid
+							);
 
-     args = [row.organization_uuid];
+    if (err5_2) {
 
-     try {
-         org = await db.selectOne(sql, args);
-     } catch(err) {
-		console.log("Create Error 5.2");
-		res.json({
-			err : 5,
-			msg : "This organization_uuid is not found."
-		});
+		let msg = `Error:${METHOD}: Create Error `;
+
+		res.status(400)
+			.json({
+				err : 5,
+				msg : msg
+			});
 		return;
 
-     }
-
+    }
 	// 6.
 	//
 	let seller = credentialSubject.seller;
@@ -531,33 +444,7 @@ router.post('/create', async function(req, res) {
 
 	// 10.
 	//
-	sql = `
-		INSERT INTO ${SELLER_DRAFT_STATUS} (
-			document_uuid,
-			document_type,
-			document_number,
-			document_folder,
-			seller_did,
-			seller_membername,
-			seller_organization,
-			seller_last_action,
-			subject_line,
-			due_by,
-			amount_due
-		) VALUES (
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			NOW(),
-			'',
-			?,
-			?
-		)
-	`;
+	let args;
 
 	args = [
 		document_uuid,
@@ -571,58 +458,22 @@ router.post('/create', async function(req, res) {
 		currency(0, config.CURRENCY).format(true)
 	];
 
-	const [result10 , err10 ] = await tran.insert(conn, sql, args);
+	const [result10 , err10 ] = await insertSellerDraftStatus (conn , args );
+
 
 	if (err10) {
 		console.log(err8);
 		errno = 10;
 		code = 400;
-		let msg = tran.rollbackAndReturn(conn, code, err10.sqlMessage, errno);
-		return res.status(400).json({ err : 9, msg : msg });
+		let msg = tran.rollbackAndReturn(conn, code, err10, errno, METHOD);
+		res.status(400)
+			.json({ err : 10, msg : msg });
+		return;
 	}
 
-	// 11.
-	//
-	if(result10.affectedRows != 1) {
-		errno = 11;
-		code = 400;
-		const err11 = "create 11:"+MESSAGE_AFFECTED_ROWS;
-		let msg = tran.rollbackAndReturn(conn, code, err11, errno);
-		return res.status(400).json({ err : errno, msg : msg });
-	}
 
 	// 12.
 	//
-
-	sql = `
-		INSERT INTO ${SELLER_DRAFT_DOCUMENT} (
-			document_uuid,
-			document_json,
-			document_type,
-
-			currency_options,
-
-			seller_did,
-			seller_membername,
-			seller_details,
-			document_meta,
-			document_body,
-			document_totals
-		) VALUES (
-			?,
-			?,
-			?,
-
-			?,
-
-			?,
-			?,
-			?,
-			?,
-			?,
-			?
-		)
-	`;
 
 	const document_meta = {
 		document_number : document_number,
@@ -665,16 +516,16 @@ router.post('/create', async function(req, res) {
 		JSON.stringify(document_totals)
 	];
 
-	//console.log("Insert into Document (execute)");
-	//console.log(Date.now());
 
-	const [ result12, err12 ] = await tran.insert(conn, sql, args);
+	const [result12 , err12] = await insertSellerDraftDocument (conn , args );
 
 	if (err12) {
 		errno = 12;
 		code = 400;
-		let msg = tran.rollbackAndReturn(conn, code, err12, errno);
-		return res.status(400).json({ err : errno, msg : msg });
+		let msg = tran.rollbackAndReturn(conn, code, err12, errno, METHOD);
+		res.status(400)
+			.json({ err : errno, msg : msg });
+		return;
 	}
 
 	// 13.
@@ -683,8 +534,10 @@ router.post('/create', async function(req, res) {
 		errno = 13;
 		code = 400;
 		const err13 = "create 13"+MESSAGE_AFFECTED_ROWS;
-		let msg = tran.rollbackAndReturn(conn, code, err13, errno);
-		return res.status(400).json({ err : errno, msg : msg });
+		let msg = tran.rollbackAndReturn(conn, code, err13, errno, METHOD);
+		res.status(400)
+			.json({ err : errno, msg : msg });
+		return;
 	}
 
     // 14.
@@ -695,20 +548,23 @@ router.post('/create', async function(req, res) {
     if (err14 ) {
         errno = 14;
         code = 400;
-		let msg = tran.rollbackAndReturn(conn, code, err14, errno);
-		return res.status(400).json({ err : errno, msg : msg });
+		let msg = tran.rollbackAndReturn(conn, code, err14, errno, METHOD);
+		res.status(400)
+			.json({ err : errno, msg : msg });
+		return;
     }
 
     // 15.
     //
     conn.end();
 
-	let end = Date.now();
-	console.log("Create Time: %d ms", end - start);
-
 	res.json({
 		err : 0,
 		msg : document_uuid
 	});
+
+	let end = Date.now();
+	console.log("Create Time: %d ms", end - start);
+
 
 });

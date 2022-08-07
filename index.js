@@ -86,6 +86,8 @@ app.get("*", function (req, res, next) {
 
 app.all("*", async (req, res, next) => {
 
+	console.log("req.headers.authorization="+req.headers.authorization);
+
 	// Force logout for swagger when basic not provided
 	if(req.headers.referer && req.headers.referer.indexOf('/api-docs') !== -1) {
 		if(!req.headers.authorization && req.headers.cookie) {
@@ -96,27 +98,45 @@ app.all("*", async (req, res, next) => {
 		}
 	}
 
+	//console.log('HERE!!!!');
+
 	// Check for authorization header
 	if(!req.headers.authorization) {
 		return next();
 	}
 	
+	console.log('a');
+
 	// Already logged in, dont need to do it again
 	if(req.headers.cookie) {
 		return next();
 	}
+	
+	console.log('b');
 
 	// Only account for basic authentication
 	if(req.headers.authorization.indexOf('Basic') === -1) {
 		return next();
 	}
 	
+	console.log('c');
+	
 	// Get the base64 encoded username + password
 	const base64 = req.headers.authorization.split(' ').pop();
 	const text = Buffer.from(base64, 'base64').toString('utf-8');
 
+	console.log(text);
+
 	const [ membername, password ] = text.split(':');
+
+	console.log(membername);
+	console.log(password);
+
 	const [ data, err ] = await handleLogin(membername, password);
+
+	console.log(data);
+	console.log(err);
+
 	if(err) {
 		return next();
 	}
@@ -151,6 +171,8 @@ app.all("*", function (req, res, next) {
     if(req.url.startsWith('/api/presentations')) {
         return next();
     }
+
+    // And the login screen too
 
     // And the login screen too
     if(req.url.startsWith('/login')) {
@@ -200,7 +222,6 @@ app.use('/api/tray', require('./routes/tray_archive.js'));
 app.use('/api/invoice', require('./routes/softDelete.js'));
 
 app.use('/api/settings', require('./routes/settings.js'));
-app.use('/api/message', require('./routes/contact_message.js'));
 
 app.use('/api/wallet', require('./routes/wallet.js'));
 app.use('/api/presentations', require('./routes/presentations.js'));

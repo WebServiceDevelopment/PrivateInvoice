@@ -20,19 +20,26 @@
 
 "use strict";
 
-// Inport
-const sub					= require("../modules/tray_sub.js");
-
 // Import Router
 
-const express				= require('express');
-const router				= express.Router();
-module.exports				= router;
+const express                    = require('express');
+const router                     = express.Router();
+module.exports                   = router;
+
+// Import Modules
+const {
+    getCount,
+    getFolder,
+    getTotal,
+	nullCheckArgsOfInvoiceTray,
+}                                = require("../modules/tray_sub.js");
 
 // Database
 
-const BUYER_STATUS			= "buyer_status";
-const SELLER_STATUS			= "seller_status";
+const BUYER_STATUS               = "buyer_status";
+const SELLER_STATUS              = "seller_status";
+
+const SELLER_DRAFT_STATUS        = "seller_status_draft";
 
 // ------------------------------- End Points -------------------------------
 
@@ -40,7 +47,9 @@ const SELLER_STATUS			= "seller_status";
  * 1.
  * getCount
  */
-router.get('/getCountOfInvoice', function(req, res) {
+router.get('/getCountOfInvoice', async function(req, res) {
+
+	const METHOD = '/getCountOfInvoice';
 
 	//console.log("/getCountOfInvoice")
 
@@ -50,37 +59,51 @@ router.get('/getCountOfInvoice', function(req, res) {
     const type = req.query.type;
 
     if(type != 'invoice') {
+
+		let msg = `ERROR:${METHOD}: Invalid argument`;
+
         res.status(400).json({
             err : 11,
-            msg : "Invalid argument"
+            msg : msg
         });
     }
 
     if(role != 'buyer' && role != 'seller') {
+
+		let msg = `ERROR:${METHOD}: Invalid argument`;
+
         res.status(400).json({
             err : 12,
-            msg : "Invalid argument"
+            msg : msg
         });
     }
 
     if(archive != 0) {
+
+		let msg = `ERROR:${METHOD}: Invalid argument`;
+
         res.status(400).json({
             err : 13,
-            msg : "Invalid argument"
+            msg : msg
         });
     }
 
-    if(folder != '[sent,returned,confirmed,paid]') {
+    if(folder != '[sent,returned,confirmed,paid]' &&
+		folder != '[sent,returned,confirmed,paid,draft]'
+	) {
+
+		let msg = `ERROR:${METHOD}: Invalid argument`;
+
         res.status(400).json({
             err : 14,
-            msg : "Invalid argument"
+            msg : msg
         });
     }
 
 
     switch(role) {
     case "buyer":
-    	req.body = [
+		req.body = [
             { type : "invoice", role : "buyer", folder : "sent", archive : 0 },
             { type : "invoice", role : "buyer", folder : "returned", archive : 0 },
             { type : "invoice", role : "buyer", folder : "confirmed", archive : 0 },
@@ -88,7 +111,7 @@ router.get('/getCountOfInvoice', function(req, res) {
         ]
     break;
     case "seller":
-    	req.body = [
+		req.body = [
             { type : "invoice", role : "seller", folder : "sent", archive : 0 },
             { type : "invoice", role : "seller", folder : "returned", archive : 0 },
             { type : "invoice", role : "seller", folder : "confirmed", archive : 0 },
@@ -97,7 +120,7 @@ router.get('/getCountOfInvoice', function(req, res) {
     break;
     }
 
-    sub.getCount(req, res, ((role) => {
+    const table = ((role) => {
 			switch(role) {
 			case "buyer":
 				return BUYER_STATUS;
@@ -105,7 +128,57 @@ router.get('/getCountOfInvoice', function(req, res) {
 				return SELLER_STATUS;
 			}
 		})(role)
-	);
+
+	const [err, counts] = await getCount(req, res, table);
+
+    if(err) {
+		res.json({
+				err: err,
+				msg: [0,0,0,0]
+			});
+		return;
+    }
+
+    if(folder == '[sent,returned,confirmed,paid]' ) {
+		return res.json({
+			err: 0,
+			msg: counts
+		});
+	}
+
+	if(role == "buyer") {
+		res.json({
+			err: 0,
+			msg: [...counts, 0]
+		});
+		return;
+	}
+
+	req.body =  [
+            {
+                archive : 0,
+                folder : 'draft',
+                role : 'seller',
+                type : 'invoice'
+            }
+        ]
+
+    const draft_table = SELLER_DRAFT_STATUS;
+
+    const [err_draft, counts_draft] = await getCount(req, res, draft_table);
+
+    if(err_draft) {
+        res.json({
+                err: err_draft,
+				msg: [...counts, 0]
+            });
+		return;
+    }
+
+    res.json({
+        err: 0,
+		msg: [...counts, counts_draft[0]]
+    });
 
 });
 
@@ -114,7 +187,9 @@ router.get('/getCountOfInvoice', function(req, res) {
  * 2.
  * getFolderOfInvoice
  */
-router.get('/getFolderOfInvoice', function(req, res) {
+router.get('/getFolderOfInvoice', async function(req, res) {
+
+	const METHOD = '/getFolderOfInvoice';
 
     const archive = req.query.archive;
     const folder = req.query.folder;
@@ -125,23 +200,26 @@ router.get('/getFolderOfInvoice', function(req, res) {
     const limit = req.query.limit;
 
     if(type != 'invoice') {
+		let msg = `ERROR:${METHOD}: Invalid argument`
         res.status(400).json({
-            err : 11,
-            msg : "Invalid argument"
+            err : 1,
+            msg : msg
         });
     }
 
     if(role != 'buyer' && role != 'seller') {
+		let msg = `ERROR:${METHOD}: Invalid argument`
         res.status(400).json({
-            err : 12,
-            msg : "Invalid argument"
+            err : 2,
+            msg : msg
         });
     }
 
     if(archive != 0) {
+		let msg = `ERROR:${METHOD}: Invalid argument`
         res.status(400).json({
-            err : 13,
-            msg : "Invalid argument"
+            err : 3,
+            msg : msg
         });
     }
 
@@ -152,9 +230,12 @@ router.get('/getFolderOfInvoice', function(req, res) {
 	case 'paid':
 	break;
 	default:
+
+		let msg = `ERROR:${METHOD}: Invalid argument`
+
         res.status(400).json({
-            err : 14,
-            msg : "Invalid argument"
+            err : 4,
+            msg : msg
         });
 		
 	}
@@ -170,7 +251,7 @@ router.get('/getFolderOfInvoice', function(req, res) {
 			}
 
 
-	sub.getFolder(req, res, ((role) => {
+	const [rows, err5] = await getFolder(req, res, ((role) => {
 			switch(role) {
 			case "buyer":
 				return BUYER_STATUS;
@@ -179,6 +260,19 @@ router.get('/getFolderOfInvoice', function(req, res) {
 			}
 		})(role)
 	);
+
+	if(err5) {
+		let msg = `ERROR:${METHOD}: Could not get Folder`
+        res.status(400).json({
+            err : 5,
+            msg : msg
+        });
+	}
+
+	res.json({
+		err : 0,
+		msg : rows
+	});
 
 });
 
@@ -189,6 +283,8 @@ router.get('/getFolderOfInvoice', function(req, res) {
  */
 router.get('/getTotalOfInvoice', async function(req, res) {
 
+	const METHOD = '/getTotalOfInvoice';
+
     const archive = req.query.archive;
     const folder = req.query.folder;
     const role = req.query.role;
@@ -197,25 +293,33 @@ router.get('/getTotalOfInvoice', async function(req, res) {
     const offset = req.query.offset;
     const limit = req.query.limit;
 
-    if(type != 'invoice') {
-        res.status(400).json({
-            err : 11,
-            msg : "Invalid argument"
-        });
-    }
+	let msg = `ERROR:${METHOD}: Invalid argument`
 
-    if(role != 'buyer' && role != 'seller') {
-        res.status(400).json({
-            err : 12,
-            msg : "Invalid argument"
-        });
+	if(nullCheckArgsOfInvoiceTray(req)== false) {
+
+        res.status(400)
+			.json({
+				err : 1,
+				msg : msg
+			});
+	}
+
+    if(type != 'invoice') {
+
+		res.status(400)
+			.json({
+				err : 2,
+				msg : msg
+			});
     }
 
     if(archive != 0) {
-        res.status(400).json({
-            err : 13,
-            msg : "Invalid argument"
-        });
+
+        res.status(400)
+			.json({
+				err : 3,
+				msg : msg
+			});
     }
 
     switch(folder) {
@@ -225,11 +329,11 @@ router.get('/getTotalOfInvoice', async function(req, res) {
 	case 'paid':
 	break;
 	default:
-        res.status(400).json({
-            err : 14,
-            msg : "Invalid argument"
-        });
-		
+        res.status(400)
+			.json({
+				err : 4,
+				msg : msg
+			});
 	}
 
     req.body = 
@@ -243,7 +347,7 @@ router.get('/getTotalOfInvoice', async function(req, res) {
 			}
 
 
-	sub.getTotal(req, res, ((role) => {
+	const [total, err1] = await getTotal(req, res, ((role) => {
 			switch(role) {
 			case "buyer":
 				return BUYER_STATUS;
@@ -252,5 +356,18 @@ router.get('/getTotalOfInvoice', async function(req, res) {
 			}
 		})(role)
 	);
+
+	if(err1) {
+		let msg = `ERROR:${METHOD}: Could not get Total`
+        res.status(400).json({
+            err : 1,
+            msg : {total : 0}
+        });
+	}
+
+	res.json({
+		err : 0,
+		msg : total
+	});
 
 });

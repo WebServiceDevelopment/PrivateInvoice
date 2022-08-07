@@ -20,23 +20,23 @@
 
 "use strict";
 
-// Import sub
-
-const sub                   	= require("../modules/invoice_sub.js");
-const tran                      = require("../modules/invoice_sub_transaction.js");
-
 // Import Router
 
-const express					= require('express');
-const router					= express.Router();
-module.exports					= router;
+const express                    = require('express');
+const router                     = express.Router();
+module.exports                   = router;
+
+// Import Modules
+
+const sub                        = require("../modules/invoice_sub.js");
+const tran                       = require("../modules/invoice_sub_transaction.js");
 
 // Database
 
 // Table Name
-const BUYER__DOCUMENT       	= "buyer_document";
-const BUYER__STATUS         	= "buyer_status";
-const CONTACTS					= "contacts";
+const BUYER__DOCUMENT            = "buyer_document";
+const BUYER__STATUS              = "buyer_status";
+const CONTACTS                   = "contacts";
 
 // ------------------------------- End Points -------------------------------
 
@@ -45,8 +45,7 @@ const CONTACTS					= "contacts";
  */
 router.post('/buyerToConnect', async (req, res) => {
 
-	//console.log(seller_did);
-	//console.log(buyer_did);
+	const METHOD = '/buyerToConnect';
 
 	const { seller_did, buyer_did } = req.body;
 
@@ -54,29 +53,38 @@ router.post('/buyerToConnect', async (req, res) => {
 	//
 	const [ seller_host, err ] = await sub.getSellerHost(CONTACTS, seller_did, buyer_did);
 	if(err) {
-        console.log("Error getSellerHost");
-		return res.status(400).json(err);
+
+		let msg = `ERROR:${METHOD}: Could not find host`;
+
+		res.status(400)
+			.json({
+				err: 1,
+				msg: msg
+			});
+		return;
 	}
 
 	// 2.
 	//
-    if(!check_ipadder(req.ip , seller_host)) {
-        console.log("invalid request : req.ip="+req.ip+":seller_host="+seller_host);
-        return res.status(400).json(err);
+    if(!sub.check_ipadder(req.ip , seller_host)) {
+
+		let msg = `ERROR:${METHOD}: Could not find host`;
+
+		res.status(400)
+			.json({
+				err: 2,
+				msg: msg
+			});
+		return;
     }
 
-	return res.status(200).end('accepted');
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
-    function check_ipadder (req_ip , seller_host) {
-
-        let ip = req_ip.split(":")[3];
-
-        if(seller_host.indexOf(ip) != -1) {
-                return true;
-        }
-        return false;
-    }
-
+	console.log("/buyerToConnect accepted");
 });
 
 /*
@@ -86,7 +94,7 @@ router.post('/buyerToConnect', async (req, res) => {
  */
 router.post('/buyerToSend', async (req, res) => {
 
-	//console.log("/buyerToSend");
+	const METHOD = '/buyerToSend';
 
 	const { document, status } = req.body;
 	const { document_uuid, seller_did, buyer_did, document_json} = document;
@@ -96,15 +104,20 @@ router.post('/buyerToSend', async (req, res) => {
 
 	// 1.
 
-	//console.log("/buyerToSend:"+CONTACTS+":"+ seller_did+":"+ buyer_did);
 
 	// 2. 
 	// Second we check to see if there is any contact information
 	const [ _2 , err2 ] = await sub.getSellerHost(CONTACTS, seller_did, buyer_did);
 
 	if(err2) {
-		console.log("/buyerToSend:err 2");
-		return res.status(400).json(err2);
+		let msg = `ERROR:${METHOD}: Could not find host`;
+
+		res.status(400)
+			.json({
+				err: 2,
+				msg: msg
+			});
+		return;
 	}
 
 	// 3.
@@ -113,8 +126,14 @@ router.post('/buyerToSend', async (req, res) => {
 	const [ _3, err3] = await sub.checkForExistingDocument(BUYER__DOCUMENT, document_uuid);
 
 	if(err3) {
-		console.log("/buyerToSend:err 3");
-		return res.status(400).json(err3);
+		let msg = `ERROR:${METHOD}: Could not find Document`;
+
+		res.status(400)
+			.json({
+				err: 3,
+				msg: msg
+			});
+		return;
 	}
 
 /*
@@ -137,7 +156,9 @@ router.post('/buyerToSend', async (req, res) => {
 		console.log("/buyerToSend:err 6");
 		errno = 6;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err6, errno));
+        res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err6, errno));
+		return;
     }
 
 	// 7.
@@ -148,7 +169,9 @@ router.post('/buyerToSend', async (req, res) => {
 		console.log("/buyerToSend:err 7");
 		errno = 7;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err7, errno));
+        res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err7, errno));
+		return;
 	}
 
 	// 8.
@@ -160,14 +183,20 @@ router.post('/buyerToSend', async (req, res) => {
 		console.log("/buyerToSend:err 8");
         errno = 8;
         code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err8, errno));
+        res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err8, errno));
+		return;
 	}
 
 	// 9.
 	//
-   	conn.end();
+	conn.end();
 
-	res.status(200).end('accepted');
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
 	console.log("/buyerToSend accepted");
 });
@@ -179,6 +208,8 @@ router.post('/buyerToSend', async (req, res) => {
  */
 router.post('/buyerToWithdraw', async (req, res) => {
 
+	const METHOD = '/buyerToWithdraw';
+
 	const { document_uuid, buyer_did, document_folder} = req.body;
 
     // 1.
@@ -187,12 +218,17 @@ router.post('/buyerToWithdraw', async (req, res) => {
     //
     const [ old_status , _1 ] = await sub.getStatus( BUYER__STATUS, document_uuid) ;
 
+
     if(old_status == undefined) {
-        res.json({
-            err : 0,
-            msg : 'Record is not exist.'
-        });
-        return;
+
+		let msg = `ERROR:${METHOD}: Record is not exist`;
+
+		res.status(400)
+			.json({
+				err : 1,
+				msg : msg
+			});
+		return;
     }
 
     // 2.
@@ -201,26 +237,38 @@ router.post('/buyerToWithdraw', async (req, res) => {
     const [ old_document , _2 ] = await sub.getDocument( BUYER__DOCUMENT, document_uuid) ;
 
 	if(old_document == undefined) {
-        res.json({
-            err : 0,
-            msg : 'Record is not exist.'
-        });
-        return;
+
+		let msg = `ERROR:${METHOD}: Record is not exist`;
+
+		res.status(400)
+			.json({
+				err : 2,
+				msg : msg
+			});
+		return;
     }
 
 	// 3.
 	const [ _3, err3] = await sub.setWithdrawBuyer(BUYER__STATUS, document_uuid , buyer_did, document_folder );
 	if(err3) {
-		console.log('/buyerToWithdraw err='+err3);
-		if(err3 == null) {
-			return res.status(400).json({message:"Record is not found."});
-		}
-		return res.status(400).json(err3);
+
+		let msg = `ERROR:${METHOD}: Record is not exist`;
+
+		res.status(400)
+			.json({
+				err : 3,
+				msg : msg
+			});
+		return;
 	}
 
-	console.log("/buyerToWithdraw accepted");
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
-	res.status(200).end('accepted');
+	console.log("/buyerToWithdraw accepted");
 
 });
 
@@ -229,6 +277,8 @@ router.post('/buyerToWithdraw', async (req, res) => {
  */
 router.post('/buyerRollbackReturnToSent', async (req, res) => {
 
+	const METHOD = '/buyerRollbackReturnToSent';
+
 	const { document_uuid, buyer_did, document_folder} = req.body;
 
     // 1.
@@ -238,9 +288,12 @@ router.post('/buyerRollbackReturnToSent', async (req, res) => {
     const [ old_status , _1 ] = await sub.getStatus( BUYER__STATUS, document_uuid) ;
 
     if(old_status == undefined) {
+
+		let msg = `ERROR:${METHOD}: Record is not exist`;
+
         res.json({
             err : 0,
-            msg : 'Record is not exist.'
+            msg : msg
         });
         return;
     }
@@ -251,9 +304,12 @@ router.post('/buyerRollbackReturnToSent', async (req, res) => {
     const [ old_document , _2 ] = await sub.getDocument( BUYER__DOCUMENT, document_uuid) ;
 
 	if(old_document == undefined) {
+
+		let msg = `ERROR:${METHOD}: Record is not exist`;
+
         res.json({
             err : 0,
-            msg : 'Record is not exist.'
+            msg : msg
         });
         return;
     }
@@ -261,16 +317,22 @@ router.post('/buyerRollbackReturnToSent', async (req, res) => {
 	// 3.
 	const [ _3, err3] = await sub.rollbackReturnToSent(BUYER__STATUS, document_uuid , buyer_did, document_folder );
 	if(err3) {
-		console.log('/rollbackReturnToSent err='+err3);
 
-		if(err3 == null) {
-			return res.status(400).json({message:"Record is not found."});
-		}
-		return res.status(400).json(err3);
+		let msg = `ERROR:${METHOD}: Record is not exist`;
+
+        res.json({
+            err : 0,
+            msg : msg
+        });
+        return;
 	}
 
-	console.log("/rollbackReturnToSent accepted");
+	res.status(200)
+		.json({
+			err: 0,
+			msg: 'accepted'
+		});
 
-	res.status(200).end('accepted');
+	console.log("/rollbackReturnToSent accepted");
 
 });
