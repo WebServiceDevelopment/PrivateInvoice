@@ -76,16 +76,16 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n   \"member\":{\r\n      \"membername\":\"{{alice_membername}}\",\r\n      \"job_title\":\"Head of Alice Corp.\",\r\n      \"contact_email\":\"alice@example.com\",\r\n      \"password\":\"{{alice_password}}\"\r\n   },\r\n   \"company\":{\r\n      \"name\":\"Alice Corp. International\",\r\n      \"department\":\"Executive\",\r\n      \"tax_id\":\"35-2337563\"\r\n   },\r\n   \"address\":{\r\n      \"country\":\"USA\",\r\n      \"region\":\"Oregon\",\r\n      \"postcode\":\"420-7156\",\r\n      \"city\":\"{{$randomCity}}\",\r\n      \"line1\":\"{{$randomStreetAddress}}\",\r\n      \"line2\":\"Suite 302\"\r\n   }\r\n}"
+					"raw": "{\r\n   \"member\":{\r\n      \"membername\":\"{{alice_membername}}\",\r\n      \"job_title\":\"Head of Alice Corp.\",\r\n      \"contact_email\":\"alice@example.com\",\r\n      \"password\":\"{{alice_password}}\"\r\n   },\r\n   \"company\":{\r\n      \"name\":\"Alice Corp. International\",\r\n      \"department\":\"Executive\",\r\n      \"tax_id\":\"35-2337563\"\r\n   },\r\n   \"address\":{\r\n      \"country\":\"USA\",\r\n      \"region\":\"Oregon\",\r\n      \"postcode\":\"420-7156\",\r\n      \"city\":\"Oregon\",\r\n      \"line1\":\"15525 Nolan Run\",\r\n      \"line2\":\"Suite 302\"\r\n   }\r\n}"
 				},
 				"url": {
-					"raw": "http://localhost:3000/api/session/signup",
+					"raw": "http://127.0.0.1:3000/api/session/signup",
 					"protocol": "http",
 					"host": [
-						"192",
-						"168",
-						"1",
-						"130"
+						"127",
+						"0",
+						"0",
+						"1"
 					],
 					"port": "3000",
 					"path": [
@@ -134,6 +134,8 @@
 							"  pm.expect(responseJson).to.have.property('addressCountry');\r",
 							"  pm.expect(responseJson).to.have.property('addressRegion');\r",
 							"  pm.expect(responseJson).to.have.property('addressCity');\r",
+							"\r",
+							"  pm.collectionVariables.set('alice_did', responseJson.member_did)\r",
 							"});\r",
 							"\r",
 							"pm.test(\"The session belongs to Alice\", () => {\r",
@@ -162,13 +164,13 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/api/session/check",
+					"raw": "http://127.0.0.1:3000/api/session/check",
 					"protocol": "http",
 					"host": [
-						"192",
-						"168",
-						"1",
-						"130"
+						"127",
+						"0",
+						"0",
+						"1"
 					],
 					"port": "3000",
 					"path": [
@@ -238,13 +240,13 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/api/contacts/createBusunessCard",
+					"raw": "http://127.0.0.1:3000/api/contacts/createBusunessCard",
 					"protocol": "http",
 					"host": [
-						"192",
-						"168",
-						"1",
-						"130"
+						"127",
+						"0",
+						"0",
+						"1"
 					],
 					"port": "3000",
 					"path": [
@@ -326,16 +328,16 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n   \"member\":{\r\n      \"membername\":\"{{bob_membername}}\",\r\n      \"job_title\":\"Head of Bob Co.\",\r\n      \"contact_email\":\"bob@example.com\",\r\n      \"password\":\"{{bob_password}}\"\r\n   },\r\n   \"company\":{\r\n      \"name\":\"Bob Co.\",\r\n      \"department\":\"Procurement\",\r\n      \"tax_id\":\"75-8772541\"\r\n   },\r\n   \"address\":{\r\n      \"country\":\"USA\",\r\n      \"region\":\"New York\",\r\n      \"postcode\":\"120-7612\",\r\n      \"city\":\"{{$randomCity}}\",\r\n      \"line1\":\"{{$randomStreetAddress}}\",\r\n      \"line2\":\"\"\r\n   }\r\n}"
+					"raw": "{\r\n   \"member\":{\r\n      \"membername\":\"{{bob_membername}}\",\r\n      \"job_title\":\"Head of Bob Co.\",\r\n      \"contact_email\":\"bob@example.com\",\r\n      \"password\":\"{{bob_password}}\"\r\n   },\r\n   \"company\":{\r\n      \"name\":\"Bob Co.\",\r\n      \"department\":\"Procurement\",\r\n      \"tax_id\":\"75-8772541\"\r\n   },\r\n   \"address\":{\r\n      \"country\":\"USA\",\r\n      \"region\":\"New York\",\r\n      \"postcode\":\"120-7612\",\r\n      \"city\":\"West Octavia\",\r\n      \"line1\":\"34095 Savannah Garden\",\r\n      \"line2\":\"\"\r\n   }\r\n}"
 				},
 				"url": {
-					"raw": "http://localhost:3000/api/session/signup",
+					"raw": "http://127.0.0.1:3000/api/session/signup",
 					"protocol": "http",
 					"host": [
-						"192",
-						"168",
-						"1",
-						"130"
+						"127",
+						"0",
+						"0",
+						"1"
 					],
 					"port": "3000",
 					"path": [
@@ -412,13 +414,13 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/api/session/check",
+					"raw": "http://127.0.0.1:3000/api/session/check",
 					"protocol": "http",
 					"host": [
-						"192",
-						"168",
-						"1",
-						"130"
+						"127",
+						"0",
+						"0",
+						"1"
 					],
 					"port": "3000",
 					"path": [
@@ -484,13 +486,13 @@
 					"raw": "{{alice_vbc}}"
 				},
 				"url": {
-					"raw": "http://localhost:3000/api/contacts/addContact",
+					"raw": "http://127.0.0.1:3000/api/contacts/addContact",
 					"protocol": "http",
 					"host": [
-						"192",
-						"168",
-						"1",
-						"130"
+						"127",
+						"0",
+						"0",
+						"1"
 					],
 					"port": "3000",
 					"path": [
@@ -539,13 +541,13 @@
 					}
 				],
 				"url": {
-					"raw": "http://localhost:3000/api/invoice/create",
+					"raw": "http://127.0.0.1:3000/api/invoice/create",
 					"protocol": "http",
 					"host": [
-						"192",
-						"168",
-						"1",
-						"130"
+						"127",
+						"0",
+						"0",
+						"1"
 					],
 					"port": "3000",
 					"path": [
@@ -578,6 +580,153 @@
 							"pm.test(\"The response has all properties\", () => {\r",
 							"  const responseJson = pm.response.json();\r",
 							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg).to.be.a('array')\r",
+							"  pm.expect(responseJson.msg.length).to.eql(1)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response includes Bob's information\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    const [ contact ] = responseJson.msg;\r",
+							"    pm.expect(contact.membername).to.eql(pm.collectionVariables.get('bob_membername'))\r",
+							"    pm.collectionVariables.set('bob_did', contact.member_did)\r",
+							"    pm.collectionVariables.set('bob_organization', contact.organization_name)\r",
+							"    pm.collectionVariables.set('bob_department', contact.organization_department)\r",
+							"    pm.collectionVariables.set('bob_city', contact.addressCity)\r",
+							"    pm.collectionVariables.set('bob_region', contact.addressRegion)\r",
+							"    pm.collectionVariables.set('bob_country', contact.addressCountry)\r",
+							"    pm.collectionVariables.set('bob_origin', contact.remote_origin)\r",
+							"    pm.collectionVariables.set('bob_address', contact.organization_address)\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/invite/getContacts?contactType=buyers",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"invite",
+						"getContacts"
+					],
+					"query": [
+						{
+							"key": "contactType",
+							"value": "buyers"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Alice Gets and Invoice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"The response includes Alice's Information\", () => {\r",
+							"    const responseJson = pm.response.json();\r",
+							"    const { document_json } = responseJson.msg;\r",
+							"    pm.collectionVariables.set('identifier', document_json.credentialSubject.identifier)\r",
+							"    pm.collectionVariables.set('invoiceNumber', document_json.credentialSubject.invoiceNumber)\r",
+							"    pm.collectionVariables.set('invoiceDate', document_json.credentialSubject.invoiceDate)\r",
+							"    pm.collectionVariables.set('purchaseDate', document_json.credentialSubject.purchaseDate)\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/invoice/getDraftDocument?document_uuid={{invoice_uuid}}",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"invoice",
+						"getDraftDocument"
+					],
+					"query": [
+						{
+							"key": "document_uuid",
+							"value": "{{invoice_uuid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Alice Updates Invoice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg).to.eql('okay');\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
@@ -605,22 +754,727 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"contactType\": \"buyers\"\r\n}"
+					"raw": "{\r\n    \"document_uuid\": \"{{invoice_uuid}}\",\r\n    \"document_json\": {\r\n        \"@context\": [\r\n            \"https://www.w3.org/2018/credentials/v1\",\r\n            \"https://w3id.org/traceability/v1\"\r\n        ],\r\n        \"id\": \"did:key:\",\r\n        \"type\": [\r\n            \"VerifiableCredential\",\r\n            \"CommercialInvoiceCertificate\"\r\n        ],\r\n        \"name\": \"Commercial Invoice Certificate\",\r\n        \"issuanceDate\": \"\",\r\n        \"issuer\": {\r\n            \"type\": \"Entity\",\r\n            \"id\": \"did:key:\",\r\n            \"entityType\": \"Organization\",\r\n            \"name\": \"Alice Corp. International\",\r\n            \"address\": {\r\n                \"type\": [\r\n                    \"PostalAddress\"\r\n                ],\r\n                \"organizationName\": \"Alice Corp. International\",\r\n                \"streetAddress\": \"Suite 302\",\r\n                \"addressLocality\": \"15525 Nolan Run\",\r\n                \"postalCode\": \"420-7156\",\r\n                \"addressCountry\": \"USA\",\r\n                \"addressRegion\": \"Oregon\",\r\n                \"addressCity\": \"\"\r\n            }\r\n        },\r\n        \"credentialSubject\": {\r\n            \"type\": \"Invoice\",\r\n            \"customerReferenceNumber\": \"Invoice No #12\",\r\n            \"identifier\": \"{{identifier}}\",\r\n            \"invoiceNumber\": \"{{invoiceNumber}}\",\r\n            \"invoiceDate\": \"{{invoiceDate}}\",\r\n            \"purchaseDate\": \"{{purchaseDate}}\",\r\n            \"seller\": {\r\n                \"type\": \"Organization\",\r\n                \"id\": \"{{alice_did}}\",\r\n                \"name\": \"Alice Corp. International\",\r\n                \"taxId\": \"35-2337563\",\r\n                \"description\": \"Executive\",\r\n                \"contactPoint\": \"alice_LLMa@127.0.0.1:3000\",\r\n                \"address\": {\r\n                    \"type\": \"PostalAddress\",\r\n                    \"streetAddress\": \"Suite 302\",\r\n                    \"addressLocality\": \"15525 Nolan Run\",\r\n                    \"addressCountry\": \"USA\",\r\n                    \"addressRegion\": \"Oregon\",\r\n                    \"addressCity\": \"Lake Mara\"\r\n                }\r\n            },\r\n            \"buyer\": {\r\n                \"type\": \"Organization\",\r\n                \"id\": \"{{bob_did}}\",\r\n                \"name\": \"{{bob_membername}}\",\r\n                \"taxId\": \"\",\r\n                \"description\": \"{{bob_department}}\",\r\n                \"contactPoint\": \"{{bob_membername}}@{{bob_origin}}\",\r\n                \"address\": {\r\n                    \"type\": \"PostalAddress\",\r\n                    \"streetAddress\": \"34095 Savannah Garden\",\r\n                    \"addressLocality\": \"\",\r\n                    \"addressCountry\": \"USA\",\r\n                    \"addressRegion\": \"New York\",\r\n                    \"addressCity\": \"West Octavia\"\r\n                }\r\n            },\r\n            \"itemsShipped\": [\r\n                {\r\n                    \"type\": \"TradeLineItem\",\r\n                    \"description\": \"2022-08-09\",\r\n                    \"product\": {\r\n                        \"type\": \"Product\",\r\n                        \"description\": \"Description\",\r\n                        \"sizeOrAmount\": {\r\n                            \"type\": \"QuantitativeValue\",\r\n                            \"unitCode\": \"\",\r\n                            \"value\": \"1\"\r\n                        },\r\n                        \"productPrice\": {\r\n                            \"type\": \"PriceSpecification\",\r\n                            \"price\": \"100\",\r\n                            \"priceCurrency\": \"Gwei\"\r\n                        }\r\n                    },\r\n                    \"lineItemTotalPrice\": {\r\n                        \"type\": \"PriceSpecification\",\r\n                        \"price\": \"100\",\r\n                        \"priceCurrency\": \"Gwei\"\r\n                    }\r\n                },\r\n                {\r\n                    \"type\": \"TradeLineItem\",\r\n                    \"description\": \"\",\r\n                    \"product\": {\r\n                        \"type\": \"Product\",\r\n                        \"description\": \"\",\r\n                        \"sizeOrAmount\": {\r\n                            \"type\": \"QuantitativeValue\",\r\n                            \"unitCode\": \"\",\r\n                            \"value\": \"\"\r\n                        },\r\n                        \"productPrice\": {\r\n                            \"type\": \"PriceSpecification\",\r\n                            \"price\": \"\",\r\n                            \"priceCurrency\": \"Gwei\"\r\n                        }\r\n                    },\r\n                    \"lineItemTotalPrice\": {\r\n                        \"type\": \"PriceSpecification\",\r\n                        \"price\": \"\",\r\n                        \"priceCurrency\": \"Gwei\"\r\n                    }\r\n                },\r\n                {\r\n                    \"type\": \"TradeLineItem\",\r\n                    \"description\": \"\",\r\n                    \"product\": {\r\n                        \"type\": \"Product\",\r\n                        \"description\": \"\",\r\n                        \"sizeOrAmount\": {\r\n                            \"type\": \"QuantitativeValue\",\r\n                            \"unitCode\": \"\",\r\n                            \"value\": \"\"\r\n                        },\r\n                        \"productPrice\": {\r\n                            \"type\": \"PriceSpecification\",\r\n                            \"price\": \"\",\r\n                            \"priceCurrency\": \"Gwei\"\r\n                        }\r\n                    },\r\n                    \"lineItemTotalPrice\": {\r\n                        \"type\": \"PriceSpecification\",\r\n                        \"price\": \"\",\r\n                        \"priceCurrency\": \"Gwei\"\r\n                    }\r\n                },\r\n                {\r\n                    \"type\": \"TradeLineItem\",\r\n                    \"description\": \"\",\r\n                    \"product\": {\r\n                        \"type\": \"Product\",\r\n                        \"description\": \"\",\r\n                        \"sizeOrAmount\": {\r\n                            \"type\": \"QuantitativeValue\",\r\n                            \"unitCode\": \"\",\r\n                            \"value\": \"\"\r\n                        },\r\n                        \"productPrice\": {\r\n                            \"type\": \"PriceSpecification\",\r\n                            \"price\": \"\",\r\n                            \"priceCurrency\": \"Gwei\"\r\n                        }\r\n                    },\r\n                    \"lineItemTotalPrice\": {\r\n                        \"type\": \"PriceSpecification\",\r\n                        \"price\": \"\",\r\n                        \"priceCurrency\": \"Gwei\"\r\n                    }\r\n                },\r\n                {\r\n                    \"type\": \"TradeLineItem\",\r\n                    \"description\": \"\",\r\n                    \"product\": {\r\n                        \"type\": \"Product\",\r\n                        \"description\": \"\",\r\n                        \"sizeOrAmount\": {\r\n                            \"type\": \"QuantitativeValue\",\r\n                            \"unitCode\": \"\",\r\n                            \"value\": \"\"\r\n                        },\r\n                        \"productPrice\": {\r\n                            \"type\": \"PriceSpecification\",\r\n                            \"price\": \"\",\r\n                            \"priceCurrency\": \"Gwei\"\r\n                        }\r\n                    },\r\n                    \"lineItemTotalPrice\": {\r\n                        \"type\": \"PriceSpecification\",\r\n                        \"price\": \"\",\r\n                        \"priceCurrency\": \"Gwei\"\r\n                    }\r\n                },\r\n                {\r\n                    \"type\": \"TradeLineItem\",\r\n                    \"description\": \"\",\r\n                    \"product\": {\r\n                        \"type\": \"Product\",\r\n                        \"description\": \"\",\r\n                        \"sizeOrAmount\": {\r\n                            \"type\": \"QuantitativeValue\",\r\n                            \"unitCode\": \"\",\r\n                            \"value\": \"\"\r\n                        },\r\n                        \"productPrice\": {\r\n                            \"type\": \"PriceSpecification\",\r\n                            \"price\": \"\",\r\n                            \"priceCurrency\": \"Gwei\"\r\n                        }\r\n                    },\r\n                    \"lineItemTotalPrice\": {\r\n                        \"type\": \"PriceSpecification\",\r\n                        \"price\": \"\",\r\n                        \"priceCurrency\": \"Gwei\"\r\n                    }\r\n                },\r\n                {\r\n                    \"type\": \"TradeLineItem\",\r\n                    \"description\": \"\",\r\n                    \"product\": {\r\n                        \"type\": \"Product\",\r\n                        \"description\": \"\",\r\n                        \"sizeOrAmount\": {\r\n                            \"type\": \"QuantitativeValue\",\r\n                            \"unitCode\": \"\",\r\n                            \"value\": \"\"\r\n                        },\r\n                        \"productPrice\": {\r\n                            \"type\": \"PriceSpecification\",\r\n                            \"price\": \"\",\r\n                            \"priceCurrency\": \"Gwei\"\r\n                        }\r\n                    },\r\n                    \"lineItemTotalPrice\": {\r\n                        \"type\": \"PriceSpecification\",\r\n                        \"price\": \"\",\r\n                        \"priceCurrency\": \"Gwei\"\r\n                    }\r\n                },\r\n                {\r\n                    \"type\": \"TradeLineItem\",\r\n                    \"description\": \"\",\r\n                    \"product\": {\r\n                        \"type\": \"Product\",\r\n                        \"description\": \"\",\r\n                        \"sizeOrAmount\": {\r\n                            \"type\": \"QuantitativeValue\",\r\n                            \"unitCode\": \"\",\r\n                            \"value\": \"\"\r\n                        },\r\n                        \"productPrice\": {\r\n                            \"type\": \"PriceSpecification\",\r\n                            \"price\": \"\",\r\n                            \"priceCurrency\": \"Gwei\"\r\n                        }\r\n                    },\r\n                    \"lineItemTotalPrice\": {\r\n                        \"type\": \"PriceSpecification\",\r\n                        \"price\": \"\",\r\n                        \"priceCurrency\": \"Gwei\"\r\n                    }\r\n                },\r\n                {\r\n                    \"type\": \"TradeLineItem\",\r\n                    \"description\": \"\",\r\n                    \"product\": {\r\n                        \"type\": \"Product\",\r\n                        \"description\": \"\",\r\n                        \"sizeOrAmount\": {\r\n                            \"type\": \"QuantitativeValue\",\r\n                            \"unitCode\": \"\",\r\n                            \"value\": \"\"\r\n                        },\r\n                        \"productPrice\": {\r\n                            \"type\": \"PriceSpecification\",\r\n                            \"price\": \"\",\r\n                            \"priceCurrency\": \"Gwei\"\r\n                        }\r\n                    },\r\n                    \"lineItemTotalPrice\": {\r\n                        \"type\": \"PriceSpecification\",\r\n                        \"price\": \"\",\r\n                        \"priceCurrency\": \"Gwei\"\r\n                    }\r\n                },\r\n                {\r\n                    \"type\": \"TradeLineItem\",\r\n                    \"description\": \"\",\r\n                    \"product\": {\r\n                        \"type\": \"Product\",\r\n                        \"description\": \"\",\r\n                        \"sizeOrAmount\": {\r\n                            \"type\": \"QuantitativeValue\",\r\n                            \"unitCode\": \"\",\r\n                            \"value\": \"\"\r\n                        },\r\n                        \"productPrice\": {\r\n                            \"type\": \"PriceSpecification\",\r\n                            \"price\": \"\",\r\n                            \"priceCurrency\": \"Gwei\"\r\n                        }\r\n                    },\r\n                    \"lineItemTotalPrice\": {\r\n                        \"type\": \"PriceSpecification\",\r\n                        \"price\": \"\",\r\n                        \"priceCurrency\": \"Gwei\"\r\n                    }\r\n                }\r\n            ],\r\n            \"invoiceSubtotal\": {\r\n                \"type\": \"PriceSpecification\",\r\n                \"price\": \"100\",\r\n                \"priceCurrency\": \"Gwei\"\r\n            },\r\n            \"totalPaymentDue\": {\r\n                \"type\": \"PriceSpecification\",\r\n                \"price\": \"100\",\r\n                \"priceCurrency\": \"Gwei\"\r\n            },\r\n            \"comments\": [\r\n                \"\"\r\n            ]\r\n        }\r\n    },\r\n    \"document_type\": \"invoice\",\r\n    \"subject_line\": \"\",\r\n    \"currency_options\": {\r\n        \"formatWithSymbol\": true,\r\n        \"symbol\": \"Gwei\",\r\n        \"separator\": \",\",\r\n        \"decimal\": \".\",\r\n        \"precision\": 0,\r\n        \"pattern\": \"# !\"\r\n    },\r\n    \"seller_did\": \"did:key:z6Mkfk7rV9pmjgXNvTGxr9z7BDX9EUbdQbWDtjPThSfevvUf\",\r\n    \"seller_membername\": \"alice_LLMa\",\r\n    \"seller_details\": {\r\n        \"organization_name\": \"Alice Corp. International\",\r\n        \"organization_postcode\": \"420-7156\",\r\n        \"organization_address\": \"15525 Nolan Run\",\r\n        \"organization_building\": \"Suite 302\",\r\n        \"organization_department\": \"Executive\",\r\n        \"organization_tax_id\": \"35-2337563\",\r\n        \"addressCountry\": \"USA\",\r\n        \"addressRegion\": \"Oregon\",\r\n        \"addressCity\": \"Lake Mara\"\r\n    },\r\n    \"buyer_did\": \"{{bob_did}}\",\r\n    \"buyer_membername\": \"{{bob_membername}}\",\r\n    \"buyer_details\": {\r\n        \"addressCity\": \"West Octavia\",\r\n        \"addressCountry\": \"USA\",\r\n        \"addressRegion\": \"New York\",\r\n        \"contactPoint\": \"{{bob_membername}}@{{bob_origin}}\",\r\n        \"member_did\": \"{{bob_did}}\",\r\n        \"organization_address\": \"34095 Savannah Garden\",\r\n        \"organization_building\": \"\",\r\n        \"organization_department\": \"\",\r\n        \"organization_name\": \"\",\r\n        \"organization_tax_id\": \"\",\r\n        \"remote_origin\": \"{{bob_origin}}\"\r\n    },\r\n    \"created_on\": \"2022-08-07T04:56:48.000Z\",\r\n    \"document_meta\": {\r\n        \"document_number\": \"inv-l6iurm3t\",\r\n        \"created_on\": \"2022-08-07\",\r\n        \"taxId\": \"35-2337563\",\r\n        \"due_by\": \"2022-09-06\"\r\n    },\r\n    \"document_body\": [\r\n        {\r\n            \"date\": \"2022-08-09\",\r\n            \"desc\": \"Description\",\r\n            \"price\": \"100 Gwei\",\r\n            \"unit\": \"\",\r\n            \"quan\": \"1\",\r\n            \"subtotal\": \"100 Gwei\"\r\n        },\r\n        {\r\n            \"date\": \"\",\r\n            \"desc\": \"\",\r\n            \"quan\": \"\",\r\n            \"unit\": \"\",\r\n            \"price\": \"\",\r\n            \"subtotal\": \"\"\r\n        },\r\n        {\r\n            \"date\": \"\",\r\n            \"desc\": \"\",\r\n            \"quan\": \"\",\r\n            \"unit\": \"\",\r\n            \"price\": \"\",\r\n            \"subtotal\": \"\"\r\n        },\r\n        {\r\n            \"date\": \"\",\r\n            \"desc\": \"\",\r\n            \"quan\": \"\",\r\n            \"unit\": \"\",\r\n            \"price\": \"\",\r\n            \"subtotal\": \"\"\r\n        },\r\n        {\r\n            \"date\": \"\",\r\n            \"desc\": \"\",\r\n            \"quan\": \"\",\r\n            \"unit\": \"\",\r\n            \"price\": \"\",\r\n            \"subtotal\": \"\"\r\n        },\r\n        {\r\n            \"date\": \"\",\r\n            \"desc\": \"\",\r\n            \"quan\": \"\",\r\n            \"unit\": \"\",\r\n            \"price\": \"\",\r\n            \"subtotal\": \"\"\r\n        },\r\n        {\r\n            \"date\": \"\",\r\n            \"desc\": \"\",\r\n            \"quan\": \"\",\r\n            \"unit\": \"\",\r\n            \"price\": \"\",\r\n            \"subtotal\": \"\"\r\n        },\r\n        {\r\n            \"date\": \"\",\r\n            \"desc\": \"\",\r\n            \"quan\": \"\",\r\n            \"unit\": \"\",\r\n            \"price\": \"\",\r\n            \"subtotal\": \"\"\r\n        },\r\n        {\r\n            \"date\": \"\",\r\n            \"desc\": \"\",\r\n            \"quan\": \"\",\r\n            \"unit\": \"\",\r\n            \"price\": \"\",\r\n            \"subtotal\": \"\"\r\n        },\r\n        {\r\n            \"date\": \"\",\r\n            \"desc\": \"\",\r\n            \"quan\": \"\",\r\n            \"unit\": \"\",\r\n            \"price\": \"\",\r\n            \"subtotal\": \"\"\r\n        }\r\n    ],\r\n    \"document_totals\": {\r\n        \"subtotal\": \"100 Gwei\",\r\n        \"total\": \"100 Gwei\"\r\n    },\r\n    \"document_logo\": null\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
 				},
 				"url": {
-					"raw": "http://localhost:3000/api/invite/contacts",
+					"raw": "http://127.0.0.1:3000/api/invoice/update",
 					"protocol": "http",
 					"host": [
-						"192",
-						"168",
-						"1",
-						"130"
+						"127",
+						"0",
+						"0",
+						"1"
 					],
 					"port": "3000",
 					"path": [
 						"api",
-						"invite",
-						"contacts"
+						"invoice",
+						"update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Alice Sends Invoice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  const invoice_uuid = pm.collectionVariables.get('invoice_uuid')\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg).to.eql(invoice_uuid);\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"document_uuid\" : \"{{invoice_uuid}}\"\r\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/invoice/sendInvoice",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"invoice",
+						"sendInvoice"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bob gets Tray Count 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg[0]).not.to.eql(0)\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{bob_auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid]&role=buyer&type=invoice",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"tray",
+						"getCountOfInvoice"
+					],
+					"query": [
+						{
+							"key": "archive",
+							"value": "0"
+						},
+						{
+							"key": "folder",
+							"value": "[sent,returned,confirmed,paid]"
+						},
+						{
+							"key": "role",
+							"value": "buyer"
+						},
+						{
+							"key": "type",
+							"value": "invoice"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Alice Gets Tray Count 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg[0]).not.to.eql(0)\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid,draft]&role=seller&type=invoice",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"tray",
+						"getCountOfInvoice"
+					],
+					"query": [
+						{
+							"key": "archive",
+							"value": "0"
+						},
+						{
+							"key": "folder",
+							"value": "[sent,returned,confirmed,paid,draft]"
+						},
+						{
+							"key": "role",
+							"value": "seller"
+						},
+						{
+							"key": "type",
+							"value": "invoice"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bob Confirms Invoice",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg).to.eql('okay');\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{bob_auth}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"document_uuid\": \"{{invoice_uuid}}\"\r\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/invoice/confirm",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"invoice",
+						"confirm"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bob gets Tray Count 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg[2]).not.to.eql(0)\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{bob_auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid]&role=buyer&type=invoice",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"tray",
+						"getCountOfInvoice"
+					],
+					"query": [
+						{
+							"key": "archive",
+							"value": "0"
+						},
+						{
+							"key": "folder",
+							"value": "[sent,returned,confirmed,paid]"
+						},
+						{
+							"key": "role",
+							"value": "buyer"
+						},
+						{
+							"key": "type",
+							"value": "invoice"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Alice Gets Tray Count 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg[2]).not.to.eql(0)\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid,draft]&role=seller&type=invoice",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"tray",
+						"getCountOfInvoice"
+					],
+					"query": [
+						{
+							"key": "archive",
+							"value": "0"
+						},
+						{
+							"key": "folder",
+							"value": "[sent,returned,confirmed,paid,draft]"
+						},
+						{
+							"key": "role",
+							"value": "seller"
+						},
+						{
+							"key": "type",
+							"value": "invoice"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bob Makes Payment",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"\r",
+							"  const { msg } = responseJson\r",
+							"  pm.expect(msg).to.have.property('consumed');\r",
+							"  pm.expect(msg).to.have.property('transaction_result');\r",
+							"  pm.expect(msg).to.have.property('ipfs_cid');\r",
+							"  pm.expect(msg).to.have.property('ipfs_address');\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{bob_auth}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"document_uuid\": \"{{invoice_uuid}}\",\r\n    \"gasLimit\":\t\"210000\"\r\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/invoice/makePayment",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"invoice",
+						"makePayment"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Alice Gets Tray Count 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg[3]).not.to.eql(0)\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid,draft]&role=seller&type=invoice",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"tray",
+						"getCountOfInvoice"
+					],
+					"query": [
+						{
+							"key": "archive",
+							"value": "0"
+						},
+						{
+							"key": "folder",
+							"value": "[sent,returned,confirmed,paid,draft]"
+						},
+						{
+							"key": "role",
+							"value": "seller"
+						},
+						{
+							"key": "type",
+							"value": "invoice"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bob gets Tray Count 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg[3]).not.to.eql(0)\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{bob_auth}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid]&role=buyer&type=invoice",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"tray",
+						"getCountOfInvoice"
+					],
+					"query": [
+						{
+							"key": "archive",
+							"value": "0"
+						},
+						{
+							"key": "folder",
+							"value": "[sent,returned,confirmed,paid]"
+						},
+						{
+							"key": "role",
+							"value": "buyer"
+						},
+						{
+							"key": "type",
+							"value": "invoice"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Alice Moves to Archive",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", () => {\r",
+							"  pm.expect(pm.response.code).to.eql(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"The response has all properties\", () => {\r",
+							"  const responseJson = pm.response.json();\r",
+							"  const invoice_uuid = pm.collectionVariables.get('invoice_uuid')\r",
+							"  pm.expect(responseJson.err).to.eql(0);\r",
+							"  pm.expect(responseJson.msg).to.eql(invoice_uuid);\r",
+							"});\r",
+							"\r",
+							"const cookieJar = pm.cookies.jar();\r",
+							"cookieJar.clear(pm.request.url, (err) => {\r",
+							"    if(err) throw err;\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "{{alice_auth}}",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"document_uuid\": \"{{invoice_uuid}}\"\r\n}"
+				},
+				"url": {
+					"raw": "http://127.0.0.1:3000/api/invoice/sellerArchive",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"invoice",
+						"sellerArchive"
 					]
 				}
 			},
@@ -662,6 +1516,66 @@
 		},
 		{
 			"key": "invoice_uuid",
+			"value": ""
+		},
+		{
+			"key": "bob_did",
+			"value": ""
+		},
+		{
+			"key": "bob_contact",
+			"value": ""
+		},
+		{
+			"key": "bob_organization",
+			"value": ""
+		},
+		{
+			"key": "bob_department",
+			"value": ""
+		},
+		{
+			"key": "bob_city",
+			"value": ""
+		},
+		{
+			"key": "bob_region",
+			"value": ""
+		},
+		{
+			"key": "bob_country",
+			"value": ""
+		},
+		{
+			"key": "bob_origin",
+			"value": ""
+		},
+		{
+			"key": "bob_address",
+			"value": ""
+		},
+		{
+			"key": "alice_issue",
+			"value": ""
+		},
+		{
+			"key": "identifier",
+			"value": ""
+		},
+		{
+			"key": "invoiceNumber",
+			"value": ""
+		},
+		{
+			"key": "invoiceDate",
+			"value": ""
+		},
+		{
+			"key": "purchaseDate",
+			"value": ""
+		},
+		{
+			"key": "alice_did",
 			"value": ""
 		}
 	]
