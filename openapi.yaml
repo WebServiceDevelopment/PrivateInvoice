@@ -36,8 +36,6 @@ tags:
     description: "Paths related to handling contacts"
   - name: "Invoice"
     description: "Paths related to handling invoices"
-  - name: "Invite"
-    description: "Paths related to handling invite"
   - name: "Session"
     description: "Paths related to handling logins and sessions"
   - name: "Settings"
@@ -123,17 +121,17 @@ paths:
                 $ref: '#/error/schemas/Responses_err_msg'
 
   #1.1.3
-  /api/contacts/getContactList:
+  /api/contacts/getContactTable:
     get:
       description: >-
         \#1.1.3 This endpoint searches the database and displays 
-        the contact list. The items in the contact list are contact person,
+        the contact list. <br>The items in the contact list are contact person,
         company name, sending authority, and receiving authority.
         You can create an invoice for anyone you have permission to send.
-        Sending authority indicates that organizations with sending authority
-        can be billed. Receiving authority indicates that you can receive
-        invoices from organizations that indicate receiving authority.
-      operationId: contacts_getContactList
+        <br>Sending authority indicates that organizations with sending 
+        authority can be billed. Receiving authority indicates that you can 
+        receive invoices from organizations that indicate receiving authority.
+      operationId: contacts_getContactTable
       tags:
         - "Contacts"
       parameters:
@@ -144,11 +142,11 @@ paths:
             type: string
       responses:
         '200':
-          description: getContactList response
+          description: getContactTable response
           content:
             application/json:
               schema:
-                $ref: '#/contacts/schemas/Responses_getContactList'
+                $ref: '#/contacts/schemas/Responses_getContactTable'
         '400':
           description: Bad request.
           content:
@@ -156,12 +154,11 @@ paths:
               schema:
                 $ref: '#/error/schemas/Responses_err_msg'
 
-  #3.1.1
-  #require('./routes/invite.js');
-  /api/invite/getContacts:
+  #1.1.4
+  /api/contacts/getContactList:
     get:
       description: >-
-        \#3.1.1 This endpoint searches the database to retrieve the contact
+        \#1.1.4 This endpoint searches the database to retrieve the contact
         list.
         <br>It is used to set the To organizationname, address, and address
         when creating a Draft invoice.
@@ -171,9 +168,9 @@ paths:
         <br>The information for the corresponding member in the
         contact list is then displayed to the recipient indicated by To
         in the invoice.
-      operationId: invite_getContacts
+      operationId: invite_getContactList
       tags:
-        - "Invite"
+        - "Contacts"
       parameters:
         - in: query
           name: contactType
@@ -183,11 +180,11 @@ paths:
             enum: ["buyers"]
       responses:
         '200':
-          description: getContacts response
+          description: getContactList response
           content:
             application/json:
               schema:
-                $ref: '#/invite/schemas/Responses_getContacts'
+                $ref: '#/invite/schemas/Responses_getContactList'
         '400':
           description: Bad request.
           content:
@@ -1783,7 +1780,7 @@ contacts:
 
     #1.1.3
 
-    Responses_getContactList:
+    Responses_getContactTable:
       type: array
       items:
         type: object
@@ -1820,37 +1817,47 @@ contacts:
             pattern: pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})T([0-9]{2}):(?:[0-9]{2}):(?:[0-9]{2}).(?:[0-9]{3})Z/
 
 invite:
-  #3.1
   schemas:
-    #3.1.1
-    Responses_getContacts:
-      type: array
-      items:
-        type: object
-        properties:
-          remote_origin:
-            type: string
-          member_did:
-            type: string
-          membername:
-            type: string
-          organization_name:
-            type: string
-          organization_address:
-            type: string
-          organization_building:
-            type: string
-          organization_department:
-            type: string
-          organization_tax_id:
-            type: string
-          organization_department:
-          addressCountry:
-            type: string
-          addressRegion:
-            type: string
-          addressCity:
-            type: string
+    #1.1.4
+    Responses_getContactList:
+      type: object
+      required:
+        - err
+        - msg
+      properties:
+        err:
+          type: integer
+          format: int32
+          enum: [0]
+        msg:
+          type: array
+          items:
+            type: object
+            properties:
+              remote_origin:
+                type: string
+              member_did:
+                type: string
+              membername:
+                type: string
+              organization_name:
+                type: string
+              organization_address:
+                type: string
+              organization_building:
+                type: string
+              organization_department:
+                type: string
+              organization_tax_id:
+                type: string
+              organization_department:
+                type: string
+              addressCountry:
+                type: string
+              addressRegion:
+                type: string
+              addressCity:
+                type: string
 
 invoice:
   #2.1

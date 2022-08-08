@@ -240,43 +240,7 @@ async function evt_handleInputFocus() {
 		}
 
 
-/*
-		const url = '/api/invite/getContacts';
-		const params = {
-			contactType : "buyers"
-		};
-
-		const ajax = new XMLHttpRequest();
-		ajax.open('POST', url);
-		ajax.setRequestHeader('Content-Type', 'application/json');
-		ajax.responseType = "json";
-		ajax.send(JSON.stringify(params));
-
-		ajax.onload = () => {
-			
-			let res = ajax.response;
-
-			if(res.err) {
-				throw res.msg;
-			}
-
-			this.MEM.initSaveTimeout();
-			
-			const list = res.msg;
-
-			this.MEM.setList( list );
-
-			this.MEM.lookup = {};
-			list.forEach( contact => {
-				this.MEM.setLookup( contact.membername, contact );
-				if(contact == null) {
-					return;
-				}
-			});
-
-		}
-*/
-		const url = '/api/invite/getContacts';
+		const url = '/api/contacts/getContactList';
 
         let response;
         try {
@@ -299,6 +263,8 @@ async function evt_handleInputFocus() {
 
         if(response.status != 200) {
             alert("this.Message.sent\n"+res.err);
+
+			return;
         }
 
 		this.MEM.initSaveTimeout();

@@ -1306,7 +1306,17 @@ const ActionWidget = (function() {
 			response = await fetch(url, opts);
 		} catch(err) {
 			this.BUTTON.enabled(button);
-			throw err;
+			this.SENDING_WRAP.hidden();
+
+			return;
+		}
+		if(response.status != 200) {
+			alert("[ Move to Trash ]\n"+res.err);
+
+			this.BUTTON.enabled(button);
+			this.SENDING_WRAP.hidden();
+
+			return;
 		}
 
 		let res;
@@ -1314,7 +1324,9 @@ const ActionWidget = (function() {
 			res = await response.json();
 		} catch(err) {
 			this.BUTTON.enabled(button);
-			throw err;
+			this.SENDING_WRAP.hidden();
+
+			return;
 		}
 
 		FolderWidget.API.getCount();
@@ -1322,9 +1334,6 @@ const ActionWidget = (function() {
 		DocumentWidget.API.clearDocument();
 		TrayWidget.API.clearDocument();
 
-		if(response.status != 200) {
-			alert("[ Move to Trash ]\n"+res.err);
-		}
 		this.BUTTON.enabled(button);
 
 		this.SENDING_WRAP.hidden();
@@ -1364,20 +1373,24 @@ const ActionWidget = (function() {
 			this.BUTTON.enabled(button);
             throw err;
         }
+		if(response.status != 200) {
+			alert("[ Soft Delete ]\n"+res.err);
+			this.BUTTON.enabled(button);
+
+			return;
+		}
 
         let res;
         try {
             res = await response.json();
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+
+            return;
         }
 		await FolderWidget.API.getCount();
 		this.API.trayRefreshAndClearDocument();
 
-		if(response.status != 200) {
-			alert("[ Soft Delete ]\n"+res.err);
-		}
 		this.BUTTON.enabled(button);
 	}
 
@@ -1412,22 +1425,27 @@ const ActionWidget = (function() {
             response = await fetch( url, opts);
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+
+			return;
         }
+		if(response.status != 200) {
+			alert("[ Soft Delete ]\n"+res.err);
+			this.BUTTON.enabled(button);
+
+			return;
+		}
 
         let res;
         try {
             res = await response.json();
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+
+			return;
         }
 		await FolderWidget.API.getCount();
 		this.API.trayRefreshAndClearDocument();
 
-		if(response.status != 200) {
-			alert("[ Soft Delete ]\n"+res.err);
-		}
 		this.BUTTON.enabled(button);
 	}
 
@@ -1464,24 +1482,31 @@ const ActionWidget = (function() {
             response = await fetch( url, opts);
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+			this.SENDING_WRAP.hidden();
+
+			return;
         }
+		if(response.status != 200) {
+			alert("[ Move to Archive ]\n"+res.err);
+			this.BUTTON.enabled(button);
+			this.SENDING_WRAP.hidden();
+
+			return;
+		}
 
         let res;
         try {
             res = await response.json();
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+			this.SENDING_WRAP.hidden();
+
+			return;
         }
 		await FolderWidget.API.getCount();
 		this.API.trayRefreshAndClearDocument();
 
-		if(response.status != 200) {
-			alert("[ Move to Archive ]\n"+res.err);
-		}
 		this.BUTTON.enabled(button);
-
 		this.SENDING_WRAP.hidden();
 	}
 
@@ -1655,27 +1680,33 @@ const ActionWidget = (function() {
             response = await fetch( url, opts);
         } catch(err) {
 			this.BUTTON.enabled(button);
+			this.SENDING_WRAP.hidden();
 
-            throw err;
+            return;
         }
+
+		if(response.status != 200) {
+			alert("[ Withdraw ]\n"+res.err);
+
+			this.BUTTON.enabled(button);
+			this.SENDING_WRAP.hidden();
+			return;
+		}
 
         let res;
         try {
             res = await response.json();
         } catch(err) {
 			this.BUTTON.enabled(button);
+			this.SENDING_WRAP.hidden();
 
-            throw err;
+            return;
         }
 
 		await FolderWidget.API.getCount();
 		this.API.trayRefreshAndClearDocument();
 
-		if(response.status != 200) {
-			alert("[ Withdraw ]\n"+res.err);
-		}
 		this.BUTTON.enabled(button);
-
 		this.SENDING_WRAP.hidden();
 
 	}
@@ -1717,21 +1748,29 @@ const ActionWidget = (function() {
             throw err;
         }
 
+		if(response.status != 200) {
+			alert("[ Move to Trash ]\n"+res.err);
+
+			this.BUTTON.enabled(button);
+			this.SENDING_WRAP.hidden();
+			return;
+		}
+
+
         let res;
         try {
             res = await response.json();
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+			this.SENDING_WRAP.hidden();
+
+			return;
         }
+
 		await FolderWidget.API.getCount();
 		this.API.trayRefreshAndClearDocument();
 
-		if(response.status != 200) {
-			alert("[ Move to Trash ]\n"+res.err);
-		}
 		this.BUTTON.enabled(button);
-
 		this.SENDING_WRAP.hidden();
 	}
 
@@ -1766,22 +1805,29 @@ const ActionWidget = (function() {
             response = await fetch( url, opts);
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+
+			return;
         }
+
+		if(response.status != 200) {
+			alert("[ Unconfirm ]\n"+res.err);
+			this.BUTTON.enabled(button);
+
+			return;
+		}
 
         let res;
         try {
             res = await response.json();
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+
+			return;
         }
+
 		await FolderWidget.API.getCount();
 		this.API.trayRefreshAndClearDocument();
 
-		if(response.status != 200) {
-			alert("[ Unconfirm ]\n"+res.err);
-		}
 		this.BUTTON.enabled(button);
 
 	}
@@ -1819,25 +1865,33 @@ const ActionWidget = (function() {
             response = await fetch( url, opts);
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+			this.SENDING_WRAP.hidden();
+
+			return;
         }
+
+		if(response.status != 200) {
+			alert("[ Move to Draft ]\n"+res.err);
+			this.BUTTON.enabled(button);
+			this.SENDING_WRAP.hidden();
+
+			return;
+		}
 
         let res;
         try {
             res = await response.json();
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+			this.SENDING_WRAP.hidden();
+
+            return;
         }
 
 		await FolderWidget.API.getCount();
 		this.API.trayRefreshAndClearDocument();
 
-		if(response.status != 200) {
-			alert("[ Move to Draft ]\n"+res.err);
-		}
 		this.BUTTON.enabled(button);
-
 		this.SENDING_WRAP.hidden();
 
 	}
@@ -1870,13 +1924,25 @@ const ActionWidget = (function() {
             body: JSON.stringify(params)
         };
 
+
         let response;
         try {
             response = await fetch( url, opts);
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+			this.SENDING_WRAP.hidden();
+
+			return;
         }
+
+		if(response.status != 200) {
+			alert("[ Confirm Invoice ]\n"+res.err);
+
+			this.BUTTON.enabled(button);
+			this.SENDING_WRAP.hidden();
+
+			return;
+		}
 
         let res;
         try {
@@ -1884,16 +1950,14 @@ const ActionWidget = (function() {
         } catch(err) {
 			this.BUTTON.enabled(button);
 			this.SENDING_WRAP.hidden();
-            throw err;
+
+            return;
         }
+
 		await FolderWidget.API.getCount();
 		this.API.trayRefreshAndClearDocument();
 
-		if(response.status != 200) {
-			alert("[ Confirm Invoice ]\n"+res.err);
-		}
 		this.BUTTON.enabled(button);
-
 		this.SENDING_WRAP.hidden();
 	}
 
@@ -1928,22 +1992,30 @@ const ActionWidget = (function() {
             response = await fetch( url, opts);
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+
+			return;
         }
+
+		if(response.status != 200) {
+			alert("[ Return to Sender ]\n"+res.err);
+			this.BUTTON.enabled(button);
+
+			return;
+		}
 
         let res;
         try {
             res = await response.json();
         } catch(err) {
 			this.BUTTON.enabled(button);
-            throw err;
+
+			return;
         }
+
 		await FolderWidget.API.getCount();
 		this.API.trayRefreshAndClearDocument();
 
-		if(response.status != 200) {
-			alert("[ Return to Sender ]\n"+res.err);
-		}
+
 		this.BUTTON.enabled(button);
 	}
 
@@ -1976,6 +2048,7 @@ const ActionWidget = (function() {
 		if ( subject == "" || subject == null) {
 			if( confirm(message) == false) {
 				this.BUTTON.enabled(button);
+
 				return;
 			}
 		}
@@ -1983,6 +2056,7 @@ const ActionWidget = (function() {
 		if( this.MEM.getSaveTimeout() != null) {
 			console.log("saveTimeout");
 			this.BUTTON.enabled(button);
+
 			return;
 		}
 
@@ -2017,7 +2091,7 @@ const ActionWidget = (function() {
 /*
  *  [ Send Invoice ]
  */
-	function network_invoiceDraftSend() {
+    async function network_invoiceDraftSend() {
 
 		const doc = DocumentWidget.API.getDocument();
 
@@ -2027,34 +2101,58 @@ const ActionWidget = (function() {
 
 		const url = '/api/invoice/sendInvoice';
 
-		const ajax = new XMLHttpRequest();
-		ajax.open('POST', url);
-		ajax.setRequestHeader('Content-Type', 'application/json');
-		ajax.responseType = "json";
-		ajax.send(JSON.stringify(params));
+        const opts = {
+            method: 'POST',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        };
 
-		ajax.onload = () => {
-
-			let res = ajax.response;
-
-			this.MEM.initSaveTimeout();
-
-
-			FolderWidget.API.getCount();
-			TrayWidget.API.refresh();
-			DocumentWidget.API.clearDocument();
-			TrayWidget.API.clearDocument();
-
-			this.API.submit.reset();
-
-			if(ajax.status != 200) {
-				alert("[ Send Invoice ]\n"
-						+`ErrorNo:${res.err}\n`
-						+`${res.msg}`);
-			}
+        let response;
+        try {
+            response = await fetch( url, opts);
+        } catch(err) {
 
 			this.SENDING_WRAP.hidden();
+			return;
+        }
+
+        let res;
+        try {
+            res = await response.json();
+        } catch(err) {
+
+			this.SENDING_WRAP.hidden();
+			return;
+        }
+
+		this.MEM.initSaveTimeout();
+
+		if(response.status != 200) {
+
+			alert("[ Send Invoice ]\n"
+					+`ErrorNo:${res.err}\n`
+					+`${res.msg}`);
+
+
+			this.API.submit.reset();
+			this.SENDING_WRAP.hidden();
+			return;
 		}
+
+
+
+		FolderWidget.API.getCount();
+		TrayWidget.API.refresh();
+		DocumentWidget.API.clearDocument();
+		TrayWidget.API.clearDocument();
+
+		this.API.submit.reset();
+
+		this.SENDING_WRAP.hidden();
 
 	}
 	
@@ -2062,7 +2160,7 @@ const ActionWidget = (function() {
  * [ Move to Trash ]
  * Draft Tray
  */
-	function evt_handleInvoiceDraftDelete() {
+    async function evt_handleInvoiceDraftDelete() {
 		
 		const params = {
 			document_uuid : this.MEM.getDocument_uuid()
@@ -2070,23 +2168,47 @@ const ActionWidget = (function() {
 
 		const url = '/api/invoice/trashDraft';
 
-		const ajax = new XMLHttpRequest();
-		ajax.open('POST', url);
-		ajax.setRequestHeader('Content-Type', 'application/json');
-		ajax.responseType = "json";
-		ajax.send(JSON.stringify(params));
+        const opts = {
+            method: 'POST',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        };
 
-		ajax.onload = () => {
+        let response;
+        try {
+            response = await fetch( url, opts);
+        } catch(err) {
 
-			console.log(ajax.response);
+			this.SENDING_WRAP.hidden();
+			return;
+        }
 
-			FolderWidget.API.updateInvoiceDraftCount();
-			TrayWidget.API.refresh();
-			DocumentWidget.API.clearDocument();
-			TrayWidget.API.clearDocument();
+        let res;
+        try {
+            res = await response.json();
+        } catch(err) {
 
+			this.SENDING_WRAP.hidden();
+			return;
+        }
+		if(response.status != 200) {
+
+			alert("[ Return to Sender ]\n"+res.err);
+
+			this.SENDING_WRAP.hidden();
+			return;
 		}
 
+		FolderWidget.API.updateInvoiceDraftCount();
+		TrayWidget.API.refresh();
+		DocumentWidget.API.clearDocument();
+		TrayWidget.API.clearDocument();
+
+		this.SENDING_WRAP.hidden();
 	}
 
 	function api_openPanel(doc) {
