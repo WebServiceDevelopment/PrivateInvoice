@@ -89,6 +89,7 @@ router.post('/sendInvoice', async function (req, res) {
 		document_uuid,
 		member_did
 	);
+
 	if (err1) {
 
 		let msg = `Error:${METHOD}: Could not get buyer did`;
