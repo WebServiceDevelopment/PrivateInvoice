@@ -117,10 +117,10 @@ async function _connection () {
 async function _insert(conn, sql, args) {
 
 	try {
-    	const result = await db.insert(conn, sql, args);
+		const result = await db.insert(conn, sql, args);
 		return [result, null];
 	} catch(err) {
-    	return [false, err];
+		return [false, err];
 	}
 }
 
@@ -130,10 +130,10 @@ async function _insert(conn, sql, args) {
 async function _update(conn, sql, args) {
 
 	try {
-    	const result = await db.update(conn, sql, args);
+		const result = await db.update(conn, sql, args);
 		return [result, null];
 	} catch(err) {
-    	return [false, err];
+		return [false, err];
 	}
 }
 
@@ -143,10 +143,10 @@ async function _update(conn, sql, args) {
 async function _rollback(conn, err) {
 
 	try {
-    	await db.rollback(conn, err);
+		await db.rollback(conn, err);
 		return [true, err];
 	} catch(err) {
-    	return [false, err];
+		return [false, err];
 	}
 }
 
@@ -156,10 +156,10 @@ async function _rollback(conn, err) {
 async function _query(conn, sql, args) {
 
 	try {
-    	const result = await db.query(conn, sql, args);
+		const result = await db.query(conn, sql, args);
 		return [result, null];
 	} catch(err) {
-    	return [false, err];
+		return [false, err];
 	}
 }
 
@@ -168,7 +168,7 @@ async function _query(conn, sql, args) {
  */
 async function _exist_check(conn, table, uuid) {
 
-	let result, err;
+	let result, msg;
 
 	const sql = `
 		SELECT
@@ -188,7 +188,7 @@ async function _exist_check(conn, table, uuid) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Select error";
+		msg = "Select error";
 		return [false, msg];
 	}
 
@@ -197,7 +197,8 @@ async function _exist_check(conn, table, uuid) {
 	if ( result.num == 1 ) {
 		return [true, null];
 	} else {
-		return [false, err];
+		msg = "result.num in not 1";
+		return [false, msg];
 	}
 
 }
@@ -207,7 +208,7 @@ async function _exist_check(conn, table, uuid) {
  */
 async function _notexist_check(conn, table, uuid) {
 
-	let result, err;
+	let result, msg;
 
 	const sql = `
 		SELECT
@@ -227,7 +228,7 @@ async function _notexist_check(conn, table, uuid) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Select error";
+		msg = "Select error";
 		return [false, msg];
 	}
 
@@ -236,7 +237,8 @@ async function _notexist_check(conn, table, uuid) {
 	if ( result.num == 0 ) {
 		return [true, null];
 	} else {
-		return [false, err];
+		msg = "result.num in not 1";
+		return [false, msg];
 	}
 
 }
@@ -246,7 +248,7 @@ async function _notexist_check(conn, table, uuid) {
  */
 async function _checkForExistingDocument (conn, table, document_uuid ) {
 
-	let result, err;
+	let msg;
 
     const sql = `
         SELECT
@@ -260,18 +262,19 @@ async function _checkForExistingDocument (conn, table, document_uuid ) {
     const args = [ document_uuid ];
 
 	try {
-    	result = await db.selectOne(conn, sql, args);
+		const result = await db.selectOne(conn, sql, args);
+
+		if(result.num) {
+			msg = 'Document Uuid already exists in database';
+			return [false, msg];
+		}
+
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Select error";
+		msg = "Select error";
 		return [false, msg];
 	}
-
-    if(result.num) {
-        err = {msg:'Document Uuid already exists in database'};
-		return [false, err];
-    }
 
 	return [true, null];
 }
@@ -280,6 +283,8 @@ async function _checkForExistingDocument (conn, table, document_uuid ) {
  * checkForNonexistingDocument
  */
 async function _checkForNotExistingDocument (conn, table, document_uuid ) {
+
+	let msg;
 
     const sql = `
         SELECT
@@ -292,13 +297,24 @@ async function _checkForNotExistingDocument (conn, table, document_uuid ) {
 
     const args = [ document_uuid ];
 
-    const { num } = await db.selectOne(sql, args);
+	try {
+		const { num } = await db.selectOne(conn, sql, args);
 
-    if(num == 0) {
-		return new Error('DOcument Uuid not exists in database yet');
-    }
+		if(num == 0) {
 
-    return null;
+			msg = 'Document Uuid not exists in database yet';
+			return [false, msg];
+		}
+
+
+	} catch (err) {
+		console.log(err);
+
+		msg = "Select error";
+		return [false, msg];
+	}
+
+	return [true, null];
 }
 
 /*
@@ -306,7 +322,7 @@ async function _checkForNotExistingDocument (conn, table, document_uuid ) {
  */
 async function _getDraftDocument(conn, table, uuid) {
 
-	let document;
+	let document, msg;
 
 	const sql = `
 		SELECT 
@@ -340,7 +356,7 @@ async function _getDraftDocument(conn, table, uuid) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Select error";
+		msg = "Select error";
 		return [false, msg];
 	}
 	//console.log(document)
@@ -354,7 +370,7 @@ async function _getDraftDocument(conn, table, uuid) {
  */
 async function _getDocument(conn, table, uuid) {
 
-	let result;
+	let result, msg;
 
 	const sql = `
 		SELECT 
@@ -378,7 +394,7 @@ async function _getDocument(conn, table, uuid) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Select error";
+		msg = "Select error";
 		return [false, msg];
 	}
 
@@ -391,7 +407,7 @@ async function _getDocument(conn, table, uuid) {
  */
 async function _getStatus(conn, table, uuid) {
 
-	let status;
+	let status, msg;
 
 	const sql = `
 		SELECT 
@@ -431,7 +447,7 @@ async function _getStatus(conn, table, uuid) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Select error";
+		msg = "Select error";
 		return [false, msg];
 	}
 
@@ -443,7 +459,7 @@ async function _getStatus(conn, table, uuid) {
  */
 async function _getBuyerDid (conn, table, document_uuid, seller_did) {
 
-	let result;
+	let result, msg;
 
     const sql = `
         SELECT
@@ -472,7 +488,7 @@ async function _getBuyerDid (conn, table, document_uuid, seller_did) {
     } catch(err) {
 		console.error(err);
 
-		let mag = "Select error";
+		msg = "Select error";
 		return [false, msg];
     }
 
@@ -483,7 +499,7 @@ async function _getBuyerDid (conn, table, document_uuid, seller_did) {
  */
 async function _getBuyerDidForDraft (conn, table, document_uuid, seller_did) {
 
-	let result;
+	let result, msg;
 
     const sql = `
         SELECT
@@ -512,7 +528,7 @@ async function _getBuyerDidForDraft (conn, table, document_uuid, seller_did) {
     } catch(err) {
 		console.error(err);
 
-		let mag = "Select error";
+		msg = "Select error";
 		return [false, msg];
     }
 
@@ -523,7 +539,7 @@ async function _getBuyerDidForDraft (conn, table, document_uuid, seller_did) {
  */
 async function _getSellerDid (conn, table, document_uuid, buyer_did) {
 
-	let result;
+	let result, msg;
 
     const sql = `
         SELECT
@@ -534,7 +550,7 @@ async function _getSellerDid (conn, table, document_uuid, buyer_did) {
             document_uuid = ?
         AND
             buyer_did = ?
-    `;
+	`;
 
     const args = [
         document_uuid,
@@ -548,7 +564,8 @@ async function _getSellerDid (conn, table, document_uuid, buyer_did) {
     }
 
 	if(!result) {
-		return [ null, new Error('seller_did not found for document_uuid') ];
+		msg = 'seller_did not found for document_uuid';
+		return [ null, msg];
     }
     const { seller_did } = result;
     return [ seller_did, null ];
@@ -560,7 +577,7 @@ async function _getSellerDid (conn, table, document_uuid, buyer_did) {
  */
 async function _getSellerHost (conn, table,  seller_did, buyer_did) {
 
-	let result, err;
+	let result, msg;
 
     const sql = `
         SELECT
@@ -579,18 +596,18 @@ async function _getSellerHost (conn, table,  seller_did, buyer_did) {
     ];
 
     try {
-    	result = await db.selectOne(conn, sql, args);
-    	//console.log(result);
+		result = await db.selectOne(conn, sql, args);
+		//console.log(result);
     } catch(err) {
 		console.error(err);
 
-		let mag = "Select error";
+		msg = "Select error";
 		return [false, msg];
 	}
 
     if(!result) {
-        err = {msg:'No contact information was found for this invoice'};
-        return [ null, err ];
+        msg = 'No contact information was found for this invoice';
+        return [ null, msg ];
     }
 
     const { seller_host } = result;
@@ -603,7 +620,7 @@ async function _getSellerHost (conn, table,  seller_did, buyer_did) {
  */
 async function _getBuyerHost (conn, table,  seller_did, buyer_did) {
 
-	let result, err;
+	let result, msg;
 
     const sql = `
         SELECT
@@ -622,21 +639,21 @@ async function _getBuyerHost (conn, table,  seller_did, buyer_did) {
     ];
 
 	try {
-	    result = await db.selectOne(conn, sql, args);
+		result = await db.selectOne(conn, sql, args);
 		//console.log(result);
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Select error";
+		msg = "Select error";
 		return [false, msg];
 	}
 	if(!result) {
-     	err = {msg:'buyer_host not found for buyer_did'};
-      	return [ null, err ];
-   	}
+		msg = {msg:'buyer_host not found for buyer_did'};
+		return [ null, msg ];
+	}
 
-   	const { buyer_host } = result;
-   	return [ buyer_host, null ];
+	const { buyer_host } = result;
+	return [ buyer_host, null ];
 
 }
 
@@ -645,7 +662,7 @@ async function _getBuyerHost (conn, table,  seller_did, buyer_did) {
  */
 async function _insertDraftDocument(conn, table, document) {
 
-	let result, err;
+	let result, msg;
 
 	const sql = `
 		INSERT INTO ${table} (
@@ -717,13 +734,13 @@ async function _insertDraftDocument(conn, table, document) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Insert error";
+		msg = "Insert error";
 		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"insertDraftDocument:result.affectedRows != 1"};
-		return [false, err];
+		msg  = {msg:"insertDraftDocument:result.affectedRows != 1"};
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -734,7 +751,7 @@ async function _insertDraftDocument(conn, table, document) {
  */
 async function _insertDocument(conn, table, status, document_json) {
 
-	let result, err;
+	let result, msg;
 
 	const sql = `
 		INSERT INTO ${table} (
@@ -756,12 +773,12 @@ async function _insertDocument(conn, table, status, document_json) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Insert error";
+		msg = "Insert error";
 		return [false, msg];
 	}
 	if(result.affectedRows != 1) {
-		err  = {msg:"insertDocument:result.affectedRows != 1"};
-		return [false, err];
+		msg  = "insertDocument:result.affectedRows != 1";
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -772,7 +789,7 @@ async function _insertDocument(conn, table, status, document_json) {
  */
 async function _insertArchiveDocument(conn, table, document) {
 
-	let result, err;
+	let result, msg;
 
 	const sql = `
 		INSERT INTO ${table} (
@@ -803,12 +820,12 @@ async function _insertArchiveDocument(conn, table, document) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Insert error";
+		msg = "Insert error";
 		return [false, msg];
 	}
 	if(result.affectedRows != 1) {
-		err  = {msg:"insertArchiveDocument:result.affectedRows != 1"};
-		return [false, err];
+		msg  = "insertArchiveDocument:result.affectedRows != 1";
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -819,7 +836,7 @@ async function _insertArchiveDocument(conn, table, document) {
  */
 async function _insertStatus(conn, table, status) {
 
-	let result, err;
+	let result, msg;
 
 	const sql = `
 		INSERT INTO ${table} (
@@ -887,13 +904,13 @@ async function _insertStatus(conn, table, status) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Insert error";
+		msg = "Insert error";
 		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"insertStatust:result.affectedRows != 1"};
-		return [false, err];
+		msg  = "insertStatust:result.affectedRows != 1";
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -904,7 +921,7 @@ async function _insertStatus(conn, table, status) {
  */
 async function _insertArchiveStatus(conn, table, status) {
 
-	let result, err;
+	let result, msg;
 
 	const sql = `
 		INSERT INTO ${table} (
@@ -979,13 +996,13 @@ async function _insertArchiveStatus(conn, table, status) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Insert error";
+		msg = "Insert error";
 		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"insertArchiveStatus:result.affectedRows != 1"};
-		return [false, err];
+		msg  = "insertArchiveStatus:result.affectedRows != 1";
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -996,9 +1013,9 @@ async function _insertArchiveStatus(conn, table, status) {
  */
 async function _updateDraftDocument(conn, table, req) {
 
-	let result, err;
+	let result, msg;
 
-	let sql = `
+	const sql = `
 		UPDATE
 			${table}
 		SET
@@ -1014,7 +1031,7 @@ async function _updateDraftDocument(conn, table, req) {
 			document_uuid = ?
 	`;
 
-	let args = [
+	const args = [
 		JSON.stringify(req.body.document_body),
 		JSON.stringify(req.body.document_totals),
 		JSON.stringify(req.body.document_meta),
@@ -1041,13 +1058,13 @@ async function _updateDraftDocument(conn, table, req) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Update error";
+		msg = "Update error";
 		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"insertArchiveStatus:result.affectedRows != 1"};
-		return [false, err];
+		msg  = {msg:"insertArchiveStatus:result.affectedRows != 1"};
+		return [false, msg];
 	}
 
 	return [result, null ];
@@ -1058,9 +1075,9 @@ async function _updateDraftDocument(conn, table, req) {
  */
 async function _updateDraftStatus(conn, table, req) {
 
-	let sql, args;
+	let result, msg;
 
-	sql = `
+	const sql = `
 		UPDATE
 			${table}
 		SET
@@ -1074,7 +1091,7 @@ async function _updateDraftStatus(conn, table, req) {
 			document_uuid = ?
 	`;
 
-	args = [
+	const args = [
 		req.body.subject_line,
 		req.body.document_totals.total,
 		req.body.document_meta.due_by
@@ -1097,13 +1114,13 @@ async function _updateDraftStatus(conn, table, req) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Update error";
+		msg = "Update error";
 		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"insertArchiveStatus:result.affectedRows != 1"};
-		return [false, err];
+		msg  = {msg:"insertArchiveStatus:result.affectedRows != 1"};
+		return [false, msg];
 	}
 
 	return [result, null ];
@@ -1114,7 +1131,7 @@ async function _updateDraftStatus(conn, table, req) {
  */
 async function _deleteStatus(conn, table, status) {
 
-	let result, err;
+	let result, msg;
 
 	const sql = `
 		DELETE FROM
@@ -1132,13 +1149,13 @@ async function _deleteStatus(conn, table, status) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Delete error";
+		msg = "Delete error";
 		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
-		err  = "deleteStatus:result.affectedRows != 1";
-		return [false, err];
+		msg  = "deleteStatus:result.affectedRows != 1";
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -1149,7 +1166,7 @@ async function _deleteStatus(conn, table, status) {
  */
 async function _deleteDocument(conn, table, status) {
 
-	let result, err;
+	let result, msg;
 
 	const sql = `
 		DELETE FROM
@@ -1167,13 +1184,13 @@ async function _deleteDocument(conn, table, status) {
 	} catch(err) {
 		console.error(err);
 
-		let mag = "Delete error";
+		msg = "Delete error";
 		return [false, msg];
 	}
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"deleteDocument:result.affectedRows != 1"};
-		return [false, err];
+		msg  = "deleteDocument:result.affectedRows != 1";
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -1184,9 +1201,9 @@ async function _deleteDocument(conn, table, status) {
  */
 async function _setConfirm (conn, table, document_uuid , buyer_did) {
 
-	let err;
+    let result, msg;
 
-    let sql = `
+    const sql = `
         UPDATE
             ${table}
         SET
@@ -1201,25 +1218,24 @@ async function _setConfirm (conn, table, document_uuid , buyer_did) {
             document_type = 'invoice'
     `;
 
-    let args = [
+    const args = [
         buyer_did,
         document_uuid
     ];
 
-    let result;
 
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
 		console.error(err);
 
-		let mag = "Update error";
+		msg = "Update error";
 		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"setConfirm:result.affectedRows != 1"};
-		return [false, err];
+		msg  = "setConfirm:result.affectedRows != 1";
+		return [false, msg];
 	}
 
     return [result, null];
@@ -1230,9 +1246,9 @@ async function _setConfirm (conn, table, document_uuid , buyer_did) {
  */
 async function _setUnconfirm (conn, table, document_uuid , buyer_did) {
 
-	let err;
+    let result, msg;
 
-    let sql = `
+    const sql = `
         UPDATE
             ${table}
         SET
@@ -1247,25 +1263,24 @@ async function _setUnconfirm (conn, table, document_uuid , buyer_did) {
             document_type = 'invoice'
     `;
 
-    let args = [
+    const args = [
         buyer_did,
         document_uuid
     ];
 
-    let result;
 
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
 		console.error(err);
 
-		let mag = "Update error";
+		msg = "Update error";
 		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"setUnconfirm:result.affectedRows != 1"};
-		return [false, err];
+		msg  = "setUnconfirm:result.affectedRows != 1";
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -1278,9 +1293,9 @@ async function _setMakePayment_status (conn, table, document_uuid , buyer_did) {
 
 	const RESERVATION = 0;
 
-	let err;
+    let result, msg;
 
-    let sql = `
+    const sql = `
         UPDATE
             ${table}
         SET
@@ -1296,25 +1311,24 @@ async function _setMakePayment_status (conn, table, document_uuid , buyer_did) {
             document_type = 'invoice'
     `;
 
-    let args = [
+    const args = [
         buyer_did,
         document_uuid
     ];
 
-    let result;
 
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
 		console.error(err);
 
-		let mag = "Update error";
+		msg = "Update error";
 		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"setMakePayment_status:result.affectedRows != 1"};
-		return [false, err];
+		msg  = "setMakePayment_status:result.affectedRows != 1";
+		return [false, msg];
 	}
 
     return [result, null];
@@ -1325,9 +1339,9 @@ async function _setMakePayment_status (conn, table, document_uuid , buyer_did) {
  */
 async function _setMakePayment_document (conn, table, document_uuid , hash) {
 
-	let err;
+    let result, msg;
 
-    let sql = `
+    const sql = `
         UPDATE
             ${table}
         SET
@@ -1337,25 +1351,24 @@ async function _setMakePayment_document (conn, table, document_uuid , hash) {
             document_uuid = ?
     `;
 
-    let args = [
+    const args = [
         hash,
         document_uuid
     ];
 
-    let result;
 
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
 		console.error(err);
 
-		let mag = "Update error";
+		msg = "Update error";
 		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"setMakePayment_document:result.affectedRows != 1"};
-		return [false, err];
+		msg  = "setMakePayment_document:result.affectedRows != 1";
+		return [false, msg];
 	}
 
     return [result, null];
@@ -1366,9 +1379,9 @@ async function _setMakePayment_document (conn, table, document_uuid , hash) {
  */
 async function _setWithdrawSeller (conn, table, document_uuid , seller_did, document_folder) {
 
-	let err;
+    let result, msg;
 
-    let sql = `
+    const sql = `
         UPDATE
             ${table}
         SET
@@ -1383,26 +1396,25 @@ async function _setWithdrawSeller (conn, table, document_uuid , seller_did, docu
             document_type = 'invoice'
     `;
 
-    let args = [
+    const args = [
         seller_did,
         document_uuid,
         document_folder
     ];
 
-    let result;
 
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
 		console.error(err);
 
-		let mag = "Update error";
+		msg = "Update error";
 		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"setWithdrawSeller:result.affectedRows != 1"};
-		return [false, err];
+		msg  = "setWithdrawSeller:result.affectedRows != 1";
+		return [false, msg];
 	}
 
 
@@ -1414,9 +1426,9 @@ async function _setWithdrawSeller (conn, table, document_uuid , seller_did, docu
  */
 async function _setWithdrawBuyer (conn, table, document_uuid , buyer_did, document_folder) {
 
-	let err;
+    let result, msg;
 
-    let sql = `
+    const sql = `
         UPDATE
             ${table}
         SET
@@ -1431,26 +1443,25 @@ async function _setWithdrawBuyer (conn, table, document_uuid , buyer_did, docume
             document_type = 'invoice'
     `;
 
-    let args = [
+    const args = [
         buyer_did,
         document_uuid,
         document_folder
     ];
 
-    let result;
 
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
 		console.error(err);
 
-		let mag = "Update error";
+		msg = "Update error";
 		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"setWithdrawBuyer:result.affectedRows != 1"};
-		return [false, err];
+		msg  = {msg:"setWithdrawBuyer:result.affectedRows != 1"};
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -1461,7 +1472,9 @@ async function _setWithdrawBuyer (conn, table, document_uuid , buyer_did, docume
  */
 async function _setReturn (conn, table, document_uuid , buyer_did) {
 
-    let sql = `
+    let result, msg;
+
+    const sql = `
         UPDATE
             ${table}
         SET
@@ -1476,25 +1489,24 @@ async function _setReturn (conn, table, document_uuid , buyer_did) {
             document_type = 'invoice'
     `;
 
-    let args = [
+    const args = [
         buyer_did,
         document_uuid
     ];
 
-    let result, err;
 
     try {
         result = await db.update(conn, sql, args);
     } catch(err) {
 		console.error(err);
 
-		let mag = "Update error";
+		msg = "Update error";
 		return [false, msg];
     }
 
 	if(result.affectedRows != 1) {
-		err  = {msg:"setReturn:result.affectedRows != 1"};
-		return [false, err];
+		msg  = {msg:"setReturn:result.affectedRows != 1"};
+		return [false, msg];
 	}
 
 	return [result, null];
@@ -1506,10 +1518,10 @@ async function _setReturn (conn, table, document_uuid , buyer_did) {
 async function _rollbackAndReturn(conn, code, err, errno, method) {
 
 	try {
-    	await db.rollback(conn, err);
+		await db.rollback(conn, err);
 	} catch(err) {
-    	conn.end();
-    	return {"err":errno, msg:`${method}:Rollback error`};
+		conn.end();
+		return {"err":errno, msg:`${method}:Rollback error`};
 	}
     conn.end();
 
@@ -1520,7 +1532,7 @@ async function _rollbackAndReturn(conn, code, err, errno, method) {
     if(code == 500) {
         rt = {"err":code, msg:"buyer connect check:ECONNRESET"};
     } else {
-   		let msg;
+		let msg;
 
 		if(typeof err === 'string') {
 			msg =err;
@@ -1544,7 +1556,7 @@ async function _rollbackAndReturn(conn, code, err, errno, method) {
 			msg = err;
 		}
 
-        rt = {"err":errno, msg:`${methos}:${msg}`};
+		rt = {"err":errno, msg:`${method}:${msg}`};
     }
     return rt;
 }

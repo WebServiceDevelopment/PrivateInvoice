@@ -148,7 +148,7 @@ const SettingsContacts = (function() {
 
 	async function api_renderContacts() {
 
-		const url = '/api/contacts/getContactList';
+		const url = '/api/contacts/getContactTable';
 
 		const opts = {
 			method: 'GET',

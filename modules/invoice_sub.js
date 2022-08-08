@@ -152,7 +152,7 @@ async function _notexist_check( table, uuid) {
  */
 async function _checkForExistingDocument (table, document_uuid ) {
 
-	let result, msg;
+	let msg;
 
     const sql = `
         SELECT
@@ -166,18 +166,19 @@ async function _checkForExistingDocument (table, document_uuid ) {
     const args = [ document_uuid ];
 
 	try {
-		result = await db.selectOne(sql, args);
+		const result = await db.selectOne(sql, args);
+
+		if(result.num) {
+			msg = 'Document Uuid already exists in database';
+			return [false, msg];
+		}
+
 	} catch(err) {
 		console.log(err);
 
 		msg = "Select error";
 		return [false, msg];
 	}
-
-    if(result.num) {
-        msg = 'Document Uuid already exists in database';
-		return [false, msg];
-    }
 
 	return [true, null];
 }
@@ -200,15 +201,24 @@ async function _checkForNotExistingDocument (table, document_uuid ) {
 
     const args = [ document_uuid ];
 
-    const { num } = await db.selectOne(sql, args);
+	try {
+		const { num } = await db.selectOne(sql, args);
 
-    if(num == 0) {
+		if(num == 0) {
 
-		msg = 'DOcument Uuid not exists in database yet';
+			msg = 'Document Uuid not exists in database yet';
+			return [false, msg];
+		}
+
+
+	} catch (err) {
+		console.log(err);
+
+		msg = "Select error";
 		return [false, msg];
-    }
+	}
 
-    return null;
+	return [true, null];
 }
 
 

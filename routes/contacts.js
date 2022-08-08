@@ -45,9 +45,13 @@ const {
     createBusinessCard,
     checkForExistingContact,
     insertNewContact,
-    getContacts,
     insertInviteTable,
+    getContactTable,
 }                           = require('../modules/contacts_sub.js')
+
+const {
+    getContactListByMember_did,
+}                           = require("../modules/contacts_in.js");
 
 // Database
 
@@ -330,16 +334,119 @@ router.post('/addContact', async function(req, res) {
 
 /*
  * 3.
- * getContactList
+ * getContactTable
  */
-router.get('/getContactList', async function(req, res) {
+router.get('/getContactTable', async function(req, res) {
 
 	const { member_did } = req.session.data;
-	const contacts = await getContacts(member_did);
+	const contactTable = await getContactTable(member_did);
 
 	console.log('--- Getting contacts ---');
-	console.log(contacts);
+	console.log(contactTable);
 
-	res.json(contacts);
+	res.json(contactTable);
 
 })
+
+
+/*
+ * 4.
+ * getContactList
+ */
+
+router.get('/getContactList', async function(req, res) {
+
+	const METHOD = '/getContactList';
+
+	let contactType, myPosition;
+
+	// First we get a list of all of the contact uuid's
+	// in the direction that we request
+
+	console.log("req.query.contactType="+req.query.contactType)
+
+	// 1.
+	//
+	switch(req.query.contactType) {
+	case "sellers":
+		contactType = "seller_did";
+		myPosition = "buyer_did";
+
+		break;
+	case "buyers":
+		contactType = "remote_member_did";
+		myPosition = "local_member_did";
+
+		break;
+	default:
+
+		let msg = `ERROR:${METHOD}: Invalid contact type provided`;
+
+		res.status(400)
+			.json({
+				err : 1,
+				msg : msg
+			});
+		return;
+	}
+
+
+	//2.
+	//
+	const [rows, err2] = await getContactListByMember_did( 
+								contactType, 
+								myPosition, 
+								req.session.data.member_did);
+
+	if( err2) {
+
+		let msg = `ERROR:${METHOD}: Invalid request`;
+
+		res.status(400)
+			.json({
+				err : 2,
+				msg : msg
+			});
+		return;
+	}
+
+	if(!rows.length) {
+		res.json({
+			err : 0,
+			msg : []
+		});
+		return;
+	}
+
+	// 3.
+	//
+	const contactList = rows.map( (row) => {
+
+		const org = JSON.parse(row.remote_organization);
+		
+		return {
+			remote_origin : row.remote_origin,
+			member_did : row.remote_member_did,
+			membername : row.remote_membername,
+            organization_name : org.name,
+            organization_address : org.address,
+            organization_building : org.building,
+            organization_department : org.department,
+            organization_tax_id : '',
+            addressCountry : org.country,
+            addressRegion : org.state,
+            addressCity : org.city,
+            wallet_address : ''
+		}
+	});
+
+
+	// 4.
+	//
+	res.json({
+		err : 0,
+		msg : contactList
+	});
+
+});
+

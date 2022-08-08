@@ -65,11 +65,42 @@ router.post('/trashDraft', async function(req, res) {
 
 	const METHOD = '/trashDraft';
 
+	const { document_uuid } = req.body;
+	const { member_did } = req.session.data;
+
 	let err, errno, code;
 
 	let start = Date.now();
 
-	// 1.
+	console.log("here 0")
+    // 1.
+    //const [buyer_did, err1] = await sub.getBuyerDidForDraft(
+    let [buyer_did, err1] = await sub.getBuyerDidForDraft(
+        SELLER_DRAFT_STATUS,
+        document_uuid,
+        member_did
+    );
+
+	console.log("here 0-1")
+    if (err1) {
+
+        let msg = `Error:${METHOD}: Could not get buyer did`;
+
+        res.status(400)
+            .json({
+                err: 1,
+                msg: msg
+            });
+        return;
+    }
+
+	if(buyer_did == null) {
+		buyer_did = "-----"
+	}
+
+	console.log("here 1")
+
+	// 2.
 	// STATUS
 	// First we go ahead and get the status.
 	//
@@ -77,7 +108,7 @@ router.post('/trashDraft', async function(req, res) {
 
 	if(old_status == undefined) {
 
-		let msg = `Err:r:${METHOD}: Status record is not exist.`
+		let msg = `Error:${METHOD}: Status record is not exist.`
 
 		res.status(400)
 			.json({
@@ -86,38 +117,66 @@ router.post('/trashDraft', async function(req, res) {
 			});
 		return;
 	}
-
-	// 2.
-	// Second we go ahead and get the document
-	//
-	const [ old_document , _2 ] = await sub.getDraftDocument( SELLER_DRAFT_DOCUMENT, req.body.document_uuid) ;
-
-	if(old_document == undefined) {
-
-		let msg = `Error:${METHOD}: Document record is not exist.`
-
-		res.status(400)
-			.json({
-				err : 2,
-				msg : msg
-			});
-		return;
-	}
+	console.log("here 2")
 
 	// 3.
+	// Second we go ahead and get the document
+	//
+/*
+	const [ old_document , _2 ] = await sub.getDraftDocument( SELLER_DRAFT_DOCUMENT, req.body.document_uuid) ;
+*/
+
+	const [document] = await sub.getDraftDocumentForSend(
+        SELLER_DRAFT_DOCUMENT,
+        document_uuid
+    );
+    if (document.document_uuid == null) {
+
+        let msg = `Error:${METHOD}: document_uuid is null`;
+
+        res.status(400)
+            .json({
+                err: 6,
+                msg: msg
+            });
+        return;
+    }
+
+	console.log("document_uuid="+document_uuid);
+
+
+    document.seller_did = member_did;
+    document.buyer_did = buyer_did;
+
+	console.log("here 3")
+	// 4.
 	// Creating Send data.
 	//
 
+/*
 	old_document.currency_options = JSON.parse(old_document.currency_options);
 	old_document.seller_details = JSON.parse(old_document.seller_details);
 	old_document.buyer_details = JSON.parse(old_document.buyer_details);
 	old_document.document_meta = JSON.parse(old_document.document_meta);
 	old_document.document_body = JSON.parse(old_document.document_body);
 	old_document.document_totals = JSON.parse(old_document.document_totals);
+*/
 
-	const document_json = JSON.stringify( old_document );
 
-	// 4.
+	console.log(typeof document.document_json);
+	
+
+    const [ keyPair ] = await getPrivateKeys(member_did);
+    const signedCredential = await sign_your_credentials.signInvoice(
+        document.document_uuid,
+        document.document_json,
+        keyPair
+    );
+
+	const document_json = JSON.stringify( signedCredential );
+
+	console.log("here 4")
+	// 5.
 	// Does document_uuid already notexist in the archive status table?
 	//
 	const [ _4, err4 ] = await sub.notexist_check( SELLER_ARCHIVE_STATUS, req.body.document_uuid)
@@ -133,7 +192,7 @@ router.post('/trashDraft', async function(req, res) {
 		return;
 	}
 
-	// 5.
+	// 6.
 	// Does document_uuid already notexist in the archive document table?
 	//
 	const [ _5, err5 ] = await sub.notexist_check( SELLER_ARCHIVE_DOCUMENT, req.body.document_uuid)
@@ -150,13 +209,14 @@ router.post('/trashDraft', async function(req, res) {
 		return;
 	}
 
-	// 6.
+	console.log("here 5")
+	// 7.
 	// begin Transaction
 	//
 	const [ conn , _6 ] = await tran.connection ();
 	await tran.beginTransaction(conn);
 
-	// 7.
+	// 8.
 	// Then we go ahead and insert into the archive status
 	//
 
@@ -168,7 +228,7 @@ router.post('/trashDraft', async function(req, res) {
 	// Because SELLER_ARCHIVE_DOCUMEN buyer_did do not accept null.
 	old_status.buyer_did  = "";
 
-	// 8.
+	// 9.
 	//
 	const [ _8, err8 ] = await tran.insertArchiveStatus(conn, SELLER_ARCHIVE_STATUS, old_status);
 
@@ -180,7 +240,7 @@ router.post('/trashDraft', async function(req, res) {
 		return;
 	}
 
-	// 9.
+	// 10.
 	// And then we need to insert into the archive document 
 	//
 	const [ _9, err9] = await tran.insertDocument(conn, SELLER_ARCHIVE_DOCUMENT, old_status, document_json);
@@ -193,7 +253,7 @@ router.post('/trashDraft', async function(req, res) {
 		return;
 	}
 
-	// 10.
+	// 11.
 	// Remove recoiored from SELLER_DRAFT_STATUS with docunent_uuid key
 	//
 	const [ _10, err10] = await tran.deleteStatus(conn, SELLER_DRAFT_STATUS, old_status) ;
@@ -205,7 +265,7 @@ router.post('/trashDraft', async function(req, res) {
 		return;
 	}
 
-	// 11.
+	// 12.
 	// Remove recoiored from SELLER_DRAFT_DOCUMENT with docunent_uuid key
 	//
 	const [ _11, err11] = await tran.deleteDocument(conn, SELLER_DRAFT_DOCUMENT, old_status) ;
@@ -217,7 +277,7 @@ router.post('/trashDraft', async function(req, res) {
 		return;
 	}
 
-	// 12.
+	// 13.
 	// commit
 	//
 	const [ _12, err12] = await tran.commit(conn);
@@ -230,7 +290,7 @@ router.post('/trashDraft', async function(req, res) {
 		return;
 	}
 
-	// 13.
+	// 14.
 	//
 	conn.end();
 
