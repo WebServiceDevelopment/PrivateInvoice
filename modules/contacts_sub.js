@@ -45,7 +45,7 @@ module.exports = {
 	createBusinessCard			: _createBusinessCard,
 	checkForExistingContact		: _checkForExistingContact,
 	insertNewContact			: _insertNewContact,
-	getContacts					: _getContacts,
+	getContactTable				: _getContactTable,
 	insertInviteTable			: _insertInviteTable,
 }
 
@@ -332,9 +332,9 @@ async function _insertNewContact (invite_code, local_member_did, credential) {
 
 
 /*
- * getContacts
+ * getContactTable
  */
-async function _getContacts (member_did) {
+async function _getContactTable (member_did) {
 
 	const sql = `
 		SELECT
@@ -357,7 +357,7 @@ async function _getContacts (member_did) {
 
 	const rows = await db.selectAll(sql, args);
 
-	const contacts = rows.map( row => {
+	const contactTable = rows.map( row => {
 		try {
 			row.remote_organization = JSON.parse(row.remote_organization);
 		} catch (e) {
@@ -366,7 +366,7 @@ async function _getContacts (member_did) {
 		return row;
 	});
 
-	return contacts;
+	return contactTable;
 
 }
 
