@@ -756,7 +756,7 @@ router.post('/makePayment', async function(req, res) {
 
 		let msg = `Error:${METHOD}: sendSignedTransaction failed`;
 
-		return res
+		return res.status(400)
 			.json({
 				err: 14,
 				msg: msg
