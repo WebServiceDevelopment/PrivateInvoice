@@ -365,7 +365,7 @@ router.post('/create', async function(req, res) {
 	// 5.2
 	//
 	const [org, err5_2] = await getOrganizationInfo(
-								row.organization_uuid
+								row.organization_did
 							);
 
     if (err5_2) {

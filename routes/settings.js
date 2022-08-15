@@ -52,54 +52,6 @@ router.post('/setProfileImage', async function(req, res) {
 
 	const METHOD = '/setProfileImage';
 
-/*
-*	const avatar_uuid = uuidv1();
-*
-*	// Insert Image Into Database
-*
-*	let sql = `
-*		INSERT INTO dat_profile_img (
-*			avatar_uuid,
-*			img_data
-*		) VALUES (
-*			?,
-*			COMPRESS(?)
-*		)
-*	`;
-*
-*	let args = [
-*		avatar_uuid,
-*		req.body.dataUrl
-*	];
-*
-*	try {
-*		await db.insert(sql, args);
-*	} catch(err) {
-*		throw err;
-*	}
-*
-*	// Set this in the member's table
-*
-*	sql = `
-*		UPDATE
-*			members
-*		SET
-*			avatar_uuid = ?
-*		WHERE
-*			member_did = ?
-*	`;
-*
-*	args = [
-*		avatar_uuid,
-*		req.session.data.member_did,
-*	];
-*
-*	// Update the current changes in session object
-*
-*
-*	req.session.data.avatar_uuid = avatar_uuid;
-*/
-
 	const [bool , err] = await setProfileImage(
 								req.body.dataUrl, 
 								req.session.member_did);
@@ -130,73 +82,6 @@ router.post('/setCompanyLogo', async function(req, res) {
 
 	const METHOD = '/setCompanyLogo';
 
-/*
-*	const logo_uuid = uuidv1();
-*
-*	// Insert Image Into Database
-*	let sql, args, row;
-*
-*	sql = `
-*		INSERT INTO organization_img (
-*			logo_uuid,
-*			img_data
-*		) VALUES (
-*			?,
-*			COMPRESS(?)
-*		)
-*	`;
-*
-*	args = [
-*		logo_uuid,
-*		req.body.dataUrl
-*	];
-*
-*	try {
-*		await db.insert(sql, args);
-*	} catch(err) {
-*		throw err;
-*	}
-*
-*	// Set this in the member's table
-*
-*	sql = `
-*        SELECT
-*            organization_uuid,
-*        FROM
-*            members
-*        WHERE
-*            member_did = ?
-*	`;
-*
-*	args = [
-*		req.session.data.member_did,
-*	];
-*
-*    try {
-*        row = await db.selectOne(sql, args);
-*    } catch (err) {
-*        throw err;
-*    }
-*
-*	sql = `
-*		UPDATE
-*			organizations
-*		SET
-*			logo_uuid = ?
-*		WHERE
-*			organization_uuid = ?
-*	`;
-*
-*	args = [
-*		logo_uuid,
-*		row.organization_uuid
-*	];
-*
-*	// Update the current changes in session object
-*
-*	req.session.data.logo_uuid = logo_uuid;
-*/
-
 	const [bool , err] = await setCompanyLogo(
 								req.body.dataUrl, 
 								req.session.data.member_did)
@@ -226,29 +111,6 @@ router.post('/setCompanyLogo', async function(req, res) {
 router.post('/getProfileImage', async function(req, res) {
 
 	const METHOD = '/getProfileImage';
-/*
-*	let sql = `
-*		SELECT
-*			UNCOMPRESS(img_data) AS dataUrl
-*		FROM
-*			dat_profile_img
-*		WHERE
-*			avatar_uuid = ?
-*		LIMIT 1
-*	`;
-*
-*	let args = [
-*		req.session.data.avatar_uuid
-*	];
-*
-*	let row;
-*
-*	try {
-*		row = await db.selectOne(sql, args);
-*	} catch(err) {
-*		throw err;
-*	}
-*/
 
 	const [row , err] = await getProfileImage( req.session.data.avatar_uuid)
 
@@ -282,30 +144,6 @@ router.post('/getProfileImage', async function(req, res) {
 router.post('/getCompanyLogo', async function(req, res) {
 
 	const METHOD = '/getCompanyLogo';
-
-/*
-*	let sql = `
-*		SELECT
-*			UNCOMPRESS(img_data) AS dataUrl
-*		FROM
-*			organization_img
-*		WHERE
-*			logo_uuid = ?
-*		LIMIT 1
-*	`;
-*
-*	let args = [
-*		req.session.data.logo_uuid
-*	];
-*
-*	let row;
-*
-*	try {
-*		row = await db.selectOne(sql, args);
-*	} catch(err) {
-*		throw err;
-*	}
-*/
 
 	const [row , err] = await getCompanyLogo( req.session.data.avatar_uuid)
 

@@ -133,7 +133,7 @@ async function _setCompanyLogo (dataUrl, member_did ) {
 
 	sql = `
         SELECT
-            organization_uuid,
+            organization_did,
         FROM
             members
         WHERE
@@ -156,12 +156,12 @@ async function _setCompanyLogo (dataUrl, member_did ) {
 		SET
 			logo_uuid = ?
 		WHERE
-			organization_uuid = ?
+			organization_did = ?
 	`;
 
 	args = [
 		logo_uuid,
-		row.organization_uuid
+		row.organization_did
 	];
 
 	// Update the current changes in session object
@@ -255,7 +255,7 @@ async function _updateOrganization(req ) {
 
     sql = `
         SELECT
-            organization_uuid
+            organization_did
         FROM
             members
         WHERE
@@ -288,7 +288,7 @@ async function _updateOrganization(req ) {
 			addressRegion = ?,
 			addressCity = ?
 		WHERE
-			organization_uuid = ?
+			organization_did = ?
 	`;
 
 	args = [
@@ -301,7 +301,7 @@ async function _updateOrganization(req ) {
 		req.body.addressCountry,
 		req.body.addressRegion,
 		req.body.addressCity,
-		row.organization_uuid
+		row.organization_did
 	];
 
 	// Step 3 : Write Changes to log database

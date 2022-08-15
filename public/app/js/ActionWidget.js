@@ -170,6 +170,7 @@ const ActionWidget = (function() {
 
 	this.NETWORK = {
 		invoiceDraftSend : network_invoiceDraftSend.bind(this),
+		invoiceDraftDelete : network_invoiceDraftDelete.bind(this),
 	}
 
 	this.MESSAGE = {
@@ -2160,7 +2161,49 @@ const ActionWidget = (function() {
  * [ Move to Trash ]
  * Draft Tray
  */
-    async function evt_handleInvoiceDraftDelete() {
+	function evt_handleInvoiceDraftDelete() {
+
+		const button = this.DOM.invoice.removeDraft;
+		this.BUTTON.disabled(button);
+
+		//console.log("send draft");
+
+		this.DOM.invoice.sendInvoiceDisabled();
+
+
+		if( this.MEM.getSaveTimeout() != null) {
+			console.log("saveTimeout");
+			this.BUTTON.enabled(button);
+
+			return;
+		}
+
+		this.API.submit.readonly();
+
+		this.SENDING_WRAP.visible();
+
+
+			let timeout =  setTimeout( () => {
+
+					this.NETWORK.invoiceDraftDelete();
+
+					this.BUTTON.enabled(button);
+					this.DOM.invoice.sendInvoiceEnabled();
+
+					this.MEM.initSaveTimeout();
+					this.API.submit.reset();
+
+			}, this.MEM.getTimeout());
+
+			this.MEM.setSaveTimeout( timeout );
+
+	}
+
+/*
+ * [ Move to Trash ]
+ * Draft Tray
+ */
+    async function network_invoiceDraftDelete() {
 		
 		const params = {
 			document_uuid : this.MEM.getDocument_uuid()
@@ -2203,7 +2246,7 @@ const ActionWidget = (function() {
 			return;
 		}
 
-		FolderWidget.API.updateInvoiceDraftCount();
+		FolderWidget.API.getCount();
 		TrayWidget.API.refresh();
 		DocumentWidget.API.clearDocument();
 		TrayWidget.API.clearDocument();
