@@ -58,7 +58,7 @@ async function _handleLogin(membername, password) {
 			job_title,
 			work_email,
 			password_hash,
-			organization_uuid,
+			organization_did,
 			created_on,
 			wallet_address,
 			avatar_uuid
@@ -108,12 +108,12 @@ async function _handleLogin(membername, password) {
 		FROM
 			organizations
 		WHERE
-			organization_uuid = ?
+			organization_did = ?
 	`;
 
 	let org;
 	try {
-		org = await db.selectOne(sql, [member_data.organization_uuid]);
+		org = await db.selectOne(sql, [member_data.organization_did]);
 	} catch(err) {
 		return [ null, { err : 100, msg : "COULD NOT FIND ORG" } ]
 	}
@@ -239,7 +239,7 @@ async function _insertMember(member_did, body, eth_address, privatekey) {
 			job_title,
 			work_email,
 			password_hash,
-			organization_uuid,
+			organization_did,
 			wallet_address,
 			wallet_private_key
 		) VALUES (
@@ -279,7 +279,7 @@ async function _insertMember(member_did, body, eth_address, privatekey) {
 
 	sql = `
 		INSERT INTO organizations (
-			organization_uuid,
+			organization_did,
 			organization_name,
 			organization_department,
 			organization_tax_id,
@@ -341,7 +341,7 @@ async function _getSessionData(member_did) {
 			job_title,
 			work_email,
 			password_hash,
-			organization_uuid,
+			organization_did,
 			wallet_address
 		FROM
 			members
@@ -372,11 +372,11 @@ async function _getSessionData(member_did) {
 		FROM
 			organizations
 		WHERE
-			organization_uuid = ?
+			organization_did = ?
 	`;
 	let org;
 	try {
-		org = await db.selectOne(sql, [member_data.organization_uuid]);
+		org = await db.selectOne(sql, [member_data.organization_did]);
 	} catch(err) {
 		return [null, err];
 	}
