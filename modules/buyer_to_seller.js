@@ -96,7 +96,7 @@ async function _getAccountOfSellerWallet(seller_host, seller_did, buyer_did) {
 /*
  * seller_connect
  */
-async function seller_connect(seller_host, seller_uuid, buyer_did) {
+async function _seller_connect(seller_host, seller_uuid, buyer_did) {
 
     const  url = `${seller_host}/api/message/sellerToConnect`;
 

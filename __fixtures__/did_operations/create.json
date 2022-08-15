@@ -1,0 +1,32 @@
+{
+   "type":"create",
+   "suffixData":{
+      "deltaHash":"EiBuXqJP9gL6ZXOQyLp_qS8QVmoqCovcsSXHjftN_4f0nA",
+      "recoveryCommitment":"EiDzsKHXgjbS0bKd-gdX7mSWBwq_Mtbn-1oPpqY7QFeHiQ"
+   },
+   "delta":{
+      "updateCommitment":"EiD1R65Q2VeFFaijZnYVT2gU8HjgEiWLJ6vrr9-W61nRtw",
+      "patches":[
+         {
+            "action":"replace",
+            "document":{
+               "publicKeys":[
+                  {
+                     "id":"default",
+                     "type":"JsonWebKey2020",
+                     "publicKeyJwk":{
+                        "kty":"OKP",
+                        "crv":"Ed25519",
+                        "x":"HYVdemNPKReEXNeafEbsyIN_RumcjkY0hg3Cknsp2ik"
+                     },
+                     "purposes":[
+                        "authentication",
+                        "assertionMethod"
+                     ]
+                  }
+               ]
+            }
+         }
+      ]
+   }
+}

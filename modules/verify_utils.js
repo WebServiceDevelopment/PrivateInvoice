@@ -27,9 +27,9 @@ const moment						= require('moment');
 const transmute						= require('@transmute/vc.js');
 
 const {
-		Ed25519Signature2018,
-		Ed25519VerificationKey2018,
-} = require('@transmute/ed25519-signature-2018');
+    Ed25519Signature2018,
+    Ed25519VerificationKey2018,
+}                                   = require('@transmute/ed25519-signature-2018');
 
 const context = {
 	"https://www.w3.org/2018/credentials/v1" : require('../context/credentials_v1.json'),
@@ -43,9 +43,16 @@ const { resolve }					= require('@transmute/did-key.js');
 
 const db 							= require('../database.js');
 
-// ---------------------------------------------------------------------------
+// Exports
+module.exports = {
+	verifyCredential                : _documentLoader,
+	documentLoader                  : _documentLoader,
+	getPrivateKeys                  : _getPrivateKeys,
+}
 
-const documentLoader = async (iri) => {
+// ---------------------------------- Modules --------------------------------
+
+async function  documentLoader (iri) {
 	
 	console.log('Starting document loader!!!!');
 	console.log(iri);
@@ -86,7 +93,7 @@ const documentLoader = async (iri) => {
 
 }
 
-const verifyCredential = async(credential) => {
+async function verifyCredential (credential) {
 	
 	console.log(credential);
 
@@ -130,7 +137,7 @@ const verifyCredential = async(credential) => {
 }
 
 
-const getPrivateKeys = async (member_did) => {
+async function getPrivateKeys (member_did) {
 
 		const sql = `
 				SELECT
@@ -157,9 +164,3 @@ const getPrivateKeys = async (member_did) => {
 
 }
 
-
-module.exports = {
-	verifyCredential,
-	documentLoader,
-	getPrivateKeys
-}

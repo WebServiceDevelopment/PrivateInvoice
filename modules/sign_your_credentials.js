@@ -83,16 +83,16 @@ async function _signStatusMessage (credential, keyPair) {
  * signInvoice (uuid, json_str)
  */
 
-async function _signInvoice (uuid, json_str, keyPair) {
+async function _signInvoice (document_uuid, json_str, keyPair) {
  
 
 	const credential = JSON.parse(json_str);
-	credential.id = uuid;
+	credential.id = document_uuid;
 	const timestamp = moment().toJSON()
 	credential.issuanceDate = timestamp.split('.').shift() + 'Z';
 	credential.issuer.id = keyPair.controller;
 
-	credential.credentialSubject.buyer.id = credential.credentialSubject.buyer.id || 'urn:uuid:null';
+	credential.credentialSubject.buyer.id = credential.credentialSubject.buyer.id || 'urn:document_uuid:null';
 
 	const { items } = await transmute.verifiable.credential.create({
 		credential,
