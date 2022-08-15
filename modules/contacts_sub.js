@@ -67,7 +67,7 @@ async function _createBusinessCard (req, member_did, invite_code, keyPair, linkR
 			membername AS member_name,
 			job_title AS member_job_title,
 			work_email AS member_contact_email,
-			organization_uuid AS organization_did,
+			organization_did AS organization_did,
 			wallet_address
 		FROM
 			members
@@ -102,7 +102,7 @@ async function _createBusinessCard (req, member_did, invite_code, keyPair, linkR
 		FROM
 			organizations
 		WHERE
-			organization_uuid = ?
+			organization_did = ?
 	`;
 
 	args = [

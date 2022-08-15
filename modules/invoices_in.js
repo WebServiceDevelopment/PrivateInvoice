@@ -58,7 +58,7 @@ async function _getMemberInfo ( member_did ) {
         SELECT
             member_did as member_did,
             membername,
-			organization_uuid,
+			organization_did,
             wallet_address
         FROM
             members
@@ -83,7 +83,7 @@ async function _getMemberInfo ( member_did ) {
 /*
  *	getOrganizationInfo
  */
-async function _getOrganizationInfo ( organization_uuid ) {
+async function _getOrganizationInfo ( organization_did ) {
 
 	const sql = `
         SELECT
@@ -99,16 +99,16 @@ async function _getOrganizationInfo ( organization_uuid ) {
         FROM
             organizations
         WHERE
-			organization_uuid = ?
+			organization_did = ?
     `;
 
-    const args = [organization_uuid];
+    const args = [organization_did];
 
     let  org;
     try {
         org = await db.selectOne(sql, args);
     } catch(err) {
-		const msg = "This organization_uuid is not found."
+		const msg = "This organization_did is not found."
 		return [null, msg];
     }
 

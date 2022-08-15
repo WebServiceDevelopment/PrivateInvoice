@@ -72,16 +72,14 @@ router.post('/trashDraft', async function(req, res) {
 
 	let start = Date.now();
 
-	console.log("here 0")
     // 1.
     //const [buyer_did, err1] = await sub.getBuyerDidForDraft(
-    let [buyer_did, err1] = await sub.getBuyerDidForDraft(
+    const [buyer_did, err1] = await sub.getBuyerDidForDraft(
         SELLER_DRAFT_STATUS,
         document_uuid,
         member_did
     );
 
-	console.log("here 0-1")
     if (err1) {
 
         let msg = `Error:${METHOD}: Could not get buyer did`;
@@ -93,12 +91,6 @@ router.post('/trashDraft', async function(req, res) {
             });
         return;
     }
-
-	if(buyer_did == null) {
-		buyer_did = "-----"
-	}
-
-	console.log("here 1")
 
 	// 2.
 	// STATUS
@@ -112,19 +104,15 @@ router.post('/trashDraft', async function(req, res) {
 
 		res.status(400)
 			.json({
-				err : 1,
+				err : 2,
 				msg : msg
 			});
 		return;
 	}
-	console.log("here 2")
 
 	// 3.
 	// Second we go ahead and get the document
 	//
-/*
-	const [ old_document , _2 ] = await sub.getDraftDocument( SELLER_DRAFT_DOCUMENT, req.body.document_uuid) ;
-*/
 
 	const [document] = await sub.getDraftDocumentForSend(
         SELLER_DRAFT_DOCUMENT,
@@ -136,35 +124,19 @@ router.post('/trashDraft', async function(req, res) {
 
         res.status(400)
             .json({
-                err: 6,
+                err: 3,
                 msg: msg
             });
         return;
     }
 
-	console.log("document_uuid="+document_uuid);
-
-
     document.seller_did = member_did;
     document.buyer_did = buyer_did;
 
-	console.log("here 3")
 	// 4.
 	// Creating Send data.
 	//
 
-/*
-	old_document.currency_options = JSON.parse(old_document.currency_options);
-	old_document.seller_details = JSON.parse(old_document.seller_details);
-	old_document.buyer_details = JSON.parse(old_document.buyer_details);
-	old_document.document_meta = JSON.parse(old_document.document_meta);
-	old_document.document_body = JSON.parse(old_document.document_body);
-	old_document.document_totals = JSON.parse(old_document.document_totals);
-*/
-
-
-	console.log(typeof document.document_json);
-	
 
     const [ keyPair ] = await getPrivateKeys(member_did);
     const signedCredential = await sign_your_credentials.signInvoice(
@@ -175,30 +147,12 @@ router.post('/trashDraft', async function(req, res) {
 
 	const document_json = JSON.stringify( signedCredential );
 
-	console.log("here 4")
 	// 5.
 	// Does document_uuid already notexist in the archive status table?
 	//
-	const [ _4, err4 ] = await sub.notexist_check( SELLER_ARCHIVE_STATUS, req.body.document_uuid)
-	if (err4 ) {
+	const [ _5, err5 ] = await sub.notexist_check( SELLER_ARCHIVE_STATUS, req.body.document_uuid)
+	if (err5 ) {
 
-		let msg = `Err:r:${METHOD}: document_uuid record is not exist.`
-
-		res.status(400)
-			.json({
-				err : 4,
-				msg : msg
-			});
-		return;
-	}
-
-	// 6.
-	// Does document_uuid already notexist in the archive document table?
-	//
-	const [ _5, err5 ] = await sub.notexist_check( SELLER_ARCHIVE_DOCUMENT, req.body.document_uuid)
-	if (err ) {
-		errno = 5;
-		
 		let msg = `Err:r:${METHOD}: document_uuid record is not exist.`
 
 		res.status(400)
@@ -209,11 +163,26 @@ router.post('/trashDraft', async function(req, res) {
 		return;
 	}
 
-	console.log("here 5")
+	// 6.
+	// Does document_uuid already notexist in the archive document table?
+	//
+	const [ _6, err6 ] = await sub.notexist_check( SELLER_ARCHIVE_DOCUMENT, req.body.document_uuid)
+	if (err6 ) {
+		
+		let msg = `Err:r:${METHOD}: document_uuid record is not exist.`
+
+		res.status(400)
+			.json({
+				err : 6,
+				msg : msg
+			});
+		return;
+	}
+
 	// 7.
 	// begin Transaction
 	//
-	const [ conn , _6 ] = await tran.connection ();
+	const [ conn , _7 ] = await tran.connection ();
 	await tran.beginTransaction(conn);
 
 	// 8.
@@ -230,33 +199,22 @@ router.post('/trashDraft', async function(req, res) {
 
 	// 9.
 	//
-	const [ _8, err8 ] = await tran.insertArchiveStatus(conn, SELLER_ARCHIVE_STATUS, old_status);
+	const [ _9, err9 ] = await tran.insertArchiveStatus(conn, SELLER_ARCHIVE_STATUS, old_status);
 
-	if(err8) {
-		errno = 8;
+	if(err9) {
+		errno = 9;
 		code = 400;
+		let msg = `Err:r:${METHOD}: document_uuid record is not exist.`
 		res.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err8, errno, METHOD));
+			.json(tran.rollbackAndReturn(conn, code, err9, errno, METHOD));
 		return;
 	}
 
 	// 10.
 	// And then we need to insert into the archive document 
 	//
-	const [ _9, err9] = await tran.insertDocument(conn, SELLER_ARCHIVE_DOCUMENT, old_status, document_json);
+	const [ _10, err10] = await tran.insertDocument(conn, SELLER_ARCHIVE_DOCUMENT, old_status, document_json);
 
-	if(err9) {
-		errno = 9;
-		code = 400;
-		res.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err9, errno, METHOD));
-		return;
-	}
-
-	// 11.
-	// Remove recoiored from SELLER_DRAFT_STATUS with docunent_uuid key
-	//
-	const [ _10, err10] = await tran.deleteStatus(conn, SELLER_DRAFT_STATUS, old_status) ;
 	if(err10) {
 		errno = 10;
 		code = 400;
@@ -265,10 +223,10 @@ router.post('/trashDraft', async function(req, res) {
 		return;
 	}
 
-	// 12.
-	// Remove recoiored from SELLER_DRAFT_DOCUMENT with docunent_uuid key
+	// 11.
+	// Remove recoiored from SELLER_DRAFT_STATUS with docunent_uuid key
 	//
-	const [ _11, err11] = await tran.deleteDocument(conn, SELLER_DRAFT_DOCUMENT, old_status) ;
+	const [ _11, err11] = await tran.deleteStatus(conn, SELLER_DRAFT_STATUS, old_status) ;
 	if(err11) {
 		errno = 11;
 		code = 400;
@@ -277,16 +235,28 @@ router.post('/trashDraft', async function(req, res) {
 		return;
 	}
 
-	// 13.
-	// commit
+	// 12.
+	// Remove recoiored from SELLER_DRAFT_DOCUMENT with docunent_uuid key
 	//
-	const [ _12, err12] = await tran.commit(conn);
-
-	if (err12) {
+	const [ _12, err12] = await tran.deleteDocument(conn, SELLER_DRAFT_DOCUMENT, old_status) ;
+	if(err12) {
 		errno = 12;
 		code = 400;
 		res.status(400)
 			.json(tran.rollbackAndReturn(conn, code, err12, errno, METHOD));
+		return;
+	}
+
+	// 13.
+	// commit
+	//
+	const [ _13, err13] = await tran.commit(conn);
+
+	if (err13) {
+		errno = 13;
+		code = 400;
+		res.status(400)
+			.json(tran.rollbackAndReturn(conn, code, err13, errno, METHOD));
 		return;
 	}
 

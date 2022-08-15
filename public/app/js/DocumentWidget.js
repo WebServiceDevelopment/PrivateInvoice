@@ -17,7 +17,7 @@
  Author: Ogawa Kousei (kogawa@wsd.co.jp)
 
 **/
-"use strict";
+//"use strict";
 
 const DocumentWidget = (function() {
 
@@ -866,9 +866,11 @@ const DocumentWidget = (function() {
 /*
  *
 */
-	function api_updateDocument() {
+     async function api_updateDocument() {
 		//console.trace();
 		//console.log(JSON.stringify(this.MEM.document.buyer_details));
+		//console.log("callee="+arguments.callee)
+		
 
 		Traceability.API.setSign(this.MEM.document);
 
@@ -879,7 +881,7 @@ const DocumentWidget = (function() {
 		const document_json = Traceability.API.getCredential();
 		document_json.credentialSubject = Traceability.API.getCredentialSubject();
 
-		const param = {
+		const params = {
 			document_uuid : this.MEM.document.document_uuid,
 			document_body : this.MEM.document.document_body,
 			document_totals : this.MEM.document.document_totals,
@@ -891,23 +893,44 @@ const DocumentWidget = (function() {
 
 		const url = '/api/invoice/update';
 
-		const ajax = new XMLHttpRequest();
-		ajax.open('POST', url);
+        const opts = {
+            method: 'POST',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(params)
+        };
 
-		ajax.setRequestHeader('Content-Type', 'application/json');
-		ajax.responseType = "json";
-		ajax.send(JSON.stringify(param));
+		let response;
+        try {
+            response = await fetch( url, opts);
+        } catch(err) {
 
-		ajax.onload = () => {
-			
-			ActionWidget.DOM.invoice.sendInvoiceEnabled();
-			//console.log(ajax.response);
+            this.SENDING_WRAP.hidden();
+            this.API.submit.reset();
+			this.MEM.initSaveTimeout();
+            return;
+        }
 
-		}
+        let res;
+        try {
+            res = await response.json();
+			this.MEM.initSaveTimeout();
+        } catch(err) {
+
+            this.SENDING_WRAP.hidden();
+            this.API.submit.reset();
+			this.MEM.initSaveTimeout();
+            return;
+        }
+
+		ActionWidget.DOM.invoice.sendInvoiceEnabled();
 
 	}
 
-	function api_triggerSavePoint() {
+	async function api_triggerSavePoint() {
 
 		if(this.MEM.getSaveTimeout()) {
 			clearTimeout(this.MEM.getSaveTimeout());
@@ -918,7 +941,7 @@ const DocumentWidget = (function() {
 
 		ActionWidget.DOM.invoice.sendInvoiceDisabled();
 
-		let timeout = setTimeout(this.API.updateDocument, this.MEM.getTimeout());
+		let timeout = setTimeout(await this.API.updateDocument, this.MEM.getTimeout());
 		this.MEM.setSaveTimeout( timeout );
 
 	}
@@ -1143,7 +1166,7 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			this.MEM.initSaveTimeout();
 
 			ActionWidget.DOM.invoice.sendInvoiceDisabled();
-			this.API.updateDocument();
+			await this.API.updateDocument();
 		}
 
 		let PATH;
