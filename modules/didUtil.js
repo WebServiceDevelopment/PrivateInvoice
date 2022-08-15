@@ -63,9 +63,9 @@ async function _createDidKey ( mnemonic ) {
 async function _createDidElem ( mnemonic ) {
 
 	const keyType = 'Ed25519';
-	const publicKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/0/0");
-	const recoveryKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/1/0");
-	const updateKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/2/0");
+const publicKey = await wallet.toKeyPair  (mnemonic, keyType, "m/44'/60'/0'/0/0");
+const recoveryKey = await wallet.toKeyPair(mnemonic, keyType, "m/44'/60'/0'/1/0");
+const updateKey = await wallet.toKeyPair  (mnemonic, keyType, "m/44'/60'/0'/2/0");
 
 	const createOperation = await wallet.operations.create({
 		document : {
