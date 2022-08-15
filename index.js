@@ -71,7 +71,6 @@ app.get("*", function (req, res, next) {
 	case 'lib':
 	case 'app':
 	case 'api':
-	case 'invite':
 	case 'signup':
 
 		break;
@@ -199,7 +198,6 @@ app.all("*", function (req, res, next) {
 // Routes
 
 app.use('/api/session', require('./routes/session.js'));
-app.use('/api/invite', require('./routes/invite.js'));
 app.use('/api/contacts', require('./routes/contacts.js'));
 
 app.use('/api/invoice', require('./routes/buyer_invoice.js'));
