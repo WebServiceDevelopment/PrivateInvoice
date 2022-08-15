@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx jest",
     "dev": "npx dotenv -e dev.env node index.js",
     "debug": "npx dotenv -e debug.env node index.js",
     "dev:seller": "NODE_OPTIONS=--openssl-legacy-provider npx dotenv -e seller.env node index.js",
