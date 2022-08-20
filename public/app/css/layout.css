@@ -2423,7 +2423,6 @@ main.app section article div.document div.paper div.content div.pmeta div.plogo 
 	position: absolute;
 	left: 0;
 	top: 10px;
-	background-image: url('../img/dashgl_logo.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 
@@ -4483,24 +4482,6 @@ main.app section article div.chat div.log div.comment div.line.right div.profile
 
 }
 
-main.app section article div.chat div.log div.comment div.line div.profile.kion {
-
-	background-image: url(../img/dashie.jpg);
-	background-size: 100%;
-	background-position: center;
-	background-repeat: no-repeat;
-
-}
-
-main.app section article div.chat div.log div.comment div.line div.profile.abso {
-
-	background-image: url(../img/piNVIyAg_200x200.jpg);
-	background-size: 100%;
-	background-position: center;
-	background-repeat: no-repeat;
-
-}
-
 main.app section article div.chat div.log div.comment div.line div.quote {
 
 	width: calc(100% - 30px);
@@ -4744,19 +4725,6 @@ main.app section article div.settings-menu div.banner table td.icon {
 
 }
 
-
-main.app section article div.settings-menu div.banner table td.icon div.gravatar {
-
-	width: 90px;
-	height: 90px;
-	display: block;
-	margin: auto;
-	border-radius: 100%;
-	background-image: url(../img/dashie.jpg);
-	background-size: cover;
-	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-
-}
 
 main.app section article div.settings-menu div.banner h3 {
 
@@ -5627,19 +5595,6 @@ main.app section article div.settings-content div.page div.profile-data table td
 
 }
 
-main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline table td.icon div.preview.dgl {
-
-	background-image: url(../img/dashgl.png);
-
-}
-
-main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline table td.icon div.preview.dash {
-
-	background-image: url(../img/dashie.jpg);
-	background-size: cover;
-
-}
-
 main.app section article div.settings-content div.page div.profile-data table td.form div.stamp-outline button.confirm {
 
 	border: 1px solid #28a745;
@@ -6235,24 +6190,6 @@ main.app section article div.settings-content div.page div.contact-list li table
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-
-}
-
-main.app section article div.settings-content div.page div.contact-list li table td.avatar div.avatar.ben {
-	
-	background-image: url(../img/ben.png);
-
-}
-
-main.app section article div.settings-content div.page div.contact-list li table td.avatar div.avatar.bingbing {
-	
-	background-image: url(../img/bingbing.png);
-
-}
-
-main.app section article div.settings-content div.page div.contact-list li table td.avatar div.avatar.jessica {
-	
-	background-image: url(../img/jessica.png);
 
 }
 
@@ -6955,11 +6892,6 @@ main.app section article div.settings-content div.page div.profile-status div.pr
 	display: block;
 	margin: 30px auto;
 
-	background-image: url(../img/dashie.jpg);
-	background-position: center;
-	background-size: cover;
-	background-repeat: no-repeat;
-
 }
 
 main.app section article div.settings-content div.page div.profile-status h3 {
@@ -7524,79 +7456,6 @@ main.app section article div.settings-content div.page div.directory-list div.ro
 
 }
 
-main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.wsd {
-
-	background-image: url(../img/wsd_logo.png);
-	background-position: center;
-	background-size: 80%;
-
-}
-
-main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.writeup {
-
-	background-image: url(../img/3071-1533019032.jpg);
-	background-position: center top;
-	background-size: 140%;
-
-}
-
-main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.yamaji {
-
-	background-image: url(../img/yamaji.png);
-	background-position: center;
-	background-size: 130%;
-
-}
-
-main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.digi {
-
-	background-image: url(../img/digibase.png);
-	background-position: center;
-	background-size: 90%;
-	background-color: #000;
-
-}
-
-main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.dashie {
-
-	background-image: url(../img/dashie.jpg);
-	background-position: center;
-	background-size: 100%;
-
-}
-
-main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.gel {
-
-	background-image: url(../img/piNVIyAg_200x200.jpg);
-	background-position: center;
-	background-size: 100%;
-
-}
-
-main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.jatco {
-
-	background-image: url(../img/choutatu.png);
-	background-position: center;
-	background-size: 140%;
-
-}
-
-main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.bs {
-
-	background-image: url(../img/Hanamura.png);
-	background-position: center top;
-	background-size: 100%;
-
-}
-
-main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.profile.paper {
-
-	background-image: url(../img/06271322_5d14447f45149.jpg);
-	background-position: center;
-	background-size: 150%;
-
-}
-
 main.app section article div.settings-content div.page div.directory-list div.row div.card div.info table div.rating {
 
 	padding-top: 10px;
@@ -8100,24 +7959,6 @@ main.app section article div.settings-content div.page div.employee-list li.staf
 	background-position: center;
 	background-repeat: no-repeat;
 
-
-}
-
-main.app section article div.settings-content div.page div.employee-list li.staff div.pic.ben {
-	
-	background-image: url(../img/ben.png);
-
-}
-
-main.app section article div.settings-content div.page div.employee-list li.staff div.pic.bingbing {
-	
-	background-image: url(../img/bingbing.png);
-
-}
-
-main.app section article div.settings-content div.page div.employee-list li.staff div.pic.jessica {
-	
-	background-image: url(../img/jessica.png);
 
 }
 
