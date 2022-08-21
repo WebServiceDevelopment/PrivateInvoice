@@ -31,14 +31,6 @@ const uuidv1                    = require('uuid').v1
 const bip39                     = require('bip39')
 const { ethers }                = require('ethers')
 
-const Web3                      = require('web3')
-const web3                      = new Web3(process.env.GANACHE_ADDRESS)
-const { eth }                   = web3;
-
-const axios                     = require('axios')
-const wallet                    = require('@sidetree/wallet')
-
-// Database
 
 // Import Modules
 const {
@@ -48,12 +40,12 @@ const {
     insertMember,
     getSessionData,
 	insertFunds,
-}                               = require('../modules/session_sub.js');
+}                               = require('../../modules/session_sub.js');
 
 const {
     createDidKey,
     createDidElem,
-}                               = require('../modules/didUtil.js');
+}                               = require('../../modules/didUtil.js');
 
 
 // ------------------------------- End Points -------------------------------

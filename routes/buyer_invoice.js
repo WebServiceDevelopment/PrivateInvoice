@@ -559,6 +559,8 @@ router.post('/makePayment', async function(req, res) {
 
 	let errno, code ;
 
+	console.log('Make payment 1');
+
 	// 1.
 	// getSellerDid
 	//
@@ -574,6 +576,8 @@ router.post('/makePayment', async function(req, res) {
 			});
 
 	}
+
+	console.log('Make payment 2');
 
 	// 2.
 	// getSellerHost
@@ -594,6 +598,7 @@ router.post('/makePayment', async function(req, res) {
 	// 3.
 	// connect
 	
+	console.log('Make payment 3');
 
 	const [ code3, err3 ] = await to_seller.connect(seller_host, member_did, seller_did);
 
@@ -618,9 +623,12 @@ router.post('/makePayment', async function(req, res) {
 	// Ask for remittance amount from document.
 	//
 
+	console.log('Make payment 4');
+
 	// 5.
 	// paymentReservation
 	
+	console.log('Make payment 5');
 	const [ code5, err5 ] = await to_seller.paymentReservation(seller_host, document_uuid, member_did);
 
 	if(code5 !== 200) {
@@ -643,6 +651,8 @@ router.post('/makePayment', async function(req, res) {
 	// 6.
 	// get value from Document
 	//
+	
+	console.log('Make payment 6');
 	const [ document , err6 ] = await sub.getDocument(BUYER_DOCUMENT, document_uuid);
 
 	if(err6) {
@@ -658,7 +668,9 @@ router.post('/makePayment', async function(req, res) {
 	}
 
 	// 7.
-	//
+	
+
+	console.log('Make payment 7');
 	let doc;
 	try {
 		doc = JSON.parse( document.document_json);
@@ -678,6 +690,7 @@ router.post('/makePayment', async function(req, res) {
 	// contract_address 
 	//
 
+	console.log('Make payment 8');
 	const { wallet_address } = req.session.data;
 	const contract_address = wallet_address;
 
@@ -686,6 +699,8 @@ router.post('/makePayment', async function(req, res) {
 	// 9.
 	// Balance before the start of payment
 	// Ask for the balance of ETH
+	
+	console.log('Make payment 8');
 	const [ balanceWei_1, err9 ] = await  eth.getBalance(web3, contract_address) ;
 
 	if( err9 ) {
@@ -703,6 +718,7 @@ router.post('/makePayment', async function(req, res) {
 	// 10.
 	// Get seller account
 	
+	console.log('Make payment 10');
 	const to_address = await getSellerWalletAddress(seller_did, member_did);
 	
 	//console.log("to_address="+to_address);
@@ -711,7 +727,9 @@ router.post('/makePayment', async function(req, res) {
 	// 11.
 	// Ask for payment from document.
 	// And Convert payment to hex.
-	//
+	
+
+	console.log('Make payment 11');
 	let payment = doc.credentialSubject.totalPaymentDue.price.replace(/,/g,"")
 
 	if(payment.indexOf(' ')) {
@@ -732,6 +750,7 @@ router.post('/makePayment', async function(req, res) {
 	// And Convert ipfs cid to hex.
 	//
 	
+	console.log('Make payment 12');
 	const ipfs_result = await Ipfs_Http_Client.add( document.document_json );
 	const ipfs_cid = ipfs_result.cid.toString();
 	const ipfs_cid_hex = web3.utils.toHex(ipfs_cid);
@@ -741,6 +760,7 @@ router.post('/makePayment', async function(req, res) {
 	// 13. 
 	// privateKey.
 	
+	console.log('Make payment 13');
 
 	// const PrivateKey = process.env.PRIVATE_KEY;
 	const PrivateKey = await getWalletPrivateKey(member_did);
@@ -749,7 +769,13 @@ router.post('/makePayment', async function(req, res) {
 	// sendTransaction
 	//
 
+	console.log('Make payment 14');
+	console.log(ipfs_cid_hex);
+
 	const [ receipt14, err14 ] = await util.sendSignedTransaction (web3, contract_address, PrivateKey, to_address, gasLimit, makePaymantTo, ipfs_cid_hex)
+	
+	console.log(err14);
+	console.log('EEEEENNNNND');
 
 	if ( err14) {
 		await util.cancelPaymentReservation(seller_host, document_uuid, member_did);
@@ -769,14 +795,18 @@ router.post('/makePayment', async function(req, res) {
 
 	// 15.
 	// begin Transaction
-	//
+	
+
+	console.log('Make payment 15');
 	const [ conn , _15 ] = await tran.connection ();
 	await tran.beginTransaction(conn);
 
 
 	// 16.
 	// setMakePayment_status
-	//
+	
+
+	console.log('Make payment 16');
 	const [ _16, err16 ] = await tran.setMakePayment_status (conn, BUYER_STATUS, document_uuid , member_did);
 
 	if (err16 ) {
@@ -791,7 +821,8 @@ router.post('/makePayment', async function(req, res) {
 
 	// 17.
 	// setMakePayment_document
-	//
+	
+	console.log('Make payment 17');
 	const [ _17, err17 ] = await tran.setMakePayment_document (conn, BUYER_DOCUMENT, document_uuid , hash);
 
 	if (err17 ) {
@@ -810,6 +841,7 @@ router.post('/makePayment', async function(req, res) {
 	//
 	// Get private keys to sign credential
 
+	console.log('Make payment 18');
 	const [keyPair, err] = await getPrivateKeys(member_did);
 	if(err) {
 		throw err;
@@ -829,7 +861,9 @@ router.post('/makePayment', async function(req, res) {
 
 	// 19.
 	// commit
-	//
+	
+
+	console.log('Make payment 19');
 	const [ _19, err19 ] = await tran.commit(conn);
 
 	if (err19) {
@@ -841,6 +875,8 @@ router.post('/makePayment', async function(req, res) {
 
 	// 20.
 	// rollback
+	
+	console.log('Make payment 20');
 		const [ code20, err20 ] = await to_seller.rollbackPaidToConfirm(seller_host, member_did, seller_did);
 
 		if(code20 !== 200) {
@@ -895,6 +931,7 @@ router.post('/makePayment', async function(req, res) {
 	// IP ADDRESS OF IPFS SERVER
 	const ipfs_address = process.env.IPFS_ADDRESS;
 
+	console.log('Make payment 24');
 	//console.log("/makePayment accepted");
 
 	let end = Date.now();
