@@ -197,7 +197,7 @@ app.all("*", function (req, res, next) {
 
 // Routes
 
-app.use('/api/session', require('./routes/session.js'));
+app.use('/api/session', require('./routes/session/index.js'));
 app.use('/api/contacts', require('./routes/contacts.js'));
 
 app.use('/api/invoice', require('./routes/buyer_invoice.js'));
