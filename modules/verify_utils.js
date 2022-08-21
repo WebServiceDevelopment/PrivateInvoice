@@ -45,9 +45,9 @@ const db 							= require('../database.js');
 
 // Exports
 module.exports = {
-	verifyCredential                : _documentLoader,
-	documentLoader                  : _documentLoader,
-	getPrivateKeys                  : _getPrivateKeys,
+	verifyCredential                : verifyCredential,
+	documentLoader                  : documentLoader,
+	getPrivateKeys                  : getPrivateKeys,
 }
 
 // ---------------------------------- Modules --------------------------------

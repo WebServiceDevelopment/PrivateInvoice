@@ -123,7 +123,7 @@
 							"  pm.expect(responseJson).to.have.property('membername');\r",
 							"  pm.expect(responseJson).to.have.property('job_title');\r",
 							"  pm.expect(responseJson).to.have.property('work_email');\r",
-							"  pm.expect(responseJson).to.have.property('organization_uuid');\r",
+							"  pm.expect(responseJson).to.have.property('organization_did');\r",
 							"  pm.expect(responseJson).to.have.property('wallet_address');\r",
 							"  pm.expect(responseJson).to.have.property('organization_name');\r",
 							"  pm.expect(responseJson).to.have.property('organization_postcode');\r",
@@ -375,7 +375,7 @@
 							"  pm.expect(responseJson).to.have.property('membername');\r",
 							"  pm.expect(responseJson).to.have.property('job_title');\r",
 							"  pm.expect(responseJson).to.have.property('work_email');\r",
-							"  pm.expect(responseJson).to.have.property('organization_uuid');\r",
+							"  pm.expect(responseJson).to.have.property('organization_did');\r",
 							"  pm.expect(responseJson).to.have.property('wallet_address');\r",
 							"  pm.expect(responseJson).to.have.property('organization_name');\r",
 							"  pm.expect(responseJson).to.have.property('organization_postcode');\r",
@@ -629,7 +629,7 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/invite/getContacts?contactType=buyers",
+					"raw": "http://127.0.0.1:3000/api/contacts/getContactList?contactType=buyers",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -640,8 +640,8 @@
 					"port": "3000",
 					"path": [
 						"api",
-						"invite",
-						"getContacts"
+						"contacts",
+						"getContactList"
 					],
 					"query": [
 						{
