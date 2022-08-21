@@ -33,7 +33,7 @@ const axios                 = require('axios')
 
 // Exports
 module.exports = {
-	connect					: seller_connect,
+	connect					: _seller_connect,
 	unconfirm				: seller_unconfirm,
 	paymentReservation		: seller_paymentReservation,
 	cancelPaymentReservation: seller_cancelPaymentReservation,
