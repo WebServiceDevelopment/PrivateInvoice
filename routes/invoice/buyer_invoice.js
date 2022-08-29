@@ -680,26 +680,26 @@ router.post('/makePayment', async function (req, res) {
     // 5.
     // paymentReservation
 
-    console.log('Make payment 5')
-    const [code5, err5] = await to_seller.paymentReservation(
-        seller_host,
-        document_uuid,
-        member_did
-    )
+    // console.log('Make payment 5')
+    // const [code5, err5] = await to_seller.paymentReservation(
+    //     seller_host,
+    //     document_uuid,
+    //     member_did
+    // )
 
-    if (code5 !== 200) {
-        let msg
-        if (code5 == 500) {
-            msg = `Error:${METHOD}:seller connect check:ECONNRESET`
-        } else {
-            msg = `Error:${METHOD}: This request is incorrect`
-        }
+    // if (code5 !== 200) {
+    //     let msg
+    //     if (code5 == 500) {
+    //         msg = `Error:${METHOD}:seller connect check:ECONNRESET`
+    //     } else {
+    //         msg = `Error:${METHOD}: This request is incorrect`
+    //     }
 
-        return res.status(400).json({
-            err: 5,
-            msg: msg,
-        })
-    }
+    //     return res.status(400).json({
+    //         err: 5,
+    //         msg: msg,
+    //     })
+    // }
 
     // 6.
     // get value from Document
