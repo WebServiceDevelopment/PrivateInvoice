@@ -17,24 +17,22 @@
     
 **/
 
-"use strict";
+'use strict'
 
 // Exports
 module.exports = {
-	softDeleteSeller			: _softDeleteSeller,
-	softDeleteBuyer				: _softDeleteBuyer,
+    softDeleteSeller: _softDeleteSeller,
+    softDeleteBuyer: _softDeleteBuyer,
 }
 
 // Libraries
 
 // Database
 
-const db						= require('../database.js');
+const db = require('../database.js')
 
-const BUYER__ARCHIVE_STATUS		= "buyer_status_archive";
-const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
-
-
+const BUYER__ARCHIVE_STATUS = 'buyer_status_archive'
+const SELLER_ARCHIVE_STATUS = 'seller_status_archive'
 
 // ------------------------------- End Points -------------------------------
 
@@ -42,13 +40,12 @@ const SELLER_ARCHIVE_STATUS		= "seller_status_archive";
  * 1.
  * softDeleteSeller
  */
-async function _softDeleteSeller (member_did, document_uuid) {
+async function _softDeleteSeller(member_did, document_uuid) {
+    const table = SELLER_ARCHIVE_STATUS
+    const archive = 'seller_archived'
+    const member_did_column = 'seller_did'
 
-	const table					= SELLER_ARCHIVE_STATUS;
-	const archive				= "seller_archived";
-	const member_did_column		= "seller_did";
-
-	const sql = `
+    const sql = `
 		UPDATE
 			${table}
 		SET
@@ -61,36 +58,30 @@ async function _softDeleteSeller (member_did, document_uuid) {
 			document_folder = 'trash'
 		AND
 			document_type = 'invoice'
-	`;
+	`
 
-	const args = [
-		member_did,
-		document_uuid
-	];
+    const args = [member_did, document_uuid]
 
-	let result;
+    let result
 
-	try {
-		result = await db.update(sql, args);
-	} catch(err) {
-		return [null, err]
+    try {
+        result = await db.update(sql, args)
+    } catch (err) {
+        return [null, err]
+    }
 
-	}
-
-	return [result, null];
-
-};
+    return [result, null]
+}
 
 /*
  * softDeleteBuyer
  */
-async function _softDeleteBuyer (member_did, document_uuid) {
+async function _softDeleteBuyer(member_did, document_uuid) {
+    const table = BUYER__ARCHIVE_STATUS
+    const archive = 'buyer_archived'
+    const member_did_column = 'buyer_did'
 
-	const table				= BUYER__ARCHIVE_STATUS;
-	const archive			= "buyer_archived";
-	const member_did_column	= "buyer_did";
-
-	const sql = `
+    const sql = `
 		UPDATE
 			${table}
 		SET
@@ -103,21 +94,17 @@ async function _softDeleteBuyer (member_did, document_uuid) {
 			document_folder = 'trash'
 		AND
 			document_type = 'invoice'
-	`;
+	`
 
-	const args = [
-		member_did,
-		document_uuid
-	];
+    const args = [member_did, document_uuid]
 
-	let result;
+    let result
 
-	try {
-		result = await db.update(sql, args);
-	} catch(err) {
-		return [null, err]
-	}
+    try {
+        result = await db.update(sql, args)
+    } catch (err) {
+        return [null, err]
+    }
 
-	return [result, null];
-
-};
+    return [result, null]
+}

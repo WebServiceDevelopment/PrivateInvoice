@@ -21,9 +21,9 @@
 "use strict";
 
 // Import sub
-const sub                       = require("../modules/invoice_sub.js");
-const tran                      = require("../modules/invoice_sub_transaction.js");
-const to_buyer                  = require("../modules/seller_to_buyer.js");
+const sub                       = require("../../modules/invoice_sub.js");
+const tran                      = require("../../modules/invoice_sub_transaction.js");
+const to_buyer                  = require("../../modules/seller_to_buyer.js");
 
 
 // Import Router
@@ -33,11 +33,11 @@ module.exports                  = router;
 
 // Libraries
 
-const sign_your_credentials     = require("../modules/sign_your_credentials.js");
-const { makePresentation }      = require("../modules/presentations_out.js");
-const { createTrashMessage }    = require("../modules/update_status.js");
+const sign_your_credentials     = require("../../modules/sign_your_credentials.js");
+const { makePresentation }      = require("../../modules/presentations_out.js");
+const { createTrashMessage }    = require("../../modules/update_status.js");
 
-const { getPrivateKeys }        = require('../modules//verify_utils.js');
+const { getPrivateKeys }        = require('../../modules//verify_utils.js');
 
 // Database 
 

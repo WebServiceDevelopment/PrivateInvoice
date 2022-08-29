@@ -22,24 +22,24 @@
 
 // Import Router
 
-const express                   = require('express')
-const router                    = express.Router()
-module.exports                  = router
+const express = require('express')
+const router = express.Router()
+module.exports = router
 
 // Import Libraries
 
-const uuidv4                    = require('uuid').v4
+const uuidv4 = require('uuid').v4
 
 // Import Modules
 
-const { verifyPresentation }    = require('../modules/sign_your_credentials.js')
-const { handleContactRequest }  = require('../modules/contacts_in.js')
-const { handleIncomingInvoice } = require('../modules/invoices_in.js')
-const { handleStatusUpdate }    = require('../modules/update_status.js')
+const { verifyPresentation } = require('../../modules/sign_your_credentials.js')
+const { handleContactRequest } = require('../../modules/contacts_in.js')
+const { handleIncomingInvoice } = require('../../modules/invoices_in.js')
+const { handleStatusUpdate } = require('../../modules/update_status.js')
 
 // Global Variable for Storing Challenges
 
-const challenges                = {}
+const challenges = {}
 
 // Define
 
@@ -54,10 +54,10 @@ router.post('/available', async (req, res) => {
     console.log(req.body)
 
     // Create a challenge
-    const domain = process.env.SERVER_LOCATION.split("://")[1];
+    const domain = process.env.SERVER_LOCATION.split('://')[1]
     const challenge = uuidv4()
 
-	console.log("domain ="+domain);
+    console.log('domain =' + domain)
 
     // Store it in Redis with a expiration timer of 10 seconds
     challenges[challenge] = 1
@@ -78,7 +78,6 @@ router.post('/available', async (req, res) => {
  * submissions
  */
 router.post('/submissions', async (req, res) => {
-
     console.log('--- /api/presentations/submissions ---')
     const signedPresentation = req.body
     const { domain, challenge } = signedPresentation.proof
@@ -94,8 +93,8 @@ router.post('/submissions', async (req, res) => {
 
     // 2.
     // Then we need to verify the presentation
-    
-	const result = await verifyPresentation(signedPresentation)
+
+    const result = await verifyPresentation(signedPresentation)
     if (!result.verified) {
         // return 400;
     }

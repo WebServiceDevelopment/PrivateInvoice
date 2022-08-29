@@ -22,41 +22,37 @@
 
 // Import Router
 
-const express               = require('express');
-const router                = express.Router();
-module.exports              = router;
+const express = require('express');
+const router = express.Router();
+module.exports = router;
 
 // Import Libraries
 
-const uuidv4                = require('uuid').v4;
+const uuidv4 = require('uuid').v4;
 
 
 // Import Modules
 
-const { signBusinessCard }  = require('../modules/sign_your_credentials.js')
-const { makePresentation }  = require('../modules/presentations_out.js')
+const { signBusinessCard } = require('../../modules/sign_your_credentials.js')
+const { makePresentation } = require('../../modules/presentations_out.js')
 
 const {
-        verifyCredential,
-        getPrivateKeys,
-}                           = require('../modules/verify_utils.js')
+	verifyCredential,
+	getPrivateKeys,
+} = require('../../modules/verify_utils.js')
 
 const {
-    createBusinessCard,
-    checkForExistingContact,
-    insertNewContact,
-    insertInviteTable,
-    getContactTable,
-}                           = require('../modules/contacts_sub.js')
+	createBusinessCard,
+	checkForExistingContact,
+	insertNewContact,
+	insertInviteTable,
+	getContactTable,
+} = require('../../modules/contacts_sub.js')
 
 const {
-    getContactListByMember_did,
-}                           = require("../modules/contacts_in.js");
+	getContactListByMember_did,
+} = require("../../modules/contacts_in.js");
 
-// Database
-
-
-// Constants
 
 
 //----------------------------- define endpoints -----------------------------
@@ -66,16 +62,16 @@ const {
  * generate
  */
 
-router.post('/createBusunessCard', async function(req, res) {
+router.post('/createBusunessCard', async function (req, res) {
 
 	const METHOD = '/createBusunessCard';
 
 	const { body } = req;
 
-// 1.1
+	// 1.1
 	const invite_code = uuidv4();
 
-// 1.2
+	// 1.2
 
 	const args = [
 		invite_code,
@@ -86,10 +82,10 @@ router.post('/createBusunessCard', async function(req, res) {
 		body.expire
 	];
 
-	const [bool3 , err3] = await insertInviteTable(args);
-	if(err3) {
+	const [bool3, err3] = await insertInviteTable(args);
+	if (err3) {
 
-		let  msg =  `Error:${METHOD}:could not insert INVITE_TABLE.`;
+		let msg = `Error:${METHOD}:could not insert INVITE_TABLE.`;
 
 		res.json({
 			err: 3,
@@ -100,10 +96,9 @@ router.post('/createBusunessCard', async function(req, res) {
 
 	console.log(req.session.data.member_did);
 
-// 1.3
-	console.log('--- aaa ---');
-	const [ keyPair, err4 ] = await getPrivateKeys(req.session.data.member_did);
-	if(err4) {
+	// 1.3
+	const [keyPair, err4] = await getPrivateKeys(req.session.data.member_did);
+	if (err4) {
 
 		let msg = `Error:${METHOD}:could not get private keys`;
 
@@ -114,11 +109,10 @@ router.post('/createBusunessCard', async function(req, res) {
 		return;
 	}
 
-// 1.4
-	console.log('--- bbb ---');
+	// 1.4
 
-	const [ credential, err5 ] = await createBusinessCard(req, req.session.data.member_did, invite_code, keyPair, body.linkRelationship);
-	if(err4) {
+	const [credential, err5] = await createBusinessCard(req, req.session.data.member_did, invite_code, keyPair, body.linkRelationship);
+	if (err4) {
 
 		let msg = `Error:${METHOD}:could not create business card`;
 
@@ -128,12 +122,12 @@ router.post('/createBusunessCard', async function(req, res) {
 		});
 		return;
 	}
-	
-// 1.5
+
+	// 1.5
 	console.log('--- ccc ---');
 	const vbc = await signBusinessCard(credential, keyPair);
-	
-// 1.6
+
+	// 1.6
 	console.log('--- eee ---');
 	res.json(vbc);
 
@@ -145,21 +139,18 @@ router.post('/createBusunessCard', async function(req, res) {
  * addContact
  */
 
-router.post('/addContact', async function(req, res) {
+router.post('/addContact', async function (req, res) {
 
 	const METHOD = '/addContact'
 
 	const { body } = req;
 
-	console.log('ADDING CONTACT');
-	console.log(body);
-
 	// 2.1 
 	// First we need to verifyCredential
-    // 
+	// 
 
 	const verified = await verifyCredential(body);
-	if(!verified) {
+	if (!verified) {
 
 		let msg = `Error:${METHOD}:Contact did not verify`;
 
@@ -181,7 +172,7 @@ router.post('/addContact', async function(req, res) {
 	// const remote_member_did = body.credentialSubject.id;
 
 	const exists = await checkForExistingContact(local_member_did, remote_member_did)
-	if(exists) {
+	if (exists) {
 
 		let msg = `Error:${METHOD}:Contact already exists`;
 
@@ -194,12 +185,12 @@ router.post('/addContact', async function(req, res) {
 	}
 
 
-    // 2.3 
+	// 2.3 
 	// Keypair
 	//
 
-	const [ keyPair, err3 ] = await getPrivateKeys(req.session.data.member_did);
-	if(err3) {
+	const [keyPair, err3] = await getPrivateKeys(req.session.data.member_did);
+	if (err3) {
 
 		let msg = `Error:${METHOD}:could not get private keys`;
 
@@ -211,28 +202,28 @@ router.post('/addContact', async function(req, res) {
 		return;
 	}
 
-    // 2.4 
-    // Extract linkRelationship from details
-    //
-    
+	// 2.4 
+	// Extract linkRelationship from details
+	//
+
 	let relatedLink = req.body.relatedLink;
 	let linkRelationship = relatedLink[0].linkRelationship;
 
-	switch(linkRelationship) {
-	case "Partner":
-	case "Buyer":
-	case "Seller":
-		break;
-	default:
+	switch (linkRelationship) {
+		case "Partner":
+		case "Buyer":
+		case "Seller":
+			break;
+		default:
 
-		let msg = `Error:${METHOD}: Incorrect inkRelationship`;
+			let msg = `Error:${METHOD}: Incorrect inkRelationship`;
 
-		res.status(400)
-			.json({
-				err: 4,
-				msg: msg
-			});
-		return;
+			res.status(400)
+				.json({
+					err: 4,
+					msg: msg
+				});
+			return;
 	}
 
 
@@ -242,9 +233,8 @@ router.post('/addContact', async function(req, res) {
 
 	//console.log('2.5');
 	const invite_code = body.id.split(':').pop();
-
-	const [ credential, err5 ] = await createBusinessCard(req, req.session.data.member_did, invite_code, keyPair, linkRelationship);
-	if(err5) {
+	const [credential, err5] = await createBusinessCard(req, req.session.data.member_did, invite_code, keyPair, linkRelationship);
+	if (err5) {
 
 		let msg = `Error:${METHOD}: could not create business card`;
 
@@ -267,38 +257,38 @@ router.post('/addContact', async function(req, res) {
 
 	const vbc = await signBusinessCard(credential, keyPair);
 
-	
+
 	// 2.7
 	// Then we need to send our verifiable business card to the other
 	// party
-	
+
 	//console.log('2.7');
-	const [ link ] = body.relatedLink;
+	const [link] = body.relatedLink;
 	const url = link.target;
 
-	const [ response, err7 ] = await makePresentation(url, keyPair, vbc);
-	if(err7) {
+	const [response, err7] = await makePresentation(url, keyPair, vbc);
+	if (err7) {
 
 		let msg = `Error:${METHOD}: Presentation failed`;
 
 		res.status(400)
-		.json({
+			.json({
 				err: 7,
 				msg: msg
 			});
 		return;
 	}
 
-	
+
 	// 2.8
 	// For debug purposes, if we add ourselves as a contact, then the
 	// entry has already been made as a result of the presentation
 	// on our server
-	
-	if( local_member_did === remote_member_did) {
+
+	if (local_member_did === remote_member_did) {
 		res.json({
 			err: 0,
-			msg : 'okay'
+			msg: 'okay'
 		});
 		return;
 	}
@@ -308,8 +298,8 @@ router.post('/addContact', async function(req, res) {
 	// If we get a successful response from the presentation,
 	// then we need to add a contact on our own server
 
-	const [ created, err9 ] = await insertNewContact(invite_code, local_member_did, body);
-	if(err9) {
+	const [created, err9] = await insertNewContact(invite_code, local_member_did, body);
+	if (err9) {
 
 		let msg = `Error:${METHOD}: insertNewContact`;
 
@@ -321,13 +311,13 @@ router.post('/addContact', async function(req, res) {
 		return;
 	}
 
-	
+
 	// 2.10
 	// End Route
 
 	res.json({
 		err: 0,
-		msg : 'okay'
+		msg: 'okay'
 	});
 
 });
@@ -336,7 +326,7 @@ router.post('/addContact', async function(req, res) {
  * 3.
  * getContactTable
  */
-router.get('/getContactTable', async function(req, res) {
+router.get('/getContactTable', async function (req, res) {
 
 	const { member_did } = req.session.data;
 	const contactTable = await getContactTable(member_did);
@@ -354,7 +344,7 @@ router.get('/getContactTable', async function(req, res) {
  * getContactList
  */
 
-router.get('/getContactList', async function(req, res) {
+router.get('/getContactList', async function (req, res) {
 
 	const METHOD = '/getContactList';
 
@@ -363,80 +353,80 @@ router.get('/getContactList', async function(req, res) {
 	// First we get a list of all of the contact uuid's
 	// in the direction that we request
 
-	console.log("req.query.contactType="+req.query.contactType)
+	console.log("req.query.contactType=" + req.query.contactType)
 
 	// 1.
 	//
-	switch(req.query.contactType) {
-	case "sellers":
-		contactType = "seller_did";
-		myPosition = "buyer_did";
+	switch (req.query.contactType) {
+		case "sellers":
+			contactType = "seller_did";
+			myPosition = "buyer_did";
 
-		break;
-	case "buyers":
-		contactType = "remote_member_did";
-		myPosition = "local_member_did";
+			break;
+		case "buyers":
+			contactType = "remote_member_did";
+			myPosition = "local_member_did";
 
-		break;
-	default:
+			break;
+		default:
 
-		let msg = `ERROR:${METHOD}: Invalid contact type provided`;
+			let msg = `ERROR:${METHOD}: Invalid contact type provided`;
 
-		res.status(400)
-			.json({
-				err : 1,
-				msg : msg
-			});
-		return;
+			res.status(400)
+				.json({
+					err: 1,
+					msg: msg
+				});
+			return;
 	}
 
 
 	//2.
 	//
-	const [rows, err2] = await getContactListByMember_did( 
-								contactType, 
-								myPosition, 
-								req.session.data.member_did);
+	const [rows, err2] = await getContactListByMember_did(
+		contactType,
+		myPosition,
+		req.session.data.member_did);
 
-	if( err2) {
+	if (err2) {
 
 		let msg = `ERROR:${METHOD}: Invalid request`;
 
 		res.status(400)
 			.json({
-				err : 2,
-				msg : msg
+				err: 2,
+				msg: msg
 			});
 		return;
 	}
 
-	if(!rows.length) {
+	if (!rows.length) {
 		res.json({
-			err : 0,
-			msg : []
+			err: 0,
+			msg: []
 		});
 		return;
 	}
 
 	// 3.
 	//
-	const contactList = rows.map( (row) => {
+	const contactList = rows.map((row) => {
 
 		const org = JSON.parse(row.remote_organization);
-		
+
 		return {
-			remote_origin : row.remote_origin,
-			member_did : row.remote_member_did,
-			membername : row.remote_membername,
-            organization_name : org.name,
-            organization_address : org.address,
-            organization_building : org.building,
-            organization_department : org.department,
-            organization_tax_id : '',
-            addressCountry : org.country,
-            addressRegion : org.state,
-            addressCity : org.city,
-            wallet_address : ''
+			remote_origin: row.remote_origin,
+			member_did: row.remote_member_did,
+			membername: row.remote_membername,
+			organization_name: org.name,
+			organization_address: org.address,
+			organization_building: org.building,
+			organization_department: org.department,
+			organization_tax_id: '',
+			addressCountry: org.country,
+			addressRegion: org.state,
+			addressCity: org.city,
+			wallet_address: ''
 		}
 	});
 
@@ -444,8 +434,8 @@ router.get('/getContactList', async function(req, res) {
 	// 4.
 	//
 	res.json({
-		err : 0,
-		msg : contactList
+		err: 0,
+		msg: contactList
 	});
 
 });
