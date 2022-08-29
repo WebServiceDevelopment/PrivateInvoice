@@ -84,9 +84,6 @@ app.get("*", function (req, res, next) {
 });
 
 app.all("*", async (req, res, next) => {
-
-	console.log("req.headers.authorization="+req.headers.authorization);
-
 	// Force logout for swagger when basic not provided
 	if(req.headers.referer && req.headers.referer.indexOf('/api-docs') !== -1) {
 		if(!req.headers.authorization && req.headers.cookie) {
@@ -104,45 +101,27 @@ app.all("*", async (req, res, next) => {
 		return next();
 	}
 	
-	console.log('a');
-
 	// Already logged in, dont need to do it again
 	if(req.headers.cookie) {
 		return next();
 	}
-	
-	console.log('b');
 
 	// Only account for basic authentication
 	if(req.headers.authorization.indexOf('Basic') === -1) {
 		return next();
 	}
 	
-	console.log('c');
-	
 	// Get the base64 encoded username + password
 	const base64 = req.headers.authorization.split(' ').pop();
 	const text = Buffer.from(base64, 'base64').toString('utf-8');
-
-	console.log(text);
-
 	const [ membername, password ] = text.split(':');
-
-	console.log(membername);
-	console.log(password);
-
 	const [ data, err ] = await handleLogin(membername, password);
-
-	console.log(data);
-	console.log(err);
-
 	if(err) {
 		return next();
 	}
 
 	req.session.data = data;
 	return next();
-
 });
 
 app.all("*", function (req, res, next) {
@@ -196,34 +175,28 @@ app.all("*", function (req, res, next) {
 });
 
 // Routes
+app.use('/api/invoice', require('./routes/invoice/buyer_invoice.js'));
+app.use('/api/invoice', require('./routes/invoice/seller_invoice.js'));
+app.use('/api/invoice', require('./routes/invoice/seller_invoice_document.js'));
+app.use('/api/invoice', require('./routes/invoice/seller_invoice_archive.js'));
+app.use('/api/invoice', require('./routes/invoice/seller_invoice_trash.js'));
+app.use('/api/invoice', require('./routes/invoice/invoice_document.js'));
+app.use('/api/invoice', require('./routes/invoice/softDelete.js'));
 
-app.use('/api/session', require('./routes/session/index.js'));
-app.use('/api/contacts', require('./routes/contacts.js'));
+app.use('/api/tray', require('./routes/tray/tray.js'));
+app.use('/api/tray', require('./routes/tray/tray_drafts.js'));
+app.use('/api/tray', require('./routes/tray/tray_archive.js'));
 
-app.use('/api/invoice', require('./routes/buyer_invoice.js'));
-app.use('/api/message', require('./routes/buyer_invoice_archive.js'));
-app.use('/api/message', require('./routes/buyer_invoice_trash.js'));
-app.use('/api/message', require('./routes/buyer_message.js'));
+app.use('/api/contacts', require('./routes/contacts/'));
+app.use('/api/session', require('./routes/session/'));
+app.use('/api/settings', require('./routes/settings/'));
+app.use('/api/wallet', require('./routes/wallet/'));
+app.use('/api/presentations', require('./routes/presentations/'));
 
-app.use('/api/invoice', require('./routes/seller_invoice.js'));
-app.use('/api/invoice', require('./routes/seller_invoice_document.js'));
-app.use('/api/invoice', require('./routes/seller_invoice_archive.js'));
-app.use('/api/invoice', require('./routes/seller_invoice_trash.js'));
-app.use('/api/message', require('./routes/seller_message.js'));
-
-app.use('/api/invoice', require('./routes/invoice_document.js'));
-
-app.use('/api/tray', require('./routes/tray.js'));
-app.use('/api/tray', require('./routes/tray_drafts.js'));
-app.use('/api/tray', require('./routes/tray_archive.js'));
-
-app.use('/api/invoice', require('./routes/softDelete.js'));
-
-app.use('/api/settings', require('./routes/settings.js'));
-
-app.use('/api/wallet', require('./routes/wallet.js'));
-app.use('/api/presentations', require('./routes/presentations.js'));
-
+app.use('/api/message', require('./routes/message/buyer_invoice_archive.js'));
+app.use('/api/message', require('./routes/message/buyer_invoice_trash.js'));
+app.use('/api/message', require('./routes/message/buyer_message.js'));
+app.use('/api/message', require('./routes/message/seller_message.js'));
 
 // Public Directory and listen
 
