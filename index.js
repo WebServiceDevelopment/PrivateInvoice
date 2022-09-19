@@ -135,11 +135,6 @@ app.all("*", function (req, res, next) {
         return next();
     }
 
-    // Allow access to message
-    if(req.url.startsWith('/api/message')) {
-        return next();
-    }
-
     // Allow access to session
     if(req.url.startsWith('/api/session')) {
         return next();
@@ -192,11 +187,6 @@ app.use('/api/session', require('./routes/session/'));
 app.use('/api/settings', require('./routes/settings/'));
 app.use('/api/wallet', require('./routes/wallet/'));
 app.use('/api/presentations', require('./routes/presentations/'));
-
-app.use('/api/message', require('./routes/message/buyer_invoice_archive.js'));
-app.use('/api/message', require('./routes/message/buyer_invoice_trash.js'));
-app.use('/api/message', require('./routes/message/buyer_message.js'));
-app.use('/api/message', require('./routes/message/seller_message.js'));
 
 // Public Directory and listen
 
