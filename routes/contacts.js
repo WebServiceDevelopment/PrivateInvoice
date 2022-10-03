@@ -35,13 +35,13 @@ const {
     handleGetContactList,
 } = require('../modules/contacts')
 
-//----------------------------- define endpoints -----------------------------
+// Define End Points
 
 router.post('/createBusunessCard', async (req, res) => {
     const { buyer, seller, uses, expire, linkRelationship } = req.body
     const { member_did } = req.session.data
     const [vbc, err] = await handleCreateBusinessCard(
-        member_did,
+        member_did, // did:key:123
         buyer, // 1 or 0
         seller, // 1 or 0
         uses, // number of times business card can be used
@@ -58,22 +58,24 @@ router.post('/createBusunessCard', async (req, res) => {
 
 router.post('/addContact', async (req, res) => {
     const { body } = req // VBC in body
-    const { member_did } = req.session.data
+    const { member_did } = req.session.data // did:key:123
     const response = await handleAddContact(member_did, body)
     const status = response.err === 0 ? 200 : 400
     res.status(status).json(response) // { err, msg }
 })
 
 router.get('/getContactTable', async (req, res) => {
-    const { member_did } = req.session.data
+    const { member_did } = req.session.data // did:key:123
     const contactTable = await handleGetContactTable(member_did)
     res.json(contactTable) // contacts[]
 })
 
 router.get('/getContactList', async (req, res) => {
     const { contactType } = req.query // 'sellers', or 'buyers'
-    const { member_did } = req.session.data
+    const { member_did } = req.session.data // did:key:123
     const response = await handleGetContactList(member_did, contactType)
     const status = response.err === 0 ? 200 : 400
     res.status(status).json(response) // { err, contacts[] }
 })
+
+// End

@@ -38,8 +38,7 @@ const YAML = require('yamljs')
 
 require('dotenv').config()
 const config = require('./config.json')
-const db = require('./database.js')
-const netUtil = require('./modules/netUtil.js')
+// const db = require('./database.js')
 
 // Create server
 
@@ -199,14 +198,13 @@ app.listen(parseInt(process.env.SERVER_PORT), function () {
     )
     console.log(
         'Private Invoice is listening on IP: %s',
-        process.env.SERVER_IP_ADDRESS || netUtil.getLocalIp()
+        process.env.SERVER_IP_ADDRESS
     )
     console.log(
         'Private Invoice is listening on Port: %d',
         process.env.SERVER_PORT
     )
-    const MY_IP = process.env.SERVER_IP_ADDRESS || netUtil.getLocalIp()
     console.log(
-        `API Documentaion: http://${MY_IP}:${process.env.SERVER_PORT}/api-docs`
+        `API Documentaion: http://${process.env.SERVER_IP_ADDRESS}:${process.env.SERVER_PORT}/api-docs`
     )
 })
