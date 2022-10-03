@@ -21,18 +21,21 @@ const {
     checkForExistingContact,
     insertNewContact,
     insertInviteTable,
+    getContactTable,
 } = require('./contacts_sub.js')
 
+const { getContactListByMember_did } = require('./contacts_in.js')
 const { verifyCredential, getPrivateKeys } = require('../verify_utils.js')
 const { signBusinessCard } = require('../sign_your_credentials.js')
+const { makePresentation } = require('../presentations_out.js')
 
 const handleCreateBusinessCard = async (
-    member_did,
-    buyer,
-    seller,
-    uses,
-    expire,
-    linkRelationship
+    member_did, // string 'did:key:123'
+    buyer, // 1 or 0
+    seller, // 1 or 0
+    uses, // number
+    expire, // yyyy-mm-dd date
+    linkRelationship // 'Seller', 'Buyer', or 'Partner' enum
 ) => {
     const invite_code = uuidv4()
     const args = [invite_code, member_did, buyer, seller, uses, expire]
@@ -74,20 +77,17 @@ const handleAddContact = async (member_did, body) => {
 
     const verified = await verifyCredential(body)
     if (!verified) {
-        let msg = `Error:${METHOD}:Contact did not verify`
-
-        res.status(400).json({
+        return {
             err: 1,
-            msg: msg,
-        })
-        return
+            msg: `Error:${METHOD}:Contact did not verify`,
+        }
     }
 
     // 2.2
     // we need to check if the contact already exists
     //
 
-    const local_member_did = req.session.data.member_did
+    const local_member_did = member_did
     const remote_member_did = body.issuer.id
     // const remote_member_did = body.credentialSubject.id;
 
@@ -95,37 +95,31 @@ const handleAddContact = async (member_did, body) => {
         local_member_did,
         remote_member_did
     )
-    if (exists) {
-        let msg = `Error:${METHOD}:Contact already exists`
 
-        res.status(400).json({
+    if (exists) {
+        return {
             err: 2,
-            msg: msg,
-        })
-        return
+            msg: `Error:${METHOD}:Contact already exists`,
+        }
     }
 
     // 2.3
     // Keypair
     //
 
-    const [keyPair, err3] = await getPrivateKeys(req.session.data.member_did)
+    const [keyPair, err3] = await getPrivateKeys(member_did)
     if (err3) {
-        let msg = `Error:${METHOD}:could not get private keys`
-
-        res.status(400).json({
+        return {
             err: 3,
-            msg: msg,
-        })
-        return
+            msg: `Error:${METHOD}:could not get private keys`,
+        }
     }
 
     // 2.4
     // Extract linkRelationship from details
-    //
 
-    let relatedLink = req.body.relatedLink
-    let linkRelationship = relatedLink[0].linkRelationship
+    const { relatedLink } = body
+    const { linkRelationship } = relatedLink[0]
 
     switch (linkRelationship) {
         case 'Partner':
@@ -133,35 +127,28 @@ const handleAddContact = async (member_did, body) => {
         case 'Seller':
             break
         default:
-            let msg = `Error:${METHOD}: Incorrect inkRelationship`
-
-            res.status(400).json({
+            return {
                 err: 4,
-                msg: msg,
-            })
-            return
+                msg: `Error:${METHOD}: Incorrect inkRelationship`,
+            }
     }
 
     // 2.5
     // Then we need to try and contact the remote host
     // We start by creating our own verifiable business card
 
-    //console.log('2.5');
     const invite_code = body.id.split(':').pop()
     const [credential, err5] = await createBusinessCard(
-        req.session.data.member_did,
+        member_did,
         invite_code,
         keyPair,
         linkRelationship
     )
     if (err5) {
-        let msg = `Error:${METHOD}: could not create business card`
-
-        res.status(400).json({
+        return {
             err: 5,
-            msg: msg,
-        })
-        return
+            msg: `Error:${METHOD}: could not create business card`,
+        }
     }
 
     // 2.6
@@ -178,19 +165,15 @@ const handleAddContact = async (member_did, body) => {
     // Then we need to send our verifiable business card to the other
     // party
 
-    //console.log('2.7');
     const [link] = body.relatedLink
     const url = link.target
 
-    const [response, err7] = await makePresentation(url, keyPair, vbc)
+    const [_response, err7] = await makePresentation(url, keyPair, vbc)
     if (err7) {
-        let msg = `Error:${METHOD}: Presentation failed`
-
-        res.status(400).json({
+        return {
             err: 7,
-            msg: msg,
-        })
-        return
+            msg: `Error:${METHOD}: Presentation failed`,
+        }
     }
 
     // 2.8
@@ -199,45 +182,118 @@ const handleAddContact = async (member_did, body) => {
     // on our server
 
     if (local_member_did === remote_member_did) {
-        res.json({
+        return {
             err: 0,
             msg: 'okay',
-        })
-        return
+        }
     }
 
     // 2.9
     // If we get a successful response from the presentation,
     // then we need to add a contact on our own server
 
-    const [created, err9] = await insertNewContact(
+    const [_created, err9] = await insertNewContact(
         invite_code,
         local_member_did,
         body
     )
     if (err9) {
-        let msg = `Error:${METHOD}: insertNewContact`
-
-        res.status(400).json({
+        return {
             err: 9,
-            msg: msg,
-        })
-        return
+            msg: `Error:${METHOD}: insertNewContact`,
+        }
     }
 
     // 2.10
     // End Route
 
-    res.json({
+    return {
         err: 0,
         msg: 'okay',
-    })
+    }
 }
 
-const handleGetContactTable = async () => {}
+const handleGetContactTable = async (member_did) => {
+    const contactTable = await getContactTable(member_did)
+    return contactTable
+}
+
+const handleGetContactList = async (member_did, contactQuery) => {
+    const METHOD = '/getContactList'
+
+    let contactType, myPosition
+
+    // 1.
+
+    switch (contactQuery) {
+        case 'sellers':
+            contactType = 'seller_did'
+            myPosition = 'buyer_did'
+            break
+        case 'buyers':
+            contactType = 'remote_member_did'
+            myPosition = 'local_member_did'
+            break
+        default:
+            return {
+                err: 1,
+                msg: `ERROR:${METHOD}: Invalid contact type provided`,
+            }
+    }
+
+    //2.
+    const [rows, err2] = await getContactListByMember_did(
+        contactType,
+        myPosition,
+        member_did
+    )
+
+    if (err2) {
+        return {
+            err: 2,
+            msg: `ERROR:${METHOD}: Invalid request`,
+        }
+    }
+
+    if (!rows.length) {
+        return {
+            err: 0,
+            msg: [],
+        }
+    }
+
+    // 3.
+    //
+    const contactList = rows.map((row) => {
+        const org = JSON.parse(row.remote_organization)
+
+        return {
+            remote_origin: row.remote_origin,
+            member_did: row.remote_member_did,
+            membername: row.remote_membername,
+            organization_name: org.name,
+            organization_address: org.address,
+            organization_building: org.building,
+            organization_department: org.department,
+            organization_tax_id: '',
+            addressCountry: org.country,
+            addressRegion: org.state,
+            addressCity: org.city,
+            wallet_address: '',
+        }
+    })
+
+    // 4.
+
+    return {
+        err: 0,
+        msg: contactList,
+    }
+}
 
 module.exports = {
     handleCreateBusinessCard,
     handleAddContact,
     handleGetContactTable,
+    handleGetContactList,
 }
