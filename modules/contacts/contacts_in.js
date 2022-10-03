@@ -22,22 +22,19 @@
 
 // Import Libraries
 
-const uuidv1					= require('uuid').v1
+const uuidv1 = require('uuid').v1
 
 // Database
 
-const db						= require('../database.js')
-
-const CONTACTS_TABLE 			= "contacts";
+const db = require('../../database.js')
 
 // Exports
 module.exports = {
-    handleContactRequest		: _handleContactRequest,
-	checkInviteCodeValid		: _checkInviteCodeValid,
-	checkForExistingContact 	: _checkForExistingContact,
-	insertNewContact			: _insertNewContact,
-
-	getContactListByMember_did	: _getContactListByMember_did,
+    handleContactRequest: _handleContactRequest,
+    checkInviteCodeValid: _checkInviteCodeValid,
+    checkForExistingContact: _checkForExistingContact,
+    insertNewContact: _insertNewContact,
+    getContactListByMember_did: _getContactListByMember_did,
 }
 
 //------------------------------ define modules ------------------------------
@@ -45,7 +42,7 @@ module.exports = {
 /*
  * handleContactRequest
  */
-async function _handleContactRequest (body) {
+async function _handleContactRequest(body) {
     console.log('--- Handle Contact Request ---')
 
     // 1.
@@ -56,7 +53,7 @@ async function _handleContactRequest (body) {
         return link.linkRelationship === 'Invite'
     })
 
-	console.log(linkRelationship);
+    console.log(linkRelationship)
     const local_member_did = linkRelationship.target
 
     const [invite, inviteEr] = await _checkInviteCodeValid(
@@ -72,7 +69,7 @@ async function _handleContactRequest (body) {
     // Then we see if the contact already exists
 
     // const remote_member_did = body.issuer.id
-	
+
     const remote_member_did = body.credentialSubject.id
     const exists = await _checkForExistingContact(
         local_member_did,
@@ -99,10 +96,12 @@ async function _handleContactRequest (body) {
     return [200, 'contact created']
 }
 
-
-async function _getContactListByMember_did (contactType, myPosition, member_did) {
-
-	const sql = `
+async function _getContactListByMember_did(
+    contactType,
+    myPosition,
+    member_did
+) {
+    const sql = `
 		SELECT
 			${contactType} AS contact_uuid,
 			remote_member_did,
@@ -110,32 +109,29 @@ async function _getContactListByMember_did (contactType, myPosition, member_did)
 			remote_origin,
 			remote_organization
 		FROM
-			${CONTACTS_TABLE}
+			contacts
 		WHERE
 			${myPosition} = ?
 		AND
 			local_to_remote = 1
-	`;
+	`
 
-	const args = [
-		member_did
-	];
+    const args = [member_did]
 
-	let rows;
+    let rows
 
-	try {
-		rows = await db.selectAll(sql, args);
-	} catch(err) {
-		const msg = err.toString();
+    try {
+        rows = await db.selectAll(sql, args)
+    } catch (err) {
+        const msg = err.toString()
 
-		console.log(msg)
+        console.log(msg)
 
-		return [null , msg];
-	}
+        return [null, msg]
+    }
 
-	return [rows, null];
+    return [rows, null]
 }
-
 
 //-----------------------------------------------------------------------------
 
@@ -143,8 +139,7 @@ async function _getContactListByMember_did (contactType, myPosition, member_did)
  * Helper functions
  */
 
-async function _checkInviteCodeValid (local_uuid, invite_code) {
-
+async function _checkInviteCodeValid(local_uuid, invite_code) {
     const sql = `
 		SELECT
 			invite_code,
@@ -180,8 +175,7 @@ async function _checkInviteCodeValid (local_uuid, invite_code) {
 /*
  * checkForExistingContact
  */
-async function _checkForExistingContact (local_uuid, remote_uuid) {
-
+async function _checkForExistingContact(local_uuid, remote_uuid) {
     const sql = `
 		SELECT
 			COUNT(*) AS num
@@ -204,7 +198,7 @@ async function _checkForExistingContact (local_uuid, remote_uuid) {
 /*
  * insertNewContact
  */
-async function _insertNewContact (invite_code, local_member_did, credential) {
+async function _insertNewContact(invite_code, local_member_did, credential) {
     // Get local username
 
     const mySql = `
@@ -255,10 +249,10 @@ async function _insertNewContact (invite_code, local_member_did, credential) {
         '/api/presentations/available',
         ''
     )
-    
+
     const remote_member_did = credential.issuer.id
     const remote_member_name = credential.issuer.name
-	const remote_wallet_address = credential.credentialSubject.wallet_address
+    const remote_wallet_address = credential.credentialSubject.wallet_address
 
     const remote_organization = {
         name: credential.credentialSubject.name,
@@ -310,7 +304,7 @@ async function _insertNewContact (invite_code, local_member_did, credential) {
         remote_origin,
         remote_member_did,
         remote_member_name,
-		remote_wallet_address,
+        remote_wallet_address,
         JSON.stringify(remote_organization),
         relation.local_to_remote,
         relation.remote_to_local,
@@ -322,21 +316,17 @@ async function _insertNewContact (invite_code, local_member_did, credential) {
         return [null, err]
     }
 
-	const incrementSql = `
+    const incrementSql = `
 		UPDATE
 			invite
 		SET
 			use_count = use_count + 1
 		WHERE
 			invite_code = ?
-	`;
+	`
 
-	const incrementArgs = [
-		invite_code
-	]
+    const incrementArgs = [invite_code]
 
-	await db.insert(incrementSql, incrementArgs);
+    await db.insert(incrementSql, incrementArgs)
     return [true, null]
-
 }
-

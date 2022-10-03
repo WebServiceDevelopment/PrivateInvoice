@@ -33,7 +33,9 @@ const uuidv4 = require('uuid').v4
 // Import Modules
 
 const { verifyPresentation } = require('../../modules/sign_your_credentials.js')
-const { handleContactRequest } = require('../../modules/contacts_in.js')
+const {
+    handleContactRequest,
+} = require('../../modules/contacts/contacts_in.js')
 const { handleIncomingInvoice } = require('../../modules/invoices_in.js')
 const { handleStatusUpdate } = require('../../modules/update_status.js')
 
