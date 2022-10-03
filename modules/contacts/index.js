@@ -68,7 +68,10 @@ const handleCreateBusinessCard = async (
     return [vbc, null]
 }
 
-const handleAddContact = async (member_did, body) => {
+const handleAddContact = async (
+    member_did, // did:key:123
+    body // vbc
+) => {
     const METHOD = '/addContact'
 
     // 2.1
@@ -213,12 +216,17 @@ const handleAddContact = async (member_did, body) => {
     }
 }
 
-const handleGetContactTable = async (member_did) => {
+const handleGetContactTable = async (
+    member_did // did:key:123
+) => {
     const contactTable = await getContactTable(member_did)
     return contactTable
 }
 
-const handleGetContactList = async (member_did, contactQuery) => {
+const handleGetContactList = async (
+    member_did, // did:key:123
+    contactQuery // // 'sellers', or 'buyers'
+) => {
     const METHOD = '/getContactList'
 
     let contactType, myPosition

@@ -61,13 +61,13 @@ router.post('/addContact', async (req, res) => {
     const { member_did } = req.session.data
     const response = await handleAddContact(member_did, body)
     const status = response.err === 0 ? 200 : 400
-    res.status(status).json(response)
+    res.status(status).json(response) // { err, msg }
 })
 
 router.get('/getContactTable', async (req, res) => {
     const { member_did } = req.session.data
     const contactTable = await handleGetContactTable(member_did)
-    res.json(contactTable)
+    res.json(contactTable) // contacts[]
 })
 
 router.get('/getContactList', async (req, res) => {
@@ -75,5 +75,5 @@ router.get('/getContactList', async (req, res) => {
     const { member_did } = req.session.data
     const response = await handleGetContactList(member_did, contactType)
     const status = response.err === 0 ? 200 : 400
-    res.status(status).json(response)
+    res.status(status).json(response) // { err, contacts[] }
 })
