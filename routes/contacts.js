@@ -33,7 +33,7 @@ const {
     handleAddContact,
     handleGetContactTable,
     handleGetContactList,
-} = require('../../modules/contacts')
+} = require('../modules/contacts')
 
 //----------------------------- define endpoints -----------------------------
 
