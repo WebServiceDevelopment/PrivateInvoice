@@ -32,7 +32,7 @@ const {
     getFolder,
     getTotal,
     nullCheckArgsOfInvoiceTray,
-} = require('../../modules/tray_sub.js')
+} = require('../../modules/tray')
 
 // Database
 
