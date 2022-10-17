@@ -27,7 +27,7 @@ const router = express.Router()
 module.exports = router
 
 // Import Modules
-const { getCount, getFolder, getTotal } = require('../../modules/tray')
+const { getCount, getFolder, getTotal } = require('../modules/tray')
 
 router.get('/getCount', async (req, res) => {
     // Get member did from session data

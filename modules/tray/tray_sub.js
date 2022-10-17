@@ -39,8 +39,9 @@ const getCount = async (
     archiveStatus, // 0, 1
     folder // enum 'draft', 'sent', ...
 ) => {
-    const member_did = role === 'seller' ? 'seller_did' : 'buyer_did'
+    const table_did = role === 'seller' ? 'seller_did' : 'buyer_did'
     const archive = role === 'seller' ? 'seller_archived' : 'buyer_archived'
+    const table = role === 'seller' ? 'seller_status' : 'buyer_status'
     const counts = new Array()
     const query = new Array()
 
@@ -98,7 +99,7 @@ const getCount = async (
 			FROM
 				${table}
 			WHERE
-				${member_did} = ?
+				${table_did} = ?
 			AND
 				document_type = 'invoice'
 			AND
@@ -132,7 +133,7 @@ const getFolder = async (
     limit, // number
     offset // number
 ) => {
-    const member_did = role === 'seller' ? 'seller_did' : 'buyer_did'
+    const table_did = role === 'seller' ? 'seller_did' : 'buyer_did'
     const archive = role === 'seller' ? 'seller_archived' : 'buyer_archived'
     const table = role === 'seller' ? 'seller_status' : 'buyer_status'
     const sort_rule = 'seller_last_action DESC'
@@ -166,7 +167,7 @@ const getFolder = async (
 		FROM
 			${table}
 		WHERE
-			${member_did} = ?
+			${table_did} = ?
 		AND
 			document_type = 'invoice'
 		AND
@@ -204,7 +205,7 @@ const getTotal = async (
     folder, // enum 'draft', 'sent', ...
     archiveStatus // 0, 1
 ) => {
-    const member_did = role === 'seller' ? 'seller_did' : 'buyer_did'
+    const table_did = role === 'seller' ? 'seller_did' : 'buyer_did'
     const archive = role === 'seller' ? 'seller_archived' : 'buyer_archived'
     const table = role === 'seller' ? 'seller_status' : 'buyer_status'
 
@@ -214,7 +215,7 @@ const getTotal = async (
 		FROM
 			${table}
 		WHERE
-			${member_did} = ?
+			${table_did} = ?
 		AND
 			document_type = 'invoice'
 		AND
