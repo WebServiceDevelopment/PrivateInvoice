@@ -36,11 +36,6 @@ const {
 
 // Database
 
-const BUYER_STATUS = 'buyer_status'
-const SELLER_STATUS = 'seller_status'
-
-const SELLER_DRAFT_STATUS = 'seller_status_draft'
-
 // ------------------------------- End Points -------------------------------
 
 /*
@@ -49,13 +44,10 @@ const SELLER_DRAFT_STATUS = 'seller_status_draft'
  */
 router.get('/getCountOfInvoice', async function (req, res) {
     const METHOD = '/getCountOfInvoice'
-
-    //console.log("/getCountOfInvoice")
-
-    const archive = req.query.archive
-    const folder = req.query.folder
-    const role = req.query.role
-    const type = req.query.type
+    const BUYER_STATUS = 'buyer_status'
+    const SELLER_STATUS = 'seller_status'
+    const SELLER_DRAFT_STATUS = 'seller_status_draft'
+    const { archive, folder, role, type } = req.query
 
     if (type != 'invoice') {
         let msg = `ERROR:${METHOD}: Invalid argument`
@@ -202,36 +194,29 @@ router.get('/getCountOfInvoice', async function (req, res) {
  */
 router.get('/getFolderOfInvoice', async function (req, res) {
     const METHOD = '/getFolderOfInvoice'
+    const BUYER_STATUS = 'buyer_status'
+    const SELLER_STATUS = 'seller_status'
 
-    const archive = req.query.archive
-    const folder = req.query.folder
-    const role = req.query.role
-    const type = req.query.type
-
-    const offset = req.query.offset
-    const limit = req.query.limit
+    const { archive, folder, role, type, offset, limit } = req.query
 
     if (type != 'invoice') {
-        let msg = `ERROR:${METHOD}: Invalid argument`
         res.status(400).json({
             err: 1,
-            msg: msg,
+            msg: `ERROR:${METHOD}: Invalid argument`,
         })
     }
 
     if (role != 'buyer' && role != 'seller') {
-        let msg = `ERROR:${METHOD}: Invalid argument`
         res.status(400).json({
             err: 2,
-            msg: msg,
+            msg: `ERROR:${METHOD}: Invalid argument`,
         })
     }
 
     if (archive != 0) {
-        let msg = `ERROR:${METHOD}: Invalid argument`
         res.status(400).json({
             err: 3,
-            msg: msg,
+            msg: `ERROR:${METHOD}: Invalid argument`,
         })
     }
 
@@ -242,11 +227,9 @@ router.get('/getFolderOfInvoice', async function (req, res) {
         case 'paid':
             break
         default:
-            let msg = `ERROR:${METHOD}: Invalid argument`
-
             res.status(400).json({
                 err: 4,
-                msg: msg,
+                msg: `ERROR:${METHOD}: Invalid argument`,
             })
     }
 
@@ -292,35 +275,29 @@ router.get('/getFolderOfInvoice', async function (req, res) {
  */
 router.get('/getTotalOfInvoice', async function (req, res) {
     const METHOD = '/getTotalOfInvoice'
+    const BUYER_STATUS = 'buyer_status'
+    const SELLER_STATUS = 'seller_status'
 
-    const archive = req.query.archive
-    const folder = req.query.folder
-    const role = req.query.role
-    const type = req.query.type
-
-    const offset = req.query.offset
-    const limit = req.query.limit
-
-    let msg = `ERROR:${METHOD}: Invalid argument`
+    const { archive, folder, role, type, offset, limit } = req.query
 
     if (nullCheckArgsOfInvoiceTray(req) == false) {
         res.status(400).json({
             err: 1,
-            msg: msg,
+            msg: `ERROR:${METHOD}: Invalid argument`,
         })
     }
 
     if (type != 'invoice') {
         res.status(400).json({
             err: 2,
-            msg: msg,
+            msg: `ERROR:${METHOD}: Invalid argument`,
         })
     }
 
     if (archive != 0) {
         res.status(400).json({
             err: 3,
-            msg: msg,
+            msg: `ERROR:${METHOD}: Invalid argument`,
         })
     }
 
@@ -333,7 +310,7 @@ router.get('/getTotalOfInvoice', async function (req, res) {
         default:
             res.status(400).json({
                 err: 4,
-                msg: msg,
+                msg: `ERROR:${METHOD}: Invalid argument`,
             })
     }
 
