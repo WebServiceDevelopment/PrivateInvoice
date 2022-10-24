@@ -38,9 +38,6 @@ router.get('/getCount', async (req, res) => {
     const role = req.query.role === 'buyer' ? 'buyer' : 'seller' // optional
     const archive = parseInt(req.query.archive) || 0 // optional
 
-    console.log('get folder for count')
-    console.log(folder, role, archive)
-
     // Get counts from tray module
     const [err, counts] = await getCount(
         member_did, // did:key:123

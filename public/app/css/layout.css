@@ -3414,7 +3414,6 @@ main.app section article div.document div.body div.stamp {
 	background-position: center;
 	background-size: 80%;
 	background-repeat: no-repeat;
-	background-image: url(../img/100789_rgb.png);
 	opacity: 0.7;
 
 }
@@ -3616,7 +3615,6 @@ main.app section article div.document div.body div.from-widget div.container div
 	top: 0;
 	width: calc(var(--tab-width));
 	height: 100%;
-	background-image: url(../img/100789_rgb.png);
 	background-position: center;
 	background-repeat: no-repeat;
 	background-size: 70%;
@@ -5591,7 +5589,6 @@ main.app section article div.settings-content div.page div.profile-data table td
 	border-radius: 5px;
 	background-color: #fff;
 
-	background-image: url(../img/100789_rgb.png);
 	background-size: 80%;
 	background-position: center;
 	background-repeat: no-repeat;

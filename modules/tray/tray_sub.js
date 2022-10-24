@@ -235,9 +235,6 @@ const getTotal = async (
 			removed_on IS NULL
 	`
 
-    console.log(sql)
-    console.log(member_did, folder, archiveStatus)
-
     const args = [member_did, folder, archiveStatus]
 
     let rows

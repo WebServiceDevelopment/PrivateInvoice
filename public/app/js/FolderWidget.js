@@ -463,21 +463,17 @@ const FolderWidget = function () {
             return
         }
 
-        this.DOM.c.draft.textContent = res[0]
-
+        const count = res[0]
+        this.DOM.c.draft.textContent = count
         if (TrayWidget.STATUS.getActiveLi()) {
             console.log('DraftFolderCount all =' + count)
-
             TrayWidget.SHOWING.setAll(count)
             TrayWidget.DOM.showing.setAll(count)
         }
-
-        //console.log("DraftFolderCount role")
     }
 
     async function api_updateInvoiceDraftCount() {
         await this.API.getDraftsFolderCount()
-
         this.SIMULATE.clickDraftsOfTray()
     }
 
@@ -528,16 +524,11 @@ const FolderWidget = function () {
         archive,
         exec
     ) {
-        //console.log("getInvoiceArchiveCount");
-        //
         if (_argsCheck(role, folder, archive) == false) {
             return
         }
 
         const url = '/api/tray/getCountOfArchive'
-
-        //console.log(archive+":"+folder+":"+role);
-
         let response
         try {
             response = await fetch(
@@ -618,12 +609,9 @@ const FolderWidget = function () {
     }
 
     async function api_getFolderTotal() {
-        let type = this.API.getActiveFolderType()
         let folder = this.API.getActiveFolderFolder()
         let role = this.API.getActiveFolderRole()
         let archive = this.API.getActiveFolderArchive()
-
-        //console.log("getFolderTotal:"+role +":"+folder+":"+archive);
 
         if (archive == 1 && folder == 'paid') {
             TrayWidget.API.displayShowingTotal(null)
@@ -640,13 +628,6 @@ const FolderWidget = function () {
         }
         if (role == null) {
             return
-        }
-
-        const params = {
-            type: type,
-            role: role,
-            folder: folder,
-            archive: archive,
         }
 
         const url = '/api/tray/getTotal'
@@ -683,11 +664,7 @@ const FolderWidget = function () {
     }
 
     function api_renderFolderTotal(msg) {
-        let total = msg.total
-
-        // total = total.toLocaleString('en-US', {style:'currency', currency: 'USD'});
-        total = total
-
+        const { total } = msg
         TrayWidget.API.displayShowingTotal(total)
     }
 
