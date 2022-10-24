@@ -18,16 +18,10 @@
     
 **/
 
-const {
-    getCount,
-    getFolder,
-    getTotal,
-    nullCheckArgsOfInvoiceTray,
-} = require('./tray_sub.js')
+const { getCount, getFolder, getTotal } = require('./tray_sub.js')
 
 module.exports = {
     getCount,
     getFolder,
     getTotal,
-    nullCheckArgsOfInvoiceTray,
 }

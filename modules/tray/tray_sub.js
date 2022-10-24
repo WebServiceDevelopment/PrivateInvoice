@@ -41,11 +41,12 @@ const getCount = async (
 ) => {
     const table_did = role === 'seller' ? 'seller_did' : 'buyer_did'
     const archive = role === 'seller' ? 'seller_archived' : 'buyer_archived'
-    const table = role === 'seller' ? 'seller_status' : 'buyer_status'
+    let table = role === 'seller' ? 'seller_status' : 'buyer_status'
     const counts = new Array()
     const query = new Array()
 
-    if (folder) {
+    if (folder === 'draft') {
+        table = 'seller_status_draft'
         query.push({
             folder,
             archiveStatus,
@@ -135,8 +136,12 @@ const getFolder = async (
 ) => {
     const table_did = role === 'seller' ? 'seller_did' : 'buyer_did'
     const archive = role === 'seller' ? 'seller_archived' : 'buyer_archived'
-    const table = role === 'seller' ? 'seller_status' : 'buyer_status'
+    let table = role === 'seller' ? 'seller_status' : 'buyer_status'
     const sort_rule = 'seller_last_action DESC'
+
+    if (folder === 'draft') {
+        table = 'seller_status_draft'
+    }
 
     limit = limit > 200 ? 200 : limit
     limit = limit < 1 ? 1 : limit
@@ -207,7 +212,11 @@ const getTotal = async (
 ) => {
     const table_did = role === 'seller' ? 'seller_did' : 'buyer_did'
     const archive = role === 'seller' ? 'seller_archived' : 'buyer_archived'
-    const table = role === 'seller' ? 'seller_status' : 'buyer_status'
+    let table = role === 'seller' ? 'seller_status' : 'buyer_status'
+
+    if (folder === 'draft') {
+        table = 'seller_status_draft'
+    }
 
     const sql = `
 		SELECT
@@ -226,6 +235,9 @@ const getTotal = async (
 			removed_on IS NULL
 	`
 
+    console.log(sql)
+    console.log(member_did, folder, archiveStatus)
+
     const args = [member_did, folder, archiveStatus]
 
     let rows
@@ -236,9 +248,7 @@ const getTotal = async (
     }
 
     let total = BigInt(0)
-
     let v
-
     for (let i = 0; i < rows.length; i++) {
         v = rows[i].amount_due
 
@@ -276,7 +286,7 @@ const getTotal = async (
         total += BigInt(parseInt(v))
     }
 
-    const t = currency(t.toString(), config.CURRENCY).format(true)
+    const t = currency(total.toString(), config.CURRENCY).format(true)
     return [{ total: t }, 0]
 }
 
