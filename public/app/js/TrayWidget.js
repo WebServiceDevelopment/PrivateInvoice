@@ -583,9 +583,7 @@ const TrayWidget = function () {
         }
 
         this.DOM.showing.setStart(this.SHOWING.setStart(start))
-
         this.DOM.showing.setEnd(this.SHOWING.setEnd(end))
-
         let max = FolderWidget.API.getCountOfActiveFolder()
 
         if (max == null) {

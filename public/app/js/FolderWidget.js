@@ -528,7 +528,8 @@ const FolderWidget = function () {
             return
         }
 
-        const url = '/api/tray/getCountOfArchive'
+        const url = `/api/tray/getCount?role=${role}&archive=1&folder=${folder}`
+
         let response
         try {
             response = await fetch(
