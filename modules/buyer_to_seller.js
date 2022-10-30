@@ -18,32 +18,30 @@
     
 **/
 
-"use strict";
+'use strict'
 
 // Import sub
 
 // Import Router
 
 // Libraries
-const axios                 = require('axios')
-
+const axios = require('axios')
 
 // Database
-
+const db = require('../database.js')
 
 // Exports
 module.exports = {
-	connect					: _seller_connect,
-	unconfirm				: seller_unconfirm,
-	paymentReservation		: seller_paymentReservation,
-	cancelPaymentReservation: seller_cancelPaymentReservation,
+    connect: _seller_connect,
+    unconfirm: seller_unconfirm,
+    paymentReservation: seller_paymentReservation,
+    cancelPaymentReservation: seller_cancelPaymentReservation,
 
-	rollbackReturnToSent	: seller_rollbackReturnToSent,
-	rollbackConfirmToSent	: seller_rollbackConfirmToSent,
-	rollbackSentToConfirm	: seller_rollbackSentToConfirm,
-	rollbackPaidToConfirm	: seller_rollbackPaidToConfirm,
-
-	getAccountOfSellerWallet: _getAccountOfSellerWallet,
+    rollbackReturnToSent: seller_rollbackReturnToSent,
+    rollbackConfirmToSent: seller_rollbackConfirmToSent,
+    rollbackSentToConfirm: seller_rollbackSentToConfirm,
+    rollbackPaidToConfirm: seller_rollbackPaidToConfirm,
+    getAccountOfSellerWallet: _getAccountOfSellerWallet,
 }
 
 //------------------------------- export modules -------------------------------
@@ -52,376 +50,378 @@ module.exports = {
  * getAccountOfSellerWallet
  */
 async function _getAccountOfSellerWallet(seller_host, seller_did, buyer_did) {
+    const url = `${seller_host}/api/message/tellMeYourWalletAccount`
 
-    const  url = `${seller_host}/api/message/tellMeYourWalletAccount`;
+    let result, msg
 
-    const params = {
-        method : 'post',
-        url : url,
-        data : {
-            seller_did,
-            buyer_did
-        }
-    };
+    const sql = `
+        SELECT
+            remote_wallet_address
+        FROM
+            contacts
+        WHERE
+            remote_member_did = ?
+        AND
+            local_member_did = ?
+    `
 
-    let response;
+    const args = [seller_did, buyer_did]
+
     try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.responce) {
-            response = {
-                status : err.response.status,
-                data : err.message
-            }
-        } else {
-            response = {
-                status : 500,
-                data : null
-            }
-        }
+        result = await db.selectOne(sql, args)
+    } catch (err) {
+        console.log(err)
+
+        msg = 'Select error'
+        return [false, msg]
     }
 
-    if ( response == null) {
-        let msg = "Not Found."
-        response = {
-            status : 404,
-            data : msg
-        }
+    if (!result) {
+        msg = 'seller_host not found for seller_did:'
+        return [null, msg]
     }
 
-    return [ response.status, response.data ];
-
+    const { remote_wallet_address } = result
+    return [remote_wallet_address, null]
 }
 
 /*
  * seller_connect
  */
 async function _seller_connect(seller_host, seller_uuid, buyer_did) {
-
-    const  url = `${seller_host}/api/message/sellerToConnect`;
+    const url = `${seller_host}/api/message/sellerToConnect`
 
     const params = {
-        method : 'post',
-        url : url,
-        data : {
+        method: 'post',
+        url: url,
+        data: {
             seller_uuid,
-            buyer_did
-        }
-    };
+            buyer_did,
+        },
+    }
 
-    let response;
+    let response
     try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.responce) {
+        response = await axios(params)
+    } catch (err) {
+        if (err.responce) {
             response = {
-                status : err.response.status,
-                data : err.message
+                status: err.response.status,
+                data: err.message,
             }
         } else {
-			console.log(err);
+            console.log(err)
             response = {
-                status : 500,
-                data : null
+                status: 500,
+                data: null,
             }
         }
     }
 
-    if ( response == null) {
-		let msg = "Not Found."
-		response = {
-			status : 404,
-			data : msg
-		}
+    if (response == null) {
+        let msg = 'Not Found.'
+        response = {
+            status: 404,
+            data: msg,
+        }
     }
 
-    return [ response.status, response.data ];
-
+    return [response.status, response.data]
 }
 
 /*
  * seller_unconfirm
  */
 async function seller_unconfirm(seller_host, document_uuid, buyer_did) {
-
-    const url = `${seller_host}/api/message/sellerToUnconfirm`;
-
-    const params = {
-        method : 'post',
-        url : url,
-        data : {
-            document_uuid,
-            buyer_did
-        }
-    };
-
-    let response;
-    try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
-            response = {
-                status : 500,
-                data : 'ECONNRESET'
-            }
-        } else {
-            response = err.response;
-        }
-    }
-
-    if ( response == null) {
-		let msg = "Not Found."
-		response = {
-			status : 404,
-			data : msg
-		}
-    }
-    return [ response.status, response.data ];
-
-}
-
-/*
-* paymentReservation
-*/
-async function seller_paymentReservation(seller_host, document_uuid, buyer_did) {
-
-    const url = `${seller_host}/api/message/sellerToPaymentReservation`;
+    const url = `${seller_host}/api/message/sellerToUnconfirm`
 
     const params = {
-        method : 'post',
-        url : url,
-        data : {
+        method: 'post',
+        url: url,
+        data: {
             document_uuid,
-            buyer_did
-        }
-    };
+            buyer_did,
+        },
+    }
 
-    let response;
+    let response
     try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
+        response = await axios(params)
+    } catch (err) {
+        if (err.code === 'ECONNRESET') {
             response = {
-                status : 500,
-                data : 'ECONNRESET'
+                status: 500,
+                data: 'ECONNRESET',
             }
         } else {
-            response = err.response;
+            response = err.response
         }
     }
 
-    if ( response == null) {
-		let msg = "Not Found."
+    if (response == null) {
+        let msg = 'Not Found.'
         response = {
-			status : 404,
-			data : msg
-		}
+            status: 404,
+            data: msg,
+        }
     }
-    return [ response.status, response.data ];
-
+    return [response.status, response.data]
 }
 
 /*
-* cancelPaymentReservation
-*/
-async function seller_cancelPaymentReservation(seller_host, document_uuid, buyer_did) {
-
-    const url = `${seller_host}/api/message/sellerToCancelPaymentReservation`;
+ * paymentReservation
+ */
+async function seller_paymentReservation(
+    seller_host,
+    document_uuid,
+    buyer_did
+) {
+    const url = `${seller_host}/api/message/sellerToPaymentReservation`
 
     const params = {
-        method : 'post',
-        url : url,
-        data : {
+        method: 'post',
+        url: url,
+        data: {
             document_uuid,
-            buyer_did
-        }
-    };
+            buyer_did,
+        },
+    }
 
-    let response;
+    let response
     try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
+        response = await axios(params)
+    } catch (err) {
+        if (err.code === 'ECONNRESET') {
             response = {
-                status : 500,
-                data : 'ECONNRESET'
+                status: 500,
+                data: 'ECONNRESET',
             }
         } else {
-            response = err.response;
+            response = err.response
         }
     }
 
-    if ( response == null) {
-		let msg = "Not Found."
+    if (response == null) {
+        let msg = 'Not Found.'
         response = {
-			status : 404,
-			data : msg
-		}
+            status: 404,
+            data: msg,
+        }
     }
-    return [ response.status, response.data ];
-
+    return [response.status, response.data]
 }
 
 /*
-*  return to sent
-*/
-async function seller_rollbackReturnToSent(seller_host, document_uuid, buyer_did) {
-
-    const url = `${seller_host}/api/message/sellerRollbackReturnToSent`;
+ * cancelPaymentReservation
+ */
+async function seller_cancelPaymentReservation(
+    seller_host,
+    document_uuid,
+    buyer_did
+) {
+    const url = `${seller_host}/api/message/sellerToCancelPaymentReservation`
 
     const params = {
-        method : 'post',
-        url : url,
-        data : {
+        method: 'post',
+        url: url,
+        data: {
             document_uuid,
-            buyer_did
-        }
-    };
+            buyer_did,
+        },
+    }
 
-    let response;
+    let response
     try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
+        response = await axios(params)
+    } catch (err) {
+        if (err.code === 'ECONNRESET') {
             response = {
-                status : 500,
-                data : 'ECONNRESET'
+                status: 500,
+                data: 'ECONNRESET',
             }
         } else {
-            response = err.response;
+            response = err.response
         }
     }
-    if ( response == null) {
-        let msg = "Not Found."
+
+    if (response == null) {
+        let msg = 'Not Found.'
         response = {
-            status : 404,
-            data : msg
+            status: 404,
+            data: msg,
         }
     }
-
-    return [ response.status, response.data ];
-
+    return [response.status, response.data]
 }
 
 /*
-* confirm to sent
-*/
-async function seller_rollbackConfirmToSent(seller_host, document_uuid, buyer_did) {
-
-    const url = `${seller_host}/api/message/sellerRollbackConfirmToSent`;
-
-    const params = {
-        method : 'post',
-        url : url,
-        data : {
-            document_uuid,
-            buyer_did
-        }
-    };
-
-    let response;
-    try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
-            response = {
-                status : 500,
-                data : 'ECONNRESET'
-            }
-        } else {
-            response = err.response;
-        }
-    }
-
-    if ( response == null) {
-		let msg = "Not Found."
-		response = {
-			status : 404,
-			data : msg
-		}
-    }
-    return [ response.status, response.data ];
-
-}
-
-/*
-* sent to confirm
-*/
-async function seller_rollbackSentToConfirm(seller_host, document_uuid, buyer_did) {
-
-    const url = `${seller_host}/api/message/sellerRollbackSentToConfirm`;
+ *  return to sent
+ */
+async function seller_rollbackReturnToSent(
+    seller_host,
+    document_uuid,
+    buyer_did
+) {
+    const url = `${seller_host}/api/message/sellerRollbackReturnToSent`
 
     const params = {
-        method : 'post',
-        url : url,
-        data : {
+        method: 'post',
+        url: url,
+        data: {
             document_uuid,
-            buyer_did
-        }
-    };
+            buyer_did,
+        },
+    }
 
-    let response;
+    let response
     try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
+        response = await axios(params)
+    } catch (err) {
+        if (err.code === 'ECONNRESET') {
             response = {
-                status : 500,
-                data : 'ECONNRESET'
+                status: 500,
+                data: 'ECONNRESET',
             }
         } else {
-            response = err.response;
+            response = err.response
         }
     }
-
-    if ( response == null) {
-		let msg = "Not Found."
-		response = {
-			status : 404,
-			data : msg
-		}
-    }
-    return [ response.status, response.data ];
-
-}
-
-/*
-* paid to confirm
-*/
-async function seller_rollbackPaidToConfirm(seller_host, document_uuid, buyer_did) {
-
-    const url = `${seller_host}/api/message/sellerRollbackPaidToConfirm`;
-
-    const params = {
-        method : 'post',
-        url : url,
-        data : {
-            document_uuid,
-            buyer_did
-        }
-    };
-
-    let response;
-    try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
-            response = {
-                status : 500,
-                data : 'ECONNRESET'
-            }
-        } else {
-            response = err.response;
-        }
-    }
-
-    if ( response == null) {
-		let msg = "Not Found."
+    if (response == null) {
+        let msg = 'Not Found.'
         response = {
-			status : 404,
-			data : msg
-		}
+            status: 404,
+            data: msg,
+        }
     }
-    return [ response.status, response.data ];
 
+    return [response.status, response.data]
+}
+
+/*
+ * confirm to sent
+ */
+async function seller_rollbackConfirmToSent(
+    seller_host,
+    document_uuid,
+    buyer_did
+) {
+    const url = `${seller_host}/api/message/sellerRollbackConfirmToSent`
+
+    const params = {
+        method: 'post',
+        url: url,
+        data: {
+            document_uuid,
+            buyer_did,
+        },
+    }
+
+    let response
+    try {
+        response = await axios(params)
+    } catch (err) {
+        if (err.code === 'ECONNRESET') {
+            response = {
+                status: 500,
+                data: 'ECONNRESET',
+            }
+        } else {
+            response = err.response
+        }
+    }
+
+    if (response == null) {
+        let msg = 'Not Found.'
+        response = {
+            status: 404,
+            data: msg,
+        }
+    }
+    return [response.status, response.data]
+}
+
+/*
+ * sent to confirm
+ */
+async function seller_rollbackSentToConfirm(
+    seller_host,
+    document_uuid,
+    buyer_did
+) {
+    const url = `${seller_host}/api/message/sellerRollbackSentToConfirm`
+
+    const params = {
+        method: 'post',
+        url: url,
+        data: {
+            document_uuid,
+            buyer_did,
+        },
+    }
+
+    let response
+    try {
+        response = await axios(params)
+    } catch (err) {
+        if (err.code === 'ECONNRESET') {
+            response = {
+                status: 500,
+                data: 'ECONNRESET',
+            }
+        } else {
+            response = err.response
+        }
+    }
+
+    if (response == null) {
+        let msg = 'Not Found.'
+        response = {
+            status: 404,
+            data: msg,
+        }
+    }
+    return [response.status, response.data]
+}
+
+/*
+ * paid to confirm
+ */
+async function seller_rollbackPaidToConfirm(
+    seller_host,
+    document_uuid,
+    buyer_did
+) {
+    const url = `${seller_host}/api/message/sellerRollbackPaidToConfirm`
+
+    const params = {
+        method: 'post',
+        url: url,
+        data: {
+            document_uuid,
+            buyer_did,
+        },
+    }
+
+    let response
+    try {
+        response = await axios(params)
+    } catch (err) {
+        if (err.code === 'ECONNRESET') {
+            response = {
+                status: 500,
+                data: 'ECONNRESET',
+            }
+        } else {
+            response = err.response
+        }
+    }
+
+    if (response == null) {
+        let msg = 'Not Found.'
+        response = {
+            status: 404,
+            data: msg,
+        }
+    }
+    return [response.status, response.data]
 }

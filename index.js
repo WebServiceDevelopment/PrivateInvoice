@@ -176,10 +176,7 @@ app.use('/api/invoice', require('./routes/invoice/seller_invoice_trash.js'))
 app.use('/api/invoice', require('./routes/invoice/invoice_document.js'))
 app.use('/api/invoice', require('./routes/invoice/softDelete.js'))
 
-app.use('/api/tray', require('./routes/tray/tray.js'))
-app.use('/api/tray', require('./routes/tray/tray_drafts.js'))
-app.use('/api/tray', require('./routes/tray/tray_archive.js'))
-
+app.use('/api/tray', require('./routes/tray.js'))
 app.use('/api/contacts', require('./routes/contacts.js'))
 app.use('/api/session', require('./routes/session/'))
 app.use('/api/settings', require('./routes/settings/'))

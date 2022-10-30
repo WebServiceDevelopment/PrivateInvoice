@@ -1,7 +1,7 @@
 {
 	"info": {
-		"_postman_id": "0c68e31f-b2cb-41e1-872c-994780d7c037",
-		"name": "Create Alice Account",
+		"_postman_id": "ecc2cfd4-004f-4182-b135-439b06d532e1",
+		"name": "Private Invoice Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "20243281"
 	},
@@ -558,7 +558,7 @@
 					"query": [
 						{
 							"key": "",
-							"value": null,
+							"value": "",
 							"disabled": true
 						}
 					]
@@ -857,8 +857,7 @@
 							"\r",
 							"pm.test(\"The response has all properties\", () => {\r",
 							"  const responseJson = pm.response.json();\r",
-							"  pm.expect(responseJson.err).to.eql(0);\r",
-							"  pm.expect(responseJson.msg[0]).not.to.eql(0)\r",
+							"  pm.expect(responseJson[0]).not.to.eql(0)\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
@@ -880,7 +879,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid]&role=buyer&type=invoice",
+					"raw": "http://127.0.0.1:3000/api/tray/getCount?role=buyer",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -892,24 +891,12 @@
 					"path": [
 						"api",
 						"tray",
-						"getCountOfInvoice"
+						"getCount"
 					],
 					"query": [
 						{
-							"key": "archive",
-							"value": "0"
-						},
-						{
-							"key": "folder",
-							"value": "[sent,returned,confirmed,paid]"
-						},
-						{
 							"key": "role",
 							"value": "buyer"
-						},
-						{
-							"key": "type",
-							"value": "invoice"
 						}
 					]
 				}
@@ -929,8 +916,7 @@
 							"\r",
 							"pm.test(\"The response has all properties\", () => {\r",
 							"  const responseJson = pm.response.json();\r",
-							"  pm.expect(responseJson.err).to.eql(0);\r",
-							"  pm.expect(responseJson.msg[0]).not.to.eql(0)\r",
+							"  pm.expect(responseJson[0]).not.to.eql(0)\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
@@ -952,7 +938,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid,draft]&role=seller&type=invoice",
+					"raw": "http://127.0.0.1:3000/api/tray/getCount",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -964,25 +950,7 @@
 					"path": [
 						"api",
 						"tray",
-						"getCountOfInvoice"
-					],
-					"query": [
-						{
-							"key": "archive",
-							"value": "0"
-						},
-						{
-							"key": "folder",
-							"value": "[sent,returned,confirmed,paid,draft]"
-						},
-						{
-							"key": "role",
-							"value": "seller"
-						},
-						{
-							"key": "type",
-							"value": "invoice"
-						}
+						"getCount"
 					]
 				}
 			},
@@ -1064,8 +1032,7 @@
 							"\r",
 							"pm.test(\"The response has all properties\", () => {\r",
 							"  const responseJson = pm.response.json();\r",
-							"  pm.expect(responseJson.err).to.eql(0);\r",
-							"  pm.expect(responseJson.msg[2]).not.to.eql(0)\r",
+							"  pm.expect(responseJson[2]).not.to.eql(0)\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
@@ -1087,7 +1054,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid]&role=buyer&type=invoice",
+					"raw": "http://127.0.0.1:3000/api/tray/getCount?role=buyer",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1099,24 +1066,12 @@
 					"path": [
 						"api",
 						"tray",
-						"getCountOfInvoice"
+						"getCount"
 					],
 					"query": [
 						{
-							"key": "archive",
-							"value": "0"
-						},
-						{
-							"key": "folder",
-							"value": "[sent,returned,confirmed,paid]"
-						},
-						{
 							"key": "role",
 							"value": "buyer"
-						},
-						{
-							"key": "type",
-							"value": "invoice"
 						}
 					]
 				}
@@ -1136,8 +1091,7 @@
 							"\r",
 							"pm.test(\"The response has all properties\", () => {\r",
 							"  const responseJson = pm.response.json();\r",
-							"  pm.expect(responseJson.err).to.eql(0);\r",
-							"  pm.expect(responseJson.msg[2]).not.to.eql(0)\r",
+							"  pm.expect(responseJson[2]).not.to.eql(0)\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
@@ -1159,7 +1113,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid,draft]&role=seller&type=invoice",
+					"raw": "http://127.0.0.1:3000/api/tray/getCount",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1171,25 +1125,7 @@
 					"path": [
 						"api",
 						"tray",
-						"getCountOfInvoice"
-					],
-					"query": [
-						{
-							"key": "archive",
-							"value": "0"
-						},
-						{
-							"key": "folder",
-							"value": "[sent,returned,confirmed,paid,draft]"
-						},
-						{
-							"key": "role",
-							"value": "seller"
-						},
-						{
-							"key": "type",
-							"value": "invoice"
-						}
+						"getCount"
 					]
 				}
 			},
@@ -1276,8 +1212,7 @@
 							"\r",
 							"pm.test(\"The response has all properties\", () => {\r",
 							"  const responseJson = pm.response.json();\r",
-							"  pm.expect(responseJson.err).to.eql(0);\r",
-							"  pm.expect(responseJson.msg[3]).not.to.eql(0)\r",
+							"  pm.expect(responseJson[3]).not.to.eql(0)\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
@@ -1299,7 +1234,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid,draft]&role=seller&type=invoice",
+					"raw": "http://127.0.0.1:3000/api/tray/getCount",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1311,25 +1246,7 @@
 					"path": [
 						"api",
 						"tray",
-						"getCountOfInvoice"
-					],
-					"query": [
-						{
-							"key": "archive",
-							"value": "0"
-						},
-						{
-							"key": "folder",
-							"value": "[sent,returned,confirmed,paid,draft]"
-						},
-						{
-							"key": "role",
-							"value": "seller"
-						},
-						{
-							"key": "type",
-							"value": "invoice"
-						}
+						"getCount"
 					]
 				}
 			},
@@ -1348,8 +1265,7 @@
 							"\r",
 							"pm.test(\"The response has all properties\", () => {\r",
 							"  const responseJson = pm.response.json();\r",
-							"  pm.expect(responseJson.err).to.eql(0);\r",
-							"  pm.expect(responseJson.msg[3]).not.to.eql(0)\r",
+							"  pm.expect(responseJson[3]).not.to.eql(0)\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
@@ -1371,7 +1287,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCountOfInvoice?archive=0&folder=[sent,returned,confirmed,paid]&role=buyer&type=invoice",
+					"raw": "http://127.0.0.1:3000/api/tray/getCount?role=buyer",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1383,24 +1299,12 @@
 					"path": [
 						"api",
 						"tray",
-						"getCountOfInvoice"
+						"getCount"
 					],
 					"query": [
 						{
-							"key": "archive",
-							"value": "0"
-						},
-						{
-							"key": "folder",
-							"value": "[sent,returned,confirmed,paid]"
-						},
-						{
 							"key": "role",
 							"value": "buyer"
-						},
-						{
-							"key": "type",
-							"value": "invoice"
 						}
 					]
 				}

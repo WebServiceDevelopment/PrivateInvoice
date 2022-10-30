@@ -482,25 +482,20 @@ router.get('/getCurrentBalanceOfBuyer', async function (req, res) {
     // 7.
     // Get seller account
     //
-    const [code7, data7] = await to_seller.getAccountOfSellerWallet(
+    const [ethAddr, err7] = await to_seller.getAccountOfSellerWallet(
         seller_host,
         seller_did,
         member_did
     )
 
-    if (code7 != 200) {
-        let msg = `ERROR:${METHOD}: Could not get account`
-
-        res.status(400).json({
+    if (err7) {
+        return res.status(400).json({
             err: 7,
-            msg: msg,
+            msg: `ERROR:${METHOD}: Could not get account`,
         })
-        return
     }
 
-    const msg = data7.msg
-
-    const to_account = msg.account
+    const to_account = ethAddr
 
     // 8.
     // callObject
@@ -513,7 +508,8 @@ router.get('/getCurrentBalanceOfBuyer', async function (req, res) {
 
     // 9.
     // getBalance
-    //
+
+    console.log(from_account)
     const [balanceWei, err9] = await eth.getBalance(web3, from_account)
 
     if (err9) {
@@ -555,50 +551,6 @@ router.get('/getCurrentBalanceOfBuyer', async function (req, res) {
         })
         return
     }
-
-    /*
-     *	const blockCount = 4;
-     *	const newestBlock = "latest";
-     *	const rewardPercentiles = ["25", "50", "75"];
-     *
-     *	const [ estimateGas, err11 ] = await  eth.getFeeHistory(web3, blockCount, newestBlock, rewardPercentiles ) ;
-     *	if(err11) {
-     *		console.log("error 11:estimateGas,"+err11);
-     *		res.json({
-     *			err : err11,
-     *			msg : null
-     *		});
-     *		return;
-     *	}
-     *
-     *	function formatFeeHistory(result, includePending) {
-     *  let blockNum = result.oldestBlock;
-     *  let index = 0;
-     *  const blocks = [];
-     *  while (blockNum < result.oldestBlock + historicalBlocks) {
-     *    blocks.push({
-     *      number: blockNum,
-     *      baseFeePerGas: Number(result.baseFeePerGas[index]),
-     *      gasUsedRatio: Number(result.gasUsedRatio[index]),
-     *      priorityFeePerGas: result.reward[index].map(x => Number(x)),
-     *    });
-     *    blockNum += 1;
-     *    index += 1;
-     *  }
-     *  if (includePending) {
-     *    blocks.push({
-     *      number: "pending",
-     *      baseFeePerGas: Number(result.baseFeePerGas[historicalBlocks]),
-     *      gasUsedRatio: NaN,
-     *      priorityFeePerGas: [],
-     *    });
-     *  }
-     *  return blocks;
-     *}
-     *
-     *const blocks = formatFeeHistory(feeHistory, false);
-     *console.log(blocks);
-     */
 
     // 12.
     // Add the integer part and the decimal point separatelya.
