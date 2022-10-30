@@ -30,8 +30,6 @@ module.exports = router
 const { getCount, getFolder, getTotal } = require('../modules/tray')
 
 router.get('/count', async (req, res) => {
-    console.log('count!!!!')
-
     // Get member did from session data
     const { member_did } = req.session.data // did:key:123
 
@@ -52,8 +50,6 @@ router.get('/count', async (req, res) => {
     if (err) {
         return res.status(400).end('Could not get count')
     }
-
-    console.log(counts)
 
     // Return number[]
     res.json(counts)
