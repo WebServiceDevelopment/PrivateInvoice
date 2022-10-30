@@ -51,6 +51,9 @@ const getCount = async (
             folder,
             archiveStatus,
         })
+    } else if (archive) {
+        table =
+            role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
     } else if (role === 'buyer') {
         query.push(
             {
@@ -141,6 +144,9 @@ const getFolder = async (
 
     if (folder === 'draft') {
         table = 'seller_status_draft'
+    } else if (archive) {
+        table =
+            role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
     }
 
     limit = limit > 200 ? 200 : limit
@@ -216,6 +222,9 @@ const getTotal = async (
 
     if (folder === 'draft') {
         table = 'seller_status_draft'
+    } else if (archive) {
+        table =
+            role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
     }
 
     const sql = `
