@@ -283,7 +283,7 @@ const FolderWidget = function () {
             { type: 'proof', role: 'seller', folder: 'confirmed', archive: 0 },
         ]
 
-        const url = '/api/tray/getCount'
+        const url = '/api/tray/count'
 
         let ajax = new XMLHttpRequest()
         ajax.open('POST', url)
@@ -321,7 +321,7 @@ const FolderWidget = function () {
             { type: 'proof', role: 'buyer', folder: 'confirmed', archive: 0 },
         ]
 
-        const url = '/api/tray/getCount'
+        const url = '/api/tray/count'
 
         const opts = {
             method: 'POST',
@@ -360,10 +360,10 @@ const FolderWidget = function () {
     /*
      * api_getCFolderCount
      *
-     * '/api/tray/getCountOfInvoice'
+     * '/api/tray/countOfInvoice'
      */
     async function api_getCFolderCount() {
-        const url = `/api/tray/getCount?archive=0&role=seller`
+        const url = `/api/tray/count?archive=0&role=seller`
         let response
 
         try {
@@ -398,10 +398,10 @@ const FolderWidget = function () {
     /*
      * api_getDFolderCount
      *
-     * '/api/tray/getCount'
+     * '/api/tray/count'
      */
     async function api_getDFolderCount() {
-        const url = `/api/tray/getCount?archive=0&role=buyer`
+        const url = `/api/tray/count?archive=0&role=buyer`
 
         let response
         try {
@@ -435,10 +435,10 @@ const FolderWidget = function () {
     /*
      * api_getDraftsFolderCount
      *
-     * '/api/tray/getCount';
+     * '/api/tray/count';
      */
     async function api_getDraftsFolderCount() {
-        const url = `/api/tray/getCount?folder=draft`
+        const url = `/api/tray/count?folder=draft`
 
         const opts = {
             method: 'GET',
@@ -488,7 +488,7 @@ const FolderWidget = function () {
                 return
         }
 
-        const url = `/api/tray/getCount?role=${role}&archive=${archive}&folder=${folder}`
+        const url = `/api/tray/count?role=${role}&archive=${archive}&folder=${folder}`
 
         let response
         try {
@@ -528,7 +528,7 @@ const FolderWidget = function () {
             return
         }
 
-        const url = `/api/tray/getCount?role=${role}&archive=1&folder=${folder}`
+        const url = `/api/tray/count?role=${role}&archive=1&folder=${folder}`
 
         let response
         try {
@@ -631,7 +631,7 @@ const FolderWidget = function () {
             return
         }
 
-        const url = '/api/tray/getTotal'
+        const url = '/api/tray/total'
 
         let response
         try {

@@ -879,7 +879,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCount?role=buyer",
+					"raw": "http://127.0.0.1:3000/api/tray/count?role=buyer",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -891,7 +891,7 @@
 					"path": [
 						"api",
 						"tray",
-						"getCount"
+						"count"
 					],
 					"query": [
 						{
@@ -938,7 +938,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCount",
+					"raw": "http://127.0.0.1:3000/api/tray/count",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -950,7 +950,7 @@
 					"path": [
 						"api",
 						"tray",
-						"getCount"
+						"count"
 					]
 				}
 			},
@@ -1054,7 +1054,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCount?role=buyer",
+					"raw": "http://127.0.0.1:3000/api/tray/count?role=buyer",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1066,7 +1066,7 @@
 					"path": [
 						"api",
 						"tray",
-						"getCount"
+						"count"
 					],
 					"query": [
 						{
@@ -1113,7 +1113,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCount",
+					"raw": "http://127.0.0.1:3000/api/tray/count",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1125,7 +1125,7 @@
 					"path": [
 						"api",
 						"tray",
-						"getCount"
+						"count"
 					]
 				}
 			},
@@ -1234,7 +1234,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCount",
+					"raw": "http://127.0.0.1:3000/api/tray/count",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1246,7 +1246,7 @@
 					"path": [
 						"api",
 						"tray",
-						"getCount"
+						"count"
 					]
 				}
 			},
@@ -1287,7 +1287,7 @@
 					}
 				],
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/tray/getCount?role=buyer",
+					"raw": "http://127.0.0.1:3000/api/tray/count?role=buyer",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1299,7 +1299,7 @@
 					"path": [
 						"api",
 						"tray",
-						"getCount"
+						"count"
 					],
 					"query": [
 						{

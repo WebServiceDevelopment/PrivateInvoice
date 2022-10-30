@@ -51,7 +51,7 @@ const getCount = async (
             folder,
             archiveStatus,
         })
-    } else if (archive) {
+    } else if (archiveStatus) {
         table =
             role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
     } else if (role === 'buyer') {
@@ -144,7 +144,7 @@ const getFolder = async (
 
     if (folder === 'draft') {
         table = 'seller_status_draft'
-    } else if (archive) {
+    } else if (archiveStatus) {
         table =
             role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
     }
@@ -222,7 +222,7 @@ const getTotal = async (
 
     if (folder === 'draft') {
         table = 'seller_status_draft'
-    } else if (archive) {
+    } else if (archiveStatus) {
         table =
             role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
     }
