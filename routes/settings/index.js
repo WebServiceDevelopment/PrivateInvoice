@@ -29,20 +29,9 @@ module.exports = router
 // Import Modules
 const {
     setProfileImage,
-    setCompanyLogo,
     getProfileImage,
-    getCompanyLogo,
-    updateOrganization,
     updateProfile,
 } = require('../../modules/settings_sub.js')
-
-// Libraries
-
-const uuidv1 = require('uuid').v1
-
-// Database
-
-// End Points
 
 /*
  * 1.
@@ -54,34 +43,6 @@ router.post('/setProfileImage', async function (req, res) {
     const [bool, err] = await setProfileImage(
         req.body.dataUrl,
         req.session.member_did
-    )
-
-    if (err) {
-        let msg = `Error:${METHOD}: Invalid request.`
-
-        res.status(400).json({
-            err: 1,
-            msg: msg,
-        })
-        return
-    }
-
-    res.json({
-        err: 0,
-        msg: 'okay',
-    })
-})
-
-/*
- * 2.
- * setCompanyLogo
- */
-router.post('/setCompanyLogo', async function (req, res) {
-    const METHOD = '/setCompanyLogo'
-
-    const [bool, err] = await setCompanyLogo(
-        req.body.dataUrl,
-        req.session.data.member_did
     )
 
     if (err) {
@@ -126,71 +87,6 @@ router.post('/getProfileImage', async function (req, res) {
     res.json({
         err: 0,
         msg: row,
-    })
-})
-
-/*
- * 4.
- * getCompanyLogo
- */
-router.post('/getCompanyLogo', async function (req, res) {
-    const METHOD = '/getCompanyLogo'
-
-    const [row, err] = await getCompanyLogo(req.session.data.avatar_uuid)
-
-    if (err) {
-        let msg = `Error:${METHOD}: Invalid request.`
-
-        res.status(400).json({
-            err: 1,
-            msg: msg,
-        })
-        return
-    }
-
-    if (row && row.dataUrl) {
-        row.dataUrl = row.dataUrl.toString()
-    }
-
-    res.json({
-        err: 0,
-        msg: row,
-    })
-})
-
-/*
- * 5.
- * Should be in settings (profile)
- */
-router.post('/updateOrganization', async function (req, res) {
-    const METHOD = '/updateOrganization'
-
-    const [bool, err] = await updateOrganization(req)
-    if (err) {
-        let msg = `Error:${METHOD}: Invalid request.`
-
-        res.status(400).json({
-            err: 1,
-            msg: msg,
-        })
-        return
-    }
-
-    // Step 4 : Update Current Redis Session
-
-    req.session.data.organization_name = req.body.organization_name
-    req.session.data.organization_postcode = req.body.organization_postcode
-    req.session.data.organization_address = req.body.organization_address
-    req.session.data.organization_building = req.body.organization_building
-    req.session.data.organization_department = req.body.organization_department
-    req.session.data.organization_tax_id = req.body.organization_tax_id
-    req.session.data.addressCountry = req.body.addressCountry
-    req.session.data.addressRegion = req.body.addressRegion
-    req.session.data.addressCity = req.body.addressCity
-
-    res.json({
-        err: 0,
-        msg: 'okay',
     })
 })
 

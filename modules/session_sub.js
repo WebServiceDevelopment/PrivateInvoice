@@ -364,16 +364,15 @@ async function _getSessionData(member_did) {
     }
 
     // 3.
-
-    ;(member_data.organization_name = org.organization_name),
-        (member_data.organization_postcode = org.organization_postcode),
-        (member_data.organization_address = org.organization_address),
-        (member_data.organization_building = org.organization_building),
-        (member_data.organization_department = org.organization_department),
-        (member_data.organization_tax_id = org.organization_tax_id),
-        (member_data.addressCountry = org.addressCountry),
-        (member_data.addressRegion = org.addressRegion),
-        (member_data.addressCity = org.addressCity)
+    member_data.organization_name = org.organization_name
+    member_data.organization_postcode = org.organization_postcode
+    member_data.organization_address = org.organization_address
+    member_data.organization_building = org.organization_building
+    member_data.organization_department = org.organization_department
+    member_data.organization_tax_id = org.organization_tax_id
+    member_data.addressCountry = org.addressCountry
+    member_data.addressRegion = org.addressRegion
+    member_data.addressCity = org.addressCity
 
     // 4.
     delete member_data.password_hash

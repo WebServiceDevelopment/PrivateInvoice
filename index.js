@@ -178,6 +178,7 @@ app.use('/api/invoice', require('./routes/invoice/softDelete.js'))
 
 app.use('/api/tray', require('./routes/tray.js'))
 app.use('/api/contacts', require('./routes/contacts.js'))
+app.use('/api/organization', require('./routes/organization.js'))
 app.use('/api/session', require('./routes/session/'))
 app.use('/api/settings', require('./routes/settings/'))
 app.use('/api/wallet', require('./routes/wallet/'))
