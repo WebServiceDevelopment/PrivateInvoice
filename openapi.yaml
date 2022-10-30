@@ -1080,14 +1080,12 @@ paths:
   #8.1
   #require('./routes/test.js');
   #/api/test:
-  #  post:
-
 
   #9.1
   #require('./routes/tray.js');
 
   #9.1.1
-  /api/tray/getCountOfInvoice:
+  /api/tray/count:
     get:
       description: >-
         \#9.1.1 This endpoint gets the number of invoices in the tray.
@@ -1139,7 +1137,7 @@ paths:
                 $ref: '#/error/schemas/Responses_err_msg'
 
   #9.1.2
-  /api/tray/getFolderOfInvoice:
+  /api/tray/folder:
     get:
       description: >-
         \#9.1.2 This endpoint retrieves the list of invoices in the given
@@ -1206,7 +1204,7 @@ paths:
 
 
   #9.1.3
-  /api/tray/getTotalOfInvoice:
+  /api/tray/total:
     get:
       description: >-
         \#9.1.3 This endpoint retrieves the total amount of invoices in the
@@ -1256,289 +1254,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/error/schemas/Responses_err_msg'
-
-
-  #9.2
-  #require('./routes/tray_archive.js');
-
-  #9.2.1
-  /api/tray/getCountOfArchive:
-    get:
-      description: >-
-        \#9.2.1 This endpoint gets the number of invoices in the tray.
-        <br>The target trays are Complete and Trash on the Seller side. 
-        For Buyer side, it is Complete and Trashed.
-        <br>Param as request is common on seller side and buyer side.
-      operationId: tray_getCountOfArchive
-      tags:
-        - "Tray"
-      parameters:
-        - in: query
-          name: archive
-          required: true
-          schema:
-            type: string
-            enum: ["0","1"]
-        - in: query
-          name: folder
-          required: true
-          schema:
-            type: string
-            enum: ["paid","trash"]
-        - in: query
-          name: role
-          required: true
-          schema:
-            type: string
-            enum: ["buyer","seller"]
-        - in: query
-          name: type
-          required: true
-          schema:
-            type: string
-            enum: ["invoice"]
-            
-      responses:
-        '200':
-          description: getCountOfArchive response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getCountOfArchive'
-        '400':
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/error/schemas/Responses_err_msg'
-
-
-  #9.2.2
-  /api/tray/getFolderOfArchive:
-    get:
-      description: >-
-        \#9.2.2 This endpoint retrieves the list of invoices in the given
-        Folder. The target trays are Complete and Trash. 
-        on the Seller side. For Buyer side, it is  Complete and Trashed.
-        Confirmed, Paid. Param as request is common on seller side and buyer
-        side.
-      operationId: tray_getFolderOfArchive
-      tags:
-        - "Tray"
-      parameters:
-        - in: query
-          name: archive
-          required: true
-          schema:
-            type: string
-            enum: ["0","1"]
-        - in: query
-          name: folder
-          required: true
-          schema:
-            type: string
-            enum: ["paid","trash"]
-        - in: query
-          name: role
-          required: true
-          schema:
-            type: string
-            enum: ["buyer","seller"]
-        - in: query
-          name: type
-          required: true
-          schema:
-            type: string
-            enum: ["invoice"]
-        - in: query
-          name: offset
-          required: true
-          schema:
-            type: integer
-            format: int64
-            example: 0
-        - in: query
-          name: limit
-          required: true
-          schema:
-            type: integer
-            format: int64
-            example: 25
-            
-      responses:
-        '200':
-          description: getFolderOfArchive response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getFolderOfArchive'
-        '400':
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/error/schemas/Responses_err_msg'
-
-
-  #9.2.3
-  /api/tray/getTotalOfArchive:
-    get:
-      description: >-
-        \#9.2.3 This endpoint retrieves the total amount of invoices in
-        the given Folder.
-        <br>The target trays are Complete and Trash on the Seller side. 
-        For the Buyer side, it is Complete and trashed.
-        <br> Param as request is common on seller side and buyer side.
-      operationId: tray_getTotalOfArchive
-      tags:
-        - "Tray"
-      parameters:
-        - in: query
-          name: archive
-          required: true
-          schema:
-            type: string
-            enum: ["0","1"]
-        - in: query
-          name: folder
-          required: true
-          schema:
-            type: string
-            enum: ["paid","trash"]
-        - in: query
-          name: role
-          required: true
-          schema:
-            type: string
-            enum: ["buyer","seller"]
-        - in: query
-          name: type
-          required: true
-          schema:
-            type: string
-            enum: ["invoice"]
-            
-      responses:
-        '200':
-          description: getTotalOfArchive response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getTotalOfArchive'
-        '400':
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/error/schemas/Responses_err_msg'
-
-
-  #9.3
-  #require('./routes/tray_drafts.js');
-  #/api/trayDrafts:
-
-  #9.3.1
-  /api/tray/getCountOfDraft:
-    get:
-      description: >
-        \#9.3.1 This endpoint gets the number of invoices in the tray.
-        <br>The target tray is Draft on the Seller side. 
-      operationId: tray_getCountOfDraft
-      tags:
-        - "Tray"
-
-      responses:
-        '200':
-          description: getCountSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getCountOfDraft'
-        '400':
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/error/schemas/Responses_err_msg'
-
-  #9.3.2
-  /api/tray/getFolderOfDraft:
-    get:
-      description: >-
-        \#9.3.2 This endpoint retrieves the list of invoices in the given
-        Folder. The target tray is Draft. 
-        side.
-      operationId: tray_getFolderOfDraft
-      tags:
-        - "Tray"
-      parameters:
-        - in: query
-          name: type
-          required: true
-          schema:
-            type: string
-            enum: ["invoice"]
-        - in: query
-          name: offset
-          required: true
-          schema:
-            type: integer
-            format: int64
-            example: 0
-        - in: query
-          name: limit
-          required: true
-          schema:
-            type: integer
-            format: int64
-            example: 25
-
-      responses:
-        '200':
-          description: getFolderSeller response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getFolderOfDraft'
-        '400':
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/error/schemas/Responses_err_msg'
-
-  #9.3.3
-  /api/tray/getTotalOfDraft:
-    get:
-      description: >-
-        \#9.3.3 This endpoint retrieves the total amount of invoices in
-        the given Folder.
-        <br>The target trays is only Draft on the Seller side. 
-      operationId: tray_getTotalOfDraft
-      tags:
-        - "Tray"
-      parameters:
-        - in: query
-          name: type
-          required: true
-          schema:
-            type: string
-            enum: ["invoice"]
-
-      responses:
-        '200':
-          description: getTotalOfDraft response
-          content:
-            application/json:
-              schema:
-                $ref: '#/tray/schemas/Responses_getTotalOfDraft'
-        '400':
-          description: Bad request.
-          content:
-            application/json:
-              schema:
-                $ref: '#/error/schemas/Responses_err_msg'
-
 
   #12.1
   #require('./routes/wallet.js');
