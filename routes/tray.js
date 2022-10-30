@@ -50,7 +50,7 @@ router.get('/count', async (req, res) => {
 
     // Handle errors
     if (err) {
-        return res.status(400).end('Could not get Folder')
+        return res.status(400).end('Could not get count')
     }
 
     console.log(counts)
