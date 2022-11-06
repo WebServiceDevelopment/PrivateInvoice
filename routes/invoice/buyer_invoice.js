@@ -200,7 +200,7 @@ router.post('/returnToSender', async function (req, res) {
 
     const url = `${seller_host}/api/presentations/available`
     console.log(url)
-    const [ credential , err7 ] = await createReturnMessage(
+    const [credential, err7] = await createReturnMessage(
         document_uuid,
         member_did,
         keyPair
@@ -322,25 +322,25 @@ router.post('/confirm', async function (req, res) {
     //3. buyer connect check
     //
 
-    console.log(seller_host +" : "+ member_did +" : "+ seller_did );
+    console.log(seller_host + ' : ' + member_did + ' : ' + seller_did)
 
-     const [code3, err3] = await to_seller.connect(
-         seller_host,
-         member_did,
-         seller_did
-     )
+    const [code3, err3] = await to_seller.connect(
+        seller_host,
+        member_did,
+        seller_did
+    )
 
-     if (code3 !== 200) {
-         let msg =
-             code3 === 500
-                 ? `Error:${METHOD}:The destination node cannot be found`
-                 : `Error:${METHOD}:` + err3
+    if (code3 !== 200) {
+        let msg =
+            code3 === 500
+                ? `Error:${METHOD}:The destination node cannot be found`
+                : `Error:${METHOD}:` + err3
 
-         return res.status(400).json({
-             err: 3,
-             msg: msg,
-         })
-     }
+        return res.status(400).json({
+            err: 3,
+            msg: msg,
+        })
+    }
 
     // 4.
     // begin Transaction
@@ -385,7 +385,7 @@ router.post('/confirm', async function (req, res) {
     // 7. createConfirmMessage
     //
     const url = `${seller_host}/api/presentations/available`
-    const [credential , err7] = await createConfirmMessage(
+    const [credential, err7] = await createConfirmMessage(
         document_uuid,
         member_did,
         keyPair
@@ -704,11 +704,11 @@ router.post('/makePayment', async function (req, res) {
 
     if (code3 !== 200) {
         let msg
-         if (code3 == 500) {
-             msg = `Error:${METHOD}: The destination node cannot be found`
-         } else {
-             msg = `Error:${METHOD}: This request is incorrect`
-         }
+        if (code3 == 500) {
+            msg = `Error:${METHOD}: The destination node cannot be found`
+        } else {
+            msg = `Error:${METHOD}: This request is incorrect`
+        }
 
         return res.status(400).json({
             err: 3,
@@ -874,9 +874,6 @@ router.post('/makePayment', async function (req, res) {
     // sendTransaction
     //
 
-    console.log('Make payment 14')
-    console.log(ipfs_cid_hex)
-
     const [receipt14, err14] = await util.sendSignedTransaction(
         web3,
         contract_address,
@@ -886,9 +883,6 @@ router.post('/makePayment', async function (req, res) {
         makePaymantTo,
         ipfs_cid_hex
     )
-
-    console.log(err14)
-    console.log('EEEEENNNNND')
 
     if (err14) {
         await util.cancelPaymentReservation(
@@ -986,7 +980,7 @@ router.post('/makePayment', async function (req, res) {
     //
     const url = `${seller_host}/api/presentations/available`
     console.log(url)
-    const [ credential , err19 ] = await createPaymentMessage(
+    const [credential, err19] = await createPaymentMessage(
         document_uuid,
         member_did,
         keyPair,

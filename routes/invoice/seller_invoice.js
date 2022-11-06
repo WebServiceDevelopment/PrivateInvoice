@@ -73,7 +73,6 @@ const CURRENCY = config.CURRENCY
  */
 
 router.post('/sendInvoice', async function (req, res) {
-
     //console.log("/sendInvoice ---")
 
     const METHOD = '/sendInvoice'
@@ -131,30 +130,33 @@ router.post('/sendInvoice', async function (req, res) {
     //
     // 20221102 undo
 
-    const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
+    const [code3, err3] = await to_buyer.connect(
+        buyer_host,
+        member_did,
+        buyer_did
+    )
 
-    if(code3 !== 200) {
-        let msg;
+    if (code3 !== 200) {
+        let msg
 
-        if(code == 500) {
-            msg = `Error:${METHOD}: buyer connect check:ECONNRESET`;
+        if (code == 500) {
+            msg = `Error:${METHOD}: buyer connect check:ECONNRESET`
         } else {
-            switch(err3) {
-            case "Not found.":
-                msg = `Error:${METHOD}: The destination node cannot be found`;
-            break;
-            default:
-                msg = `Error:${METHOD}: Invalid request`;
-            break;
+            switch (err3) {
+                case 'Not found.':
+                    msg = `Error:${METHOD}: derp The destination node cannot be found`
+                    break
+                default:
+                    msg = `Error:${METHOD}: Invalid request`
+                    break
             }
         }
 
-        res.status(400)
-            .json({
-                err: 3,
-                msg: msg
-            });
-        return;
+        res.status(400).json({
+            err: 3,
+            msg: msg,
+        })
+        return
     }
 
     // 4.
@@ -811,7 +813,7 @@ router.post('/recreate', async function (req, res) {
 
     // 18. createRecreateMessage
     const url = `${buyer_host}/api/presentations/available`
-    const [ credential , err18 ]= await createRecreateMessage(
+    const [credential, err18] = await createRecreateMessage(
         document_uuid,
         member_did,
         keyPair
@@ -1037,7 +1039,7 @@ router.post('/withdraw', async function (req, res) {
     // 10. createWithdrawMessage
     //
     const url = `${buyer_host}/api/presentations/available`
-    const [ credential , err10 ] = await createWithdrawMessage(
+    const [credential, err10] = await createWithdrawMessage(
         document_uuid,
         member_did,
         keyPair
