@@ -1144,7 +1144,7 @@ const DocumentWidget = (function() {
 			this.MEM.items.push(memberData);
 
 		}
-		
+
 		this.API.updateShimHeight();
 
 	}
@@ -1476,6 +1476,8 @@ async	function api_openDocument(document_uuid, role, folder, archive) {
 			f( this.DOM.to.addressCity );
 			f( this.DOM.to.addressCountry );
 
+        	// 20221104 add kogawa
+        	f(this.DOM.textarea.comments);
 		}
 
 		this.DOM.label.created_on.innerText = this.MEM.document.created_on || "";

@@ -41,6 +41,10 @@ const BUYER_STATUS              = "buyer_status";
 const BUYER_ARCHIVE_DOCUMENT    = "buyer_document_archive";
 const BUYER_ARCHIVE_STATUS      = "buyer_status_archive";
 
+module.exports = {
+	moveToTrash : _moveToTrash
+};
+
 // ------------------------------- End Points -------------------------------
 
 
@@ -48,7 +52,9 @@ const BUYER_ARCHIVE_STATUS      = "buyer_status_archive";
  * Execution of'Move to Trash'when folder is draft.
 */
 
-const moveToTrash = async (status, document_uuid, seller_did) => {
+async _moveToTrash(status, document_uuid, seller_did) {
+
+    let msg;
 
     // 1.
     // STATUS
@@ -57,11 +63,9 @@ const moveToTrash = async (status, document_uuid, seller_did) => {
     const [ old_status , _1 ] = await sub.getStatus( status, document_uuid) ;
 
     if(old_status == undefined) {
-        res.json({
-            err : 0,
-            msg : 'Record is not exist.'
-        });
-        return;
+        msg : 'Record is not exist.'
+
+        return [msg, 1];
     }
 
     // 2.
@@ -72,12 +76,9 @@ const moveToTrash = async (status, document_uuid, seller_did) => {
     if(old_document == undefined) {
 
         // status　からrecordを削除する
+        msg : "Record is not exist."
 
-        res.json({
-            err : 0,
-            msg : "Record is not exist."
-        });
-        return;
+        return [msg , 2];
     }
 
     // 3.
@@ -86,9 +87,9 @@ const moveToTrash = async (status, document_uuid, seller_did) => {
     const [ _3, err3 ] = await sub.notexist_check( BUYER_ARCHIVE_STATUS, document_uuid)
 
     if (err3 ) {
-        errno = 3;
-        console.log("Error: "+errno);
-        return res.status(400).json({ err : errno, msg : err });
+        msg = "document_uuid exist";
+
+        return [msg , 3];
     }
 
     // 4.
@@ -96,9 +97,9 @@ const moveToTrash = async (status, document_uuid, seller_did) => {
     //
     const [ _4, err4] = await sub.notexist_check( BUYER_ARCHIVE_DOCUMENT, document_uuid)
     if (err4 ) {
-        errno = 4;
-        console.log("Error: "+errno);
-        return res.status(400).json({ err : errno, msg : err });
+        msg = "document_uuid exist";
+
+        return [msg , 4];
     }
 
     // 5.
@@ -119,9 +120,8 @@ const moveToTrash = async (status, document_uuid, seller_did) => {
     // 7.
     const [ _7, err7 ] = await tran.insertArchiveStatus(conn, BUYER_ARCHIVE_STATUS, old_status);
     if (err7 ) {
-        errno = 7;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err7, errno));
+
+        return [tran.rollback(conn,err7), 7];
     }
 
     // 8.
@@ -129,9 +129,8 @@ const moveToTrash = async (status, document_uuid, seller_did) => {
     //
     const [ _8, err8 ] = await tran.insertDocument(conn, BUYER_ARCHIVE_DOCUMENT, old_status, old_document.document_json);
     if(err8) {
-        errno = 8;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err7, errno));
+
+        return [tran.rollback(conn,err8), 8];
     }
 
     // 9.
@@ -139,9 +138,8 @@ const moveToTrash = async (status, document_uuid, seller_did) => {
     //
     const [ _9, err9 ] = await tran.deleteStatus(conn, BUYER_STATUS, old_status) ;
     if(err9) {
-        errno = 9;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err9, errno));
+
+        return [tran.rollback(conn,err9), 9];
     }
 
     // 10
@@ -149,9 +147,8 @@ const moveToTrash = async (status, document_uuid, seller_did) => {
     //
     const [ _10, err10 ] = await tran.deleteDocument(conn, BUYER_DOCUMENT, old_status) ;
     if(err10) {
-        errno = 10;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err10, errno));
+
+        return [tran.rollback(conn,err10), 10];
     }
 
     // 11.
@@ -160,17 +157,14 @@ const moveToTrash = async (status, document_uuid, seller_did) => {
     const [ _11, err11 ] = await tran.commit(conn);
 
     if (err11) {
-        errno = 11;
-        code = 400;
-        return res.status(400).json(tran.rollbackAndReturn(conn, code, err11, errno));
+
+        return [tran.rollback(conn,err11), 11];
     }
 
     // 12.
     //
     conn.end();
 
+    return [null, 0]
 }
 
-module.exports = {
-	moveToTrash
-};

@@ -126,6 +126,7 @@ router.post('/returnToSender', async function (req, res) {
 
     // 3. buyer connect check
     //
+    // 20221102  undo
 
     const [code3, err3] = await to_seller.connect(
         seller_host,
@@ -183,19 +184,7 @@ router.post('/returnToSender', async function (req, res) {
     //
     // Get private keys to sign credential
 
-    const [keyPair, err] = await getPrivateKeys(member_did)
-    if (err) {
-        throw err
-    }
-
-    const url = `${seller_host}/api/presentations/available`
-    console.log(url)
-    const credential = await createReturnMessage(
-        document_uuid,
-        member_did,
-        keyPair
-    )
-    const [sent, err6] = await makePresentation(url, keyPair, credential)
+    const [keyPair, err6] = await getPrivateKeys(member_did)
     if (err6) {
         errno = 6
         code = 400
@@ -206,37 +195,70 @@ router.post('/returnToSender', async function (req, res) {
     }
 
     // 7.
-    // commit
+    //  createReturnMessage
     //
 
-    const [_7, err7] = await tran.commit(conn)
-
+    const url = `${seller_host}/api/presentations/available`
+    console.log(url)
+    const [ credential , err7 ] = await createReturnMessage(
+        document_uuid,
+        member_did,
+        keyPair
+    )
     if (err7) {
         errno = 7
         code = 400
-        let rt = tran.rollbackAndReturn(conn, code, err7, errno, METHOD)
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, code, err7, errno, METHOD)
+        )
+        return
+    }
 
-        // 8.
+    // 8.
+    // makePresentation
+    //
+    const [sent, err8] = await makePresentation(url, keyPair, credential)
+    if (err8) {
+        errno = 8
+        code = 400
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, code, err8, errno, METHOD)
+        )
+        return
+    }
+
+    // 9.
+    // commit
+    //
+
+    const [_9, err9] = await tran.commit(conn)
+
+    if (err9) {
+        errno = 9
+        code = 400
+        let rt = tran.rollbackAndReturn(conn, code, err9, errno, METHOD)
+
+        // 10.
         //
-        const [code8, err8] = await to_seller.rollbackReturnToSent(
+        const [code10, err10] = await to_seller.rollbackReturnToSent(
             seller_host,
             member_did,
             seller_did
         )
 
-        if (code8 !== 200) {
-            console.log('Error 8 code=' + code8 + ':err=' + err8)
-            if (code8 == 500) {
-                rt = { err: 8, msg: 'seller connect check:ECONNRESET' }
+        if (code10 !== 200) {
+            console.log('Error 10 code=' + code10 + ':err=' + err10)
+            if (code10 == 500) {
+                rt = { err: 10, msg: 'seller connect check:ECONNRESET' }
             } else {
-                rt = { err: 8, msg: err8 }
+                rt = { err: 10, msg: err10 }
             }
         }
         res.status(400).json(rt)
         return
     }
 
-    // 9.
+    // 11.
     //
     conn.end()
 
@@ -300,23 +322,25 @@ router.post('/confirm', async function (req, res) {
     //3. buyer connect check
     //
 
-    // const [code3, err3] = await to_seller.connect(
-    //     seller_host,
-    //     member_did,
-    //     seller_did
-    // )
+    console.log(seller_host +" : "+ member_did +" : "+ seller_did );
 
-    // if (code3 !== 200) {
-    //     let msg =
-    //         code3 === 500
-    //             ? `Error:${METHOD}:The destination node cannot be found`
-    //             : `Error:${METHOD}:` + err3
+     const [code3, err3] = await to_seller.connect(
+         seller_host,
+         member_did,
+         seller_did
+     )
 
-    //     return res.status(400).json({
-    //         err: 3,
-    //         msg: msg,
-    //     })
-    // }
+     if (code3 !== 200) {
+         let msg =
+             code3 === 500
+                 ? `Error:${METHOD}:The destination node cannot be found`
+                 : `Error:${METHOD}:` + err3
+
+         return res.status(400).json({
+             err: 3,
+             msg: msg,
+         })
+     }
 
     // 4.
     // begin Transaction
@@ -347,18 +371,7 @@ router.post('/confirm', async function (req, res) {
     //
     // Get private keys to sign credential
 
-    const [keyPair, err] = await getPrivateKeys(member_did)
-    if (err) {
-        throw err
-    }
-
-    const url = `${seller_host}/api/presentations/available`
-    const credential = await createConfirmMessage(
-        document_uuid,
-        member_did,
-        keyPair
-    )
-    const [sent, err6] = await makePresentation(url, keyPair, credential)
+    const [keyPair, err6] = await getPrivateKeys(member_did)
     if (err6) {
         errno = 6
         code = 400
@@ -369,19 +382,50 @@ router.post('/confirm', async function (req, res) {
         return
     }
 
-    // 7.
-    // commit
+    // 7. createConfirmMessage
     //
-    const [_7, err7] = await tran.commit(conn)
-
+    const url = `${seller_host}/api/presentations/available`
+    const [credential , err7] = await createConfirmMessage(
+        document_uuid,
+        member_did,
+        keyPair
+    )
     if (err7) {
         errno = 7
         code = 400
-        let roll = tran.rollbackAndReturn(conn, code, err7, errno, METHOD)
 
-        // 8.
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, code, err7, errno, METHOD)
+        )
+        return
+    }
+
+    // 8. makePresentation
+    //
+    const [sent, err8] = await makePresentation(url, keyPair, credential)
+    if (err8) {
+        errno = 8
+        code = 400
+
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, code, err8, errno, METHOD)
+        )
+        return
+    }
+
+    // 9.
+    // commit
+    //
+    const [_9, err9] = await tran.commit(conn)
+
+    if (err9) {
+        errno = 9
+        code = 400
+        let roll = tran.rollbackAndReturn(conn, code, err9, errno, METHOD)
+
+        // 10.
         //
-        const [code8, err8] = await to_seller.rollbackConfirmToSent(
+        const [code10, err10] = await to_seller.rollbackConfirmToSent(
             seller_host,
             member_did,
             seller_did
@@ -390,26 +434,26 @@ router.post('/confirm', async function (req, res) {
         let msg
         msg = `Error:${METHOD}: Commit `
 
-        if (code8 !== 200) {
-            if (code8 == 500) {
+        if (code10 !== 200) {
+            if (code10 == 500) {
                 msg = `Error:${METHOD}: seller connect check:ECONNRESET`
             } else {
                 msg = `Error:${METHOD}: Invalid argument`
             }
 
             return res.status(400).json({
-                err: 8,
+                err: 10,
                 msg: msg,
             })
         }
 
         return res.status(400).json({
-            err: 7,
+            err: 9,
             msg: msg,
         })
     }
 
-    // 9.
+    // 11.
     //
     conn.end()
 
@@ -648,28 +692,29 @@ router.post('/makePayment', async function (req, res) {
 
     // 3.
     // connect
+    // 20221102 undo
 
     console.log('Make payment 3')
 
-    // const [code3, err3] = await to_seller.connect(
-    //     seller_host,
-    //     member_did,
-    //     seller_did
-    // )
+    const [code3, err3] = await to_seller.connect(
+        seller_host,
+        member_did,
+        seller_did
+    )
 
-    // if (code3 !== 200) {
-    //     let msg
-    //     if (code3 == 500) {
-    //         msg = `Error:${METHOD}: The destination node cannot be found`
-    //     } else {
-    //         msg = `Error:${METHOD}: This request is incorrect`
-    //     }
+    if (code3 !== 200) {
+        let msg
+         if (code3 == 500) {
+             msg = `Error:${METHOD}: The destination node cannot be found`
+         } else {
+             msg = `Error:${METHOD}: This request is incorrect`
+         }
 
-    //     return res.status(400).json({
-    //         err: 3,
-    //         msg: msg,
-    //     })
-    // }
+        return res.status(400).json({
+            err: 3,
+            msg: msg,
+        })
+    }
 
     // 4.
     // Ask for remittance amount from document.
@@ -928,20 +973,7 @@ router.post('/makePayment', async function (req, res) {
     // Get private keys to sign credential
 
     console.log('Make payment 18')
-    const [keyPair, err] = await getPrivateKeys(member_did)
-    if (err) {
-        throw err
-    }
-
-    const url = `${seller_host}/api/presentations/available`
-    console.log(url)
-    const credential = await createPaymentMessage(
-        document_uuid,
-        member_did,
-        keyPair,
-        hash
-    )
-    const [sent, err18] = await makePresentation(url, keyPair, credential)
+    const [keyPair, err18] = await getPrivateKeys(member_did)
     if (err18) {
         errno = 18
         res.status(400).json(
@@ -950,55 +982,85 @@ router.post('/makePayment', async function (req, res) {
         return
     }
 
-    // 19.
-    // commit
-
-    console.log('Make payment 19')
-    const [_19, err19] = await tran.commit(conn)
+    // 19.  createPaymentMessage
+    //
+    const url = `${seller_host}/api/presentations/available`
+    console.log(url)
+    const [ credential , err19 ] = await createPaymentMessage(
+        document_uuid,
+        member_did,
+        keyPair,
+        hash
+    )
 
     if (err19) {
         errno = 19
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, 'code19', err19, errno, METHOD)
+        )
+        return
+    }
+
+    // 20. makePresentation
+    //
+    const [sent, err20] = await makePresentation(url, keyPair, credential)
+    if (err20) {
+        errno = 20
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, 'code20', err20, errno, METHOD)
+        )
+        return
+    }
+
+    // 21.
+    // commit
+
+    console.log('Make payment 21')
+    const [_21, err21] = await tran.commit(conn)
+
+    if (err21) {
+        errno = 21
         code = 400
-        let result = tran.rollbackAndReturn(conn, code, err19, errno, METHOD)
+        let result = tran.rollbackAndReturn(conn, code, err21, errno, METHOD)
 
         let msg = `Error:${METHOD}: Commit failed`
 
-        // 20.
+        // 22.
         // rollback
 
-        console.log('Make payment 20')
-        const [code20, err20] = await to_seller.rollbackPaidToConfirm(
+        console.log('Make payment 22')
+        const [code22, err22] = await to_seller.rollbackPaidToConfirm(
             seller_host,
             member_did,
             seller_did
         )
 
-        if (code20 !== 200) {
-            if (code20 == 500) {
+        if (code22 !== 200) {
+            if (code22 == 500) {
                 msg = `Error:${METHOD}:seller connect check:ECONNRESET`
             } else {
                 msg = `Error:${METHOD}:rollbackPaidToConfirm `
             }
             return res.json({
-                err: 20,
+                err: 22,
                 msg: msg,
             })
         }
 
         return res.json({
-            err: 19,
+            err: 21,
             msg: msg,
         })
     }
 
-    // 21.
+    // 23.
     //
     conn.end()
 
-    // 22.
+    // 24.
     // ETH balance Confirmation
     //
-    const [balanceWei_2, _22] = await eth.getBalance(web3, contract_address)
+    const [balanceWei_2, _24] = await eth.getBalance(web3, contract_address)
 
     let balanceETH_1 = web3.utils.fromWei(balanceWei_1, 'ether')
     let balanceETH_2 = web3.utils.fromWei(balanceWei_2, 'ether')
@@ -1007,21 +1069,21 @@ router.post('/makePayment', async function (req, res) {
         'ether'
     )
 
-    // 23.
+    // 25.
     // ETH transaction result
     //
-    const [transaction_result, err23] = await eth.getTransaction(web3, hash)
+    const [transaction_result, err25] = await eth.getTransaction(web3, hash)
 
-    if (err23) {
-        console.log('err23' + err23)
+    if (err25) {
+        console.log('err25' + err25)
     }
     //console.log(transaction_result);
 
-    // 24.
+    // 26.
     // IP ADDRESS OF IPFS SERVER
     const ipfs_address = process.env.IPFS_ADDRESS
 
-    console.log('Make payment 24')
+    console.log('Make payment 26')
     //console.log("/makePayment accepted");
 
     let end = Date.now()

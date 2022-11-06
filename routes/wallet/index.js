@@ -356,7 +356,7 @@ router.get('/getWalletInfo', async function (req, res) {
     if (err2) {
         let msg = `ERROR:${METHOD}: Could not get getBalance`
         res.status(400)
-        json({
+        .json({
             err: 2,
             msg: msg,
         })

@@ -23,8 +23,8 @@
 const fs			= require('fs');
 const mysql			= require('mysql');
 
-const configStr		= fs.readFileSync('config.json').toString();
-const config		= JSON.parse(configStr);
+//const configStr		= fs.readFileSync('config.json').toString();
+//const config		= JSON.parse(configStr);
 
 const DATABASE = {
 		"connectionLimit" : 4,
@@ -34,7 +34,7 @@ const DATABASE = {
 		"database" : process.env.DATABASE_NAME
 	}
 
-const SALT_ROUNDS 	= 10;
+//const SALT_ROUNDS 	= 10;
 
 
 module.exports = {
@@ -62,7 +62,7 @@ function _beginTransaction(connection) {
 }
 
 function _commit (connection) {
- 	return new Promise((resolve, reject) => {
+	return new Promise((resolve, reject) => {
 		connection.commit((err) => {
 			if (err) {
 				return reject(err);

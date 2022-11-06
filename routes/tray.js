@@ -29,7 +29,7 @@ module.exports = router
 // Import Modules
 const { getCount, getFolder, getTotal } = require('../modules/tray')
 
-router.get('/count', async (req, res) => {
+router.get('/getCount', async (req, res) => {
     // Get member did from session data
     const { member_did } = req.session.data // did:key:123
 
@@ -48,14 +48,14 @@ router.get('/count', async (req, res) => {
 
     // Handle errors
     if (err) {
-        return res.status(400).end('Could not get count')
+        return res.status(400).end('Could not get Folder')
     }
 
     // Return number[]
     res.json(counts)
 })
 
-router.get('/folder', async (req, res) => {
+router.get('/getFolder', async (req, res) => {
     // Get member did from session data
     const { member_did } = req.session.data
 
@@ -85,7 +85,7 @@ router.get('/folder', async (req, res) => {
     res.json(rows)
 })
 
-router.get('/total', async (req, res) => {
+router.get('/getTotal', async (req, res) => {
     // Get member did from session data
     const { member_did } = req.session.data // did:key:123
 
