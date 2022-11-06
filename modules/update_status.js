@@ -348,5 +348,5 @@ const createMessage = async (document_uuid, member_did, message, keyPair) => {
 	// Sign Credential
 
 	const signedCredential = await signStatusMessage(credential, keyPair);
-	return signedCredential;
+	return [ signedCredential , null];
 }

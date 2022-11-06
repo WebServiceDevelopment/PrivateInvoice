@@ -21,7 +21,7 @@
 
 // Database
 
-const config                    = require('../config.json');
+//const config                    = require('../config.json');
 
 // Database Libraries
 
@@ -67,7 +67,7 @@ async function _getBalance(web3, coinbase) {
     try {
         const balanceWei = await __getBalance(web3, coinbase) ;
 
-    	return [balanceWei, null];
+		return [balanceWei, null];
     } catch (err) {
         return [false, err];
     }
@@ -95,7 +95,7 @@ async function _sendTransaction(web3, transactionObject) {
     try {
         const hash = await __sendTransaction(web3, transactionObject) ;
 
-    	return [hash, null];
+		return [hash, null];
     } catch (err) {
         return [false, err];
     }
@@ -123,7 +123,7 @@ async function _sendSignedTransaction(web3, transactionObject) {
     try {
         const hash = await __sendSignedTransaction(web3, transactionObject) ;
 
-    	return [hash, null];
+		return [hash, null];
     } catch (err) {
             return [false, err];
     }
@@ -150,7 +150,7 @@ async function _getTransaction(web3, hash) {
     try {
         const result = await __getTransaction(web3, hash) ;
 
-    	return [result, null];
+		return [result, null];
     } catch (err) {
         return [false, err];
     }
@@ -178,7 +178,7 @@ async function _getGasPrice(web3 ) {
     try {
         const gasPrice = await __getGasPrice(web3) ;
 
-    	return [gasPrice, null];
+		return [gasPrice, null];
     } catch (err) {
         return [false, err];
     }
@@ -206,7 +206,7 @@ async function _estimateGas(web3 , callObject) {
     try {
         const estimateGas = await __estimateGas(web3, callObject) ;
 
-    	return [estimateGas, null];
+		return [estimateGas, null];
     } catch (err) {
         return [false, err];
     }
@@ -234,7 +234,7 @@ async function _getCode(web3 , account) {
     try {
         const code = await __getCode(web3, account) ;
 
-    	return [code, null];
+		return [code, null];
     } catch (err) {
         return [false, err];
     }
@@ -262,7 +262,7 @@ async function _getTransactionCount(web3 , address) {
     try {
         const count = await __getTransactionCount(web3, address) ;
 
-    	return [count, null];
+ 		return [count, null];
     } catch (err) {
         return [false, err];
     }
@@ -290,7 +290,7 @@ async function _getTransactionReceipt(web3 , hash) {
     try {
         const receipt = await __getTransactionReceipt(web3) ;
 
-    	return [receipt, null];
+		return [receipt, null];
     } catch (err) {
         return [false, err];
     }
@@ -318,7 +318,7 @@ async function _getFeeHistory(web3, blockCount, newestBlock, rewardPercentiles )
     try {
         const fee = await __getFeeHistory(web3, blockCount, newestBlock, rewardPercentiles) ;
 
-    	return [fee, null];
+		return [fee, null];
     } catch (err) {
         return [false, err];
     }
@@ -346,7 +346,7 @@ async function _getMaxPriorityFeePerGas(web3) {
     try {
         const fee = await __getMaxPriorityFeePerGas(web3) ;
 
-    	return [fee, null];
+		return [fee, null];
     } catch (err) {
         return [false, err];
     }

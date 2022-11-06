@@ -69,11 +69,7 @@ async function _handleLogin(membername, password) {
 
     let member_data
 
-    try {
-        member_data = await db.selectOne(sql, [membername])
-    } catch (err) {
-        throw err
-    }
+    member_data = await db.selectOne(sql, [membername])
 
     if (!member_data) {
         return [null, { err: 100, msg: 'USERNAME NOT FOUND' }]
@@ -82,11 +78,7 @@ async function _handleLogin(membername, password) {
     // 2.
     let match = false
 
-    try {
-        match = await db.compare(password, member_data.password_hash)
-    } catch (err) {
-        throw err
-    }
+    match = await db.compare(password, member_data.password_hash)
 
     if (!match) {
         return [null, { err: 100, msg: 'INCORRECT PASSWORD' }]
@@ -207,11 +199,7 @@ async function _insertMember(member_did, body, eth_address, privatekey) {
     // 2.
     // First Create Password Hash
     let password_hash
-    try {
-        password_hash = await db.hash(member.password)
-    } catch (err) {
-        throw err
-    }
+    password_hash = await db.hash(member.password)
 
     let sql, args
 

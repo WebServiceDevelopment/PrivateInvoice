@@ -68,7 +68,7 @@ router.post('/trashDraft', async function(req, res) {
 	const { document_uuid } = req.body;
 	const { member_did } = req.session.data;
 
-	let err, errno, code;
+	let errno, code;
 
 	let start = Date.now();
 
@@ -482,10 +482,10 @@ router.post('/trash', async function(req, res) {
 		return;
 	}
 
+	if(!USE_PRESENTATION) {
 	// 14.
 	//
 	
-	if(!USE_PRESENTATION) {
 		const [ code14, err14 ] = await to_buyer.trash(buyer_host, old_status.document_uuid, old_status.seller_did);
 
 		if(code14 !== 200) {
@@ -496,38 +496,54 @@ router.post('/trash', async function(req, res) {
 		}
 
 	} else {
+	// 15.
+	//
 
-		const [keyPair, err] = await getPrivateKeys(member_did);
-		if(err) {
-			throw err;
+		const [keyPair, err15] = await getPrivateKeys(member_did);
+		if(err15) {
+			errno = 15;
+			res.status(400)
+				.json(tran.rollbackAndReturn(conn, 'code15', err15, errno, METHOD));
+			return;
 		}
-		errno = 14;
+	// 16. createTrashMessage
+	//
 
 		const url = `${buyer_host}/api/presentations/available`
-		const credential = await createTrashMessage(document_uuid,member_did, keyPair);
-		const [ sent, err14 ] = await makePresentation(url, keyPair, credential);
-		if(err14) {
+		const [ credential , err16 ] = await createTrashMessage(document_uuid,member_did, keyPair);
+		if(err16) {
+			errno = 16;
 			res.status(400)
-				.json(tran.rollbackAndReturn(conn, 'code14', err14, errno, METHOD));
+				.json(tran.rollbackAndReturn(conn, 'code16', err16, errno, METHOD));
+			return;
+		}
+
+	// 17.
+	//
+		const [ sent, err17 ] = await makePresentation(url, keyPair, credential);
+		if(err17) {
+			errno = 17;
+			res.status(400)
+				.json(tran.rollbackAndReturn(conn, 'code17', err17, errno, METHOD));
 			return;
 		}
 
 	}
 
-	// 15.
+	// 18.
 	// commit
 	//
-	const [ _15, err15 ] = await tran.commit(conn);
+	const [ _18, err18 ] = await tran.commit(conn);
 
-	if (err15) {
-		errno = 15;
+	if (err18) {
+		errno = 18;
 		code = 400;
 		res.status(400)
-			.json(tran.rollbackAndReturn(conn, code, err15, errno, METHOD));
+			.json(tran.rollbackAndReturn(conn, code, err18, errno, METHOD));
 		return;
 	}
 
-	// 16.
+	// 19.
 	//
 	conn.end();
 
