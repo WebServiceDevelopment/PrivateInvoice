@@ -32,7 +32,6 @@ const web3						= eth.getWeb3();
 // Table Name
 const SELLER_STATUS			    = "seller_status";
 const SELLER_DOCUMENT		    = "seller_document";
-const CONTACTS				    = "contacts";
 
 const moveToPaid = async (document_uuid, buyer_did, hash) => {
 

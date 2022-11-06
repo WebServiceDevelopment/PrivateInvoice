@@ -619,7 +619,7 @@ const TrayWidget = function () {
         //console.log("params="+JSON.stringify(params));
         //console.log("ajax_get:"+"folder="+folder+":arcgive="+archive+":role="+role);
 
-        const url = '/api/tray/folder'
+        const url = '/api/tray/getFolder'
         const args = {
             offset: params.offset,
             limit: params.limit,

@@ -24,8 +24,8 @@ const fs = require('fs');
 const mysql = require('mysql');
 const bcrypt = require('bcrypt');
 
-const configStr = fs.readFileSync('config.json').toString();
-const config = JSON.parse(configStr);
+//const configStr = fs.readFileSync('config.json').toString();
+//const config = JSON.parse(configStr);
 
 const DATABASE = {
 		"connectionLimit" : 4,

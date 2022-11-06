@@ -52,7 +52,7 @@ function _toReturnError(err , code, method_no) {
 
 	if(error.indexOf( ERR_KEYWORD ) !== -1) {
 		rt.err = error.replace( ERR_KEYWORD,"");
-   	}
+	}
 	rt.code = method_no + code;
 
 	return rt;
@@ -99,15 +99,15 @@ async function _sendSignedTransaction (web3, buyerAddr, buyerPrivateKey, sellerA
 			_gasLimit = gasLimit;
 		}
 		try {
-        	_gasLimit = parseInt(_gasLimit);
+			_gasLimit = parseInt(_gasLimit);
 		} catch (e) {
-        	_gasLimit = GAS_LIMIT;
+			_gasLimit = GAS_LIMIT;
 		}
     }
 
     let gasLimit_hex;
 
-    if(typeof (_gasLimit) === 'number' && _gasLimit > 0 ) {
+	if(typeof (_gasLimit) === 'number' && _gasLimit > 0 ) {
     } else {
         gasLimit_hex = GAS_LIMIT;
     }
@@ -123,7 +123,7 @@ async function _sendSignedTransaction (web3, buyerAddr, buyerPrivateKey, sellerA
     const count = await eth.getTransactionCount(buyerAddr);
 
 	if(DEBUG) {
-    	console.log("count="+count);
+		console.log("count="+count);
 	}
     const nonce = web3.utils.toHex(count);
 
@@ -131,7 +131,7 @@ async function _sendSignedTransaction (web3, buyerAddr, buyerPrivateKey, sellerA
     const gasPrice = await eth.getGasPrice()
 
 	if(DEBUG) {
-    	console.log("gasPrice"+gasPrice)
+		console.log("gasPrice"+gasPrice)
 	}
 
 	// 4.
@@ -139,7 +139,7 @@ async function _sendSignedTransaction (web3, buyerAddr, buyerPrivateKey, sellerA
 	//
 	if(DEBUG) {
 
-	    const sellerBalanceStart = await eth.getBalance(sellerAddr);
+		const sellerBalanceStart = await eth.getBalance(sellerAddr);
 		const buyerBalanceStart = await eth.getBalance(buyerAddr);
 
 		console.log("Before Balance");
@@ -154,9 +154,9 @@ async function _sendSignedTransaction (web3, buyerAddr, buyerPrivateKey, sellerA
     let chainId;
 
     if( ROPSTEN_SWITCH_FLAG ) {
-    	chainId = ROPSTEN_CHAINID;
+		chainId = ROPSTEN_CHAINID;
 	} else {
-    	chainId = web3.utils.toHex(GANACHE_DEFAULT_CHAINID);
+		chainId = web3.utils.toHex(GANACHE_DEFAULT_CHAINID);
 	}
 
 
@@ -181,9 +181,9 @@ async function _sendSignedTransaction (web3, buyerAddr, buyerPrivateKey, sellerA
 	//
     var  tx;
     if( ROPSTEN_SWITCH_FLAG ) {
-    	tx = new Tx ( transactionObject , { chain: 'ropsten' });
+		tx = new Tx ( transactionObject , { chain: 'ropsten' });
 	} else {
-    	tx = new Tx ( transactionObject );
+		tx = new Tx ( transactionObject );
 	}
 
     tx.sign(privateKeyBUF);
@@ -200,11 +200,11 @@ async function _sendSignedTransaction (web3, buyerAddr, buyerPrivateKey, sellerA
 	
     let transaction;
 	try {
-    	transaction = await eth.sendSignedTransaction(serializedTx_hex);
-    	console.log(transaction);
+		transaction = await eth.sendSignedTransaction(serializedTx_hex);
+		console.log(transaction);
 	} catch (err) {
 		console.log(err);
-    	return [ null, err];
+		return [ null, err];
 	}
 
 	// 10.

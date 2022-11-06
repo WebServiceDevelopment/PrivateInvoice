@@ -50,7 +50,7 @@ module.exports = {
  * getAccountOfSellerWallet
  */
 async function _getAccountOfSellerWallet(seller_host, seller_did, buyer_did) {
-    const url = `${seller_host}/api/message/tellMeYourWalletAccount`
+    //const url = `${seller_host}/api/message/tellMeYourWalletAccount`
 
     let result, msg
 
@@ -88,7 +88,9 @@ async function _getAccountOfSellerWallet(seller_host, seller_did, buyer_did) {
 /*
  * seller_connect
  */
+
 async function _seller_connect(seller_host, seller_uuid, buyer_did) {
+
     const url = `${seller_host}/api/message/sellerToConnect`
 
     const params = {
@@ -110,7 +112,8 @@ async function _seller_connect(seller_host, seller_uuid, buyer_did) {
                 data: err.message,
             }
         } else {
-            console.log(err)
+            //console.log(err)
+            console.log("seller_connect err ---")
             response = {
                 status: 500,
                 data: null,

@@ -73,6 +73,9 @@ const CURRENCY = config.CURRENCY
  */
 
 router.post('/sendInvoice', async function (req, res) {
+
+    //console.log("/sendInvoice ---")
+
     const METHOD = '/sendInvoice'
 
     const start = Date.now()
@@ -125,31 +128,34 @@ router.post('/sendInvoice', async function (req, res) {
     }
 
     //3. buyer connect check
-    // const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
+    //
+    // 20221102 undo
 
-    // if(code3 !== 200) {
-    // 	let msg;
+    const [ code3 , err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
 
-    // 	if(code == 500) {
-    // 		msg = `Error:${METHOD}: buyer connect check:ECONNRESET`;
-    // 	} else {
-    // 		switch(err3) {
-    // 		case "Not found.":
-    // 			msg = `Error:${METHOD}: The destination node cannot be found`;
-    // 		break;
-    // 		default:
-    // 			msg = `Error:${METHOD}: Invalid request`;
-    // 		break;
-    // 		}
-    // 	}
+    if(code3 !== 200) {
+        let msg;
 
-    // 	res.status(400)
-    // 		.json({
-    // 			err: 3,
-    // 			msg: msg
-    // 		});
-    // 	return;
-    // }
+        if(code == 500) {
+            msg = `Error:${METHOD}: buyer connect check:ECONNRESET`;
+        } else {
+            switch(err3) {
+            case "Not found.":
+                msg = `Error:${METHOD}: The destination node cannot be found`;
+            break;
+            default:
+                msg = `Error:${METHOD}: Invalid request`;
+            break;
+            }
+        }
+
+        res.status(400)
+            .json({
+                err: 3,
+                msg: msg
+            });
+        return;
+    }
 
     // 4.
     // DRAFT_STATUS
@@ -793,18 +799,7 @@ router.post('/recreate', async function (req, res) {
     //
     // Get private keys to sign credential
 
-    const [keyPair, err] = await getPrivateKeys(member_did)
-    if (err) {
-        throw err
-    }
-
-    const url = `${buyer_host}/api/presentations/available`
-    const credential = await createRecreateMessage(
-        document_uuid,
-        member_did,
-        keyPair
-    )
-    const [_17, err17] = await makePresentation(url, keyPair, credential)
+    const [keyPair, err17] = await getPrivateKeys(member_did)
     if (err17) {
         errno = 17
         code = 400
@@ -814,11 +809,13 @@ router.post('/recreate', async function (req, res) {
         return
     }
 
-    // 18.
-    // commit
-    //
-    const [_18, err18] = await tran.commit(conn)
-
+    // 18. createRecreateMessage
+    const url = `${buyer_host}/api/presentations/available`
+    const [ credential , err18 ]= await createRecreateMessage(
+        document_uuid,
+        member_did,
+        keyPair
+    )
     if (err18) {
         errno = 18
         code = 400
@@ -828,7 +825,33 @@ router.post('/recreate', async function (req, res) {
         return
     }
 
-    // 19.
+    // 19. makePresentation
+    //
+    const [_19, err19] = await makePresentation(url, keyPair, credential)
+    if (err19) {
+        errno = 19
+        code = 400
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, code, err19, errno, METHOD)
+        )
+        return
+    }
+
+    // 20.
+    // commit
+    //
+    const [_20, err20] = await tran.commit(conn)
+
+    if (err20) {
+        errno = 20
+        code = 400
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, code, err20, errno, METHOD)
+        )
+        return
+    }
+
+    // 21.
     //
     conn.end()
 
@@ -1003,18 +1026,7 @@ router.post('/withdraw', async function (req, res) {
     //
     // Get private keys to sign credential
 
-    const [keyPair, err] = await getPrivateKeys(member_did)
-    if (err) {
-        throw err
-    }
-
-    const url = `${buyer_host}/api/presentations/available`
-    const credential = await createWithdrawMessage(
-        document_uuid,
-        member_did,
-        keyPair
-    )
-    const [_9, err9] = await makePresentation(url, keyPair, credential)
+    const [keyPair, err9] = await getPrivateKeys(member_did)
     if (err9) {
         res.status(400).json(
             tran.rollbackAndReturn(conn, 'code9', err9, errno, METHOD)
@@ -1022,65 +1034,89 @@ router.post('/withdraw', async function (req, res) {
         return
     }
 
-    // 10
+    // 10. createWithdrawMessage
+    //
+    const url = `${buyer_host}/api/presentations/available`
+    const [ credential , err10 ] = await createWithdrawMessage(
+        document_uuid,
+        member_did,
+        keyPair
+    )
+    if (err10) {
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, 'code10', err10, errno, METHOD)
+        )
+        return
+    }
+
+    // 11.
+    const [_11, err11] = await makePresentation(url, keyPair, credential)
+    if (err11) {
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, 'code11', err11, errno, METHOD)
+        )
+        return
+    }
+
+    // 12
     // commit
     //
-    const [_10, err10] = await tran.commit(conn)
+    const [_12, err12] = await tran.commit(conn)
 
-    if (err10) {
-        console.log('Error 10 status = 400 code=' + err10)
-        errno = 10
+    if (err12) {
+        console.log('Error 12 status = 400 code=' + err12)
+        errno = 12
         code = 400
-        let msg = tran.rollbackAndReturn(conn, code, err10, errno, METHOD)
+        let msg = tran.rollbackAndReturn(conn, code, err12, errno, METHOD)
 
-        // 11.
+        // 13.
         //
-        const [seller_host, err11] = await sub.getSellerHost(
+        const [seller_host, err13] = await sub.getSellerHost(
             CONTACTS,
             member_did,
             buyer_did
         )
 
-        if (err11) {
+        if (err13) {
             msg = `Error:${METHOD}: Could not get host`
 
             res.status(400).json({
-                err: 11,
+                err: 13,
                 msg: msg,
             })
             return
         }
 
-        // 12.
+        // 14.
         //
-        const [code12, err12] = await to_buyer.rollbackReturnToSent(
+        const [code14, err14] = await to_buyer.rollbackReturnToSent(
             seller_host,
             buyer_did,
             member_did
         )
 
-        if (code12 !== 200) {
-            if (code12 == 500) {
+        if (code14 !== 200) {
+            if (code14 == 500) {
                 msg = `Error:${METHOD}: seller connect check:ECONNRESET`
             } else {
                 msg = `Error:${METHOD}: Invalid request`
             }
 
             res.status(400).json({
-                err: 12,
+                err: 14,
                 msg: msg,
             })
             return
         }
 
         res.status(400).json({
-            err: 10,
+            err: 12,
             msg: msg,
         })
         return
     }
 
-    // 13.
+    // 15.
     //
     conn.end()
 

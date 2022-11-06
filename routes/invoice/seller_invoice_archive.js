@@ -34,7 +34,7 @@ const sub = require('../../modules/invoice_sub.js')
 const tran = require('../../modules/invoice_sub_transaction.js')
 const to_buyer = require('../../modules/seller_to_buyer.js')
 
-const sign_your_credentials = require('../../modules/sign_your_credentials.js')
+//const sign_your_credentials = require('../../modules/sign_your_credentials.js')
 const { makePresentation } = require('../../modules/presentations_out.js')
 const { createArchiveMessage } = require('../../modules/update_status.js')
 
@@ -56,6 +56,9 @@ const CONTACTS = 'contacts'
  * [ Move to Archive ]
  */
 router.post('/sellerArchive', async function (req, res) {
+
+    //console.log("/sellerArchive ---" )
+
     const METHOD = '/sellerArchive'
 
     let start = Date.now()
@@ -105,31 +108,32 @@ router.post('/sellerArchive', async function (req, res) {
 
     // 3.
     // buyer connect check
+    // 20221102 undo
 
-    // const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
+    const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
 
-    // if(code3 !== 200) {
-    // 	let msg;
-    // 	if(code == 500) {
-    // 		msg = `ERROR:${METHOD}:buyer connect check:ECONNRESET`;
-    // 	} else {
-    // 		switch(err3) {
-    // 		case "Not found.":
-    // 			msg = `ERROR:${METHOD}:The destination node cannot be found`;
-    // 		break;
-    // 		default:
-    // 			msg = `ERROR:${METHOD}: Invalid request`;
-    // 		break;
-    // 		}
-    // 	}
+    if(code3 !== 200) {
+        let msg;
+        if(code == 500) {
+            msg = `ERROR:${METHOD}:buyer connect check:ECONNRESET`;
+        } else {
+            switch(err3) {
+            case "Not found.":
+                msg = `ERROR:${METHOD}:The destination node cannot be found`;
+            break;
+            default:
+                msg = `ERROR:${METHOD}: Invalid request`;
+            break;
+            }
+        }
 
-    // 	res.status(400)
-    // 			.json({
-    // 		err: 3,
-    // 			msg: msg
-    // 		});
-    // 	return;
-    // }
+        res.status(400)
+                .json({
+            err: 3,
+                msg: msg
+            });
+        return;
+    }
 
     // 4.
     // STATUS
@@ -283,21 +287,27 @@ router.post('/sellerArchive', async function (req, res) {
     }
 
     // 13.
+    // getPrivateKeys
     //
     const [keyPair, err13] = await getPrivateKeys(member_did)
     if (err13) {
-        throw err
+        errno = 13
+        code = 400
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, code, err13, errno, METHOD)
+        )
+        return
     }
 
     // 14.
+    // createArchiveMessage
     //
     const url = `${buyer_host}/api/presentations/available`
-    const credential = await createArchiveMessage(
+    const [ credential , err14 ] = await createArchiveMessage(
         document_uuid,
         member_did,
         keyPair
     )
-    const [sent, err14] = await makePresentation(url, keyPair, credential)
     if (err14) {
         errno = 14
         code = 400
@@ -308,11 +318,10 @@ router.post('/sellerArchive', async function (req, res) {
     }
 
     // 15.
-    // commit
+    // makePresentation
     //
-    const [_15, err15] = await tran.commit(conn)
-
-    if (err14) {
+    const [sent, err15] = await makePresentation(url, keyPair, credential)
+    if (err15) {
         errno = 15
         code = 400
         res.status(400).json(
@@ -322,10 +331,24 @@ router.post('/sellerArchive', async function (req, res) {
     }
 
     // 16.
+    // commit
+    //
+    const [_16, err16] = await tran.commit(conn)
+
+    if (err16) {
+        errno = 16
+        code = 400
+        res.status(400).json(
+            tran.rollbackAndReturn(conn, code, err16, errno, METHOD)
+        )
+        return
+    }
+
+    // 17.
     //
     conn.end()
 
-    // 17.
+    // 18.
     //
     res.json({
         err: 0,

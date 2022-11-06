@@ -41,58 +41,84 @@ const getCount = async (
 ) => {
     const table_did = role === 'seller' ? 'seller_did' : 'buyer_did'
     const archive = role === 'seller' ? 'seller_archived' : 'buyer_archived'
-    let table = role === 'seller' ? 'seller_status' : 'buyer_status'
     const counts = new Array()
     const query = new Array()
 
-    if (folder === 'draft') {
+// 20221031 change
+// <<
+    let table;
+
+    switch (folder) {
+	case 'draft':
         table = 'seller_status_draft'
         query.push({
             folder,
             archiveStatus,
         })
-    } else if (archiveStatus) {
-        table =
-            role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
-    } else if (role === 'buyer') {
-        query.push(
-            {
-                folder: 'sent',
-                archiveStatus,
-            },
-            {
-                folder: 'returned',
-                archiveStatus,
-            },
-            {
-                folder: 'confirmed',
-                archiveStatus,
-            },
-            {
+
+    break;
+    default:
+        if (archiveStatus === 1 && folder === 'paid') {
+            table = role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
+            query.push({
                 folder: 'paid',
-                archiveStatus,
-            }
-        )
-    } else {
-        query.push(
-            {
-                folder: 'sent',
-                archiveStatus,
-            },
-            {
-                folder: 'returned',
-                archiveStatus,
-            },
-            {
-                folder: 'confirmed',
-                archiveStatus,
-            },
-            {
-                folder: 'paid',
-                archiveStatus,
-            }
-        )
+                archiveStatus ,
+                }
+            )
+        } else if (archiveStatus === 0 && folder === 'trash') {
+            table = role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
+            query.push({
+                folder :'trash',
+                archiveStatus ,
+                }
+            )
+        } else if (role === 'buyer') {
+            table = 'buyer_status'
+            query.push(
+                {
+                    folder: 'sent',
+                    archiveStatus,
+                },
+                {
+                    folder: 'returned',
+                    archiveStatus,
+                },
+                {
+                    folder: 'confirmed',
+                    archiveStatus,
+                },
+                {
+                    folder: 'paid',
+                    archiveStatus,
+                }
+            )
+        } else {
+            table = 'seller_status';
+            query.push(
+                {
+                    folder: 'sent',
+                    archiveStatus,
+                },
+                {
+                    folder: 'returned',
+                    archiveStatus,
+                },
+                {
+                    folder: 'confirmed',
+                    archiveStatus,
+                },
+                {
+                    folder: 'paid',
+                    archiveStatus,
+                }
+            )
+        }
+
+    break;
     }
+
+// 20221031 change
+// >>
 
     for (let i = 0; i < query.length; i++) {
         const q = query[i]
@@ -139,15 +165,29 @@ const getFolder = async (
 ) => {
     const table_did = role === 'seller' ? 'seller_did' : 'buyer_did'
     const archive = role === 'seller' ? 'seller_archived' : 'buyer_archived'
-    let table = role === 'seller' ? 'seller_status' : 'buyer_status'
     const sort_rule = 'seller_last_action DESC'
 
-    if (folder === 'draft') {
+// 20221031 change
+// <<
+    let table;
+
+    switch (folder ) {
+	case 'draft':
         table = 'seller_status_draft'
-    } else if (archiveStatus) {
-        table =
-            role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
+    break;
+    default:
+        if (archiveStatus === 1 && folder === 'paid') {
+            table = role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
+        } else if (archiveStatus === 0 && folder === 'trash') {
+            table = role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
+        } else if (role === 'buyer') {
+            table = 'buyer_status'
+        } else {
+            table = 'seller_status';
+        }
     }
+// 20221031 change
+// >>
 
     limit = limit > 200 ? 200 : limit
     limit = limit < 1 ? 1 : limit
@@ -222,9 +262,6 @@ const getTotal = async (
 
     if (folder === 'draft') {
         table = 'seller_status_draft'
-    } else if (archiveStatus) {
-        table =
-            role === 'seller' ? 'seller_status_archive' : 'buyer_status_archive'
     }
 
     const sql = `

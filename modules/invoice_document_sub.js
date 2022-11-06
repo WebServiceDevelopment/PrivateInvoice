@@ -19,7 +19,7 @@
 **/
 
 // Database Libraries
-const config					= require('../config.json');
+//const config					= require('../config.json');
 
 const db						= require('../database.js');
 
@@ -70,7 +70,7 @@ async function _getDocumentBuyer (document_uuid) {
 
 	return [ result, null];
 
-};
+}
 
 /*
  * 2.
@@ -101,7 +101,7 @@ async function _getDocumentSeller (document_uuid) {
 
 	return [ result, null];
 
-};
+}
 
 /*
  * 3.
@@ -132,7 +132,7 @@ async function _getArchiveDocumentBuyer (document_uuid) {
 
 	return [ result, null];
 
-};
+}
 
 /*
  * 4.
@@ -163,7 +163,7 @@ async function _getArchiveDocumentSeller (document_uuid) {
 
 	return [ result, null];
 
-};
+}
 
 /*
  * 5.
@@ -213,4 +213,4 @@ async function _getDraftDocument (member_did, document_uuid) {
 
 	return [doc , null];
 
-};
+}
