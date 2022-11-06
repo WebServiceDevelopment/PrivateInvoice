@@ -18,123 +18,109 @@
 
 **/
 
-"use script";
+'use strict'
 
-const fs = require('fs');
-const mysql = require('mysql');
-const bcrypt = require('bcrypt');
+const fs = require('fs')
+const mysql = require('mysql')
+const bcrypt = require('bcrypt')
 
 //const configStr = fs.readFileSync('config.json').toString();
 //const config = JSON.parse(configStr);
 
 const DATABASE = {
-		"connectionLimit" : 4,
-		"host" : "localhost",
-		"user" : process.env.DATABASE_USER,
-		"password" : process.env.DATABASE_PASS,
-		"database" : process.env.DATABASE_NAME
-	}
-const pool = mysql.createPool(DATABASE);
+    connectionLimit: 4,
+    host: 'localhost',
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASS,
+    database: process.env.DATABASE_NAME,
+}
+const pool = mysql.createPool(DATABASE)
 
-
-const SALT_ROUNDS = 10;
+const SALT_ROUNDS = 10
 
 module.exports = {
-	insert		: _insert,
-	update		: _update,
-	delete		: _delete,
-	selectOne	: _selectOne,
-	selectAll	: _selectAll, 
-	hash		: _hash,
-	compare		: _compare
+    insert: _insert,
+    update: _update,
+    delete: _delete,
+    selectOne: _selectOne,
+    selectAll: _selectAll,
+    hash: _hash,
+    compare: _compare,
 }
 
-function _insert (sql, args) {
-	
-	return new Promise ((resolve, reject) => {
-		pool.query(sql, args, (err, result) => {
-			if(err) {
-				return reject (err);
-			}
-			resolve(result);
-		});
-	});
-
+function _insert(sql, args) {
+    return new Promise((resolve, reject) => {
+        pool.query(sql, args, (err, result) => {
+            if (err) {
+                return reject(err)
+            }
+            resolve(result)
+        })
+    })
 }
 
 function _update(sql, args) {
-	
-	return new Promise ((resolve, reject) => {
-		pool.query(sql, args, (err, result) => {
-			if(err) {
-				return reject (err);
-			}
-			resolve(result);
-		});
-	});
-
+    return new Promise((resolve, reject) => {
+        pool.query(sql, args, (err, result) => {
+            if (err) {
+                return reject(err)
+            }
+            resolve(result)
+        })
+    })
 }
 
 function _delete(sql, args) {
-	
-	return new Promise ((resolve, reject) => {
-		pool.query(sql, args, (err, result) => {
-			if(err) {
-				return reject (err);
-			}
-			resolve(result);
-		});
-	});
-
+    return new Promise((resolve, reject) => {
+        pool.query(sql, args, (err, result) => {
+            if (err) {
+                return reject(err)
+            }
+            resolve(result)
+        })
+    })
 }
 
 function _selectOne(sql, args) {
-		
-	return new Promise ((resolve, reject) => {
-		pool.query(sql, args, (err, row) => {
-			if(err) {
-				return reject (err);
-			}
-			resolve(row[0]);
-		});
-	});
-
+    return new Promise((resolve, reject) => {
+        pool.query(sql, args, (err, row) => {
+            if (err) {
+                return reject(err)
+            }
+            resolve(row[0])
+        })
+    })
 }
 
 function _selectAll(sql, args) {
-		
-	return new Promise( (resolve, reject) => {
-		pool.query(sql, args, (err, rows) => {
-			if(err) {
-				return reject (err);
-			}
-			resolve(rows);
-		});
-	});
-
+    return new Promise((resolve, reject) => {
+        pool.query(sql, args, (err, rows) => {
+            if (err) {
+                return reject(err)
+            }
+            resolve(rows)
+        })
+    })
 }
 
 function _hash(raw) {
-
-	return new Promise( (resolve, reject) => {
-		bcrypt.hash(raw, SALT_ROUNDS, (err, hash) => {
-			if(err) {
-				return reject(err);
-			}
-			resolve(hash);
-		});
-	});
-
+    return new Promise((resolve, reject) => {
+        bcrypt.hash(raw, SALT_ROUNDS, (err, hash) => {
+            if (err) {
+                return reject(err)
+            }
+            resolve(hash)
+        })
+    })
 }
 
 function _compare(raw, hash) {
-
-	return new Promise( (resolve, reject) => {
-		bcrypt.compare(raw, hash, (err, result) => {
-			if(err) {
-				return reject(err);
-			}
-			resolve(result);
-		});
-	});
+    return new Promise((resolve, reject) => {
+        bcrypt.compare(raw, hash, (err, result) => {
+            if (err) {
+                return reject(err)
+            }
+            resolve(result)
+        })
+    })
 }

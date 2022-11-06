@@ -25,57 +25,12 @@ const router = express.Router()
 module.exports = router
 
 // Import Modules
-const {
-    setCompanyLogo,
-    getCompanyLogo,
-    updateOrganization,
-} = require('../modules/settings_sub.js')
-
-/*
- * 4.
- * getCompanyLogo
- */
-router.get('/logo', async function (req, res) {
-    const { logoUuid } = req.query // optional, enum
-    const [dataUrl, err] = await getCompanyLogo(logoUuid)
-
-    if (err) {
-        return res.status(400).json({
-            err: 1,
-            msg: 'Invalid request',
-        })
-    }
-
-    res.json({
-        err: 0,
-        msg: dataUrl,
-    })
-})
-
-/*
- * 2.
- * setCompanyLogo
- */
-router.put('/logo', async function (req, res) {
-    const { dataUrl } = req.body
-    const { organization_did } = req.session.data
-    const [logoUuid, err] = await setCompanyLogo(organization_did, dataUrl)
-
-    if (err) {
-        return res.status(400).json({
-            err: 1,
-            msg: `Invalid request.`,
-        })
-    }
-
-    res.json({
-        err: 0,
-        msg: logoUuid,
-    })
-})
+const { updateOrganization } = require('../modules/organization/')
 
 /*
  * Update Organization
+ * PUT /api/organization/
+ * BODY: Organization Details (type)
  */
 router.put('/', async function (req, res) {
     const { organization_did } = req.session.data
@@ -97,10 +52,7 @@ router.put('/', async function (req, res) {
     )
 
     if (err) {
-        return res.status(400).json({
-            err: 1,
-            msg: `Error: Invalid request.`,
-        })
+        return res.status(400).json('Error: Invalid request')
     }
 
     // Step 4 : Update Current Redis Session

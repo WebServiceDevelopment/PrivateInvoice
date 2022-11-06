@@ -18,7 +18,7 @@
     
 **/
 
-"use strict";
+'use strict'
 
 // Import sub
 
@@ -26,15 +26,14 @@
 
 // Libraries
 
-const axios					= require('axios');
+const axios = require('axios')
 
-// Database 
-
+// Database
 
 // Exports
 module.exports = {
-	connect					: buyer_connect,
-	rollbackReturnToSent	: buyer_rollbackReturnToSent,
+    connect: buyer_connect,
+    rollbackReturnToSent: buyer_rollbackReturnToSent,
 }
 
 //------------------------------- export modules ------------------------------
@@ -43,77 +42,77 @@ module.exports = {
  * buyer_connect
  */
 async function buyer_connect(buyer_host, seller_did, buyer_did) {
-
-    const url = `${buyer_host}/api/message/buyerToConnect`;
+    console.log(buyer_host)
+    const url = `${buyer_host}/api/message/buyerToConnect`
 
     const params = {
-        method : 'post',
-        url : url,
-        data : {
+        method: 'post',
+        url: url,
+        data: {
             seller_did,
-            buyer_did
-        }
-    };
+            buyer_did,
+        },
+    }
 
-    let response;
+    let response
     try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.responce) {
+        response = await axios(params)
+    } catch (err) {
+        if (err.responce) {
             response = {
-                status : err.response.status,
-                data : err.message
+                status: err.response.status,
+                data: err.message,
             }
         } else {
             response = {
-                status : 400,
-                data : "Not found."
+                status: 400,
+                data: 'Not found.',
             }
         }
     }
 
-    return [ response.status, response.data ];
-
+    return [response.status, response.data]
 }
 
 /*
-*  buyer_rollbackReturnToSent
-*/
-async function buyer_rollbackReturnToSent (buyer_host, document_uuid, buyer_did) {
-
-    const url = `${buyer_host}/api/message/buyerRollbackReturnToSent`;
+ *  buyer_rollbackReturnToSent
+ */
+async function buyer_rollbackReturnToSent(
+    buyer_host,
+    document_uuid,
+    buyer_did
+) {
+    const url = `${buyer_host}/api/message/buyerRollbackReturnToSent`
 
     const params = {
-        method : 'post',
-        url : url,
-        data : {
+        method: 'post',
+        url: url,
+        data: {
             document_uuid,
-            buyer_did
-        }
-    };
+            buyer_did,
+        },
+    }
 
-    let response;
+    let response
     try {
-        response = await axios(params);
-    } catch(err) {
-        if(err.code === 'ECONNRESET') {
+        response = await axios(params)
+    } catch (err) {
+        if (err.code === 'ECONNRESET') {
             response = {
-                status : 500,
-                data : 'ECONNRESET'
+                status: 500,
+                data: 'ECONNRESET',
             }
         } else {
-            response = err.response;
+            response = err.response
         }
     }
-    if ( response == null) {
-        let msg = "Not Found."
+    if (response == null) {
+        let msg = 'Not Found.'
         response = {
-            status : 404,
-            data : msg
+            status: 404,
+            data: msg,
         }
     }
 
-    return [ response.status, response.data ];
-
+    return [response.status, response.data]
 }
-

@@ -392,10 +392,10 @@ const SettingsProfile = function () {
             work_email: memberData.work_email,
         }
 
-        const url = '/api/settings/updateProfile'
+        const url = '/api/member/'
 
         let ajax = new XMLHttpRequest()
-        ajax.open('POST', url)
+        ajax.open('PUT', url)
         ajax.setRequestHeader('Content-Type', 'application/json')
         ajax.responseType = 'json'
         ajax.send(JSON.stringify(args))
@@ -420,8 +420,8 @@ const SettingsProfile = function () {
         this.DOM.profile.job_title.setAttribute('readonly', 'readonly')
         this.DOM.profile.work_email.setAttribute('readonly', 'readonly')
 
+        /*
         const url = '/api/settings/getProfileImage'
-
         const ajax = new XMLHttpRequest()
         ajax.open('POST', url)
         ajax.setRequestHeader('Content-Type', 'application/json')
@@ -439,6 +439,7 @@ const SettingsProfile = function () {
             let url = res.msg.dataUrl
             this.DOM.profile.img.style.backgroundImage = `url('${url}')`
         }
+        */
 
         // Company
 

@@ -24,46 +24,29 @@
 
 const db = require('../../database.js')
 
-/*
- * UpdateOrganization
- *
- */
-
-const updateOrganization = async (
-    organization_did, // string, did:key:123
-    organizationDetails // object OrganizationDetails
+const updateProfile = async (
+    member_did, // string, did:key:123
+    memberDetails // object MemberDetails
 ) => {
     const sql = `
 		UPDATE
-			organizations
+			members
 		SET
-			organization_name = ?,
-			organization_postcode = ?,
-			organization_address = ?,
-			organization_building = ?,
-			organization_department = ?,
-			organization_tax_id = ?,
-			addressCountry = ?,
-			addressRegion = ?,
-			addressCity = ?
+			membername = ?,
+			job_title = ?,
+			work_email = ?
 		WHERE
-			organization_did = ?
+			member_did = ?
 	`
 
     const args = [
-        organizationDetails.name,
-        organizationDetails.postcode,
-        organizationDetails.address,
-        organizationDetails.building,
-        organizationDetails.department,
-        organizationDetails.tax_id,
-        organizationDetails.country,
-        organizationDetails.region,
-        organizationDetails.city,
-        organization_did,
+        memberDetails.membername,
+        memberDetails.job_title,
+        memberDetails.work_email,
+        member_did,
     ]
 
-    // Step 3 : Write Changes to log database
+    // Step 2 : Write Changes to log database
 
     try {
         await db.update(sql, args)
@@ -75,5 +58,5 @@ const updateOrganization = async (
 // Exports
 
 module.exports = {
-    updateOrganization,
+    updateProfile,
 }
