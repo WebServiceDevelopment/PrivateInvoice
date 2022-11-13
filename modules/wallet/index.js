@@ -22,6 +22,10 @@
 
 const wallet = require('@sidetree/wallet')
 
+const Web3 = require('web3')
+const web3 = new Web3(process.env.GANACHE_ADDRESS)
+const { eth } = web3
+
 /*
 did:key Return Type
 {
@@ -53,7 +57,7 @@ const createDidKey = async (
     mnemonic, //string
     hdPathIndex // number
 ) => {
-    const keyType = 'secp256k1'
+    const keyType = 'Ed25519'
     const hdPath = `m/44'/60'/0'/0/${hdPathIndex}`
     const key = await wallet.toKeyPair(mnemonic, keyType, hdPath)
     return key
@@ -85,7 +89,7 @@ const insertFunds = async (
     const sourceBalanceEnd = await eth.getBalance(sourceAddress)
     console.log('Source Balance(end): ', sourceBalanceEnd)
 
-    const memberBalance = await eth.getBalance(newMemberAddress)
+    const memberBalance = await eth.getBalance(memberAddress)
     console.log('Member Balance: ', memberBalance)
 }
 

@@ -25,10 +25,13 @@ const router = express.Router()
 module.exports = router
 
 // Import Modules
+
 const {
     createOrganization,
     updateOrganization,
 } = require('../modules/organization/')
+
+const { getSessionData } = require('../modules/session/')
 
 /**
  * Create Organzation
@@ -60,11 +63,17 @@ const {
  */
 
 router.post('/', async (req, res) => {
-    console.log(req.body)
     const { member, company, address } = req.body
-    createOrganization(company, address, member)
-
-    res.status(400).end('okay')
+    const memberDid = await createOrganization(company, address, member)
+    const [member_data, err] = await getSessionData(memberDid)
+    if (err) {
+        return res.status(500).end('Could not get session data')
+    }
+    req.session.data = member_data
+    res.json({
+        err: 0,
+        msg: 'okay',
+    })
 })
 
 /*

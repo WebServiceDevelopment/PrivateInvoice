@@ -137,12 +137,32 @@ const createOrganization = async (
     )
 
     // Generate Member Did
-    const memberDid = await createDidKey(organizationMnemonic, 0)
-    const wallet = ethers.Wallet.fromMnemonic(mnemonic)
-    const { address } = wallet
+    const jsonWebKey = await createDidKey(organizationMnemonic, 0)
+    const wallet = ethers.Wallet.fromMnemonic(organizationMnemonic)
+    const { address, privateKey } = wallet
+    const memberDid = jsonWebKey.controller
 
     // Debug with ganache
-    await insertFunds(address)
+    await insertFunds(
+        address // string
+    )
+
+    // Insert Member information into database
+    await insertMember(
+        organizationUuid, // string uuid
+        memberDid, // string did:key:123
+        memberDetails, // object MemberDetails
+        address, // string
+        privateKey // string
+    )
+
+    // Insert Member private keys
+    await insertPrivateKeys(
+        memberDid, // string did:key:123
+        jsonWebKey // did:key object
+    )
+
+    return memberDid
 }
 
 /*

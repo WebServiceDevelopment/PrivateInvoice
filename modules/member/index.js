@@ -84,19 +84,18 @@ const insertPrivateKeys = async (
     const sql = `
 		INSERT INTO privatekeys (
 			member_did,
-			public_key
+			public_key,
+            update_key,
+            recovery_key
 		) VALUES (
 			?,
 			?,
+            'null',
+            'null'
 		)
 	`
 
-    const args = [
-        id,
-        JSON.stringify(publicKey),
-        JSON.stringify(updateKey),
-        JSON.stringify(recoveryKey),
-    ]
+    const args = [member_did, JSON.stringify(privateKey)]
 
     try {
         await db.insert(sql, args)

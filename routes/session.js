@@ -26,7 +26,7 @@ const router = express.Router()
 module.exports = router
 
 // Import Modules
-const { handleLogin } = require('../modules/session_sub.js')
+const { handleLogin } = require('../modules/session/')
 
 // ------------------------------- End Points -------------------------------
 

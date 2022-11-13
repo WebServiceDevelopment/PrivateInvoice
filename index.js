@@ -59,7 +59,7 @@ app.use(
 
 // Middleware
 
-const { handleLogin } = require('./modules/sessions.js')
+const { handleLogin } = require('./modules/session/')
 
 app.get('*', function (req, res, next) {
     let parts = req.url.split('/')

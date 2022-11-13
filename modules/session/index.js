@@ -21,20 +21,16 @@
 'use strict'
 
 //  Database
-const db = require('../database.js')
-
-// Exports
-
-module.exports = {
-    handleLogin: _handleLogin,
-    getSessionData: _getSessionData,
-}
+const db = require('../../database.js')
 
 /*
  * handleLogin
  */
 
-async function _handleLogin(membername, password) {
+const handleLogin = async (
+    membername, // string
+    password // string
+) => {
     // 1.
 
     let sql
@@ -120,7 +116,9 @@ async function _handleLogin(membername, password) {
 /*
  * getSessionData
  */
-async function _getSessionData(member_did) {
+const getSessionData = async (
+    member_did // string did:key:123
+) => {
     let sql
 
     // 1.
@@ -186,4 +184,11 @@ async function _getSessionData(member_did) {
 
     // 5.
     return [member_data, null]
+}
+
+// Exports
+
+module.exports = {
+    handleLogin,
+    getSessionData,
 }
