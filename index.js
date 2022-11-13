@@ -175,6 +175,7 @@ app.all('*', function (req, res, next) {
 })
 
 // Routes
+
 app.use('/api/invoice', require('./routes/invoice/buyer_invoice.js'))
 app.use('/api/invoice', require('./routes/invoice/seller_invoice.js'))
 app.use('/api/invoice', require('./routes/invoice/seller_invoice_document.js'))
@@ -183,16 +184,21 @@ app.use('/api/invoice', require('./routes/invoice/seller_invoice_trash.js'))
 app.use('/api/invoice', require('./routes/invoice/invoice_document.js'))
 app.use('/api/invoice', require('./routes/invoice/softDelete.js'))
 
-app.use('/api/tray', require('./routes/tray.js'))
-app.use('/api/contacts', require('./routes/contacts.js'))
-app.use('/api/organization', require('./routes/organization.js'))
-app.use('/api/member', require('./routes/member.js'))
-app.use('/api/session', require('./routes/session.js'))
+app.use('/api/message', require('./routes/message/seller_message.js'))
+app.use('/api/message', require('./routes/message/buyer_message.js'))
+
 app.use('/api/wallet', require('./routes/wallet/'))
 app.use('/api/presentations', require('./routes/presentations/'))
 
-app.use('/api/message', require('./routes/message/seller_message.js'))
-app.use('/api/message', require('./routes/message/buyer_message.js'))
+// Refactored End Points
+
+app.use('/api/contacts', require('./routes/contacts.js'))
+app.use('/api/invoice', require('./routes/invoice.js'))
+app.use('/api/member', require('./routes/member.js'))
+app.use('/api/organization', require('./routes/organization.js'))
+app.use('/api/session', require('./routes/session.js'))
+app.use('/api/tray', require('./routes/tray.js'))
+
 
 // Public Directory and listen
 
