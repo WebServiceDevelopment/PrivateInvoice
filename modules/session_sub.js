@@ -20,32 +20,20 @@
 
 'use strict'
 
-// Import Libraries
-const Web3 = require('web3')
-const web3 = new Web3(process.env.GANACHE_ADDRESS)
-const { eth } = web3
-
 //  Database
 const db = require('../database.js')
-
-const MEMBERS_TABLE = 'members'
 
 // Exports
 
 module.exports = {
     handleLogin: _handleLogin,
-    insertMnemonic: _insertMnemonic,
-    insertPrivateKeys: _insertPrivateKeys,
-    insertMember: _insertMember,
     getSessionData: _getSessionData,
-    insertFunds: _insertFunds,
 }
-
-// ---------------------------------------------------------------------------
 
 /*
  * handleLogin
  */
+
 async function _handleLogin(membername, password) {
     // 1.
 
@@ -68,11 +56,8 @@ async function _handleLogin(membername, password) {
         OR
             work_email = ?
 	`
-    
-    const args = [
-        membername,
-        membername,
-    ]
+
+    const args = [membername, membername]
 
     let member_data
     member_data = await db.selectOne(sql, args)
@@ -130,177 +115,6 @@ async function _handleLogin(membername, password) {
     delete member_data.avatar_uuid
 
     return [member_data, null]
-}
-
-/*
- * insertMnemonic
- */
-async function _insertMnemonic(organization_id, mnemonic) {
-    const sql = `
-		INSERT INTO mnemonics (
-			organization_did,
-			recovery_phrase
-		) VALUES (
-			?,
-			?
-		)
-	`
-
-    const args = [organization_id, mnemonic]
-
-    try {
-        await db.insert(sql, args)
-    } catch (err) {
-        return [err]
-    }
-
-    return [null]
-}
-
-async function _insertPrivateKeys(keys) {
-    const { id, publicKey, recoveryKey, updateKey } = keys
-
-    const sql = `
-		INSERT INTO privatekeys (
-			member_did,
-			public_key,
-			update_key,
-			recovery_key
-		) VALUES (
-			?,
-			?,
-			?,
-			?
-		)
-	`
-
-    const args = [
-        id,
-        JSON.stringify(publicKey),
-        JSON.stringify(updateKey),
-        JSON.stringify(recoveryKey),
-    ]
-
-    try {
-        await db.insert(sql, args)
-    } catch (err) {
-        return [err]
-    }
-
-    return [null]
-}
-
-/*
- * insertMember
- */
-async function _insertMember(member_did, body, eth_address, privatekey) {
-    console.log('Member did: ', member_did)
-
-    // 1.
-    // Deconstruct postbody arguments
-
-    const { member, company, address } = body
-
-    // 2.
-    // First Create Password Hash
-    let password_hash
-    password_hash = await db.hash(member.password)
-
-    let sql, args
-
-    // 3.
-    // Then insert into members table
-
-    sql = `
-		INSERT INTO members (
-			member_did,
-			membername,
-			job_title,
-			work_email,
-			password_hash,
-			organization_did,
-			wallet_address,
-			wallet_private_key
-		) VALUES (
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?
-		)
-	`
-
-    // Construct arguments
-
-    args = [
-        member_did,
-        member.membername,
-        member.job_title,
-        member.contact_email,
-        password_hash,
-        member_did,
-        eth_address,
-        privatekey,
-    ]
-
-    try {
-        await db.insert(sql, args)
-    } catch (err) {
-        return [err]
-    }
-
-    // 4.
-    // Then insert into organizations table
-
-    sql = `
-		INSERT INTO organizations (
-			organization_did,
-			organization_name,
-			organization_department,
-			organization_tax_id,
-			addressCountry,
-			addressRegion,
-			organization_postcode,
-			addressCity,
-			organization_address,
-			organization_building
-		) VALUES (
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?,
-			?
-		)
-	`
-
-    args = [
-        member_did,
-        company.name,
-        company.department,
-        company.tax_id,
-        address.country,
-        address.region,
-        address.postcode,
-        address.city,
-        address.line1,
-        address.line2,
-    ]
-
-    try {
-        await db.insert(sql, args)
-    } catch (err) {
-        return [err]
-    }
-
-    return [null]
 }
 
 /*
@@ -372,35 +186,4 @@ async function _getSessionData(member_did) {
 
     // 5.
     return [member_data, null]
-}
-
-/*
- * insertFunds
- */
-async function _insertFunds(newMemberAddress) {
-    // 0.1 ETH in Wei
-    const UNIT_VALUE = 100000000000000000
-    const AMOUNT = Math.floor(Math.random() * 3) + 2
-    const WEI_TO_SEND = UNIT_VALUE * AMOUNT
-
-    const accounts = await eth.getAccounts()
-    const [sourceAddress] = accounts
-    const gasPrice = await eth.getGasPrice()
-
-    const sourceBalanceStart = await eth.getBalance(sourceAddress)
-    console.log('Source Balance(start): ', sourceBalanceStart)
-
-    const transactionObj = {
-        from: sourceAddress,
-        to: newMemberAddress,
-        value: WEI_TO_SEND,
-    }
-
-    const transaction = await eth.sendTransaction(transactionObj)
-
-    const sourceBalanceEnd = await eth.getBalance(sourceAddress)
-    console.log('Source Balance(end): ', sourceBalanceEnd)
-
-    const memberBalance = await eth.getBalance(newMemberAddress)
-    console.log('Member Balance: ', memberBalance)
 }

@@ -132,6 +132,11 @@ app.all('*', function (req, res, next) {
     }
 
     // Allow access to message
+    if (req.url.startsWith('/api/organization')) {
+        return next()
+    }
+
+    // Allow access to message
     if (req.url.startsWith('/api/message')) {
         return next()
     }
@@ -182,7 +187,7 @@ app.use('/api/tray', require('./routes/tray.js'))
 app.use('/api/contacts', require('./routes/contacts.js'))
 app.use('/api/organization', require('./routes/organization.js'))
 app.use('/api/member', require('./routes/member.js'))
-app.use('/api/session', require('./routes/session/'))
+app.use('/api/session', require('./routes/session.js'))
 app.use('/api/wallet', require('./routes/wallet/'))
 app.use('/api/presentations', require('./routes/presentations/'))
 
