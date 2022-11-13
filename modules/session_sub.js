@@ -62,14 +62,20 @@ async function _handleLogin(membername, password) {
 			wallet_address,
 			avatar_uuid
 		FROM
-			${MEMBERS_TABLE}
+			members
 		WHERE
 			membername = ?
+        OR
+            work_email = ?
 	`
+    
+    const args = [
+        membername,
+        membername,
+    ]
 
     let member_data
-
-    member_data = await db.selectOne(sql, [membername])
+    member_data = await db.selectOne(sql, args)
 
     if (!member_data) {
         return [null, { err: 100, msg: 'USERNAME NOT FOUND' }]
@@ -77,7 +83,6 @@ async function _handleLogin(membername, password) {
 
     // 2.
     let match = false
-
     match = await db.compare(password, member_data.password_hash)
 
     if (!match) {
