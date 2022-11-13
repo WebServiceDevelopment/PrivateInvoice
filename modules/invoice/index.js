@@ -20,6 +20,7 @@
 
 const { sendInvoice } = require('./status_seller_send')
 const { confirmInvoice } = require('./status_buyer_confirm')
+const { unconfirmInvoice } = require('./status_buyer_unconfirm')
 
 const updateStatus = async (
     action, // enum send, confirm, unconfirm
@@ -35,6 +36,10 @@ const updateStatus = async (
         case 'confirm':
             // buyer
             await confirmInvoice(member_did, document_uuid)
+            break;
+        case 'unconfirm':
+            // buyer
+            await unconfirmInvoice(member_did, document_uuid)
             break;
         default:
             return res.status(400).end('invalid status provided');
