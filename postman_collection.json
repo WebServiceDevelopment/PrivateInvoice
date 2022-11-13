@@ -861,7 +861,7 @@
 							"\r",
 							"pm.test(\"The response has all properties\", () => {\r",
 							"  const responseJson = pm.response.json();\r",
-							"  // pm.expect(responseJson[0]).not.to.eql(0)\r",
+							"  pm.expect(responseJson[0]).not.to.eql(0)\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
@@ -974,7 +974,6 @@
 							"pm.test(\"The response has all properties\", () => {\r",
 							"  const responseJson = pm.response.json();\r",
 							"  pm.expect(responseJson.err).to.eql(0);\r",
-							"  pm.expect(responseJson.msg).to.eql('okay');\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
@@ -987,7 +986,7 @@
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [
 					{
 						"key": "Authorization",
@@ -1005,7 +1004,7 @@
 					"raw": "{\r\n    \"document_uuid\": \"{{invoice_uuid}}\"\r\n}"
 				},
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/invoice/confirm",
+					"raw": "http://127.0.0.1:3000/api/invoice/status?action=confirm",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1017,7 +1016,13 @@
 					"path": [
 						"api",
 						"invoice",
-						"confirm"
+						"status"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "confirm"
+						}
 					]
 				}
 			},

@@ -27,7 +27,7 @@ const router = express.Router()
 module.exports = router
 
 const {
-    sendInvoice
+    updateStatus
 } = require('../modules/invoice')
 
 router.put('/status', async (req, res) => {
@@ -36,13 +36,11 @@ router.put('/status', async (req, res) => {
     const { document_uuid } = req.body
     const { member_did } = req.session.data
 
-    switch (action) {
-        case 'send':
-            sendInvoice(member_did, document_uuid)
-            break;
-        default:
-            return res.status(400).end('invalid status provided');
-    }
+    await updateStatus(
+        action, // enum send, confirm, unconfirm
+        member_did, // string did:key:123
+        document_uuid, // string uuid
+    )
 
     res.json({
         err: 0,

@@ -18,10 +18,6 @@
 	
 **/
 
-const uuidv1 = require('uuid').v1
-const uniqid = require('uniqid')
-const moment = require('moment')
-
 // Import Modules
 const sub = require('../invoice_sub.js')
 const tran = require('../invoice_sub_transaction.js')
@@ -29,9 +25,6 @@ const to_buyer = require('../seller_to_buyer.js')
 
 const sign_your_credentials = require('../sign_your_credentials.js')
 const { makePresentation } = require('../presentations_out.js')
-
-// Database
-const config = require('../../config.json')
 
 // Table Name
 const SELLER_DRAFT_DOCUMENT = 'seller_document_draft'

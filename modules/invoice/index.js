@@ -19,7 +19,29 @@
 **/
 
 const { sendInvoice } = require('./status_seller_send')
+const { confirmInvoice } = require('./status_buyer_confirm')
+
+const updateStatus = async (
+    action, // enum send, confirm, unconfirm
+    member_did, // string did:key:123
+    document_uuid, // string uuid
+) => {
+
+    switch (action) {
+        case 'send':
+            // seller
+            await sendInvoice(member_did, document_uuid)
+            break;
+        case 'confirm':
+            // buyer
+            await confirmInvoice(member_did, document_uuid)
+            break;
+        default:
+            return res.status(400).end('invalid status provided');
+    }
+
+}
 
 module.exports = {
-    sendInvoice
+    updateStatus
 }
