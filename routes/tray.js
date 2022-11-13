@@ -61,10 +61,10 @@ router.get('/getFolder', async (req, res) => {
 
     // Parse Query Parameters
     const { folder } = req.query // required, enum
+    const role = req.query.role === 'buyer' ? 'buyer' : 'seller' // optional
+    const archive = parseInt(req.query.archive) || 0 // optional, bool
     const limit = parseInt(req.query.limit) || 25 // optional, number
     const offset = parseInt(req.query.offset) || 0 // optional, number
-    const role = req.query.role === 'buyer' ? 'buyer' : 'seller' // optional, enum
-    const archive = parseInt(req.query.archive) || 0 // optional, bool
 
     // Get folder from tray module
     const [rows, err] = await getFolder(

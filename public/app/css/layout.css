@@ -2651,20 +2651,26 @@ main.app section article div.document div.paper div.content div.ptable div.tbody
 
 }
 
+main.app section article div.document div.paper div.content div.ptable div.tbody li table  td:nth-child(3) {
+	
+	padding-top: 2px;
+
+}
+
 main.app section article div.document div.paper div.content div.ptable div.tbody li table  td input {
 
 	border: 0;
 	background-color: transparent;
-	width: calc(100% - 10px);
+	width: calc(100% - 6px);
 
 }
 
 main.app section article div.document div.paper div.content div.ptable div.tbody li table  td textarea {
 
-	width: calc(100% - 2px);
+	width: calc(100% - 6px);
 	resize: none;
 	border: none;
-	height: 30px;
+	height: 32px;
 	background-color: transparent;
 
 }
