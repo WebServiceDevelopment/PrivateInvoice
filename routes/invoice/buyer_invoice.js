@@ -855,12 +855,12 @@ router.post('/makePayment', async function (req, res) {
     // And Convert ipfs cid to hex.
     //
 
-    console.log('Make payment 12')
-    const ipfs_result = await Ipfs_Http_Client.add(document.document_json)
-    const ipfs_cid = ipfs_result.cid.toString()
-    const ipfs_cid_hex = web3.utils.toHex(ipfs_cid)
+    // console.log('Make payment 12')
+    // const ipfs_result = await Ipfs_Http_Client.add(document.document_json)
+    // const ipfs_cid = ipfs_result.cid.toString()
+    // const ipfs_cid_hex = web3.utils.toHex(ipfs_cid)
 
-    console.log('cid=' + ipfs_cid + ':ipfs_cid_hex =' + ipfs_cid_hex)
+    // console.log('cid=' + ipfs_cid + ':ipfs_cid_hex =' + ipfs_cid_hex)
 
     // 13.
     // privateKey.
@@ -881,7 +881,7 @@ router.post('/makePayment', async function (req, res) {
         to_address,
         gasLimit,
         makePaymantTo,
-        ipfs_cid_hex
+        // ipfs_cid_hex
     )
 
     if (err14) {
@@ -1088,8 +1088,8 @@ router.post('/makePayment', async function (req, res) {
         msg: {
             consumed: balanceETH_3 + ' ETH',
             transaction_result: transaction_result,
-            ipfs_cid: ipfs_cid,
-            ipfs_address: ipfs_address,
+            // ipfs_cid: ipfs_cid,
+            // ipfs_address: ipfs_address,
         },
     })
 

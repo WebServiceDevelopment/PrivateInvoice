@@ -1147,8 +1147,6 @@
 							"  const { msg } = responseJson\r",
 							"  pm.expect(msg).to.have.property('consumed');\r",
 							"  pm.expect(msg).to.have.property('transaction_result');\r",
-							"  pm.expect(msg).to.have.property('ipfs_cid');\r",
-							"  pm.expect(msg).to.have.property('ipfs_address');\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
