@@ -164,7 +164,7 @@ function itemsShipped_object() {
     }
 }
 
-const createInvoice = async (
+const createDraft = async (
     member_did, // string did:key:123
     member_data // object 
 ) => {
@@ -172,11 +172,6 @@ const createInvoice = async (
     const METHOD = '/create'
     const MAX_ROWS = 10
     let start = Date.now()
-
-    // 1.
-    // We go ahead and get the organization information.
-
-
 
     // 2.
     //
@@ -191,7 +186,6 @@ const createInvoice = async (
     // 4.
     //
     const credentialSubject = new credentialSubject_object()
-
     credentialSubject.customerReferenceNumber = ''
     credentialSubject.identifier = document_uuid
     credentialSubject.invoiceNumber = document_number
@@ -380,5 +374,5 @@ const createInvoice = async (
 }
 
 module.exports = {
-    createInvoice
+    createDraft
 }

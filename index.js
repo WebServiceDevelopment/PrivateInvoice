@@ -174,7 +174,6 @@ app.all('*', function (req, res, next) {
 
 // Routes
 
-app.use('/api/invoice', require('./routes/invoice/seller_invoice_document.js'))
 app.use('/api/invoice', require('./routes/invoice/seller_invoice_archive.js'))
 app.use('/api/invoice', require('./routes/invoice/seller_invoice_trash.js'))
 app.use('/api/invoice', require('./routes/invoice/invoice_document.js'))

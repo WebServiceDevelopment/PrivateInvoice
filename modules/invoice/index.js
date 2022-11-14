@@ -19,7 +19,8 @@
 **/
 
 // Seller Status
-const { createInvoice } = require('./status_seller_create')
+const { createDraft } = require('./draft_seller_create')
+const { updateDraft } = require('./draft_seller_update')
 const { sendInvoice } = require('./status_seller_send')
 const { recreateInvoice } = require('./status_seller_recreate')
 const { withdrawInvoice } = require('./status_seller_withdraw')
@@ -65,6 +66,7 @@ const updateStatus = async (
 }
 
 module.exports = {
-    createInvoice,
+    createDraft,
+    updateDraft,
     updateStatus
 }
