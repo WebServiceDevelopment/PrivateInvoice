@@ -19,6 +19,7 @@
 **/
 
 // Seller Status
+const { createInvoice } = require('./status_seller_create')
 const { sendInvoice } = require('./status_seller_send')
 const { recreateInvoice } = require('./status_seller_recreate')
 const { withdrawInvoice } = require('./status_seller_withdraw')
@@ -64,5 +65,6 @@ const updateStatus = async (
 }
 
 module.exports = {
+    createInvoice,
     updateStatus
 }

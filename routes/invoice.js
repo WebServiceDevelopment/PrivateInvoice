@@ -27,10 +27,34 @@ const router = express.Router()
 module.exports = router
 
 const {
+    createInvoice,
     updateStatus
 } = require('../modules/invoice')
 
-router.put('/status', async (req, res) => {
+router.post('/', async (req, res) => {
+
+    const { member_did } = req.session.data
+    const member_data = {
+        organization_name: req.session.data.organization_name,
+        organization_postcode: req.session.data.organization_postcode,
+        organization_address: req.session.data.organization_address,
+        organization_building: req.session.data.organization_building,
+        organization_department: req.session.data.organization_department,
+        organization_tax_id: req.session.data.organization_tax_id,
+        addressCountry: req.session.data.addressCountry,
+        addressRegion: req.session.data.addressRegion,
+        addressCity: req.session.data.addressCity,
+    }
+
+    const document_uuid = await createInvoice(member_did, member_data)
+
+    res.json({
+        err: 0,
+        msg: document_uuid,
+    })
+});
+
+router.patch('/', async (req, res) => {
 
     const { action } = req.query
     const { document_uuid } = req.body
