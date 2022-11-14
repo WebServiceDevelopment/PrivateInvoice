@@ -20,6 +20,8 @@
 
 // Seller Status
 const { sendInvoice } = require('./status_seller_send')
+const { recreateInvoice } = require('./status_seller_recreate')
+const { withdrawInvoice } = require('./status_seller_withdraw')
 
 // Buyer Status
 const { confirmInvoice } = require('./status_buyer_confirm')
@@ -36,25 +38,27 @@ const updateStatus = async (
     switch (action) {
         case 'send':
             // seller
-            await sendInvoice(member_did, document_uuid)
-            break;
+            return await sendInvoice(member_did, document_uuid)
+        case 'recreate':
+            // seller
+            return await recreateInvoice(member_did, document_uuid)
+        case 'withdraw':
+            // seller
+            return await withdrawInvoice(member_did, document_uuid)
         case 'return':
             // buyer
-            await returnInvoice(member_did, document_uuid)
+            return await returnInvoice(member_did, document_uuid)
         case 'confirm':
             // buyer
-            await confirmInvoice(member_did, document_uuid)
-            break;
+            return await confirmInvoice(member_did, document_uuid)
         case 'unconfirm':
             // buyer
-            await unconfirmInvoice(member_did, document_uuid)
-            break;
+            return await unconfirmInvoice(member_did, document_uuid)
         case 'pay':
             // buyer
-            await payInvoice(member_did, document_uuid)
-            break;
+            return await payInvoice(member_did, document_uuid)
         default:
-            return res.status(400).end('invalid status provided');
+            throw new Error('invalid status provided');
     }
 
 }

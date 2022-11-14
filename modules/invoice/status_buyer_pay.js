@@ -57,10 +57,6 @@ const payInvoice = async (
 
     let start = Date.now()
 
-    const { document_uuid, gasLimit } = req.body
-    const { member_did } = req.session.data
-
-    let errno, code
 
     console.log('Make payment 1')
 
