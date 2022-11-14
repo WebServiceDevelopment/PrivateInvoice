@@ -152,8 +152,6 @@ app.all('*', function (req, res, next) {
     }
 
     // And the login screen too
-
-    // And the login screen too
     if (req.url.startsWith('/login')) {
         return next()
     }
@@ -176,7 +174,6 @@ app.all('*', function (req, res, next) {
 
 // Routes
 
-app.use('/api/invoice', require('./routes/invoice/buyer_invoice.js'))
 app.use('/api/invoice', require('./routes/invoice/seller_invoice.js'))
 app.use('/api/invoice', require('./routes/invoice/seller_invoice_document.js'))
 app.use('/api/invoice', require('./routes/invoice/seller_invoice_archive.js'))

@@ -18,9 +18,14 @@
 	
 **/
 
+// Seller Status
 const { sendInvoice } = require('./status_seller_send')
+
+// Buyer Status
 const { confirmInvoice } = require('./status_buyer_confirm')
 const { unconfirmInvoice } = require('./status_buyer_unconfirm')
+const { returnInvoice } = require('./status_buyer_return')
+const { payInvoice } = require('./status_buyer_pay')
 
 const updateStatus = async (
     action, // enum send, confirm, unconfirm
@@ -33,6 +38,9 @@ const updateStatus = async (
             // seller
             await sendInvoice(member_did, document_uuid)
             break;
+        case 'return':
+            // buyer
+            await returnInvoice(member_did, document_uuid)
         case 'confirm':
             // buyer
             await confirmInvoice(member_did, document_uuid)
@@ -40,6 +48,10 @@ const updateStatus = async (
         case 'unconfirm':
             // buyer
             await unconfirmInvoice(member_did, document_uuid)
+            break;
+        case 'pay':
+            // buyer
+            await payInvoice(member_did, document_uuid)
             break;
         default:
             return res.status(400).end('invalid status provided');

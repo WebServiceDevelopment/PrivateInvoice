@@ -18,37 +18,24 @@
 	
 **/
 
-'use strict'
-
-// Import Router
-
-const express = require('express')
-const router = express.Router()
-module.exports = router
-
-// Libraries
-
 // Import Modules
-const sub = require('../../modules/invoice_sub.js')
-const tran = require('../../modules/invoice_sub_transaction.js')
-const to_seller = require('../../modules/buyer_to_seller.js')
-const eth = require('../../modules/web3_eth.js')
-
-const util = require('../../modules/util.js')
+const sub = require('../invoice_sub.js')
+const tran = require('../invoice_sub_transaction.js')
+const to_seller = require('../buyer_to_seller.js')
+const eth = require('../web3_eth.js')
+const util = require('../util.js')
 
 const {
-    createConfirmMessage,
-    createReturnMessage,
     createPaymentMessage,
-} = require('../../modules/update_status.js')
+} = require('../update_status.js')
 
-const { getPrivateKeys } = require('../../modules/verify_utils.js')
+const { getPrivateKeys } = require('../verify_utils.js')
 
 const {
     makePresentation,
     getWalletPrivateKey,
     getSellerWalletAddress,
-} = require('../../modules/presentations_out.js')
+} = require('../presentations_out.js')
 
 //  web3.js
 
@@ -62,219 +49,13 @@ const BUYER_STATUS = 'buyer_status'
 const BUYER_DOCUMENT = 'buyer_document'
 const CONTACTS = 'contacts'
 
-// ------------------------------- End Points -------------------------------
-
-/*
- * 1.
- * [ Return to Sender ]
- * returnToSender
- */
-router.post('/returnToSender', async function (req, res) {
-    const METHOD = '/returnToSender'
-
-    let start = Date.now()
-
-    const { document_uuid } = req.body
-    const { member_did } = req.session.data
-
-    let errno, code
-
-    // 1.
-    //
-    const [seller_did, err1] = await sub.getSellerDid(
-        BUYER_STATUS,
-        document_uuid,
-        member_did
-    )
-    if (err1) {
-        console.error(`Error 1: ${METHOD} err=` + err1)
-
-        let msg = `${METHOD}:This request is incorrect.`
-
-        return res.status(400).json({
-            err: 1,
-            msg: msg,
-        })
-    }
-
-    // 2.
-    //
-    const [seller_host, err2] = await sub.getSellerHost(
-        CONTACTS,
-        seller_did,
-        member_did
-    )
-    if (err2) {
-        console.error(`Error 2: ${METHOD} err=` + err2)
-
-        let msg = `${METHOD}:This request is incorrect.`
-
-        return res.status(400).json({
-            err: 2,
-            msg: msg,
-        })
-    }
-
-    // 3. buyer connect check
-    //
-    // 20221102  undo
-
-    const [code3, err3] = await to_seller.connect(
-        seller_host,
-        member_did,
-        seller_did
-    )
-
-    if (code3 !== 200) {
-        console.error(`Error 3: ${METHOD} err=` + err3)
-
-        let msg
-        switch (code3) {
-            case 500:
-                msg = `${METHOD}:The destination node cannot be found.`
-                break
-            case 400:
-            default:
-                msg = `${METHOD}:This request is incorrect.`
-                break
-        }
-
-        return res.status(400).json({
-            err: 3,
-            msg: msg,
-        })
-    }
-
-    // 4.
-    // begin Transaction
-    //
-    const [conn, _4] = await tran.connection()
-    await tran.beginTransaction(conn)
-
-    // 5.
-    // Set BUYER_STATUS to 'return' with document_uuid as the key.
-    //
-    const [_5, err5] = await tran.setReturn(
-        conn,
-        BUYER_STATUS,
-        document_uuid,
-        member_did
-    )
-
-    if (err5) {
-        errno = 5
-        code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err5, errno, METHOD)
-        )
-        return
-    }
-
-    // 6.
-    // Send a 'return' request to seller.
-    //
-    // Get private keys to sign credential
-
-    const [keyPair, err6] = await getPrivateKeys(member_did)
-    if (err6) {
-        errno = 6
-        code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err6, errno, METHOD)
-        )
-        return
-    }
-
-    // 7.
-    //  createReturnMessage
-    //
-
-    const url = `${seller_host}/api/presentations/available`
-    console.log(url)
-    const [credential, err7] = await createReturnMessage(
-        document_uuid,
-        member_did,
-        keyPair
-    )
-    if (err7) {
-        errno = 7
-        code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err7, errno, METHOD)
-        )
-        return
-    }
-
-    // 8.
-    // makePresentation
-    //
-    const [sent, err8] = await makePresentation(url, keyPair, credential)
-    if (err8) {
-        errno = 8
-        code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err8, errno, METHOD)
-        )
-        return
-    }
-
-    // 9.
-    // commit
-    //
-
-    const [_9, err9] = await tran.commit(conn)
-
-    if (err9) {
-        errno = 9
-        code = 400
-        let rt = tran.rollbackAndReturn(conn, code, err9, errno, METHOD)
-
-        // 10.
-        //
-        const [code10, err10] = await to_seller.rollbackReturnToSent(
-            seller_host,
-            member_did,
-            seller_did
-        )
-
-        if (code10 !== 200) {
-            console.log('Error 10 code=' + code10 + ':err=' + err10)
-            if (code10 == 500) {
-                rt = { err: 10, msg: 'seller connect check:ECONNRESET' }
-            } else {
-                rt = { err: 10, msg: err10 }
-            }
-        }
-        res.status(400).json(rt)
-        return
-    }
-
-    // 11.
-    //
-    conn.end()
-
-    res.json({
-        err: 0,
-        msg: 'okay',
-    })
-
-    let end = Date.now()
-    console.log('/return Time: %d ms', end - start)
-})
-
-
-
-/*
- * 4.
- * [ Make Payment ]
- * makePayment
- */
-
-router.post('/makePayment', async function (req, res) {
+const payInvoice = async (
+    member_did, // string did:key:123
+    document_uuid // string
+) => {
     const METHOD = '/makePayment'
 
     let start = Date.now()
-    const USE_PRESENTATION = true
 
     const { document_uuid, gasLimit } = req.body
     const { member_did } = req.session.data
@@ -702,27 +483,17 @@ router.post('/makePayment', async function (req, res) {
     if (err25) {
         console.log('err25' + err25)
     }
-    //console.log(transaction_result);
 
-    // 26.
-    // IP ADDRESS OF IPFS SERVER
-    const ipfs_address = process.env.IPFS_ADDRESS
-
-    console.log('Make payment 26')
-    //console.log("/makePayment accepted");
-
-    let end = Date.now()
+    const end = Date.now()
     console.log('/makePayment Time: %d ms', end - start)
 
-    res.json({
-        err: 0,
-        msg: {
-            consumed: balanceETH_3 + ' ETH',
-            transaction_result: transaction_result,
-            // ipfs_cid: ipfs_cid,
-            // ipfs_address: ipfs_address,
-        },
-    })
+    return {
+        consumed: balanceETH_3 + ' ETH',
+        transaction_result: transaction_result,
+    }
 
-    return
-})
+}
+
+module.exports = {
+    payInvoice
+}
