@@ -33,7 +33,6 @@ const {
 } = require('../modules/invoice')
 
 router.post('/', async (req, res) => {
-
     const { member_did } = req.session.data
     const member_data = {
         organization_name: req.session.data.organization_name,
@@ -48,7 +47,6 @@ router.post('/', async (req, res) => {
     }
 
     const document_uuid = await createDraft(member_did, member_data)
-
     res.json({
         err: 0,
         msg: document_uuid,
@@ -56,13 +54,12 @@ router.post('/', async (req, res) => {
 });
 
 router.put('/', async (req, res) => {
-
     const { member_did } = req.session.data
-    await updateDraft(member_did, member_data)
-
+    const updatedDoc = req.body;
+    await updateDraft(member_did, updatedDoc)
     res.json({
         err: 0,
-        msg: document_uuid,
+        msg: updatedDoc.document_uuid,
     })
 });
 

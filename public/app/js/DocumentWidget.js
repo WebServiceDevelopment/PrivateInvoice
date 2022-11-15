@@ -891,10 +891,10 @@ const DocumentWidget = (function () {
 			document_json: document_json,
 		}
 
-		const url = '/api/invoice/update';
+		const url = '/api/invoice/';
 
 		const opts = {
-			method: 'POST',
+			method: 'PUT',
 			cache: 'no-cache',
 			credentials: 'same-origin',
 			headers: {

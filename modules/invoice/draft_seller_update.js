@@ -21,11 +21,11 @@
 // Import Modules
 
 const tran = require('../invoice_sub_transaction.js')
-const db = require('../database.js');
+const db = require('../../transaction.js');
 
 // Database
 
-const updateDraftDocument = async (conn, req) => {
+const updateDraftDocument = async (conn, doc) => {
 
     let result, msg;
 
@@ -46,31 +46,35 @@ const updateDraftDocument = async (conn, req) => {
 	`;
 
     const args = [
-        JSON.stringify(req.body.document_body),
-        JSON.stringify(req.body.document_totals),
-        JSON.stringify(req.body.document_meta),
-        req.body.subject_line
+        JSON.stringify(doc.document_body),
+        JSON.stringify(doc.document_totals),
+        JSON.stringify(doc.document_meta),
+        doc.subject_line
     ];
 
 
-    if (req.body.buyer_details) {
-        args.push(req.body.buyer_details.member_did);
-        args.push(req.body.buyer_details.membername);
-        args.push(JSON.stringify(req.body.buyer_details));
+    if (doc.buyer_details) {
+        args.push(doc.buyer_details.member_did);
+        args.push(doc.buyer_details.membername);
+        args.push(JSON.stringify(doc.buyer_details));
     } else {
         args.push(null);
         args.push(null);
         args.push(null);
     }
 
-    args.push(JSON.stringify(req.body.document_json));
-    args.push(req.body.document_uuid);
+    args.push(JSON.stringify(doc.document_json));
+    args.push(doc.document_uuid);
 
     try {
         result = await db.update(conn, sql, args);
     } catch (err) {
-        console.error(err);
 
+        console.log('----- HERE -----')
+        console.log(conn);
+        console.log(sql);
+        console.log(args);
+        console.error(err);
         msg = "Update error";
         return [false, msg];
     }
@@ -87,7 +91,7 @@ const updateDraftDocument = async (conn, req) => {
 /*
  * updateDraftStatus
  */
-const updateDraftStatus = async (conn, table, req) => {
+const updateDraftStatus = async (conn, doc) => {
 
     let result, msg;
 
@@ -106,22 +110,22 @@ const updateDraftStatus = async (conn, table, req) => {
 	`;
 
     const args = [
-        req.body.subject_line,
-        req.body.document_totals.total,
-        req.body.document_meta.due_by
+        doc.subject_line,
+        doc.document_totals.total,
+        doc.document_meta.due_by
     ];
 
-    if (req.body.buyer_details) {
-        args.push(req.body.buyer_details.member_did);
-        args.push(req.body.buyer_details.membername);
-        args.push(req.body.buyer_details.organization_name);
+    if (doc.buyer_details) {
+        args.push(doc.buyer_details.member_did);
+        args.push(doc.buyer_details.membername);
+        args.push(doc.buyer_details.organization_name);
     } else {
         args.push(null);
         args.push(null);
         args.push(null);
     }
 
-    args.push(req.body.document_uuid);
+    args.push(doc.document_uuid);
 
     try {
         result = await db.update(conn, sql, args);
@@ -140,60 +144,52 @@ const updateDraftStatus = async (conn, table, req) => {
     return [result, null];
 }
 
-const updateDraft = async () => {
+const updateDraft = async (
+    member_did, // string did:key:123
+    invoiceDraft // obj
+) => {
 
     const METHOD = '/update'
 
     let start = Date.now()
-
     let errno, code
 
     // 1.
     // begin Transaction
     //
-    const [conn, _1] = await tran.connection()
+    const [conn, _err] = await tran.connection()
     await tran.beginTransaction(conn)
 
     // 2.
     // Second we update the document
 
-    const [result2, err2] = await updateDraftDocument(
+    const [_a, err2] = await updateDraftDocument(
         conn,
-        req
+        invoiceDraft
     )
 
     if (err2) {
         console.log(err2)
         errno = 2
         code = 400
-        let msg = await tran.rollbackAndReturn(conn, code, err2, errno, METHOD)
-
-        res.status(400).json({
-            err: 2,
-            msg: msg,
-        })
-        return
+        await tran.rollbackAndReturn(conn, code, err2, errno, METHOD)
+        throw new Error(err2)
     }
 
     // 3.
     // And then we update the status
 
-    const [result3, err3] = await updateDraftStatus(
+    const [_b, err3] = await updateDraftStatus(
         conn,
-        req
+        invoiceDraft
     )
 
     if (err3) {
         console.log(err3)
         errno = 3
         code = 400
-        let msg = await tran.rollbackAndReturn(conn, code, err3, errno, METHOD)
-
-        res.status(400).json({
-            err: 3,
-            msg: msg,
-        })
-        return
+        await tran.rollbackAndReturn(conn, code, err3, errno, METHOD)
+        throw new Error(err3)
     }
 
     // 4.
