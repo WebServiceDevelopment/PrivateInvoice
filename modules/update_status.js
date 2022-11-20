@@ -21,148 +21,29 @@
 "use strict";
 
 // Libraries
-const moment                = require('moment');
+const moment = require('moment');
 
-// Import Modules
-const sub					= require("./invoice_sub.js");
 const { signStatusMessage } = require('./sign_your_credentials.js');
 
-const {
-    moveToTrash,
-    moveToPaid,
-    moveToArchive,
-}							= require('./move_to.js');
-
 // Database
-const db                    = require('../database.js')
+const db = require('../database.js')
 
 // Exports
 module.exports = {
-	handleStatusUpdate      : _handleStatusUpdate,
-	createConfirmMessage    : _createConfirmMessage,
-	createReturnMessage     : _createReturnMessage,
-	createWithdrawMessage   : _createWithdrawMessage,
-	createTrashMessage      : _createTrashMessage,
-	createRecreateMessage   : _createRecreateMessage,
-	createPaymentMessage    : _createPaymentMessage,
-	createArchiveMessage    : _createArchiveMessage,
+	createConfirmMessage: _createConfirmMessage,
+	createReturnMessage: _createReturnMessage,
+	createWithdrawMessage: _createWithdrawMessage,
+	createTrashMessage: _createTrashMessage,
+	createRecreateMessage: _createRecreateMessage,
+	createPaymentMessage: _createPaymentMessage,
+	createArchiveMessage: _createArchiveMessage,
 }
 
 // -------------------------- Export Modules ---------------------------------
 
-async function _handleStatusUpdate (credential, res) {
 
 
-	const [ message ] = credential.credentialSubject.items;
-	
-	let status, document_uuid, buyer_did, seller_did, hash; 
-
-	let  msg, err;
-
-	switch(message.statusCode) {
-	case 'toConfirm':
-		
-		status = 'seller_status';
-        document_uuid = message.recordNo;
-        buyer_did = message.entryNo;
-		[ msg, err] = await sub.setConfirm(status, document_uuid, buyer_did);
-		if(err) {
-			_error (message.statusCode, msg, err);
-			return res.status(400).end(msg);
-		}
-		return res.status(200).end('okay');
-
-	case 'toPaid':
-		
-		status = 'seller_status';
-        document_uuid = message.recordNo;
-        buyer_did = message.entryNo;
-        hash = message.validCodeReason;
-
-		[ msg, err] = await moveToPaid(document_uuid, buyer_did, hash);
-		if(err) {
-			_error (message.statusCode, msg, err);
-			return res.status(400).end(msg);
-		}
-		return res.status(200).end('okay');
-
-	case 'toReturn':
-		
-		status = 'seller_status';
-        document_uuid = message.recordNo;
-        buyer_did = message.entryNo;
-
-		[ msg, err] = await sub.setReturn(status, document_uuid, buyer_did);
-		if(err) {
-			_error (message.statusCode, msg, err);
-			return res.status(400).end(msg);
-		}
-
-		console.log("toReturn accepted");
-
-		return res.status(200).end('okay');
-
-	case "toWithdraw":
-		
-		status = 'buyer_status';
-        document_uuid = message.recordNo;
-        seller_did = message.entryNo;
-
-		[ msg, err] = await sub.setWithdrawSeller(status, document_uuid, seller_did);
-		if(err) {
-			_error (message.statusCode, msg, err);
-			return res.status(400).end(msg);
-		}
-
-		return res.status(200).end('okay');
-
-	case "toTrash":
-	case "toRecreate":
-		
-		status = 'buyer_status';
-        document_uuid = message.recordNo;
-        seller_did = message.entryNo;
-
-		[ msg, err] = await moveToTrash(status, document_uuid, seller_did);
-		if(err) {
-			_error (message.statusCode, msg, err);
-			return res.status(400).end(msg);
-		}
-
-		console.log("moveToTrash accepted");
-
-		return res.status(200).end('okay');
-
-	case "toArchive":
-		
-		status = 'buyer_status';
-        document_uuid = message.recordNo;
-        seller_did = message.entryNo;
-
-		[ msg, err] = await moveToArchive(document_uuid);
-		if(err) {
-			_error (message.statusCode, msg, err);
-			return res.status(400).end(msg);
-		}
-
-		console.log("moveToArchive accepted");
-
-		return res.status(200).end('okay');
-
-	default:
-		return res.status(400).end('Invalid message')
-	}
-
-
-	function _error (statusCode, msg, err) {
-
-		console.log(`${statusCode}, mag=${msg}, err=+${err}`);
-	}
-
-}
-
-
-async function _createConfirmMessage (document_uuid, member_did, keyPair) {
+async function _createConfirmMessage(document_uuid, member_did, keyPair) {
 
 	const message = {
 		type: "PGAStatusMessage",
@@ -180,7 +61,7 @@ async function _createConfirmMessage (document_uuid, member_did, keyPair) {
 }
 
 
-async function _createReturnMessage (document_uuid, member_did, keyPair) {
+async function _createReturnMessage(document_uuid, member_did, keyPair) {
 
 	const message = {
 		type: "PGAStatusMessage",
@@ -197,7 +78,7 @@ async function _createReturnMessage (document_uuid, member_did, keyPair) {
 
 }
 
-async function _createWithdrawMessage (document_uuid, member_did, keyPair) {
+async function _createWithdrawMessage(document_uuid, member_did, keyPair) {
 
 	const message = {
 		type: "PGAStatusMessage",
@@ -214,7 +95,7 @@ async function _createWithdrawMessage (document_uuid, member_did, keyPair) {
 
 }
 
-async function _createTrashMessage (document_uuid, member_did, keyPair) {
+async function _createTrashMessage(document_uuid, member_did, keyPair) {
 
 	const message = {
 		type: "PGAStatusMessage",
@@ -231,7 +112,7 @@ async function _createTrashMessage (document_uuid, member_did, keyPair) {
 
 }
 
-async function _createRecreateMessage (document_uuid, member_did, keyPair) {
+async function _createRecreateMessage(document_uuid, member_did, keyPair) {
 
 	const message = {
 		type: "PGAStatusMessage",
@@ -248,7 +129,7 @@ async function _createRecreateMessage (document_uuid, member_did, keyPair) {
 
 }
 
-async function _createPaymentMessage (document_uuid, member_did, keyPair, hash) {
+async function _createPaymentMessage(document_uuid, member_did, keyPair, hash) {
 
 	const message = {
 		type: "PGAStatusMessage",
@@ -265,7 +146,7 @@ async function _createPaymentMessage (document_uuid, member_did, keyPair, hash) 
 
 }
 
-async function _createArchiveMessage (document_uuid, member_did, keyPair) {
+async function _createArchiveMessage(document_uuid, member_did, keyPair) {
 
 	const message = {
 		type: "PGAStatusMessage",
@@ -308,8 +189,8 @@ const createMessage = async (document_uuid, member_did, message, keyPair) => {
 	let row;
 	try {
 		row = await db.selectOne(sql, args);
-	} catch(err) {
-		return [ null, err ];
+	} catch (err) {
+		return [null, err];
 	}
 
 	// 2.
@@ -339,8 +220,8 @@ const createMessage = async (document_uuid, member_did, message, keyPair) => {
 			email: row.member_contact_email,
 			jobTitle: row.member_job_title
 		},
-		credentialSubject : {
-			items : [ message ]
+		credentialSubject: {
+			items: [message]
 		}
 	}
 
@@ -348,5 +229,5 @@ const createMessage = async (document_uuid, member_did, message, keyPair) => {
 	// Sign Credential
 
 	const signedCredential = await signStatusMessage(credential, keyPair);
-	return [ signedCredential , null];
+	return [signedCredential, null];
 }

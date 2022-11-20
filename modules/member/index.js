@@ -135,10 +135,41 @@ const updateProfile = async (
     }
 }
 
+const getMemberInfo = async (
+    member_did // string: did:key:123
+) => {
+
+    const sql = `
+        SELECT
+            member_did as member_did,
+            membername,
+			organization_did,
+            wallet_address
+        FROM
+            members
+        WHERE
+            member_did = ?
+    `;
+
+    const args = [member_did];
+
+    let row;
+    try {
+        row = await db.selectOne(sql, args);
+    } catch (err) {
+        const msg = "This member_did is not found."
+        return [null, msg];
+
+    }
+
+    return [row, null];
+}
+
 // Exports
 
 module.exports = {
     updateProfile,
     insertMember,
     insertPrivateKeys,
+    getMemberInfo
 }

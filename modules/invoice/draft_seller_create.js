@@ -32,15 +32,106 @@ const currency = require('currency.js')
 const { CURRENCY } = require('../../config.json')
 const tran = require('../invoice_sub_transaction.js')
 
+const SELLER_DRAFT_DOCUMENT = "seller_document_draft";
+const SELLER_DRAFT_STATUS = "seller_status_draft";
+
 const {
-    getMemberInfo,
-    getOrganizationInfo,
-    insertSellerDraftStatus,
-    insertSellerDraftDocument,
-} = require('../invoices_in.js')
+    getOrganizationInfo
+} = require('../organization')
+
+const {
+    getMemberInfo
+} = require('../member')
 
 // Error Message
-const MESSAGE_AFFECTED_ROWS = ':result.affectedRows != 1'
+const MESSAGE_AFFECTED_ROWS = ":result.affectedRows != 1";
+
+// --------------------------------- Modules ---------------------------------
+
+
+async function insertSellerDraftStatus(conn, args) {
+
+    const sql = `
+		INSERT INTO ${SELLER_DRAFT_STATUS} (
+			document_uuid,
+			document_type,
+			document_number,
+			document_folder,
+			seller_did,
+			seller_membername,
+			seller_organization,
+			seller_last_action,
+			subject_line,
+			due_by,
+			amount_due
+		) VALUES (
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			NOW(),
+			'',
+			?,
+			?
+		)
+	`;
+
+    const [result, err] = await tran.insert(conn, sql, args);
+
+    if (err) {
+        return [result, err]
+    }
+
+    if (result.affectedRows != 1) {
+        let msg = { Message: MESSAGE_AFFECTED_ROWS };
+        return [result, msg]
+    }
+
+    return [result, err];
+
+}
+
+async function insertSellerDraftDocument(conn, args) {
+
+    const sql = `
+		INSERT INTO ${SELLER_DRAFT_DOCUMENT} (
+			document_uuid,
+			document_json,
+			document_type,
+
+			currency_options,
+
+			seller_did,
+			seller_membername,
+			seller_details,
+			document_meta,
+			document_body,
+			document_totals
+		) VALUES (
+			?,
+			?,
+			?,
+
+			?,
+
+			?,
+			?,
+			?,
+			?,
+			?,
+			?
+		)
+	`;
+
+    const [result, err] = await tran.insert(conn, sql, args);
+
+    return [result, err];
+
+}
+
 
 function credential_object() {
     return {

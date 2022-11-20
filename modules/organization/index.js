@@ -213,9 +213,44 @@ const updateOrganization = async (
     }
 }
 
+const getOrganizationInfo = async (
+    organization_did // string uuid | did
+) => {
+
+    const sql = `
+        SELECT
+            organization_name,
+            organization_address,
+            organization_building,
+            organization_department,
+            organization_tax_id,
+			organization_postcode,
+            addressCountry,
+            addressRegion,
+            addressCity
+        FROM
+            organizations
+        WHERE
+			organization_did = ?
+    `;
+
+    const args = [organization_did];
+
+    let org;
+    try {
+        org = await db.selectOne(sql, args);
+    } catch (err) {
+        const msg = "This organization_did is not found."
+        return [null, msg];
+    }
+
+    return [org, null];
+}
+
 // Exports
 
 module.exports = {
+    getOrganizationInfo,
     createOrganization,
     updateOrganization,
 }

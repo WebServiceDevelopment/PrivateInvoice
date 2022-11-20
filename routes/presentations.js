@@ -37,19 +37,6 @@ const {
 } = require('../modules/presentations')
 
 
-
-// Global Variable for Storing Challenges
-
-const challenges = {}
-
-// Define
-
-// ------------------------------- End Points -------------------------------
-
-/*
- * 1.
- * available
- */
 router.post('/available', async (req, res) => {
     console.log('--- /api/presentations/available ---')
     console.log(req.body)
@@ -73,8 +60,6 @@ router.post('/submissions', async (req, res) => {
     console.log('--- /api/presentations/submissions ---')
     const signedPresentation = req.body
     const { domain, challenge } = signedPresentation.proof
-
-
-
-    res.status(400).end('no valid credential detected')
+    const msg = await handleSubmission(domain, challenge, signedPresentation)
+    res.json(msg)
 })
