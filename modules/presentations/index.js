@@ -14,82 +14,40 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- Author: Ogawa Kousei (kogawa@wsd.co.jp)
+ Author: Ogawa Kousei (collins@wsd.co.jp)
     
 **/
 
 'use strict'
 
-// Import Router
-
-const express = require('express')
-const router = express.Router()
-module.exports = router
-
-// Import Libraries
+const NodeCache = require("node-cache");
+const myCache = new NodeCache();
 
 const uuidv4 = require('uuid').v4
 
-// Import Modules
-
-const { verifyPresentation } = require('../../modules/sign_your_credentials.js')
+const { verifyPresentation } = require('../sign_your_credentials.js')
 const {
     handleContactRequest,
-} = require('../../modules/contacts/contacts_in.js')
-const { handleIncomingInvoice } = require('../../modules/invoices_in.js')
-const { handleStatusUpdate } = require('../../modules/update_status.js')
+} = require('../contacts/contacts_in.js')
+const { handleIncomingInvoice } = require('../invoices_in.js')
+const { handleStatusUpdate } = require('../update_status.js')
 
-// Global Variable for Storing Challenges
+const handleAvailable = async () => {
 
-const challenges = {}
-
-// Define
-
-// ------------------------------- End Points -------------------------------
-
-/*
- * 1.
- * available
- */
-router.post('/available', async (req, res) => {
-    console.log('--- /api/presentations/available ---')
-    console.log(req.body)
-
-    // Create a challenge
-    const domain = process.env.SERVER_LOCATION.split('://')[1]
+    const domain = process.env.SERVER_DOMAIN
     const challenge = uuidv4()
 
-    console.log('domain =' + domain)
+    return { domain, challenge }
+}
 
-    // Store it in Redis with a expiration timer of 10 seconds
-    challenges[challenge] = 1
-    setTimeout(() => {
-        delete challenges[challenge]
-    }, 10 * 1000)
-
-    // Return the domain and challenge
-    res.json({
-        ...req.body,
-        domain,
-        challenge,
-    })
-})
-
-/*
- * 2.
- * submissions
- */
-router.post('/submissions', async (req, res) => {
-    console.log('--- /api/presentations/submissions ---')
-    const signedPresentation = req.body
-    const { domain, challenge } = signedPresentation.proof
+const handleSubmission = async () => {
 
     // 1.
     // First we need to see if the challenge is still available
     // And delete it if it exists
 
     if (!challenges[challenge]) {
-        // return 400;
+        // return res.status(400).end('Invalid challenge')
     }
     delete challenges[challenge]
 
@@ -98,7 +56,7 @@ router.post('/submissions', async (req, res) => {
 
     const result = await verifyPresentation(signedPresentation)
     if (!result.verified) {
-        // return 400;
+        // return res.status(400).end('Invalid challenge')
     }
 
     // 3.
@@ -108,24 +66,29 @@ router.post('/submissions', async (req, res) => {
 
     const { verifiableCredential } = signedPresentation
     const [credential] = verifiableCredential
+    const { type } = credential
 
     // First option is a contact request, which does not require the
     // controller to be in the list of contacts
 
-    if (credential.type.indexOf('VerifiableBusinessCard') !== -1) {
+    if (type.find('VerifiableBusinessCard')) {
         // Handle Contact Request
         const [status, message] = await handleContactRequest(credential)
         return res.status(status).end(message)
-    } else if (credential.type.indexOf('CommercialInvoiceCertificate') !== -1) {
+    } else if (type.find('CommercialInvoiceCertificate')) {
         // Handle Commercial Invoice
         console.log('handle commercial invoice!!!!')
         return await handleIncomingInvoice(credential, res)
         // return res.status(400).end("Stahhp it");
-    } else if (credential.type.indexOf('PGAStatusMessageCertificate') !== -1) {
+    } else if (type.indexOf('PGAStatusMessageCertificate')) {
         // Handle Commercial Invoice
         console.log('handle status update!!!!')
         return await handleStatusUpdate(credential, res)
     }
 
-    res.status(400).end('no valid credential detected')
-})
+}
+
+module.exports = {
+    handleAvailable,
+    handleSubmission
+}

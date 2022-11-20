@@ -21,179 +21,172 @@
 "use strict";
 
 // Import sub
-const sub                       = require("./invoice_sub.js");
-const tran                      = require("./invoice_sub_transaction.js");
-
-// Import Router
-const to_seller                 = require("./buyer_to_seller.js");
+const sub = require("./invoice_sub.js");
+const tran = require("./invoice_sub_transaction.js");
 
 // Libraries
 
-// Database
+const BUYER_DOCUMENT = "buyer_document";
+const BUYER_STATUS = "buyer_status";
 
-// Table Name
+const BUYER_ARCHIVE_DOCUMENT = "buyer_document_archive";
+const BUYER_ARCHIVE_STATUS = "buyer_status_archive";
 
-const BUYER_DOCUMENT            = "buyer_document";
-const BUYER_STATUS              = "buyer_status";
-
-const BUYER_ARCHIVE_DOCUMENT    = "buyer_document_archive";
-const BUYER_ARCHIVE_STATUS      = "buyer_status_archive";
-
-const CONTACTS                  = "contacts";
+const CONTACTS = "contacts";
 
 const moveToArchive = async (document_uuid) => {
 
-    const _NO = "090";
-    const FOLDER  = 'paid';
+  const _NO = "090";
+  const FOLDER = 'paid';
 
-    let errno, code;
+  let errno, code;
 
-    // 1.
-    // getStatus
-    // First we go ahead and get the status.
-    // Does record exist?
-    //
-    const [ old_status , _1] = await sub.getStatus( BUYER_STATUS, document_uuid) ;
+  // 1.
+  // getStatus
+  // First we go ahead and get the status.
+  // Does record exist?
+  //
+  const [old_status, _1] = await sub.getStatus(BUYER_STATUS, document_uuid);
 
-    if(old_status == undefined) {
-		return 1;
-    }
+  if (old_status == undefined) {
+    return 1;
+  }
 
-    // 2.
-    // Second we go ahead and get the document
-    // Does record exist?
-    //
-    const [ old_document, _2 ] = await sub.getDocument( BUYER_DOCUMENT, document_uuid) ;
+  // 2.
+  // Second we go ahead and get the document
+  // Does record exist?
+  //
+  const [old_document, _2] = await sub.getDocument(BUYER_DOCUMENT, document_uuid);
 
-    if(old_document == undefined) {
-        return 2;
-    }
+  if (old_document == undefined) {
+    return 2;
+  }
 
 
-    // 3.
-    // seller_did in old_status.
-    // member_did in old_status.
-    //
-    const seller_did = old_status.seller_did;
-    const member_did = old_status.buyer_did;
+  // 3.
+  // seller_did in old_status.
+  // member_did in old_status.
+  //
+  const seller_did = old_status.seller_did;
+  const member_did = old_status.buyer_did;
 
-    //console.log(" seller_did="+ seller_did+":member_did="+ member_did);
+  //console.log(" seller_did="+ seller_did+":member_did="+ member_did);
 
-    // 4.
-    // getSellerHost
-    //
-    const [ seller_host, err4 ] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
-    if(err4) {
-        console.log("Error 4 status = 400 err="+err4 +":NO="+_NO);
-		return 4;
-    }
+  // 4.
+  // getSellerHost
+  //
+  const [seller_host, err4] = await sub.getSellerHost(CONTACTS, seller_did, member_did);
+  if (err4) {
+    console.log("Error 4 status = 400 err=" + err4 + ":NO=" + _NO);
+    return 4;
+  }
 
-    // 5.
-    // Compare Host address and req.ip.
-    // Are the two ips the same?
-    //
-	
-	/*
+  // 5.
+  // Compare Host address and req.ip.
+  // Are the two ips the same?
+  //
+
+  /*
     if(!check_ipadder(req.ip , seller_host)) {
         console.log("invalid request : req.ip="+req.ip+":seller_host="+seller_host);
         let err5 = {err:"invalid host"};
-		return 5;
+    return 5;
     }
-	*/
+  */
 
-    // 6.
-    // Does document_uuid already notexist in the archive status table?
-    //
-    const [ bool6, err6 ] = await sub.notexist_check( BUYER_ARCHIVE_STATUS, document_uuid)
-    if ( bool6 == false) {
-		return 6;
-    }
+  // 6.
+  // Does document_uuid already notexist in the archive status table?
+  //
+  const [bool6, err6] = await sub.notexist_check(BUYER_ARCHIVE_STATUS, document_uuid)
+  if (bool6 == false) {
+    return 6;
+  }
 
-    // 7.
-    // Does document_uuid already notexist in the archive document table?
-    //
-    const [ bool7, err7 ] = await sub.notexist_check( BUYER_ARCHIVE_DOCUMENT, document_uuid)
-    if ( bool7 == false) {
-		return 7;
-    }
-
-
-    // 8.
-    // begin Transaction
-    //
-    const [ conn, _8 ] = await tran.connection ();
-    await tran.beginTransaction(conn);
-
-    // 9.
-    //
-
-    old_status.document_folder  = FOLDER;
-    old_status.seller_archived  = 1;
-    old_status.buyer_archived  = 1;
-
-    // 10.
-    // Then we go ahead and insert into the archive status
-    //
-    const [ _10, err10 ] = await tran.insertArchiveStatus(conn, BUYER_ARCHIVE_STATUS, old_status);
-
-    if(err10) {
-        errno = 10;
-        code = 400;
-		return 10;
-    }
-
-    // 11.
-    // And then we need to insert into the archive document
-    //
-    const [ _11, err11 ] = await tran.insertArchiveDocument(conn, BUYER_ARCHIVE_DOCUMENT, old_document);
-
-    if(err11) {
-        errno = 11;
-        code = 400;
-		return 11;
-    }
-
-    // 12.
-    // Remove recoiored from BUYER_STATUS with docunent_uuid key
-    //
-    const [ _12, err12 ] = await tran.deleteStatus(conn, BUYER_STATUS, old_status) ;
-
-    if(err11) {
-        errno = 12;
-        code = 400;
-		return 12;
-    }
-
-    // 13.
-    // Remove recoiored from BUYER_DOCUMENT with docunent_uuid key
-    //
-    const [ _13, err13] = await tran.deleteDocument(conn, BUYER_DOCUMENT, old_status) ;
-
-    if(err13) {
-        errno = 13;
-        code = 400;
-		return 13;
-    }
+  // 7.
+  // Does document_uuid already notexist in the archive document table?
+  //
+  const [bool7, err7] = await sub.notexist_check(BUYER_ARCHIVE_DOCUMENT, document_uuid)
+  if (bool7 == false) {
+    return 7;
+  }
 
 
-    // 14.
-    // commit
-    //
-    const [ _14, err14] = await tran.commit(conn);
+  // 8.
+  // begin Transaction
+  //
+  const [conn, _8] = await tran.connection();
+  await tran.beginTransaction(conn);
 
-    if (err14) {
-        errno = 14;
-        code = 400;
-		return 14;
-    }
+  // 9.
+  //
 
-    // 15.
-    
-	conn.end();
-    console.log("moveToArchive accepted");
+  old_status.document_folder = FOLDER;
+  old_status.seller_archived = 1;
+  old_status.buyer_archived = 1;
+
+  // 10.
+  // Then we go ahead and insert into the archive status
+  //
+  const [_10, err10] = await tran.insertArchiveStatus(conn, BUYER_ARCHIVE_STATUS, old_status);
+
+  if (err10) {
+    errno = 10;
+    code = 400;
+    return 10;
+  }
+
+  // 11.
+  // And then we need to insert into the archive document
+  //
+  const [_11, err11] = await tran.insertArchiveDocument(conn, BUYER_ARCHIVE_DOCUMENT, old_document);
+
+  if (err11) {
+    errno = 11;
+    code = 400;
+    return 11;
+  }
+
+  // 12.
+  // Remove recoiored from BUYER_STATUS with docunent_uuid key
+  //
+  const [_12, err12] = await tran.deleteStatus(conn, BUYER_STATUS, old_status);
+
+  if (err11) {
+    errno = 12;
+    code = 400;
+    return 12;
+  }
+
+  // 13.
+  // Remove recoiored from BUYER_DOCUMENT with docunent_uuid key
+  //
+  const [_13, err13] = await tran.deleteDocument(conn, BUYER_DOCUMENT, old_status);
+
+  if (err13) {
+    errno = 13;
+    code = 400;
+    return 13;
+  }
+
+
+  // 14.
+  // commit
+  //
+  const [_14, err14] = await tran.commit(conn);
+
+  if (err14) {
+    errno = 14;
+    code = 400;
+    return 14;
+  }
+
+  // 15.
+
+  conn.end();
+  console.log("moveToArchive accepted");
 
 }
 
 module.exports = {
-	moveToArchive
+  moveToArchive
 }

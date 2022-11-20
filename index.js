@@ -178,10 +178,11 @@ app.use('/api/message', require('./routes/message/seller_message.js'))
 app.use('/api/message', require('./routes/message/buyer_message.js'))
 
 app.use('/api/wallet', require('./routes/wallet/'))
-app.use('/api/presentations', require('./routes/presentations/'))
+
 
 // Refactored End Points
 
+app.use('/api/presentations', require('./routes/presentations.js'))
 app.use('/api/contacts', require('./routes/contacts.js'))
 app.use('/api/invoice', require('./routes/invoice.js'))
 app.use('/api/member', require('./routes/member.js'))
