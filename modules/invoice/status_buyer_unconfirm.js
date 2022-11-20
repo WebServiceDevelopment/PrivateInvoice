@@ -18,7 +18,6 @@
 	
 **/
 
-
 // Import Modules
 const sub = require('../invoice_sub.js')
 const tran = require('../invoice_sub_transaction.js')
@@ -44,7 +43,6 @@ const {
 const web3 = eth.getWeb3()
 web3.eth.transactionConfirmationBlocks = 2
 
-
 // Database
 
 const BUYER_STATUS = 'buyer_status'
@@ -55,7 +53,6 @@ const unconfirmInvoice = async (
     member_did, // string did:key:123
     document_uuid // string
 ) => {
-
     const start = Date.now()
 
     // 1.
@@ -92,7 +89,9 @@ const unconfirmInvoice = async (
 
     if (code3 !== 200) {
         if (code3 == 500) {
-            throw new Error('Error (unconfirm): The destination node cannot be found')
+            throw new Error(
+                'Error (unconfirm): The destination node cannot be found'
+            )
         }
         throw new Error('Error (unconfirm): Imvalid request')
     }
@@ -115,9 +114,9 @@ const unconfirmInvoice = async (
     if (err5) {
         errno = 54
         code = 400
-        return res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err5, errno, METHOD)
-        )
+        return res
+            .status(400)
+            .json(tran.rollbackAndReturn(conn, code, err5, errno, METHOD))
     }
 
     // 6.
@@ -130,9 +129,9 @@ const unconfirmInvoice = async (
 
     if (code6 !== 200) {
         errno = 6
-        return res.status(400).json(
-            tran.rollbackAndReturn(conn, code6, err6, errno, METHOD)
-        )
+        return res
+            .status(400)
+            .json(tran.rollbackAndReturn(conn, code6, err6, errno, METHOD))
     }
 
     // 7.
@@ -155,7 +154,9 @@ const unconfirmInvoice = async (
 
         if (code8 !== 200) {
             if (code8 == 500) {
-                throw new Error('Error (unconfirm): seller connect check:ECONNRESET')
+                throw new Error(
+                    'Error (unconfirm): seller connect check:ECONNRESET'
+                )
             } else {
                 throw new Error('Error (unconfirm): Invalid argument')
             }
@@ -172,5 +173,5 @@ const unconfirmInvoice = async (
 }
 
 module.exports = {
-    unconfirmInvoice
+    unconfirmInvoice,
 }

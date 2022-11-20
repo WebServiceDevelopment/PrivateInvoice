@@ -1799,10 +1799,10 @@ const ActionWidget = function () {
             document_uuid: doc.document_uuid,
         }
 
-        const url = '/api/invoice/unconfirm'
+        const url = '/api/invoice/?action=unconfirm'
 
         const opts = {
-            method: 'POST',
+            method: 'PATCH',
             cache: 'no-cache',
             credentials: 'same-origin',
             headers: {
@@ -1980,10 +1980,10 @@ const ActionWidget = function () {
             document_uuid: doc.document_uuid,
         }
 
-        const url = '/api/invoice/returnToSender'
+        const url = '/api/invoice/?action=return'
 
         const opts = {
-            method: 'POST',
+            method: 'PATCH',
             cache: 'no-cache',
             credentials: 'same-origin',
             headers: {

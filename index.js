@@ -174,9 +174,6 @@ app.all('*', function (req, res, next) {
 
 // Routes
 
-app.use('/api/invoice', require('./routes/invoice/invoice_document.js'))
-app.use('/api/invoice', require('./routes/invoice/softDelete.js'))
-
 app.use('/api/message', require('./routes/message/seller_message.js'))
 app.use('/api/message', require('./routes/message/buyer_message.js'))
 
