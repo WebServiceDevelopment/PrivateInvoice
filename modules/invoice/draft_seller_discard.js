@@ -20,23 +20,14 @@
 
 'use strict'
 
-// Import sub
-const sub = require('../../modules/invoice_sub.js')
-const tran = require('../../modules/invoice_sub_transaction.js')
-const to_buyer = require('../../modules/seller_to_buyer.js')
-
-// Import Router
-const express = require('express')
-const router = express.Router()
-module.exports = router
+const sub = require('../invoice_sub.js')
+const tran = require('../invoice_sub_transaction.js')
 
 // Libraries
 
-const sign_your_credentials = require('../../modules/sign_your_credentials.js')
-const { makePresentation } = require('../../modules/presentations_out.js')
-const { createTrashMessage } = require('../../modules/update_status.js')
+const sign_your_credentials = require('../sign_your_credentials.js')
 
-const { getPrivateKeys } = require('../../modules//verify_utils.js')
+const { getPrivateKeys } = require('../verify_utils.js')
 
 // Database
 
@@ -44,22 +35,13 @@ const { getPrivateKeys } = require('../../modules//verify_utils.js')
 const SELLER_DRAFT_DOCUMENT = 'seller_document_draft'
 const SELLER_DRAFT_STATUS = 'seller_status_draft'
 
-const SELLER_DOCUMENT = 'seller_document'
-const SELLER_STATUS = 'seller_status'
-
 const SELLER_ARCHIVE_DOCUMENT = 'seller_document_archive'
 const SELLER_ARCHIVE_STATUS = 'seller_status_archive'
 
-const CONTACTS = 'contacts'
-
-// ------------------------------- End Points -------------------------------
-
-/*
- * 1.
- * Execution of'Move to Trash'when folder is draft.
- */
-
-router.post('/trashDraft', async function (req, res) {
+const trashDraft = async (
+    member_did, // string did:key:123
+    document_uuid // string
+) => {
     const METHOD = '/trashDraft'
 
     let errno, code
@@ -76,11 +58,10 @@ router.post('/trashDraft', async function (req, res) {
     if (err1) {
         let msg = `Error:${METHOD}: Could not get buyer did`
 
-        res.status(400).json({
+        return {
             err: 1,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 2.
@@ -95,11 +76,10 @@ router.post('/trashDraft', async function (req, res) {
     if (old_status == undefined) {
         let msg = `Error:${METHOD}: Status record is not exist.`
 
-        res.status(400).json({
+        return {
             err: 2,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 3.
@@ -113,11 +93,10 @@ router.post('/trashDraft', async function (req, res) {
     if (document.document_uuid == null) {
         let msg = `Error:${METHOD}: document_uuid is null`
 
-        res.status(400).json({
+        return {
             err: 3,
             msg: msg,
-        })
-        return
+        }
     }
 
     document.seller_did = member_did
@@ -146,11 +125,10 @@ router.post('/trashDraft', async function (req, res) {
     if (err5) {
         let msg = `Err:r:${METHOD}: document_uuid record is not exist.`
 
-        res.status(400).json({
+        return {
             err: 5,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 6.
@@ -163,11 +141,10 @@ router.post('/trashDraft', async function (req, res) {
     if (err6) {
         let msg = `Err:r:${METHOD}: document_uuid record is not exist.`
 
-        res.status(400).json({
+        return {
             err: 6,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 7.
@@ -200,10 +177,7 @@ router.post('/trashDraft', async function (req, res) {
         errno = 9
         code = 400
         let msg = `Err:r:${METHOD}: document_uuid record is not exist.`
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err9, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err9, errno, METHOD)
     }
 
     // 10.
@@ -219,10 +193,7 @@ router.post('/trashDraft', async function (req, res) {
     if (err10) {
         errno = 10
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err10, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err10, errno, METHOD)
     }
 
     // 11.
@@ -236,10 +207,7 @@ router.post('/trashDraft', async function (req, res) {
     if (err11) {
         errno = 11
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err11, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err11, errno, METHOD)
     }
 
     // 12.
@@ -253,10 +221,7 @@ router.post('/trashDraft', async function (req, res) {
     if (err12) {
         errno = 12
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err12, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err12, errno, METHOD)
     }
 
     // 13.
@@ -267,22 +232,21 @@ router.post('/trashDraft', async function (req, res) {
     if (err13) {
         errno = 13
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err13, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err13, errno, METHOD)
     }
 
     // 14.
     //
     conn.end()
+    let end = Date.now()
+    console.log('/TrashDraft Time: %d ms', end - start)
 
-    res.json({
+    return {
         err: 0,
         msg: old_status.document_uuid,
-    })
+    }
+}
 
-    let end = Date.now()
-
-    console.log('/TrashDraft Time: %d ms', end - start)
-})
+module.exports = {
+    trashDraft,
+}

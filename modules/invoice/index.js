@@ -21,6 +21,7 @@
 // Seller Status
 const { createDraft } = require('./draft_seller_create')
 const { updateDraft } = require('./draft_seller_update')
+const { trashDraft } = require('./draft_seller_discard')
 const { sendInvoice } = require('./status_seller_send')
 const { recreateInvoice } = require('./status_seller_recreate')
 const { withdrawInvoice } = require('./status_seller_withdraw')
@@ -53,6 +54,9 @@ const updateStatus = async (
         case 'trash':
             // seller
             return await trashInvoice(member_did, document_uuid)
+        case 'discard':
+            // seller
+            return await trashDraft(member_did, document_uuid)
         case 'return':
             // buyer
             return await returnInvoice(member_did, document_uuid)

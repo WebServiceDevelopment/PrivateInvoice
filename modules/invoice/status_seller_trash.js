@@ -119,7 +119,7 @@ const trashInvoice = async (
     //
     const [old_status, _4] = await sub.getStatus(SELLER_STATUS, document_uuid)
 
-    if (old_status == undefined) {
+    if (old_status === undefined) {
         let msg = 'Error:${METHOD}: Record is not exist.'
 
         return {
@@ -136,7 +136,7 @@ const trashInvoice = async (
         document_uuid
     )
 
-    if (old_document == undefined) {
+    if (old_document === undefined) {
         let msg = 'Error:${METHOD}: Record is not exist.'
 
         return {

@@ -1857,10 +1857,10 @@ const ActionWidget = function () {
             document_uuid: doc.document_uuid,
         }
 
-        const url = '/api/invoice/recreate'
+        const url = '/api/invoice/?action=recreate'
 
         const opts = {
-            method: 'POST',
+            method: 'PATCH',
             cache: 'no-cache',
             credentials: 'same-origin',
             headers: {
@@ -2186,10 +2186,10 @@ const ActionWidget = function () {
             document_uuid: this.MEM.getDocument_uuid(),
         }
 
-        const url = '/api/invoice/trashDraft'
+        const url = '/api/invoice/?action=discard'
 
         const opts = {
-            method: 'POST',
+            method: 'PATCH',
             cache: 'no-cache',
             credentials: 'same-origin',
             headers: {

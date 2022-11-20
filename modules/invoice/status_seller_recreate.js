@@ -34,9 +34,7 @@ const to_buyer = require('../seller_to_buyer.js')
 const { makePresentation } = require('../presentations_out.js')
 
 // delete createTrashMessage
-const {
-    createRecreateMessage,
-} = require('../update_status.js')
+const { createRecreateMessage } = require('../update_status.js')
 
 // Database
 const config = require('../../config.json')
@@ -57,7 +55,6 @@ const { getPrivateKeys } = require('../verify_utils.js')
 // CURRENCY
 const CURRENCY = config.CURRENCY
 
-
 const recreateInvoice = async (
     member_did, // string did:key:123
     document_uuid // string
@@ -77,11 +74,10 @@ const recreateInvoice = async (
     if (err1) {
         let msg = `Error:${METHOD}: Could not get buyer did`
 
-        res.status(400).json({
+        return {
             err: 1,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 2.
@@ -94,11 +90,10 @@ const recreateInvoice = async (
     if (err2) {
         let msg = `Error:${METHOD}: Could not get buyer host`
 
-        res.status(400).json({
+        return {
             err: 1,
             msg: msg,
-        })
-        return
+        }
     }
 
     //3. buyer connect check
@@ -125,11 +120,10 @@ const recreateInvoice = async (
             }
         }
 
-        res.status(400).json({
+        return {
             err: 3,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 4
@@ -141,11 +135,10 @@ const recreateInvoice = async (
     if (old_status.document_uuid == null) {
         let msg = `Error:${METHOD}: document_uuid is null`
 
-        res.status(400).json({
+        return {
             err: 4,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 5.
@@ -174,11 +167,10 @@ const recreateInvoice = async (
     if (old_document.document_uuid == null) {
         let msg = `Error:${METHOD}: document_uuid is null`
 
-        res.status(400).json({
+        return {
             err: 4,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 7.
@@ -334,11 +326,10 @@ const recreateInvoice = async (
     if (err8) {
         let msg = `Error:${METHOD}: document_uuid is not exist`
 
-        res.status(400).json({
+        return {
             err: 8,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 9.
@@ -351,11 +342,10 @@ const recreateInvoice = async (
     if (err9) {
         let msg = `Error:${METHOD}: document_uuid is not exist`
 
-        res.status(400).json({
+        return {
             err: 9,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 10.
@@ -377,10 +367,7 @@ const recreateInvoice = async (
     if (err11) {
         errno = 11
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err11, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err11, errno, METHOD)
     }
 
     // 12.
@@ -396,10 +383,7 @@ const recreateInvoice = async (
         console.log('err12=' + err12)
         errno = 12
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err12, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err12, errno, METHOD)
     }
 
     // 13.
@@ -414,10 +398,7 @@ const recreateInvoice = async (
     if (err13) {
         errno = 13
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err13, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err13, errno, METHOD)
     }
 
     // 14.
@@ -431,10 +412,7 @@ const recreateInvoice = async (
     if (err14) {
         errno = 14
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err14, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err14, errno, METHOD)
     }
 
     // 15.
@@ -451,10 +429,7 @@ const recreateInvoice = async (
     if (err15) {
         errno = 15
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err15, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err15, errno, METHOD)
     }
 
     // 16.
@@ -470,10 +445,7 @@ const recreateInvoice = async (
     if (err16) {
         errno = 16
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err16, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err16, errno, METHOD)
     }
 
     // 17.
@@ -485,10 +457,7 @@ const recreateInvoice = async (
     if (err17) {
         errno = 17
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err17, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err17, errno, METHOD)
     }
 
     // 18. createRecreateMessage
@@ -501,10 +470,7 @@ const recreateInvoice = async (
     if (err18) {
         errno = 18
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err18, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err18, errno, METHOD)
     }
 
     // 19. makePresentation
@@ -513,10 +479,7 @@ const recreateInvoice = async (
     if (err19) {
         errno = 19
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err19, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err19, errno, METHOD)
     }
 
     // 20.
@@ -527,27 +490,24 @@ const recreateInvoice = async (
     if (err20) {
         errno = 20
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err20, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err20, errno, METHOD)
     }
 
     // 21.
     //
     conn.end()
 
-    res.json({
-        err: 0,
-        msg: status.document_uuid,
-    })
-
-    //console.log("recreate accepted");
-
     let end = Date.now()
     console.log('/recreate Time: %d ms', end - start)
+
+    return {
+        err: 0,
+        msg: status.document_uuid,
+    }
+
+    //console.log("recreate accepted");
 }
 
 module.exports = {
-    recreateInvoice
+    recreateInvoice,
 }
