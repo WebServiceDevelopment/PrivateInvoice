@@ -19,18 +19,18 @@
 **/
 
 // Import Modules
-const to_seller					= require("../modules/buyer_to_seller.js");
+const to_seller = require("../modules/buyer_to_seller.js");
 
 //  Libraries
-const Tx                        = require('ethereumjs-tx').Transaction;
+const Tx = require('ethereumjs-tx').Transaction;
 
 // Database Libraries
 
 // Exports 
 module.exports = {
-	toReturnError				: _toReturnError,
-	cancelPaymentReservation	: _cancelPaymentReservation,
-	sendSignedTransaction		: _sendSignedTransaction,
+	toReturnError: _toReturnError,
+	cancelPaymentReservation: _cancelPaymentReservation,
+	sendSignedTransaction: _sendSignedTransaction,
 }
 
 // Constant
@@ -43,15 +43,15 @@ const GAS_LIMIT = 210000;
 /*
  * toReturnError
  */
-function _toReturnError(err , code, method_no) {
+function _toReturnError(err, code, method_no) {
 
 	let ERR_KEYWORD = "Error: toReturnError error:";
 	let error = err.toString();
 
-	let rt ={}
+	let rt = {}
 
-	if(error.indexOf( ERR_KEYWORD ) !== -1) {
-		rt.err = error.replace( ERR_KEYWORD,"");
+	if (error.indexOf(ERR_KEYWORD) !== -1) {
+		rt.err = error.replace(ERR_KEYWORD, "");
 	}
 	rt.code = method_no + code;
 
@@ -61,40 +61,40 @@ function _toReturnError(err , code, method_no) {
 /*
  * cancelPaymentReservation
  */
-async function _cancelPaymentReservation(seller_host, document_uuid, member_did){
+async function _cancelPaymentReservation(seller_host, document_uuid, member_did) {
 
-	const [ _r, _e ] = await to_seller.cancelPaymentReservation(seller_host, document_uuid, member_did);
-	if( _e == null) {
+	const [_r, _e] = await to_seller.cancelPaymentReservation(seller_host, document_uuid, member_did);
+	if (_e == null) {
 		console.log("cancelPaymentReservation id success.");
 	}
 
-	return [ _r, _e ];
+	return [_r, _e];
 }
 
 /*
  * sendSignedTransaction
  */
 
-async function _sendSignedTransaction (web3, buyerAddr, buyerPrivateKey, sellerAddr, gasLimit, value, data) {
+async function _sendSignedTransaction(web3, buyerAddr, buyerPrivateKey, sellerAddr, gasLimit, value, data) {
 
-    const ROPSTEN_SWITCH_FLAG		= 0;
+	const ROPSTEN_SWITCH_FLAG = 0;
 
-	const TIMEOUT					= 5000;
-    const GANACHE_DEFAULT_CHAINID   = 1337;
-    const ROPSTEN_CHAINID 			= 3;
+	const TIMEOUT = 5000;
+	const GANACHE_DEFAULT_CHAINID = 1337;
+	const ROPSTEN_CHAINID = 3;
 
-	const DEBUG						= 1;
+	const DEBUG = 1;
 
-    const { eth }					= web3;
+	const { eth } = web3;
 
 
 	// 1.
-    // gasLimit to hex.
-    //
-    let _gasLimit;
-    if( typeof (gasLimit) === 'string') {
-		if(gasLimit.indexOf(",") !== -1) {
-			_gasLimit = gasLimit.replace(/,/g,",");
+	// gasLimit to hex.
+	//
+	let _gasLimit;
+	if (typeof (gasLimit) === 'string') {
+		if (gasLimit.indexOf(",") !== -1) {
+			_gasLimit = gasLimit.replace(/,/g, ",");
 		} else {
 			_gasLimit = gasLimit;
 		}
@@ -103,122 +103,122 @@ async function _sendSignedTransaction (web3, buyerAddr, buyerPrivateKey, sellerA
 		} catch (e) {
 			_gasLimit = GAS_LIMIT;
 		}
-    }
+	}
 
-    let gasLimit_hex;
+	let gasLimit_hex;
 
-	if(typeof (_gasLimit) === 'number' && _gasLimit > 0 ) {
-    } else {
-        gasLimit_hex = GAS_LIMIT;
-    }
-    gasLimit_hex = web3.utils.toHex(_gasLimit);
+	if (typeof (_gasLimit) === 'number' && _gasLimit > 0) {
+	} else {
+		gasLimit_hex = GAS_LIMIT;
+	}
+	gasLimit_hex = web3.utils.toHex(_gasLimit);
 
-	if(DEBUG) {
-		console.log("gasLimit="+gasLimit+":"+gasLimit_hex)
+	if (DEBUG) {
+		console.log("gasLimit=" + gasLimit + ":" + gasLimit_hex)
 	}
 
 	// 2.
 	// nonce 
 	//
-    const count = await eth.getTransactionCount(buyerAddr);
+	const count = await eth.getTransactionCount(buyerAddr);
 
-	if(DEBUG) {
-		console.log("count="+count);
+	if (DEBUG) {
+		console.log("count=" + count);
 	}
-    const nonce = web3.utils.toHex(count);
+	const nonce = web3.utils.toHex(count);
 
 	// 3. .getGasPrice
-    const gasPrice = await eth.getGasPrice()
+	const gasPrice = await eth.getGasPrice()
 
-	if(DEBUG) {
-		console.log("gasPrice"+gasPrice)
+	if (DEBUG) {
+		console.log("gasPrice" + gasPrice)
 	}
 
 	// 4.
 	// getBalance
 	//
-	if(DEBUG) {
+	if (DEBUG) {
 
 		const sellerBalanceStart = await eth.getBalance(sellerAddr);
 		const buyerBalanceStart = await eth.getBalance(buyerAddr);
 
 		console.log("Before Balance");
-		console.log("seller = "+sellerBalanceStart);
-		console.log("buyer  = "+buyerBalanceStart);
+		console.log("seller = " + sellerBalanceStart);
+		console.log("buyer  = " + buyerBalanceStart);
 	}
 
 	// 5.
 	// transactionObject
 	//
 
-    let chainId;
+	let chainId;
 
-    if( ROPSTEN_SWITCH_FLAG ) {
+	if (ROPSTEN_SWITCH_FLAG) {
 		chainId = ROPSTEN_CHAINID;
 	} else {
 		chainId = web3.utils.toHex(GANACHE_DEFAULT_CHAINID);
 	}
 
 
-    const transactionObject = {
-        nonce   : nonce,
-        chainId : chainId,
-        gasPrice: web3.utils.toHex(gasPrice),
-        gasLimit: gasLimit_hex,
-        to		: sellerAddr,
-        value   : value,
-        data    : data,
-        timeout : web3.utils.toHex(TIMEOUT)
-    }
+	const transactionObject = {
+		nonce: nonce,
+		chainId: chainId,
+		gasPrice: web3.utils.toHex(gasPrice),
+		gasLimit: gasLimit_hex,
+		to: sellerAddr,
+		value: value,
+		data: data,
+		timeout: web3.utils.toHex(TIMEOUT)
+	}
 
 	// 6.
 	// privateKeyBUF
 	//
-    const privateKeyBUF = Buffer.from(buyerPrivateKey, 'hex');
+	const privateKeyBUF = Buffer.from(buyerPrivateKey, 'hex');
 
 	// 7.
 	// Tx
 	//
-    var  tx;
-    if( ROPSTEN_SWITCH_FLAG ) {
-		tx = new Tx ( transactionObject , { chain: 'ropsten' });
+	var tx;
+	if (ROPSTEN_SWITCH_FLAG) {
+		tx = new Tx(transactionObject, { chain: 'ropsten' });
 	} else {
-		tx = new Tx ( transactionObject );
+		tx = new Tx(transactionObject);
 	}
 
-    tx.sign(privateKeyBUF);
+	tx.sign(privateKeyBUF);
 
 	// 8.
 	// serializedTx
 	// serializedTx_hex
-    const serializedTx = tx.serialize();
-    const serializedTx_hex = '0x' + serializedTx.toString('hex');
+	const serializedTx = tx.serialize();
+	const serializedTx_hex = '0x' + serializedTx.toString('hex');
 
 	// 9.
 	// sendSignedTransaction
 	//
-	
-    let transaction;
+
+	let transaction;
 	try {
 		transaction = await eth.sendSignedTransaction(serializedTx_hex);
 		console.log(transaction);
 	} catch (err) {
 		console.log(err);
-		return [ null, err];
+		return [null, err];
 	}
 
 	// 10.
 	// getBalance
 	//
-	if(DEBUG) {
+	if (DEBUG) {
 
 		const sellerBalanceEnd = await eth.getBalance(sellerAddr);
 		const buyerBalanceEnd = await eth.getBalance(buyerAddr);
 
 		console.log("After Balance");
-		console.log("seller = "+sellerBalanceEnd);
-		console.log("buyer  = "+buyerBalanceEnd);
+		console.log("seller = " + sellerBalanceEnd);
+		console.log("buyer  = " + buyerBalanceEnd);
 	}
 
-    return [ transaction, null];
+	return [transaction, null];
 }
