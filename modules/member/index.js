@@ -24,6 +24,86 @@
 
 const db = require('../../database.js')
 
+const insertMember = async (
+    organizationUuid, // string
+    memberDid, // string did:key:123
+    memberDetails, // object
+    eth_address, // string
+    privatekey // string
+) => {
+    // First Create Password Hash
+    const password_hash = await db.hash(memberDetails.password)
+
+    // Then insert into members table
+    const sql = `
+		INSERT INTO members (
+			member_did,
+			membername,
+			job_title,
+			work_email,
+			password_hash,
+			organization_did,
+			wallet_address,
+			wallet_private_key
+		) VALUES (
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?
+		)
+	`
+
+    // Construct arguments
+
+    const args = [
+        memberDid,
+        memberDetails.membername,
+        memberDetails.job_title,
+        memberDetails.contact_email,
+        password_hash,
+        organizationUuid,
+        eth_address,
+        privatekey,
+    ]
+
+    try {
+        await db.insert(sql, args)
+    } catch (err) {
+        throw err
+    }
+}
+
+const insertPrivateKeys = async (
+    member_did, // string did:key:123
+    privateKey // object
+) => {
+    const sql = `
+		INSERT INTO privatekeys (
+			member_did,
+			public_key,
+            update_key,
+            recovery_key
+		) VALUES (
+			?,
+			?,
+            'null',
+            'null'
+		)
+	`
+
+    const args = [member_did, JSON.stringify(privateKey)]
+
+    try {
+        await db.insert(sql, args)
+    } catch (err) {
+        throw err
+    }
+}
+
 const updateProfile = async (
     member_did, // string, did:key:123
     memberDetails // object MemberDetails
@@ -51,7 +131,7 @@ const updateProfile = async (
     try {
         await db.update(sql, args)
     } catch (err) {
-        return err
+        throw err
     }
 }
 
@@ -59,4 +139,6 @@ const updateProfile = async (
 
 module.exports = {
     updateProfile,
+    insertMember,
+    insertPrivateKeys,
 }

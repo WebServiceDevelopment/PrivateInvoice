@@ -528,21 +528,21 @@ const FolderWidget = function () {
             return
         }
 
-// 20221031 chnage
-//        const url = `/api/tray/getCount?role=${role}&archive=1&folder=${folder}`
+        // 20221031 chnage
+        //        const url = `/api/tray/getCount?role=${role}&archive=1&folder=${folder}`
         const url = `/api/tray/getCount`
 
         let response
         try {
             response = await fetch(
                 url +
-                    '?' +
-                    new URLSearchParams({
-                        archive: archive,
-                        folder: folder,
-                        role: role,
-                        type: 'invoice',
-                    }).toString()
+                '?' +
+                new URLSearchParams({
+                    archive: archive,
+                    folder: folder,
+                    role: role,
+                    type: 'invoice',
+                }).toString()
             )
         } catch (err) {
             throw err
@@ -560,8 +560,8 @@ const FolderWidget = function () {
         } catch (err) {
             throw err
         }
-		
-		console.log(res);
+
+        console.log(res);
         let max = res[0]
 
         try {
@@ -640,12 +640,12 @@ const FolderWidget = function () {
         try {
             response = await fetch(
                 url +
-                    '?' +
-                    new URLSearchParams({
-                        archive: archive,
-                        folder: folder,
-                        role: role,
-                    }).toString()
+                '?' +
+                new URLSearchParams({
+                    archive: archive,
+                    folder: folder,
+                    role: role,
+                }).toString()
             )
         } catch (err) {
             throw err
@@ -756,11 +756,11 @@ const FolderWidget = function () {
         if (!role || !folder || !type) {
             console.log(
                 '1 handleGroupClick : folder=' +
-                    folder +
-                    ':role=' +
-                    role +
-                    ':type=' +
-                    type
+                folder +
+                ':role=' +
+                role +
+                ':type=' +
+                type
             )
             return
         }
@@ -876,7 +876,7 @@ const FolderWidget = function () {
             body: JSON.stringify(params),
         }
 
-        const url = '/api/invoice/create'
+        const url = '/api/invoice'
 
         let response
         try {

@@ -24,6 +24,147 @@
 
 const db = require('../../database.js')
 
+// Libraries
+
+const uuidv4 = require('uuid').v4
+const { generateMnemonic } = require('bip39')
+const { ethers } = require('ethers')
+
+// Modules
+
+const { insertMember, insertPrivateKeys } = require('../member')
+const { createDidKey, insertFunds } = require('../wallet')
+
+const storePhrase = async (
+    uuid, // string
+    mnemonic // string
+) => {
+    const sql = `
+		INSERT INTO mnemonics (
+			organization_did,
+			recovery_phrase
+		) VALUES (
+			?,
+			?
+		)
+	`
+
+    const args = [uuid, mnemonic]
+
+    try {
+        await db.insert(sql, args)
+    } catch (err) {
+        throw err
+    }
+}
+
+const insertOrganization = async (
+    organization_uuid, // string
+    organizationDetails, // object
+    organizationAddress // object
+) => {
+    const sql = `
+		INSERT INTO organizations (
+			organization_did,
+			organization_name,
+			organization_department,
+			organization_tax_id,
+			addressCountry,
+			addressRegion,
+			organization_postcode,
+			addressCity,
+			organization_address,
+			organization_building
+		) VALUES (
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?,
+			?
+		)
+	`
+
+    const args = [
+        organization_uuid,
+        organizationDetails.name,
+        organizationDetails.department,
+        organizationDetails.tax_id,
+        organizationAddress.country,
+        organizationAddress.region,
+        organizationAddress.postcode,
+        organizationAddress.city,
+        organizationAddress.line1,
+        organizationAddress.line2,
+    ]
+
+    try {
+        await db.insert(sql, args)
+    } catch (err) {
+        throw err
+    }
+}
+
+/*
+ * Create Organization
+ *
+ */
+
+const createOrganization = async (
+    organizationDetails, // object OrganizationDetails
+    organizationAddress, // object OrganizationAddress
+    memberDetails // object MemberDetails
+) => {
+    // Generate Organization GUID and Mnemonic
+    const organizationUuid = `uri:uuid:${uuidv4()}`
+    const organizationMnemonic = generateMnemonic()
+
+    // Store organization uuid and phrase
+    await storePhrase(
+        organizationUuid, // string
+        organizationMnemonic // string
+    )
+
+    // Store organization uuid and details
+    await insertOrganization(
+        organizationUuid, //string
+        organizationDetails, // object OrganizationDetails
+        organizationAddress // object OrganizationAddress
+    )
+
+    // Generate Member Did
+    const jsonWebKey = await createDidKey(organizationMnemonic, 0)
+    const wallet = ethers.Wallet.fromMnemonic(organizationMnemonic)
+    const { address, privateKey } = wallet
+    const memberDid = jsonWebKey.controller
+
+    // Debug with ganache
+    await insertFunds(
+        address // string
+    )
+
+    // Insert Member information into database
+    await insertMember(
+        organizationUuid, // string uuid
+        memberDid, // string did:key:123
+        memberDetails, // object MemberDetails
+        address, // string
+        privateKey // string
+    )
+
+    // Insert Member private keys
+    await insertPrivateKeys(
+        memberDid, // string did:key:123
+        jsonWebKey // did:key object
+    )
+
+    return memberDid
+}
+
 /*
  * UpdateOrganization
  *
@@ -75,5 +216,6 @@ const updateOrganization = async (
 // Exports
 
 module.exports = {
+    createOrganization,
     updateOrganization,
 }

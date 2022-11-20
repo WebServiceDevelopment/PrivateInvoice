@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "ecc2cfd4-004f-4182-b135-439b06d532e1",
+		"_postman_id": "4048cb61-064c-423e-848b-aa34fc7035d4",
 		"name": "Private Invoice Test",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "20243281"
@@ -79,7 +79,7 @@
 					"raw": "{\r\n   \"member\":{\r\n      \"membername\":\"{{alice_membername}}\",\r\n      \"job_title\":\"Head of Alice Corp.\",\r\n      \"contact_email\":\"alice@example.com\",\r\n      \"password\":\"{{alice_password}}\"\r\n   },\r\n   \"company\":{\r\n      \"name\":\"Alice Corp. International\",\r\n      \"department\":\"Executive\",\r\n      \"tax_id\":\"35-2337563\"\r\n   },\r\n   \"address\":{\r\n      \"country\":\"USA\",\r\n      \"region\":\"Oregon\",\r\n      \"postcode\":\"420-7156\",\r\n      \"city\":\"Oregon\",\r\n      \"line1\":\"15525 Nolan Run\",\r\n      \"line2\":\"Suite 302\"\r\n   }\r\n}"
 				},
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/session/signup",
+					"raw": "http://127.0.0.1:3000/api/organization",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -90,8 +90,7 @@
 					"port": "3000",
 					"path": [
 						"api",
-						"session",
-						"signup"
+						"organization"
 					]
 				}
 			},
@@ -331,7 +330,7 @@
 					"raw": "{\r\n   \"member\":{\r\n      \"membername\":\"{{bob_membername}}\",\r\n      \"job_title\":\"Head of Bob Co.\",\r\n      \"contact_email\":\"bob@example.com\",\r\n      \"password\":\"{{bob_password}}\"\r\n   },\r\n   \"company\":{\r\n      \"name\":\"Bob Co.\",\r\n      \"department\":\"Procurement\",\r\n      \"tax_id\":\"75-8772541\"\r\n   },\r\n   \"address\":{\r\n      \"country\":\"USA\",\r\n      \"region\":\"New York\",\r\n      \"postcode\":\"120-7612\",\r\n      \"city\":\"West Octavia\",\r\n      \"line1\":\"34095 Savannah Garden\",\r\n      \"line2\":\"\"\r\n   }\r\n}"
 				},
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/session/signup",
+					"raw": "http://127.0.0.1:3000/api/organization",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -342,8 +341,7 @@
 					"port": "3000",
 					"path": [
 						"api",
-						"session",
-						"signup"
+						"organization"
 					]
 				}
 			},
@@ -808,7 +806,7 @@
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [
 					{
 						"key": "Authorization",
@@ -826,7 +824,7 @@
 					"raw": "{\r\n    \"document_uuid\" : \"{{invoice_uuid}}\"\r\n}"
 				},
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/invoice/sendInvoice",
+					"raw": "http://127.0.0.1:3000/api/invoice/status?action=send",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -838,7 +836,13 @@
 					"path": [
 						"api",
 						"invoice",
-						"sendInvoice"
+						"status"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "send"
+						}
 					]
 				}
 			},
@@ -970,7 +974,6 @@
 							"pm.test(\"The response has all properties\", () => {\r",
 							"  const responseJson = pm.response.json();\r",
 							"  pm.expect(responseJson.err).to.eql(0);\r",
-							"  pm.expect(responseJson.msg).to.eql('okay');\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
@@ -983,7 +986,7 @@
 				}
 			],
 			"request": {
-				"method": "POST",
+				"method": "PUT",
 				"header": [
 					{
 						"key": "Authorization",
@@ -1001,7 +1004,7 @@
 					"raw": "{\r\n    \"document_uuid\": \"{{invoice_uuid}}\"\r\n}"
 				},
 				"url": {
-					"raw": "http://127.0.0.1:3000/api/invoice/confirm",
+					"raw": "http://127.0.0.1:3000/api/invoice/status?action=confirm",
 					"protocol": "http",
 					"host": [
 						"127",
@@ -1013,7 +1016,13 @@
 					"path": [
 						"api",
 						"invoice",
-						"confirm"
+						"status"
+					],
+					"query": [
+						{
+							"key": "action",
+							"value": "confirm"
+						}
 					]
 				}
 			},
@@ -1149,8 +1158,6 @@
 							"  const { msg } = responseJson\r",
 							"  pm.expect(msg).to.have.property('consumed');\r",
 							"  pm.expect(msg).to.have.property('transaction_result');\r",
-							"  pm.expect(msg).to.have.property('ipfs_cid');\r",
-							"  pm.expect(msg).to.have.property('ipfs_address');\r",
 							"});\r",
 							"\r",
 							"const cookieJar = pm.cookies.jar();\r",
