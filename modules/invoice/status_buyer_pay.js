@@ -25,9 +25,7 @@ const to_seller = require('../buyer_to_seller.js')
 const eth = require('../web3_eth.js')
 const util = require('../util.js')
 
-const {
-    createPaymentMessage,
-} = require('../update_status.js')
+const { createPaymentMessage } = require('../update_status.js')
 
 const { getPrivateKeys } = require('../verify_utils.js')
 
@@ -42,7 +40,6 @@ const {
 const web3 = eth.getWeb3()
 web3.eth.transactionConfirmationBlocks = 2
 
-
 // Database
 
 const BUYER_STATUS = 'buyer_status'
@@ -51,12 +48,13 @@ const CONTACTS = 'contacts'
 
 const payInvoice = async (
     member_did, // string did:key:123
-    document_uuid // string
+    document_uuid, // string
+    wallet_address, // string
+    gasLimit // number
 ) => {
     const METHOD = '/makePayment'
 
     let start = Date.now()
-
 
     console.log('Make payment 1')
 
@@ -205,7 +203,6 @@ const payInvoice = async (
     //
 
     console.log('Make payment 8')
-    const { wallet_address } = req.session.data
     const contract_address = wallet_address
 
     //console.log("contract_address ="+contract_address)
@@ -288,7 +285,7 @@ const payInvoice = async (
         PrivateKey,
         to_address,
         gasLimit,
-        makePaymantTo,
+        makePaymantTo
         // ipfs_cid_hex
     )
 
@@ -487,9 +484,8 @@ const payInvoice = async (
         consumed: balanceETH_3 + ' ETH',
         transaction_result: transaction_result,
     }
-
 }
 
 module.exports = {
-    payInvoice
+    payInvoice,
 }

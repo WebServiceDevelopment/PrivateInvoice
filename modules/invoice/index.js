@@ -35,8 +35,9 @@ const updateStatus = async (
     action, // enum send, confirm, unconfirm
     member_did, // string did:key:123
     document_uuid, // string uuid
+    wallet_address, // string | null (used for pay)
+    gasLimit // number | null (userd for pay)
 ) => {
-
     switch (action) {
         case 'send':
             // seller
@@ -58,15 +59,19 @@ const updateStatus = async (
             return await unconfirmInvoice(member_did, document_uuid)
         case 'pay':
             // buyer
-            return await payInvoice(member_did, document_uuid)
+            return await payInvoice(
+                member_did,
+                document_uuid,
+                wallet_address,
+                gasLimit
+            )
         default:
-            throw new Error('invalid status provided');
+            throw new Error('invalid status provided')
     }
-
 }
 
 module.exports = {
     createDraft,
     updateDraft,
-    updateStatus
+    updateStatus,
 }

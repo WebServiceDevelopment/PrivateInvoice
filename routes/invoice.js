@@ -26,11 +26,7 @@ const express = require('express')
 const router = express.Router()
 module.exports = router
 
-const {
-    createDraft,
-    updateDraft,
-    updateStatus
-} = require('../modules/invoice')
+const { createDraft, updateDraft, updateStatus } = require('../modules/invoice')
 
 router.post('/', async (req, res) => {
     const { member_did } = req.session.data
@@ -51,32 +47,33 @@ router.post('/', async (req, res) => {
         err: 0,
         msg: document_uuid,
     })
-});
+})
 
 router.put('/', async (req, res) => {
     const { member_did } = req.session.data
-    const updatedDoc = req.body;
+    const updatedDoc = req.body
     await updateDraft(member_did, updatedDoc)
     res.json({
         err: 0,
         msg: updatedDoc.document_uuid,
     })
-});
+})
 
 router.patch('/', async (req, res) => {
-
     const { action } = req.query
-    const { document_uuid } = req.body
-    const { member_did } = req.session.data
+    const { document_uuid, gasLimit } = req.body
+    const { member_did, wallet_address } = req.session.data
 
     await updateStatus(
         action, // enum send, confirm, unconfirm
         member_did, // string did:key:123
         document_uuid, // string uuid
+        wallet_address, // string
+        gasLimit // number | null
     )
 
     res.json({
         err: 0,
         msg: document_uuid,
     })
-});
+})
