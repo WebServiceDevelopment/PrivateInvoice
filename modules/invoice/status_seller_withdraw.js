@@ -32,9 +32,6 @@ const { makePresentation } = require('../presentations_out.js')
 // delete createTrashMessage
 const { createWithdrawMessage } = require('../update_status.js')
 
-// Database
-const config = require('../../config.json')
-
 // Table Name
 
 const SELLER_DOCUMENT = 'seller_document'
@@ -42,9 +39,6 @@ const SELLER_STATUS = 'seller_status'
 
 const CONTACTS = 'contacts'
 const { getPrivateKeys } = require('../verify_utils.js')
-
-// CURRENCY
-const CURRENCY = config.CURRENCY
 
 const withdrawInvoice = async (
     member_did, // string did:key:123
@@ -224,7 +218,6 @@ const withdrawInvoice = async (
     // 12
     // commit
     //
-    console.log('--- withdraw 12 ---')
     const [_12, err12] = await tran.commit(conn)
 
     if (err12) {

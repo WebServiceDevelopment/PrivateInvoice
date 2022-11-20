@@ -25,6 +25,7 @@ const { sendInvoice } = require('./status_seller_send')
 const { recreateInvoice } = require('./status_seller_recreate')
 const { withdrawInvoice } = require('./status_seller_withdraw')
 const { completeInvoice } = require('./status_seller_complete')
+const { trashInvoice } = require('./status_seller_trash')
 
 // Buyer Status
 const { confirmInvoice } = require('./status_buyer_confirm')
@@ -49,6 +50,9 @@ const updateStatus = async (
         case 'withdraw':
             // seller
             return await withdrawInvoice(member_did, document_uuid)
+        case 'trash':
+            // seller
+            return await trashInvoice(member_did, document_uuid)
         case 'return':
             // buyer
             return await returnInvoice(member_did, document_uuid)

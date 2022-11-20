@@ -1741,10 +1741,10 @@ const ActionWidget = function () {
             document_uuid: doc.document_uuid,
         }
 
-        const url = '/api/invoice/trash'
+        const url = '/api/invoice/?action=trash'
 
         const opts = {
-            method: 'POST',
+            method: 'PATCH',
             cache: 'no-cache',
             credentials: 'same-origin',
             headers: {
