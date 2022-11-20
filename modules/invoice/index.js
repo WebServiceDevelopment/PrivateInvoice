@@ -24,6 +24,7 @@ const { updateDraft } = require('./draft_seller_update')
 const { sendInvoice } = require('./status_seller_send')
 const { recreateInvoice } = require('./status_seller_recreate')
 const { withdrawInvoice } = require('./status_seller_withdraw')
+const { completeInvoice } = require('./status_seller_complete')
 
 // Buyer Status
 const { confirmInvoice } = require('./status_buyer_confirm')
@@ -65,8 +66,11 @@ const updateStatus = async (
                 wallet_address,
                 gasLimit
             )
+        case 'complete':
+            // buyer
+            return await completeInvoice(member_did, document_uuid)
         default:
-            throw new Error('invalid status provided')
+            throw new Error(`invalid status provided: ${action}`)
     }
 }
 

@@ -1489,10 +1489,10 @@ const ActionWidget = function () {
             document_uuid: doc.document_uuid,
         }
 
-        const url = '/api/invoice/sellerArchive'
+        const url = '/api/invoice/?action=complete'
 
         const opts = {
-            method: 'POST',
+            method: 'PATCH',
             cache: 'no-cache',
             credentials: 'same-origin',
             headers: {

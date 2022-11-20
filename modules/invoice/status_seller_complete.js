@@ -20,23 +20,18 @@
 
 'use strict'
 
-// Import Router
-const express = require('express')
-const router = express.Router()
-module.exports = router
-
-const { getPrivateKeys } = require('../../modules/verify_utils.js')
+const { getPrivateKeys } = require('../verify_utils.js')
 
 // Libraries
 
 // Import Modules
-const sub = require('../../modules/invoice_sub.js')
-const tran = require('../../modules/invoice_sub_transaction.js')
-const to_buyer = require('../../modules/seller_to_buyer.js')
+const sub = require('../invoice_sub.js')
+const tran = require('../invoice_sub_transaction.js')
+const to_buyer = require('../seller_to_buyer.js')
 
-//const sign_your_credentials = require('../../modules/sign_your_credentials.js')
-const { makePresentation } = require('../../modules/presentations_out.js')
-const { createArchiveMessage } = require('../../modules/update_status.js')
+//const sign_your_credentials = require('../sign_your_credentials.js')
+const { makePresentation } = require('../presentations_out.js')
+const { createArchiveMessage } = require('../update_status.js')
 
 // Database
 
@@ -49,25 +44,14 @@ const SELLER_ARCHIVE_STATUS = 'seller_status_archive'
 
 const CONTACTS = 'contacts'
 
-// ------------------------------- End Points -------------------------------
-
-/*
- * 1.
- * [ Move to Archive ]
- */
-router.post('/sellerArchive', async function (req, res) {
-
-    //console.log("/sellerArchive ---" )
-
+const completeInvoice = async (
+    member_did, // string did:key:123
+    document_uuid // string
+) => {
     const METHOD = '/sellerArchive'
 
     let start = Date.now()
-
     const FOLDER = 'paid'
-
-    const { document_uuid } = req.body
-    const { member_did } = req.session.data
-
     let err, errno, code
 
     // 1.
@@ -81,11 +65,10 @@ router.post('/sellerArchive', async function (req, res) {
     if (err1) {
         let msg = `ERROR:${METHOD}: buyer_did is not found`
 
-        res.status(400).json({
+        return {
             err: 1,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 2.
@@ -99,40 +82,41 @@ router.post('/sellerArchive', async function (req, res) {
     if (err2) {
         let msg = `ERROR:${METHOD}: buyer_did is not found`
 
-        res.status(400).json({
+        return {
             err: 2,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 3.
     // buyer connect check
     // 20221102 undo
 
-    const [ code3, err3 ] = await to_buyer.connect(buyer_host, member_did, buyer_did);
+    const [code3, err3] = await to_buyer.connect(
+        buyer_host,
+        member_did,
+        buyer_did
+    )
 
-    if(code3 !== 200) {
-        let msg;
-        if(code == 500) {
-            msg = `ERROR:${METHOD}:buyer connect check:ECONNRESET`;
+    if (code3 !== 200) {
+        let msg
+        if (code == 500) {
+            msg = `ERROR:${METHOD}:buyer connect check:ECONNRESET`
         } else {
-            switch(err3) {
-            case "Not found.":
-                msg = `ERROR:${METHOD}:The destination node cannot be found`;
-            break;
-            default:
-                msg = `ERROR:${METHOD}: Invalid request`;
-            break;
+            switch (err3) {
+                case 'Not found.':
+                    msg = `ERROR:${METHOD}:The destination node cannot be found`
+                    break
+                default:
+                    msg = `ERROR:${METHOD}: Invalid request`
+                    break
             }
         }
 
-        res.status(400)
-                .json({
+        return {
             err: 3,
-                msg: msg
-            });
-        return;
+            msg: msg,
+        }
     }
 
     // 4.
@@ -144,11 +128,10 @@ router.post('/sellerArchive', async function (req, res) {
     if (old_status == undefined) {
         let msg = `ERROR:${METHOD}:Record is not exist`
 
-        res.status(400).json({
+        return {
             err: 4,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 5. Second we go ahead and get the document
@@ -161,11 +144,10 @@ router.post('/sellerArchive', async function (req, res) {
     if (old_document == undefined) {
         let msg = `ERROR:${METHOD}:Record is not exist`
 
-        res.status(400).json({
+        return {
             err: 4,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 6.
@@ -179,11 +161,10 @@ router.post('/sellerArchive', async function (req, res) {
     if (err6) {
         let msg = `ERROR:${METHOD}:document_uuid is not exist`
 
-        res.status(400).json({
+        return {
             err: 6,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 7.
@@ -197,11 +178,10 @@ router.post('/sellerArchive', async function (req, res) {
     if (err7) {
         let msg = `ERROR:${METHOD}:document_uuid is not exist`
 
-        res.status(400).json({
+        return {
             err: 6,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 8.
@@ -227,10 +207,7 @@ router.post('/sellerArchive', async function (req, res) {
     if (err) {
         errno = 9
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err9, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err9, errno, METHOD)
     }
 
     // 10.
@@ -246,10 +223,7 @@ router.post('/sellerArchive', async function (req, res) {
         //console.log(old_document)
         errno = 10
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err10, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err10, errno, METHOD)
     }
 
     // 11.
@@ -263,10 +237,7 @@ router.post('/sellerArchive', async function (req, res) {
     if (err11) {
         errno = 11
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err11, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err11, errno, METHOD)
     }
 
     // 12.
@@ -280,10 +251,7 @@ router.post('/sellerArchive', async function (req, res) {
     if (err12) {
         errno = 12
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err12, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err12, errno, METHOD)
     }
 
     // 13.
@@ -293,17 +261,14 @@ router.post('/sellerArchive', async function (req, res) {
     if (err13) {
         errno = 13
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err13, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err13, errno, METHOD)
     }
 
     // 14.
     // createArchiveMessage
     //
     const url = `${buyer_host}/api/presentations/available`
-    const [ credential , err14 ] = await createArchiveMessage(
+    const [credential, err14] = await createArchiveMessage(
         document_uuid,
         member_did,
         keyPair
@@ -311,10 +276,7 @@ router.post('/sellerArchive', async function (req, res) {
     if (err14) {
         errno = 14
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err14, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err14, errno, METHOD)
     }
 
     // 15.
@@ -324,10 +286,7 @@ router.post('/sellerArchive', async function (req, res) {
     if (err15) {
         errno = 15
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err15, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err15, errno, METHOD)
     }
 
     // 16.
@@ -338,25 +297,22 @@ router.post('/sellerArchive', async function (req, res) {
     if (err16) {
         errno = 16
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err16, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err16, errno, METHOD)
     }
 
     // 17.
     //
     conn.end()
-
+    const end = Date.now()
+    console.log('/sellerArchive Time: %d ms', end - start)
     // 18.
     //
-    res.json({
+    return {
         err: 0,
         msg: old_status.document_uuid,
-    })
+    }
+}
 
-    //console.log("/sellerArchive accepted");
-
-    let end = Date.now()
-    console.log('/sellerArchive Time: %d ms', end - start)
-})
+module.exports = {
+    completeInvoice,
+}

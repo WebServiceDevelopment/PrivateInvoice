@@ -174,7 +174,6 @@ app.all('*', function (req, res, next) {
 
 // Routes
 
-app.use('/api/invoice', require('./routes/invoice/seller_invoice_archive.js'))
 app.use('/api/invoice', require('./routes/invoice/seller_invoice_trash.js'))
 app.use('/api/invoice', require('./routes/invoice/invoice_document.js'))
 app.use('/api/invoice', require('./routes/invoice/softDelete.js'))
@@ -193,7 +192,6 @@ app.use('/api/member', require('./routes/member.js'))
 app.use('/api/organization', require('./routes/organization.js'))
 app.use('/api/session', require('./routes/session.js'))
 app.use('/api/tray', require('./routes/tray.js'))
-
 
 // Public Directory and listen
 
