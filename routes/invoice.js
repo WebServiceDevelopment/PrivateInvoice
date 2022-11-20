@@ -60,9 +60,12 @@ router.put('/', async (req, res) => {
 })
 
 router.patch('/', async (req, res) => {
+    console.log('aaa')
     const { action } = req.query
     const { document_uuid, gasLimit } = req.body
     const { member_did, wallet_address } = req.session.data
+
+    console.log(action)
 
     await updateStatus(
         action, // enum send, confirm, unconfirm

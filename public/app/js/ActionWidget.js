@@ -1678,10 +1678,10 @@ const ActionWidget = function () {
             document_folder: 'sent',
         }
 
-        const url = '/api/invoice/withdraw'
+        const url = '/api/invoice/?action=withdraw'
 
         const opts = {
-            method: 'POST',
+            method: 'PATCH',
             cache: 'no-cache',
             credentials: 'same-origin',
             headers: {

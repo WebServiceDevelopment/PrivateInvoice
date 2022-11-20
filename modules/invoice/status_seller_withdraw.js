@@ -22,7 +22,6 @@
 
 // Libraries
 
-
 // Import Modules
 const sub = require('../invoice_sub.js')
 const tran = require('../invoice_sub_transaction.js')
@@ -31,9 +30,7 @@ const to_buyer = require('../seller_to_buyer.js')
 const { makePresentation } = require('../presentations_out.js')
 
 // delete createTrashMessage
-const {
-    createWithdrawMessage,
-} = require('../update_status.js')
+const { createWithdrawMessage } = require('../update_status.js')
 
 // Database
 const config = require('../../config.json')
@@ -54,11 +51,11 @@ const withdrawInvoice = async (
     document_uuid // string
 ) => {
     const METHOD = '/withdraw'
-
     let start = Date.now()
+    const document_folder = 'sent'
 
     // 1.
-    //
+
     const [buyer_did, err1] = await sub.getBuyerDid(
         SELLER_STATUS,
         document_uuid,
@@ -76,6 +73,7 @@ const withdrawInvoice = async (
     }
 
     // 2.
+
     const [buyer_host, err2] = await sub.getBuyerHost(
         CONTACTS,
         member_did,
@@ -191,10 +189,7 @@ const withdrawInvoice = async (
         console.log('Error 8 status = 400 code=' + err8.msg)
         errno = 8
         code = 400
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, code, err8, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, code, err8, errno, METHOD)
     }
 
     // 9.
@@ -204,10 +199,7 @@ const withdrawInvoice = async (
 
     const [keyPair, err9] = await getPrivateKeys(member_did)
     if (err9) {
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, 'code9', err9, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, 'code9', err9, errno, METHOD)
     }
 
     // 10. createWithdrawMessage
@@ -219,24 +211,20 @@ const withdrawInvoice = async (
         keyPair
     )
     if (err10) {
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, 'code10', err10, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, 'code10', err10, errno, METHOD)
     }
 
     // 11.
+    console.log('--- withdraw 11 ---')
     const [_11, err11] = await makePresentation(url, keyPair, credential)
     if (err11) {
-        res.status(400).json(
-            tran.rollbackAndReturn(conn, 'code11', err11, errno, METHOD)
-        )
-        return
+        return tran.rollbackAndReturn(conn, 'code11', err11, errno, METHOD)
     }
 
     // 12
     // commit
     //
+    console.log('--- withdraw 12 ---')
     const [_12, err12] = await tran.commit(conn)
 
     if (err12) {
@@ -247,6 +235,7 @@ const withdrawInvoice = async (
 
         // 13.
         //
+        console.log('--- err: withdraw 13 ---')
         const [seller_host, err13] = await sub.getSellerHost(
             CONTACTS,
             member_did,
@@ -256,15 +245,15 @@ const withdrawInvoice = async (
         if (err13) {
             msg = `Error:${METHOD}: Could not get host`
 
-            res.status(400).json({
+            return {
                 err: 13,
                 msg: msg,
-            })
-            return
+            }
         }
 
         // 14.
         //
+        console.log('--- err: withdraw 14 ---')
         const [code14, err14] = await to_buyer.rollbackReturnToSent(
             seller_host,
             buyer_did,
@@ -278,37 +267,33 @@ const withdrawInvoice = async (
                 msg = `Error:${METHOD}: Invalid request`
             }
 
-            res.status(400).json({
+            return {
                 err: 14,
                 msg: msg,
-            })
-            return
+            }
         }
 
-        res.status(400).json({
+        return {
             err: 12,
             msg: msg,
-        })
-        return
+        }
     }
 
     // 15.
     //
     conn.end()
 
-    res.json({
+    const end = Date.now()
+    console.log('/withdraw Time: %d ms', end - start)
+
+    return {
         err: 0,
         msg: document_uuid,
-    })
+    }
 
     //console.log("/withdraw accepted");
-
-    let end = Date.now()
-
-    console.log('/withdraw Time: %d ms', end - start)
 }
 
 module.exports = {
-    withdrawInvoice
+    withdrawInvoice,
 }
-
