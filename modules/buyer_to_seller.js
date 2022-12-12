@@ -70,8 +70,6 @@ async function _getAccountOfSellerWallet(seller_host, seller_did, buyer_did) {
     try {
         result = await db.selectOne(sql, args)
     } catch (err) {
-        console.log(err)
-
         msg = 'Select error'
         return [false, msg]
     }
@@ -112,7 +110,6 @@ async function _seller_connect(seller_host, seller_uuid, buyer_did) {
                 data: err.message,
             }
         } else {
-            //console.log(err)
             console.log("seller_connect err ---")
             response = {
                 status: 500,

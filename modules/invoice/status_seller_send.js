@@ -73,6 +73,8 @@ const sendInvoice = async (
     //
     // 20221102 undo
 
+console.log('Buyer host: ', buyer_host);
+
     const [code3, err3] = await to_buyer.connect(
         buyer_host,
         member_did,
@@ -81,7 +83,7 @@ const sendInvoice = async (
 
     if (code3 !== 200) {
 
-        if (code == 500) {
+        if (code3 === 500) {
             throw new Error('Error (send invoice): buyer connect check:ECONNRESET')
         } else {
             switch (err3) {

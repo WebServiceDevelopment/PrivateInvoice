@@ -71,7 +71,7 @@ router.post('/tellMeYourWalletAccount', async function (req, res) {
 	}
 
 	// 2.
-	//
+	/*
 	if (!sub.check_ipadder(req.ip, seller_host)) {
 
 		let msg = `Error:${METHOD}: Invalid request.`;
@@ -82,6 +82,7 @@ router.post('/tellMeYourWalletAccount', async function (req, res) {
 				msg: msg
 			});
 	}
+	*/
 
 	res.json({
 		err: 0,
@@ -116,7 +117,7 @@ router.post('/sellerToConnect', async (req, res) => {
 	const [seller_host, err1] = await sub.getSellerHost(CONTACTS, seller_uuid, buyer_did);
 
 	if (err1) {
-
+		console.log('seller connect err 1');
 		let msg = `Error:${METHOD}: Invalid request.`;
 
 		res.status(400)
@@ -128,7 +129,7 @@ router.post('/sellerToConnect', async (req, res) => {
 	}
 
 	// 2.
-	//
+	/*
 	if (!sub.check_ipadder(req.ip, seller_host)) {
 
 		let msg = `Error:${METHOD}: Invalid request.`;
@@ -139,6 +140,7 @@ router.post('/sellerToConnect', async (req, res) => {
 				msg: msg
 			});
 	}
+	*/
 
 	console.log("/sellerToConnect accepted");
 
