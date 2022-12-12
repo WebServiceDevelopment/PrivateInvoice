@@ -73,6 +73,7 @@ router.post('/buyerToConnect', async (req, res) => {
 
     // 2.
     //
+/*
     if (!sub.check_ipadder(req.ip, seller_host)) {
         console.log('buyer err 2')
         let msg = `ERROR:${METHOD}: Could not find host`
@@ -83,6 +84,7 @@ router.post('/buyerToConnect', async (req, res) => {
         })
         return
     }
+*/
 
     res.status(200).json({
         err: 0,

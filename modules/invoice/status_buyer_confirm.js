@@ -87,7 +87,7 @@ const confirmInvoice = async (
     )
 
     if (code3 !== 200) {
-        throw new Error('Error (confirm):The destination node cannot be found')
+        throw new Error('Error (confirm):The destination node cannot be found ' + code3)
     } else if (code3 !== 200) {
         throw new Error(`Error (confirm): ${err3}`)
     }
